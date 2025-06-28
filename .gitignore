@@ -33,3 +33,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Application data
+logs/
+/src/main/resources/${assetsDir}/
