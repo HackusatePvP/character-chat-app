@@ -2,6 +2,10 @@ package me.piitex.app.views.characters;
 
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
@@ -82,11 +86,38 @@ public class CharactersView {
             displayBox.addElement(helper);
             displayBox.setAlignment(Pos.BASELINE_CENTER);
 
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem edit = new MenuItem("Edit");
+            edit.setOnAction(event -> {
+                editCharacter(character);
+            });
+            MenuItem copy = new MenuItem("Copy");
+            copy.setOnAction(event -> {
+                duplicateCharacter(character);
+            });
+            MenuItem delete = new MenuItem("Delete");
+            delete.setOnAction(event -> {
+                deleteCharacter(character);
+            });
+
+            contextMenu.getItems().add(edit);
+            contextMenu.getItems().add(copy);
+            contextMenu.getItems().add(delete);
+
             displayBox.setClickEvent(event -> {
-                // Load chat window...
-                App.window.clearContainers();
-                App.window.addContainer(new ChatView(character, character.getLastChat()).getContainer());
-                App.window.render();
+                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
+                    // Load chat window...
+                    App.window.clearContainers();
+                    App.window.addContainer(new ChatView(character, character.getLastChat()).getContainer());
+                    App.window.render();
+                }
+
+                if (event.getFxClick().getButton() == MouseButton.SECONDARY) {
+                    if (contextMenu.isShowing()) return;
+                    contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
+                }
+
             });
 
             ImageOverlay icon = User.getUserAvatar(character.getIconPath(), imageWidth, imageHeight);
@@ -119,15 +150,7 @@ public class CharactersView {
         TextOverlay edit = new TextOverlay(editIcon);
         edit.setTooltip("Edit the character");
         edit.onClick(event -> {
-            Container container;
-            if (App.mobile) {
-                container = new CharacterEditMobileView(character, false).getRoot();
-            } else {
-                container = new CharacterEditView(character, false).getRoot();
-            }
-            App.window.clearContainers();
-            App.window.addContainer(container);
-            App.window.render();
+            editCharacter(character);
         });
         root.addElement(edit);
 
@@ -136,24 +159,7 @@ public class CharactersView {
         TextOverlay duplicate = new TextOverlay(duplicateIcon);
         duplicate.setTooltip("Duplicate the character.");
         duplicate.onClick(event -> {
-            // Duplicate the character.
-            String newId = character.getId() + " (copy)";
-            while (App.getInstance().getCharacter(newId) != null) {
-                newId += " (copy)";
-            }
-
-            // Edit the character in the edit view rather than duplicating the files
-            // Allow the id to be edited and changed.
-
-            // Create a copy of the character.
-            Character duplicated = new Character(newId, null);
-            duplicated.copy(character);
-
-
-            CharacterEditView editView = new CharacterEditView(duplicated, true);
-            App.window.clearContainers();
-            App.window.addContainer(editView.getRoot());
-            App.window.render();
+            duplicateCharacter(character);
         });
         root.addElement(duplicate);
 
@@ -163,40 +169,77 @@ public class CharactersView {
         delete.addStyle(Styles.DANGER);
         delete.setTooltip("Delete the character.");
         delete.onClick(event -> {
-            DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + character.getId() + "'?", 500, 500);
-
-            ButtonOverlay cancel = new ButtonOverlay("cancel", "Keep");
-            cancel.setWidth(150);
-            cancel.addStyle(Styles.SUCCESS);
-            cancel.onClick(event1 -> {
-                App.window.removeContainer(dialogueContainer);
-            });
-
-            ButtonOverlay confirm = new ButtonOverlay("confirm", "Delete");
-            confirm.setWidth(150);
-            confirm.addStyle(Styles.DANGER);
-            confirm.onClick(event1 -> {
-                App.getInstance().getCharacters().remove(character.getId());
-                try {
-                    FileUtils.deleteDirectory(character.getCharacterDirectory());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
-            });
-
-            dialogueContainer.setCancelButton(cancel);
-            dialogueContainer.setConfirmButton(confirm);
-
-            // Render this on top
-            App.window.renderPopup(dialogueContainer, PopupPosition.CENTER, 500, 500);
-
+            deleteCharacter(character);
         });
         root.addElement(delete);
         return root;
+    }
+
+    private void editCharacter(Character character) {
+        Container container;
+        if (App.mobile) {
+            container = new CharacterEditMobileView(character, false).getRoot();
+        } else {
+            container = new CharacterEditView(character, false).getRoot();
+        }
+        App.window.clearContainers();
+        App.window.addContainer(container);
+        App.window.render();
+
+    }
+
+    private void duplicateCharacter(Character character) {
+        // Duplicate the character.
+        String newId = character.getId() + " (copy)";
+        while (App.getInstance().getCharacter(newId) != null) {
+            newId += " (copy)";
+        }
+
+        // Edit the character in the edit view rather than duplicating the files
+        // Allow the id to be edited and changed.
+
+        // Create a copy of the character.
+        Character duplicated = new Character(newId, null);
+        duplicated.copy(character);
+
+
+        CharacterEditView editView = new CharacterEditView(duplicated, true);
+        App.window.clearContainers();
+        App.window.addContainer(editView.getRoot());
+        App.window.render();
+    }
+
+    private void deleteCharacter(Character character) {
+        DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + character.getId() + "'?", 500, 500);
+
+        ButtonOverlay cancel = new ButtonOverlay("cancel", "Keep");
+        cancel.setWidth(150);
+        cancel.addStyle(Styles.SUCCESS);
+        cancel.onClick(event1 -> {
+            App.window.removeContainer(dialogueContainer);
+        });
+
+        ButtonOverlay confirm = new ButtonOverlay("confirm", "Delete");
+        confirm.setWidth(150);
+        confirm.addStyle(Styles.DANGER);
+        confirm.onClick(event1 -> {
+            App.getInstance().getCharacters().remove(character.getId());
+            try {
+                FileUtils.deleteDirectory(character.getCharacterDirectory());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            App.window.clearContainers();
+            App.window.addContainer(new HomeView().getContainer());
+            App.window.render();
+        });
+
+        dialogueContainer.setCancelButton(cancel);
+        dialogueContainer.setConfirmButton(confirm);
+
+        // Render this on top
+        App.window.renderPopup(dialogueContainer, PopupPosition.CENTER, 500, 500);
     }
 
     public ScrollContainer getRoot() {
