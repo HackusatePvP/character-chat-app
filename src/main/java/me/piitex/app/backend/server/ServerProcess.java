@@ -42,26 +42,33 @@ public class ServerProcess {
         // See if the server didn't properly shutdown
         if (App.getInstance().getSettings().getInfoFile().hasKey("pid")) {
             long pid = App.getInstance().getSettings().getInfoFile().getLong("pid");
+            App.logger.info("Previous PID: {}", pid);
             // Destroy old process...
             Optional<ProcessHandle> processHandleOptional = ProcessHandle.of(pid);
             if (processHandleOptional.isPresent()) {
                 ProcessHandle processHandle = processHandleOptional.get();
                 if (processHandle.isAlive()) {
+                    App.logger.info("Destroying PID: {}...", pid);
                     boolean destroy = processHandle.destroy();
                     if (destroy) {
                         try {
                             processHandle.onExit().get();
+                            App.logger.info("Destroying {} gracefully...", pid);
                         } catch (Exception e) {
                             if (processHandle.isAlive()) {
+                                App.logger.info("Destroying {} forcefully.", pid);
                                 processHandle.destroyForcibly();
                             }
                         }
                     } else {
                         if (processHandle.isAlive()) {
+                            App.logger.info("Destroying {} forcefully.", pid);
                             processHandle.destroyForcibly();
                         }
                     }
                 }
+            } else {
+                App.logger.info("{} is already destroyed.", pid);
             }
         }
 
