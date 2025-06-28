@@ -308,7 +308,7 @@ public class ChatView {
             chat.update();
         });
 
-        if (role == Role.ASSISTANT) {
+        if (role == Role.ASSISTANT && !Placeholder.retrieveOriginalText(message).equalsIgnoreCase(character.getFirstMessage())) {
             TextOverlay regenerate = new TextOverlay(new FontIcon(Material2MZ.REFRESH));
             regenerate.setTooltip("Regenerate the response.");
             root.addElement(regenerate);
