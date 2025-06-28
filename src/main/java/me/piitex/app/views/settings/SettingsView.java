@@ -6,13 +6,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
+import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.SidebarView;
-import me.piitex.app.views.characters.CharactersView;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -24,6 +22,7 @@ import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +58,7 @@ public class SettingsView {
         root.addElement(scrollContainer);
 
         layout.addElement(buildDangerZone());
+        layout.addElement(buildResolution());
         layout.addElement(buildModelSelection());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
@@ -68,6 +68,50 @@ public class SettingsView {
 
         // If the server is currently running but not active display progress bar
         handleServerLoad();
+    }
+
+    public CardContainer buildResolution() {
+        CardContainer card = new CardContainer(0, 0, 1600, 120);
+        card.setMaxSize(1600, 120);
+
+        HorizontalLayout root = new HorizontalLayout(0, 0);
+        root.setMaxSize(1600, 120);
+
+        root.setAlignment(Pos.BASELINE_LEFT);
+        root.setSpacing(layoutSpacing);
+
+        TextFlowOverlay description = new TextFlowOverlay("Set the base resolution for the application. Will require a restart to have an affect.", 600, 200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setTextFillColor(Color.WHITE);
+        root.addElement(description);
+
+        List<String> items = new ArrayList<>();
+        items.add("1280x720");
+        items.add("1920x1080");
+        items.add("2560x1440");
+        items.add("3840x2160");
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
+        selection.setMaxHeight(50);
+        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+        String current = (infoFile.hasKey("width") && infoFile.hasKey("height") ? infoFile.get("width") + "x" + infoFile.get("height") : "");
+        selection.setDefaultItem(current);
+        root.addElement(selection);
+        selection.onItemSelect(event -> {
+            String item = event.getItem();
+            int width = Integer.parseInt(item.split("x")[0]);
+            int height = Integer.parseInt(item.split("x")[1]);
+            infoFile.set("width", width);
+            infoFile.set("height", height);
+
+            //TODO: RenEngine doesn't have API for changing window size dynamically.
+        });
+        card.setBody(root);
+
+        return card;
     }
 
     public CardContainer buildModelSelection() {
@@ -291,7 +335,7 @@ public class SettingsView {
         text.addStyle(Styles.DANGER);
         card.setHeader(text);
 
-        TextOverlay desc = new TextOverlay("Any changes made to the settings will require a reload. Please wait until a notification appears to ensure everything worked properly.");
+        TextOverlay desc = new TextOverlay("Any changes made to model settings will require a reload. Please wait until a notification appears to ensure everything worked properly.");
         card.setBody(desc);
 
         HorizontalLayout layout = new HorizontalLayout(0, 0);
