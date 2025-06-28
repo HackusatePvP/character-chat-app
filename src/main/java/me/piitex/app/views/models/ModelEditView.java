@@ -33,6 +33,7 @@ public class ModelEditView {
         VerticalLayout layout = new VerticalLayout(0, 0);
 
         ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, 1670, 800);
+        scrollContainer.setMaxSize(1670, 1000);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -71,7 +72,7 @@ public class ModelEditView {
         description.setTextFillColor(Color.WHITE);
         root.addElement(description);
 
-        TextAreaOverlay input = new TextAreaOverlay(settings.getModelInstructions(), 0, 0, 400, 200);
+        TextAreaOverlay input = new TextAreaOverlay(settings.getModelInstructions(), 0, 0, 800, 200);
         root.addElement(input);
         input.onInputSetEvent(event -> {
             settings.setModelInstructions(event.getInput());
