@@ -50,8 +50,8 @@ public class SettingsView {
         layout.setSpacing(20);
 
         //FIXME: If the scroller breaks it's probably because of changes to VerticalLayout. setPrefSize() does not work with the scroller and will break it. Only use setMinSize.
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, 1670, 850);
-        scrollContainer.setMaxSize(1670, 850);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, 1670, 1000);
+        scrollContainer.setMaxSize(1670, 1000);
 
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
