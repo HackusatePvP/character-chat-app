@@ -392,6 +392,8 @@ public class ChatView {
         root.addElement(bottom);
 
         send = new TextAreaOverlay("", "Type your response.", 0, 0, 800, 100);
+        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+        send.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
         bottom.addElement(send);
 
         submit = new ButtonOverlay("submit", "Send");
