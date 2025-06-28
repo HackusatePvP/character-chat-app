@@ -251,8 +251,11 @@ public class ChatView {
         edit.addStyle(Styles.ACCENT);
         edit.setTooltip("Edit the message.");
         root.addElement(edit);
+
         edit.onClick(event -> {
             if (ServerProcess.getCurrentServer().isLoading()) return;
+
+            String content = chat.getContent(chat.getLine(index));
 
             // Open edit dialogue or something
             VerticalLayout verticalLayout = new VerticalLayout(0, 0);
@@ -261,7 +264,7 @@ public class ChatView {
             modalContainer.addStyle(Styles.ELEVATED_1);
 
             verticalLayout.addElement(new TextOverlay("Edit Message"));
-            TextAreaOverlay area = new TextAreaOverlay(message, 0, 0, 400, 300);
+            TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(content), 0, 0, 400, 300);
             verticalLayout.addElement(area);
 
             ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
