@@ -3,16 +3,18 @@ package me.piitex.app.views.chats;
 import atlantafx.base.controls.Card;
 import atlantafx.base.layout.ModalBox;
 import atlantafx.base.theme.Styles;
-import atlantafx.base.util.BBCodeParser;
 import com.drew.lang.annotations.Nullable;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
@@ -208,15 +210,7 @@ public class ChatView {
 
         content = Placeholder.applyDynamicBBCode(content);
 
-        VerticalLayout chatLayout = new VerticalLayout(1300, 0);
-
-        TextFlowOverlay chatBox = new TextFlowOverlay(content, 1100, 0);
-        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-        chatBox.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
-        chatBox.setMaxWidth(1100); // Set a little less than chatLayout
-        chatLayout.addElement(chatBox);
-
-        cardContainer.setBody(chatBox);
+        cardContainer.setBody(buildTextFlow(content, chat, index));
 
         cardContainer.setFooter(buildButtonBox(role, content, index));
 
@@ -333,7 +327,7 @@ public class ChatView {
                 CardContainer responseBox = buildChatBox(Role.ASSISTANT, "", chat.getRawLines().size()); // Set content later
                 // Gen response
 
-                Response response = new Response(chat.getLines().size() + 1, message, character, character.getUser(), chat);
+                Response response = new Response(chat.getLines().size(), message, character, character.getUser(), chat);
                 chat.setResponse(response);
 
                 layout.addElement(responseBox);
@@ -544,7 +538,7 @@ public class ChatView {
 
         // Gen response
 
-        Response response = new Response(chat.getLines().size() + 1, message, character, character.getUser(), chat);
+        Response response = new Response(chat.getLines().size(), message, character, character.getUser(), chat);
         chat.setResponse(response);
 
         layout.addElement(responseBox);
@@ -624,5 +618,36 @@ public class ChatView {
 
     public Container getContainer() {
         return container;
+    }
+
+    public static TextFlowOverlay buildTextFlow(String content, Chat chat, int index) {
+        TextFlowOverlay chatBox = new TextFlowOverlay(content, 1100, 0);
+        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+        chatBox.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
+        chatBox.setMaxWidth(1100); // Set a little less than chatLayout
+
+        // Right click menu
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem copy = new MenuItem("Copy");
+        contextMenu.getItems().add(copy);
+
+        chatBox.onClick(event -> {
+            if (event.getHandler().getButton() == MouseButton.SECONDARY) {
+                if (contextMenu.isShowing()) {
+                    contextMenu.hide();
+                    return;
+                }
+                copy.setOnAction(event1 -> {
+                    Clipboard clipboard = Clipboard.getSystemClipboard();
+                    ClipboardContent clipboardContent = new ClipboardContent();
+                    clipboardContent.putString(Placeholder.retrieveOriginalText(chat.getContent(chat.getLine(index))));
+                    clipboard.setContent(clipboardContent);
+                });
+
+                contextMenu.show(chatBox.getNode(), Side.BOTTOM, 300, 0);
+            }
+        });
+
+        return chatBox;
     }
 }

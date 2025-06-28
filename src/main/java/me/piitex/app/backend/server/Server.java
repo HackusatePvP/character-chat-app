@@ -1,18 +1,16 @@
 package me.piitex.app.backend.server;
 
 import atlantafx.base.controls.Card;
-import atlantafx.base.util.BBCodeParser;
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.text.TextFlow;
 import me.piitex.app.App;
 import me.piitex.app.backend.Response;
-import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
+import me.piitex.app.views.chats.ChatView;
+import me.piitex.engine.hanlders.events.OverlayClickEvent;
 import me.piitex.engine.overlays.TextFlowOverlay;
-import org.apache.commons.io.FileUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -133,15 +131,18 @@ public class Server {
                         // Apply coloring for roleplay. Yellow around quotes, blue around astrix
                         updated = Placeholder.applyDynamicBBCode(updated);
 
-                        TextFlowOverlay textFlow = new TextFlowOverlay(updated, 1100, 0);
-                        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-                        textFlow.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
+                        TextFlowOverlay textFlow = ChatView.buildTextFlow(updated, response.getChat(), response.getIndex());
 
                         TextFlow fxFlow = (TextFlow) textFlow.render();
+                        textFlow.setNode(fxFlow);
+                        fxFlow.setOnMouseClicked(event -> {
+                            if (textFlow.getOnClick() != null) {
+                                textFlow.getOnClick().onClick(new OverlayClickEvent(textFlow, event));
+                            }
+                        });
 
                         card.setBody(fxFlow);
                         fxFlow.widthProperty().addListener(observable -> {
-                            System.out.println("Value: " + scrollPane.getVvalue());
                             if (scrollPane.getVvalue() >= 0.93) {
                                 scrollPane.setVvalue(1);
                             }

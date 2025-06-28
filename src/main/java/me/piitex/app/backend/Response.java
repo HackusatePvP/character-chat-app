@@ -153,6 +153,10 @@ public class Response {
 
     }
 
+    public int getIndex() {
+        return index;
+    }
+
     private String getImageType() {
         if (image == null) {
             return "";
