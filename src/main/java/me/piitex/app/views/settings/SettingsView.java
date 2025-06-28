@@ -32,7 +32,7 @@ public class SettingsView {
     private final ServerSettings settings = App.getInstance().getSettings();
 
     // The amount of spacing between the description and the input.
-    private int layoutSpacing = 200;
+    private final int layoutSpacing = 200;
 
     private ButtonOverlay start, stop, reload;
 
@@ -59,6 +59,7 @@ public class SettingsView {
 
         layout.addElement(buildDangerZone());
         layout.addElement(buildResolution());
+        layout.addElement(buildChatSize());
         layout.addElement(buildModelSelection());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
@@ -112,6 +113,79 @@ public class SettingsView {
         card.setBody(root);
 
         return card;
+    }
+
+    public CardContainer buildChatSize() {
+        CardContainer card = new CardContainer(0, 0, 1600, 120);
+        card.setMaxSize(1600, 120);
+
+        HorizontalLayout root = new HorizontalLayout(0, 0);
+        root.setMaxSize(1600, 120);
+
+        root.setAlignment(Pos.BASELINE_LEFT);
+        root.setSpacing(layoutSpacing);
+
+        TextFlowOverlay description = new TextFlowOverlay("Set the text size for the chats. Can be helpful to those with visual impairments.", 600, 200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setTextFillColor(Color.WHITE);
+        root.addElement(description);
+
+        List<String> items = new ArrayList<>();
+        items.add("Small");
+        items.add("Default");
+        items.add("Large");
+        items.add("Larger");
+        items.add("Extra Large");
+        items.add("Extreme Large Ultimate");
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
+        selection.setMaxHeight(50);
+        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+        selection.setDefaultItem(infoFile.hasKey("chat-text-size") ? getTextKey(infoFile.get("chat-text-size")) : "Default");
+        root.addElement(selection);
+        selection.onItemSelect(event -> {
+            String item = event.getItem();
+            if (item.equalsIgnoreCase("small")) {
+                item = Styles.TEXT_SMALL;
+            } else if (item.equalsIgnoreCase("Default")) {
+                item = Styles.TEXT;
+            } else if (item.equalsIgnoreCase("large")) {
+                item = Styles.TITLE_4;
+            } else if (item.equalsIgnoreCase("larger")) {
+                item = Styles.TITLE_3;
+            } else if (item.equalsIgnoreCase("extra large")) {
+                item = Styles.TITLE_2;
+            } else if (item.equalsIgnoreCase("extreme large ultimate")) {
+                item = Styles.TITLE_1;
+            } else {
+                item = Styles.TEXT;
+            }
+            infoFile.set("chat-text-size", item);
+        });
+        card.setBody(root);
+
+        return card;
+    }
+
+    private String getTextKey(String item) {
+        if (item.contains("small")) {
+            return "Small";
+        } else if (item.equalsIgnoreCase("text")) {
+            return "Default";
+        } else if (item.contains("title-4")) {
+            return "Large";
+        } else if (item.contains("title-3")) {
+            return "Larger";
+        } else if (item.contains("title-2")) {
+            return "Extra Large";
+        } else if (item.contains("title-1")) {
+            return "Extreme Large Ultimate";
+        } else {
+            return "Default";
+        }
     }
 
     public CardContainer buildModelSelection() {

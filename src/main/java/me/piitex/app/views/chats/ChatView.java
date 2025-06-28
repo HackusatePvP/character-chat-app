@@ -13,7 +13,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
@@ -23,13 +22,13 @@ import me.piitex.app.backend.Role;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
+import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.HorizontalLayout;
-import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
@@ -212,6 +211,8 @@ public class ChatView {
         VerticalLayout chatLayout = new VerticalLayout(1300, 0);
 
         TextFlowOverlay chatBox = new TextFlowOverlay(content, 1100, 0);
+        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+        chatBox.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
         chatBox.setMaxWidth(1100); // Set a little less than chatLayout
         chatLayout.addElement(chatBox);
 
