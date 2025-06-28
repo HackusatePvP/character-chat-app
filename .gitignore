@@ -36,4 +36,4 @@ build/
 
 ### Application data
 logs/
-/src/main/resources/${assetsDir}/
+/src/main/resources/windows/
