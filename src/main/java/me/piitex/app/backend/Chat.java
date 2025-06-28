@@ -1,5 +1,6 @@
 package me.piitex.app.backend;
 
+import me.piitex.app.App;
 import me.piitex.app.utils.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -34,7 +35,7 @@ public class Chat {
                 FileCrypter.decryptFile(file, out);
                 lines.addAll(Files.readAllLines(out.toPath()));
             } catch (IOException | IllegalBlockSizeException e) {
-                System.err.println("Error decrypting file: " + e.getMessage());
+                App.logger.error("Error decrypting file: ", e);
             } finally {
                 if (out.exists()) {
                     out.delete();
