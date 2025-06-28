@@ -8,6 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.text.TextFlow;
 import me.piitex.app.App;
 import me.piitex.app.backend.Response;
+import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.engine.overlays.TextFlowOverlay;
@@ -26,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Scanner;
@@ -58,7 +60,6 @@ public class Server {
     public static String generateResponseOAIStream(ScrollPane scrollPane, Card card, Response response) throws JSONException, IOException, InterruptedException {
         App.logger.info("Generating response from server...");
         HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
-        App.logger.info("Server: {}", baseUrl);
         ModelSettings settings = response.getCharacter().getModelSettings();
         JSONObject toPost = new JSONObject();
         toPost.put("stream", true);
@@ -133,8 +134,19 @@ public class Server {
                         updated = Placeholder.applyDynamicBBCode(updated);
 
                         TextFlowOverlay textFlow = new TextFlowOverlay(updated, 1100, 0);
-                        card.setBody(textFlow.render());
-                        scrollPane.setVvalue(scrollPane.getVmax());
+                        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+                        textFlow.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
+
+                        TextFlow fxFlow = (TextFlow) textFlow.render();
+
+                        card.setBody(fxFlow);
+                        fxFlow.widthProperty().addListener(observable -> {
+                            System.out.println("Value: " + scrollPane.getVvalue());
+                            if (scrollPane.getVvalue() >= 0.93) {
+                                scrollPane.setVvalue(1);
+                            }
+                        });
+
                     });
                 }
 
