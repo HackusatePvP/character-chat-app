@@ -99,10 +99,13 @@ public class CharacterEditView {
         }
         this.infoFile = new InfoFile();
         this.character = character;
-        build(null);
         if (character != null) {
+            updateCharacterFields();
             warnTokens();
         }
+        build(null);
+
+        warnTokens();
     }
 
     public CharacterEditView(@Nullable Character character, boolean duplicate) {
@@ -113,11 +116,13 @@ public class CharacterEditView {
         this.infoFile = new InfoFile();
         this.character = character;
         this.duplicate = duplicate;
-        build(null);
+        infoFile.set("duplicate", duplicate);
         if (character != null) {
-            warnTokens();
+            updateCharacterFields();
         }
+        build(null);
 
+        warnTokens();
     }
 
     public CharacterEditView(@Nullable Character character, @Nullable User user, @Nullable InfoFile infoFile, @Nullable Tab tab) {
@@ -128,6 +133,9 @@ public class CharacterEditView {
         this.character = character;
         this.infoFile = infoFile;
         this.user = user;
+        if (character != null) {
+            updateCharacterFields();
+        }
         if (infoFile != null) {
             updateInfoFields();
         }
@@ -137,9 +145,6 @@ public class CharacterEditView {
     }
 
     public void build(@Nullable Tab tab) {
-        if (character != null) {
-            updateCharacterFields();
-        }
         if (user != null) {
             updateUserFields();
         } else {
@@ -308,7 +313,7 @@ public class CharacterEditView {
         root.setMaxSize(250, 200);
         root.setSpacing(10);
 
-        charIdInput = new InputFieldOverlay((character != null ? character.getId() : characterId), 0, 0, 200, 50);
+        charIdInput = new InputFieldOverlay(characterId, 0, 0, 200, 50);
         if (character != null && !duplicate) {
             charIdInput.setEnabled(false);
         }
@@ -833,6 +838,9 @@ public class CharacterEditView {
         if (infoFile.hasKey("context")) {
             chatContextSize = infoFile.getInteger("context");
         }
+        if (infoFile.hasKey("duplicate")) {
+            duplicate = infoFile.getBoolean("duplicate");
+        }
     }
 
     public boolean validate() {
@@ -894,6 +902,7 @@ public class CharacterEditView {
     private void warnTokens() {
         // This part of the method (checking currentServer and isLoading) can safely
         // run on any thread that calls warnTokens, as it only accesses volatile fields.
+        if (character == null) return;
         ServerProcess currentServer = ServerProcess.getCurrentServer();
 
         // If the server is not configured (null), there's no point in retrying.
