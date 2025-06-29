@@ -15,12 +15,11 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import me.piitex.app.App;
+import me.piitex.app.backend.*;
 import me.piitex.app.backend.Character;
-import me.piitex.app.backend.Chat;
-import me.piitex.app.backend.Response;
-import me.piitex.app.backend.Role;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
@@ -55,6 +54,8 @@ public class ChatView {
     private TextAreaOverlay send;
 
     private ButtonOverlay submit;
+
+    private File image = null;
 
     public ChatView(Character character, @Nullable Chat chat) {
         this.character = character;
@@ -467,7 +468,42 @@ public class ChatView {
 
         });
 
+        TextOverlay addMedia = new TextOverlay(new FontIcon(Material2AL.ADD));
+        addMedia.setTooltip("Attach an image to your prompt.");
+        topControls.addElement(addMedia);
+        addMedia.onClick(event -> {
+            if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isLoading() || ServerProcess.getCurrentServer().isError()) return;
+            Model model = ServerProcess.getCurrentServer().getModel();
+            if (model.getSettings().getMmProj().equalsIgnoreCase("None / Disabled")) {
+                MessageOverlay error = new MessageOverlay(-100, 0, 600, 100,"Image Error", "This model is not configured to support images. Set the MM-Proj file if it's a vision supported model.");
+                error.addStyle(Styles.DANGER);
+                error.addStyle(Styles.ELEVATED_4);
+                App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, true);
+                return;
+            }
 
+            // Attach an image to the response
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*.png"));
+            image = fileChooser.showOpenDialog(App.window.getStage());
+
+            HorizontalLayout imgBox = new HorizontalLayout(100, 40);
+            imgBox.setMaxSize(100, 40);
+            imgBox.setSpacing(20);
+
+            imgBox.addElement(new TextOverlay(image.getName()));
+            TextOverlay remove = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));
+            remove.addStyle(Styles.DANGER);
+            imgBox.addElement(remove);
+
+            Node node = imgBox.render();
+            remove.onClick(event1 -> {
+                topControls.getPane().getChildren().remove(node);
+                image = null;
+            });
+            topControls.getPane().getChildren().add(node);
+
+        });
 
 
         return topControls;
@@ -539,6 +575,9 @@ public class ChatView {
         // Gen response
 
         Response response = new Response(chat.getLines().size(), message, character, character.getUser(), chat);
+        if (image != null) {
+            response.setImage(image);
+        }
         chat.setResponse(response);
 
         layout.addElement(responseBox);

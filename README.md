@@ -23,11 +23,12 @@ Only works with Windows 10/11. Linux and Mac are being explored.
 * [JavaFX](https://openjfx.io) The GUI library.
 * [AtlantaFX](https://github.com/mkpaz/atlantafx) Modernized styling for JavaFX.
 * [RenEngine](https://github.com/HackusatePvP/RenEngine) Simplified framework for JavaFX.
-* [llama.cpp](https://github.com/ggml-org/llama.cpp) Backend for the models.
+* [llama.cpp](https://github.com/ggml-org/llama.cpp) Backend server for the models.
 
 
 ## Multimodal Support
 Multimodal is a type of model that supports vision (Image processing). The backend does support vision but there is no UI implementation for it.
+
 This is coming soon.
 
 ## Vulkan Issues
