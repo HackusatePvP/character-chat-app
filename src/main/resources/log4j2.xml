@@ -16,7 +16,7 @@
 </Appenders>
 
     <Loggers>
-        <Logger name="com.yourcompany.yourapp" level="debug" additivity="false">
+        <Logger name="me.piitex.app" level="debug" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="RollingFileAppender"/> </Logger>
 
