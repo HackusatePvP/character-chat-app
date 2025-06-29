@@ -196,6 +196,7 @@ public class ChatView {
         }
 
         ImageOverlay avatar = new ImageOverlay(new ImageLoader(new File(iconPath)));
+        avatar.setPreserveRatio(false);
         avatar.setWidth(64);
         avatar.setHeight(64);
 
@@ -307,7 +308,9 @@ public class ChatView {
             chat.update();
         });
 
-        if (role == Role.ASSISTANT && !Placeholder.retrieveOriginalText(message).equalsIgnoreCase(character.getFirstMessage())) {
+        // Doesn't make sense to regenerate the configured message.
+        String firstMsg = (character.getFirstMessage() == null || character.getFirstMessage().isEmpty() ? "null" : character.getFirstMessage());
+        if (role == Role.ASSISTANT && !firstMsg.equalsIgnoreCase(message)) {
             TextOverlay regenerate = new TextOverlay(new FontIcon(Material2MZ.REFRESH));
             regenerate.setTooltip("Regenerate the response.");
             root.addElement(regenerate);
@@ -432,6 +435,8 @@ public class ChatView {
             // Copy user message to clipboard
             // Delete both last assistant and user messages
             int index = chat.getRawLines().size();
+            if (index == 0) return;
+
             String lastLine = chat.getLastLine(index);
             int layoutSize = layout.getPane().getChildren().size();
 
