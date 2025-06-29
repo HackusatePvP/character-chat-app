@@ -3,6 +3,7 @@ package me.piitex.app.views.models;
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
+import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.views.SidebarView;
@@ -14,7 +15,9 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ModelEditView {
     private final ModelSettings settings;
@@ -40,6 +43,7 @@ public class ModelEditView {
         main.addElement(scrollContainer);
 
         layout.addElement(buildInstructions());
+        layout.addElement(buildModalFile());
         layout.addElement(buildTemperature());
         layout.addElement(buildMinP());
         layout.addElement(buildRepeatPenalty());
@@ -76,6 +80,44 @@ public class ModelEditView {
         root.addElement(input);
         input.onInputSetEvent(event -> {
             settings.setModelInstructions(event.getInput());
+        });
+
+        card.setBody(root);
+
+        return card;
+    }
+
+    private CardContainer buildModalFile() {
+        CardContainer card = new CardContainer(0, 0, 1600, 120);
+        card.setMaxSize(1600, 120);
+
+        HorizontalLayout root = new HorizontalLayout(0, 0);
+        root.setMaxSize(1600, 120);
+        root.setAlignment(Pos.BASELINE_LEFT);
+        root.setSpacing(layoutSpacing);
+
+        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setTextFillColor(Color.WHITE);
+        root.addElement(description);
+
+        TextOverlay key = new TextOverlay("Multimodal Support: ");
+        key.addStyle(Styles.TEXT_BOLD);
+        description.add(key);
+
+        TextOverlay value = new TextOverlay("Set the MM-Proj file for vision support. Only works if the model has a supported MM-Proj. Without setting this, image processing won't work.");
+        description.add(value);
+
+        List<String> items = new ArrayList<>();
+        items.add("None / Disabled");
+        items.addAll(App.getModelNames());
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
+        selection.setDefaultItem(settings.getMmProj());
+        root.addElement(selection);
+        selection.onItemSelect(event -> {
+            settings.setMmProj(event.getItem());
         });
 
         card.setBody(root);

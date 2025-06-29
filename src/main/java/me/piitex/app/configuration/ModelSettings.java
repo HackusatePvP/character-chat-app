@@ -9,6 +9,7 @@ public class ModelSettings {
     private double minP = 0.1; // min 0.05
     private int repeatTokens = 64; // min -1
     private double repeatPenalty = 1.1; // min 1.0
+    private String mmProj = "None / Disabled";
     private String chatTemplate = "default";
     private String reasoningTemplate = "disabled";
     private boolean useDefault;
@@ -67,6 +68,11 @@ public class ModelSettings {
             this.jinja = infoFile.getBoolean("jinja");
         } else {
             infoFile.set("jinja", jinja);
+        }
+        if (infoFile.hasKey("mm-proj")) {
+            mmProj = infoFile.get("mm-proj");
+        } else {
+            infoFile.set("mm-proj", mmProj);
         }
     }
 
@@ -163,6 +169,15 @@ public class ModelSettings {
     public void setJinja(boolean jinja) {
         this.jinja = jinja;
         infoFile.set("jinja", jinja);
+    }
+
+    public String getMmProj() {
+        return mmProj;
+    }
+
+    public void setMmProj(String mmProj) {
+        this.mmProj = mmProj;
+        infoFile.set("mm-proj", mmProj);
     }
 
     @Nullable

@@ -318,4 +318,8 @@ public class ServerProcess {
             listener.onServerLoadingComplete(success);
         }
     }
+
+    public Model getModel() {
+        return model;
+    }
 }
