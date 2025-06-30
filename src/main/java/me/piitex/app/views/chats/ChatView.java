@@ -107,13 +107,14 @@ public class ChatView {
 
         VerticalLayout chatView = new VerticalLayout(0, 0);
         chatView.setY(70);
+        chatView.setSpacing(50);
         main.addElement(chatView);
 
         layout = new VerticalLayout(1000, 0);
         layout.setX(100);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        double scrollHeight = 760;
+        double scrollHeight = 720;
         scrollContainer = new ScrollContainer(layout, 0, 0, 1500, scrollHeight);
         scrollContainer.setMaxSize(1920, scrollHeight);
         scrollContainer.setVerticalScroll(true);
@@ -375,9 +376,8 @@ public class ChatView {
 
     public VerticalLayout buildSendBox() {
         VerticalLayout root = new VerticalLayout(0, 0);
-        root.setMaxSize(1000, 200);
+        root.setMaxSize(1000, 250);
         root.setX(200);
-        root.setY(50);
 
         root.addElement(buildTopControls());
 
@@ -385,11 +385,11 @@ public class ChatView {
         //bottom.setX(200);
        //bottom.setY(100);
         bottom.setSpacing(20);
-        bottom.setMaxSize(1000, 100);
+        bottom.setMaxSize(1000, 150);
 
         root.addElement(bottom);
 
-        send = new TextAreaOverlay("", "Type your response.", 0, 0, 800, 100);
+        send = new TextAreaOverlay("", "Type your response.", 0, 0, 800, 150);
         InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
         send.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
         bottom.addElement(send);
