@@ -46,10 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CharacterEditView {
     private Container root;
@@ -88,7 +85,7 @@ public class CharacterEditView {
 
     private InputFieldOverlay userDisplayName;
 
-    private final Map<String, String> loreItems = new HashMap<>();
+    private final Map<String, String> loreItems = new TreeMap<>();
 
     private TabsContainer container;
 

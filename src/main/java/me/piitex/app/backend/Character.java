@@ -6,10 +6,7 @@ import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Character {
     private final String id;
@@ -29,7 +26,7 @@ public class Character {
 
     private InfoFile infoFile;
 
-    private Map<String, String> lorebook = new HashMap<>();
+    private Map<String, String> lorebook = new TreeMap<>();
 
     private final List<Chat> chats = new ArrayList<>();
 
