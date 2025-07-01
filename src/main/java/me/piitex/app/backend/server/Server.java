@@ -107,8 +107,7 @@ public class Server {
                 if (content.isEmpty()) continue;
                 JSONObject receive = new JSONObject(content);
                 if (!receive.has("choices")) {
-                    System.out.println("Not processing!");
-                    System.err.println(receive.toString(1));
+                    App.logger.error("Error has occurred: {}", receive.toString(1));
                     break;
                 }
                 JSONArray choices = receive.getJSONArray("choices");

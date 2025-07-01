@@ -133,15 +133,10 @@ public class Response {
             textPart.put("text", format(currentChatMessage.getContent(), character, user));
             contentArray.put(textPart);
 
-            System.out.println("Response image: " + (image != null ? image.getAbsolutePath() : "NULL"));
-
             if (image != null && index == chat.getMessages().size() - 1) {
-                System.out.println("PASSED");
                 if (image.exists() && image.isFile()) {
-                    System.out.println("PASSED 1");
                     App.logger.debug("Processing bas64 data...");
                     try {
-                        System.out.println("Processing base64 data");
                         byte[] fileContent = FileUtils.readFileToByteArray(image);
                         String iData = Base64.getEncoder().encodeToString(fileContent);
                         JSONObject imgPart = new JSONObject();
@@ -152,8 +147,6 @@ public class Response {
                     } catch (IOException e) {
                         App.logger.error("Error reading image file for base64 encoding: {}", image, e);
                     }
-                } else {
-                    System.out.println("Nope!");
                 }
             }
             chatMessageContext.put("content", contentArray);

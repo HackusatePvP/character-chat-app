@@ -495,8 +495,6 @@ public class ChatView {
             image = fileChooser.showOpenDialog(App.window.getStage());
             if (image == null) return;
 
-            System.out.println("Set image: " + image.getAbsolutePath());
-
             HorizontalLayout imgBox = new HorizontalLayout(100, 40);
             imgBox.setMaxSize(100, 40);
             imgBox.setSpacing(20);
@@ -572,9 +570,6 @@ public class ChatView {
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
         ChatMessage chatMessage = chat.addLine(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
         chat.update();
-        if (image != null) {
-            System.out.println("Image: " + image.getAbsolutePath());
-        }
         CardContainer userBox = buildChatBox(chatMessage, chat.getMessages().size()); // <-- How??
 
 
@@ -590,7 +585,6 @@ public class ChatView {
 
         Response response = new Response(chat.getMessages().size(), message, character, character.getUser(), chat);
         chat.setResponse(response);
-        System.out.println("Size: " + chat.getMessages().size());
 
         layout.addElement(responseBox);
         layout.getPane().getChildren().add(responseBox.build().getKey());

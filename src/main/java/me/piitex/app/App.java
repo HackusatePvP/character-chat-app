@@ -163,7 +163,6 @@ public class App {
         List<Model> models = new ArrayList<>();
 
         if (App.getInstance().getSettings().getModelPath().isEmpty()) {
-            System.out.println("Model path is empty.");
             return models;
         }
 
@@ -171,13 +170,11 @@ public class App {
         File modelPath = new File(path);
 
         if (!modelPath.exists()) {
-            System.out.println("Model directory does not exist. Creating: " + modelPath.getAbsolutePath());
             modelPath.mkdirs();
             return models;
         }
 
         if (!modelPath.isDirectory()) {
-            System.out.println("Model path is not a directory: " + modelPath.getAbsolutePath());
             return models;
         }
         findGGUFModelsRecursive(modelPath, models, filterType);
