@@ -5,6 +5,7 @@ import com.drew.lang.annotations.Nullable;
 
 public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only."; //TODO: Default
+    private int contextSize;
     private double temperature = 0.8; // min 0
     private double minP = 0.1; // min 0.05
     private int repeatTokens = 64; // min -1
@@ -28,6 +29,11 @@ public class ModelSettings {
             this.modelInstructions = infoFile.get("instructions");
         } else {
             infoFile.set("instructions", modelInstructions);
+        }
+        if (infoFile.hasKey("tokens")) {
+            contextSize = infoFile.getInteger("tokens");
+        } else {
+            infoFile.set("tokens", contextSize);
         }
         if (infoFile.hasKey("temperature")) {
             this.temperature = infoFile.getDouble("temperature");
@@ -85,6 +91,15 @@ public class ModelSettings {
         if (infoFile != null) {
             infoFile.set("instructions", modelInstructions);
         }
+    }
+
+    public int getContextSize() {
+        return contextSize;
+    }
+
+    public void setContextSize(int contextSize) {
+        this.contextSize = contextSize;
+        infoFile.set("tokens", contextSize);
     }
 
     public double getTemperature() {

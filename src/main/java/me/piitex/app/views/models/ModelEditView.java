@@ -43,6 +43,7 @@ public class ModelEditView {
         main.addElement(scrollContainer);
 
         layout.addElement(buildInstructions());
+        layout.addElement(buildContextSize());
         layout.addElement(buildModalFile());
         layout.addElement(buildTemperature());
         layout.addElement(buildMinP());
@@ -87,6 +88,39 @@ public class ModelEditView {
         return card;
     }
 
+    private CardContainer buildContextSize() {
+        CardContainer card = new CardContainer(0, 0, 1600, 120);
+        card.setMaxSize(1600, 120);
+
+        HorizontalLayout root = new HorizontalLayout(0, 0);
+        root.setMaxSize(1600, 120);
+        root.setAlignment(Pos.BASELINE_LEFT);
+        root.setSpacing(layoutSpacing);
+
+        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setTextFillColor(Color.WHITE);
+        root.addElement(description);
+
+        TextOverlay key = new TextOverlay("Context Size: ");
+        key.addStyle(Styles.TEXT_BOLD);
+        description.add(key);
+
+        TextOverlay value = new TextOverlay("The size of the prompts tokens. 0 will be model default. It is recommended to set this as some models will require an industrial GPU for default.");
+        description.add(value);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, settings.getContextSize());
+        input.onValueChange(event -> {
+            settings.setContextSize((int) event.getNewValue());
+        });
+        root.addElement(input);
+
+        card.setBody(root);
+
+        return card;
+    }
+
     private CardContainer buildModalFile() {
         CardContainer card = new CardContainer(0, 0, 1600, 120);
         card.setMaxSize(1600, 120);
@@ -106,12 +140,12 @@ public class ModelEditView {
         key.addStyle(Styles.TEXT_BOLD);
         description.add(key);
 
-        TextOverlay value = new TextOverlay("Set the MM-Proj file for vision support. Only works if the model has a supported MM-Proj. Without setting this, image processing won't work.");
+        TextOverlay value = new TextOverlay("Set the MM-Proj file for vision support. The file will have to contain 'mmproj' . Only works if the model has a supported MM-Proj. Without setting this, image processing won't work.");
         description.add(value);
 
         List<String> items = new ArrayList<>();
         items.add("None / Disabled");
-        items.addAll(App.getModelNames());
+        items.addAll(App.getModelNames("mmproj"));
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setDefaultItem(settings.getMmProj());
@@ -404,30 +438,6 @@ public class ModelEditView {
 
         return card;
     }
-
-    /*private CardContainer buildAstrixRP() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
-
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Do you want to include \"*\" in chats. Example: *waves* Hey! User come here. If disabled the app will automatically remove the astrix.", 600, 200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isAstrixEnabled());
-        switchOverlay.onToggle(event -> {
-            settings.setAstrixEnabled(!settings.isAstrixEnabled());
-        });
-        root.addElement(switchOverlay);
-
-        card.setBody(root);
-
-        return card;
-    }*/
 
     public Container getContainer() {
         return container;
