@@ -5,7 +5,9 @@ import javafx.application.Platform;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.text.TextFlow;
 import me.piitex.app.App;
+import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
+import me.piitex.app.backend.Role;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.ChatView;
@@ -25,9 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,7 +67,7 @@ public class Server {
         toPost.put("repeat_penalty", settings.getRepeatPenalty());
         //TODO: Add more sampling parameters!
 
-        response.createContext(true);
+        response.createContext();
         toPost.put("messages", response.getMessages());
 
         post.setEntity(new StringEntity(toPost.toString(), ContentType.APPLICATION_JSON));
@@ -106,6 +106,11 @@ public class Server {
 
                 if (content.isEmpty()) continue;
                 JSONObject receive = new JSONObject(content);
+                if (!receive.has("choices")) {
+                    System.out.println("Not processing!");
+                    System.err.println(receive.toString(1));
+                    break;
+                }
                 JSONArray choices = receive.getJSONArray("choices");
                 for (int i = 0; i < choices.length(); i++) {
                     JSONObject arrayObject = choices.getJSONObject(i);
@@ -131,7 +136,7 @@ public class Server {
                         // Apply coloring for roleplay. Yellow around quotes, blue around astrix
                         updated = Placeholder.applyDynamicBBCode(updated);
 
-                        TextFlowOverlay textFlow = ChatView.buildTextFlow(updated, response.getChat(), response.getIndex());
+                        TextFlowOverlay textFlow = ChatView.buildTextFlow(new ChatMessage(Role.ASSISTANT, updated, null), response.getChat(), response.getIndex());
 
                         TextFlow fxFlow = (TextFlow) textFlow.render();
                         textFlow.setNode(fxFlow);
