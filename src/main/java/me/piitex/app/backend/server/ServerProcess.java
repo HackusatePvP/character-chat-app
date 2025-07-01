@@ -105,10 +105,16 @@ public class ServerProcess {
         }
 
         // Vision model file
-        if (!settings.getMMprojString().equalsIgnoreCase("")) {
-            App.logger.debug("MMPROJ: " + settings.getMmProjModel().getFile().getName());
-            parameters.add("--mmproj");
-            parameters.add(settings.getMmProjModel().getFile().getAbsolutePath());
+        if (!model.getSettings().getMmProj().equalsIgnoreCase("")) {
+            if (model.getSettings().getMmProj().startsWith("None")) {
+                App.logger.warn("MMProj not specified.");
+                parameters.add("--no-mmproj");
+            } else {
+                Model mmproj = App.getModelByName(model.getSettings().getMmProj());
+                App.logger.debug("MMPROJ: " + mmproj.getFile().getAbsolutePath());
+                parameters.add("--mmproj");
+                parameters.add(mmproj.getFile().getAbsolutePath());
+            }
         }
 
         // GPU layers
@@ -161,10 +167,15 @@ public class ServerProcess {
             parameters.add("0");
         }
 
+        parameters.add("-c");
+        parameters.add(model.getSettings().getContextSize() + "");
+
         // Server port and WebUI
         parameters.add("--port");
         parameters.add("8187");
         parameters.add("--no-webui");
+
+        App.logger.debug("Server Parameters: " + parameters.toString());
 
         if (App.dev) {
             App.logger.debug("Server Parameters: " + parameters);

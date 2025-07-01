@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import me.piitex.app.App;
@@ -175,19 +174,19 @@ public class ChatView {
 
     public void loadMessages() {
         int index = 0;
-        for (String line : chat.getRawLines()) {
-            Role role = chat.getSender(line);
-            String content = chat.getContent(line);
-            layout.addElement(buildChatBox(role, content, index));
+        for (ChatMessage message : chat.getMessages()) {
+            layout.addElement(buildChatBox(message, index));
             index++;
         }
     }
 
-    public CardContainer buildChatBox(Role role, String content, int index) {
+    public CardContainer buildChatBox(ChatMessage chatMessage, int index) {
         CardContainer cardContainer = new CardContainer(1000, 0); // Width, height
         cardContainer.setMaxSize(1300, 0);
         String iconPath = "";
         String displayName = "";
+        Role role = chatMessage.getSender();
+        String content = chatMessage.getContent();
         if (role == Role.USER) {
             iconPath = character.getUser().getIconPath();
             displayName = character.getUser().getDisplayName();
@@ -211,16 +210,14 @@ public class ChatView {
         display.addStyle(Styles.TITLE_4);
         header.addElement(display);
 
-        content = Placeholder.applyDynamicBBCode(content);
+        cardContainer.setBody(buildTextFlow(chatMessage, chat, index));
 
-        cardContainer.setBody(buildTextFlow(content, chat, index));
-
-        cardContainer.setFooter(buildButtonBox(role, content, index));
+        cardContainer.setFooter(buildButtonBox(chatMessage, index));
 
         return cardContainer;
     }
 
-    public HorizontalLayout buildButtonBox(Role role, String message, int index) {
+    public HorizontalLayout buildButtonBox(ChatMessage chatMessage, int index) {
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setSpacing(20);
         root.setMaxSize(900, 50);
@@ -231,7 +228,7 @@ public class ChatView {
         copy.onClick(event -> {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             ClipboardContent clipboardContent = new ClipboardContent();
-            clipboardContent.putString(Placeholder.retrieveOriginalText(message));
+            clipboardContent.putString(Placeholder.retrieveOriginalText(chatMessage.getContent()));
             clipboard.setContent(clipboardContent);
 
             // Maybe add green to the icon and set it back??
@@ -239,7 +236,7 @@ public class ChatView {
 
             // After 3 seconds remove the style?
             Timeline timeline = new Timeline(new KeyFrame(
-                    Duration.seconds(3), // Delay for 3 seconds
+                    Duration.seconds(1), // Delay for 1 seconds
                     event1 -> copy.getNode().getStyleClass().remove(Styles.SUCCESS) // Action to perform after delay
             ));
             timeline.play();
@@ -253,38 +250,44 @@ public class ChatView {
         edit.onClick(event -> {
             if (ServerProcess.getCurrentServer().isLoading()) return;
 
-            String content = chat.getContent(chat.getLine(index));
+            ChatMessage originalMessage = chat.getMessage(index);
 
-            // Open edit dialogue or something
+            if (originalMessage == null) {
+                App.logger.warn("Attempted to edit message at index " + index + " but no message found.");
+                return;
+            }
+
+            String contentForEdit = originalMessage.getContent();
+
             VerticalLayout verticalLayout = new VerticalLayout(0, 0);
 
             ModalContainer modalContainer = new ModalContainer(verticalLayout, 400, 400);
             modalContainer.addStyle(Styles.ELEVATED_1);
 
             verticalLayout.addElement(new TextOverlay("Edit Message"));
-            TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(content), 0, 0, 400, 300);
+            TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(contentForEdit), 0, 0, 400, 300);
             verticalLayout.addElement(area);
 
             ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
             submit.addStyle(Styles.SUCCESS);
             verticalLayout.addElement(submit);
+
             submit.onClick(event1 -> {
-                String old = chat.getLine(index);
+                String newContentFromUser = area.getCurrentText();
+                String contentToStore = newContentFromUser.replace("\n", "!@!");
 
-                String replace = area.getCurrentText();
-                replace = Role.ASSISTANT.name().toLowerCase() + ":" + replace;
+                chat.replaceMessageContent(index, contentToStore);
 
-                chat.replaceLine(old, replace);
+                layout.getPane().getChildren().removeLast(); // Re-evaluate this line for correctness in your UI setup
 
-                layout.getPane().getChildren().removeLast();
-
-                CardContainer responseBox = buildChatBox(Role.ASSISTANT, chat.getContent(replace), chat.getRawLines().size());
-                layout.addElement(responseBox);
-                layout.getPane().getChildren().add(responseBox.build().getKey());
+                ChatMessage updatedChatMessage = chat.getMessage(index);
+                if (updatedChatMessage != null) {
+                    CardContainer responseBox = buildChatBox(updatedChatMessage, index);
+                    layout.addElement(responseBox);
+                    layout.getPane().getChildren().add(responseBox.build().getKey());
+                }
 
                 App.window.removeContainer(modalContainer);
-
-                chat.update();
             });
 
             App.window.renderPopup(modalContainer, PopupPosition.CENTER, 400, 400);
@@ -305,34 +308,32 @@ public class ChatView {
             // Delete the message
             //TODO: Add confirm for deleting
             layout.getPane().getChildren().removeLast();
-            chat.removeLine(index);
+            chat.removeMessage(index);
             chat.update();
         });
 
         // Doesn't make sense to regenerate the configured message.
         String firstMsg = (character.getFirstMessage() == null || character.getFirstMessage().isEmpty() ? "null" : character.getFirstMessage());
-        if (role == Role.ASSISTANT && !firstMsg.equalsIgnoreCase(message)) {
+        if (chatMessage.getSender() == Role.ASSISTANT && !firstMsg.equalsIgnoreCase(chatMessage.getContent())) {
             TextOverlay regenerate = new TextOverlay(new FontIcon(Material2MZ.REFRESH));
             regenerate.setTooltip("Regenerate the response.");
             root.addElement(regenerate);
             regenerate.onClick(event -> {
                 if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isLoading() || ServerProcess.getCurrentServer().isError()) return;
 
-                if (index + 1 != chat.getRawLines().size()) {
+                if (index + 1 != chat.getMessages().size()) {
                     return;
                 }
 
-                String remove = chat.getLine(index);
-
                 // Remove the line which is the last line of the chat
-                chat.removeLine(chat.getIndex(remove));
+                chat.removeMessage(index);
                 layout.getPane().getChildren().removeLast();
 
                 // Generate new box with
-                CardContainer responseBox = buildChatBox(Role.ASSISTANT, "", chat.getRawLines().size()); // Set content later
+                CardContainer responseBox = buildChatBox(chatMessage, chat.getMessages().size()); // Set content later
                 // Gen response
 
-                Response response = new Response(chat.getLines().size(), message, character, character.getUser(), chat);
+                Response response = new Response(index, chat.getLastLine(index).getContent(), character, character.getUser(), chat);
                 chat.setResponse(response);
 
                 layout.addElement(responseBox);
@@ -340,10 +341,11 @@ public class ChatView {
                 // Disable buttons to prevent spamming
                 send.getNode().setDisable(true);
                 submit.getNode().setDisable(true);
-                generateResponse(response, message, responseBox);
+                generateResponse(response, chatMessage, responseBox);
 
             });
         }
+
 
         return root;
     }
@@ -434,32 +436,32 @@ public class ChatView {
 
             // Copy user message to clipboard
             // Delete both last assistant and user messages
-            int index = chat.getRawLines().size();
+            int index = chat.getMessages().size();
             if (index == 0) return;
 
-            String lastLine = chat.getLastLine(index);
+            ChatMessage lastLine = chat.getLastLine(index);
             int layoutSize = layout.getPane().getChildren().size();
 
-            Role role = chat.getSender(lastLine);
+            Role role = lastLine.getSender();
             if (role == Role.ASSISTANT) {
                 layout.getPane().getChildren().remove(layoutSize - 1);
                 layout.getPane().getChildren().remove(layoutSize - 2);
 
                 // Remove assistant
-                chat.removeLine(index - 1);
+                chat.removeMessage(index - 1);
 
                 // Copy user message and then remove it
-                String content = chat.getLine(index - 2);
-                ((TextArea) send.getNode()).setText(chat.getContent(content));
-                chat.removeLine(index - 2);
+                ChatMessage content = chat.getMessage(index - 2);
+                ((TextArea) send.getNode()).setText(content.getContent());
+                chat.removeMessage(index - 2);
 
                 chat.update();
             } else {
                 // The last message is user
                 // Just remove the message from the chat and put it back into the box.
                 layout.getPane().getChildren().remove(layoutSize - 1);
-                ((TextArea) send.getNode()).setText(chat.getContent(lastLine));
-                chat.removeLine(index - 1);
+                ((TextArea) send.getNode()).setText(lastLine.getContent());
+                chat.removeMessage(index - 1);
                 chat.update();
             }
 
@@ -491,6 +493,9 @@ public class ChatView {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*.png"));
             image = fileChooser.showOpenDialog(App.window.getStage());
+            if (image == null) return;
+
+            System.out.println("Set image: " + image.getAbsolutePath());
 
             HorizontalLayout imgBox = new HorizontalLayout(100, 40);
             imgBox.setMaxSize(100, 40);
@@ -563,40 +568,46 @@ public class ChatView {
         send.getNode().setDisable(true);
         submit.getNode().setDisable(true);
 
-        // First add the user box then generate the ai box and response
-        Role role = Role.USER;
 
-        int userIndex = chat.getRawLines().size();
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
-        CardContainer userBox = buildChatBox(role, message, chat.getRawLines().size());
-        chat.addLine(role, message);
+        ChatMessage chatMessage = chat.addLine(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
+        chat.update();
+        if (image != null) {
+            System.out.println("Image: " + image.getAbsolutePath());
+        }
+        CardContainer userBox = buildChatBox(chatMessage, chat.getMessages().size()); // <-- How??
+
+
         layout.addElement(userBox); // This doesn't render the user box, but it does add it to the layout for reference.
         layout.getPane().getChildren().add(userBox.build().getKey()); // Force render the new box
         //chat.addLine(role, message);
 
-        int assistantIndex = chat.getRawLines().size();
-        CardContainer responseBox = buildChatBox(Role.ASSISTANT, "", assistantIndex); // Set content later
+        int assistantIndex = chat.getMessages().size();
+        ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", null);
+        CardContainer responseBox = buildChatBox(newMsg, assistantIndex); // Set content later
 
         // Gen response
 
-        Response response = new Response(chat.getLines().size(), message, character, character.getUser(), chat);
-        if (image != null) {
-            response.setImage(image);
-        }
+        Response response = new Response(chat.getMessages().size(), message, character, character.getUser(), chat);
         chat.setResponse(response);
+        System.out.println("Size: " + chat.getMessages().size());
 
         layout.addElement(responseBox);
         layout.getPane().getChildren().add(responseBox.build().getKey());
 
-        generateResponse(response, message, responseBox);
+        generateResponse(response, chatMessage, responseBox);
     }
 
-    private void generateResponse(Response response, String message, CardContainer responseBox) {
+    private void generateResponse(Response response, ChatMessage chatMessage, CardContainer responseBox) {
         Card card = (Card) responseBox.build().getKey();
+
+        if (image != null) {
+            response.setImage(image);
+        }
 
         Thread thread = new Thread(() -> {
             // Generate response!
-            response.setPrompt(message);
+            response.setPrompt(chatMessage.getContent());
             String received;
             try {
                 received = Server.generateResponseOAIStream(scrollContainer.getScrollPane(), card, response);
@@ -664,7 +675,9 @@ public class ChatView {
         return container;
     }
 
-    public static TextFlowOverlay buildTextFlow(String content, Chat chat, int index) {
+    public static TextFlowOverlay buildTextFlow(ChatMessage chatMessage, Chat chat, int index) {
+        String content = Placeholder.applyDynamicBBCode(chatMessage.getContent());
+
         TextFlowOverlay chatBox = new TextFlowOverlay(content, 1100, 0);
         InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
         chatBox.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
@@ -684,7 +697,7 @@ public class ChatView {
                 copy.setOnAction(event1 -> {
                     Clipboard clipboard = Clipboard.getSystemClipboard();
                     ClipboardContent clipboardContent = new ClipboardContent();
-                    clipboardContent.putString(Placeholder.retrieveOriginalText(chat.getContent(chat.getLine(index))));
+                    clipboardContent.putString(Placeholder.retrieveOriginalText(content));
                     clipboard.setContent(clipboardContent);
                 });
 

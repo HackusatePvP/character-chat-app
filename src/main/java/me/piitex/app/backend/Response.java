@@ -4,7 +4,6 @@ import me.piitex.app.App;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
-import me.piitex.app.utils.Placeholder;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +48,7 @@ public class Response {
         });
     }
 
-    public void createContext(boolean oai) throws JSONException, IOException {
+    public void createContext() throws JSONException {
         App.logger.info("Creating current context tokens...");
 
         messages = new JSONArray();
@@ -88,13 +87,13 @@ public class Response {
             tokens += Server.tokenize(character.getChatScenario());
         }
 
-        LinkedList<String> chatMessages = chat.getLines();
+        LinkedList<ChatMessage> chatMessages = chat.getMessages(); // Now returns ChatMessage objects
         Collections.reverse(chatMessages);
 
-        LinkedList<String> chatContext = new LinkedList<>();
+        LinkedList<ChatMessage> chatContext = new LinkedList<>();
 
-        for (String s : chatMessages) {
-            tokens += Server.tokenize(s);
+        for (ChatMessage s : chatMessages) {
+            tokens += Server.tokenize(s.getContent());
             if (tokens < maxTokens) {
                 chatContext.add(s);
             } else {
@@ -118,39 +117,49 @@ public class Response {
         });
 
         Collections.reverse(chatContext);
-        for (String s : chatContext) {
+
+        //TODO: Add images to the chat data. That way each message can have an image as context.
+        // This would take up significant token size. I believe in the near future, per message image is possible.
+        // For now it will only use the last image uploaded.
+        //TODO: Add images to the chat data. That way each message can have an image as context.
+        int index = 0;
+        for (ChatMessage currentChatMessage : chatContext) {
             JSONObject chatMessageContext = new JSONObject();
-            chatMessageContext.put("role", chat.getSender(s).name());
-            chatMessageContext.put("content", format(chat.getContent(s), character, user));
-            messages.put(chatMessageContext);
-        }
+            chatMessageContext.put("role", currentChatMessage.getSender().name().toLowerCase());
+            JSONArray contentArray = new JSONArray();
 
-        // Open API has the image embedded into the messages (context).
-        // /completion has the image into the root object "image_data".
-        if (oai) {
-            if (image != null) {
-                App.logger.info("Fetching character base64...");
-                byte[] fileContent = FileUtils.readFileToByteArray(image);
+            JSONObject textPart = new JSONObject();
+            textPart.put("type", "text");
+            textPart.put("text", format(currentChatMessage.getContent(), character, user));
+            contentArray.put(textPart);
 
-                String iData = Base64.getEncoder().encodeToString(fileContent);
+            System.out.println("Response image: " + (image != null ? image.getAbsolutePath() : "NULL"));
 
-                JSONObject message = new JSONObject();
-                message.put("role", "user");
-                JSONArray content = new JSONArray();
-                JSONObject img = new JSONObject();
-                img.put("type", "image_url");
-                img.put("image_url", new JSONObject().put("url", "data:image/" + getImageType() + ";base64," + iData));
-                JSONObject object = new JSONObject();
-                object.put("type", "text");
-                object.put("text", format(prompt, character, user));
-                content.put(img);
-                content.put(object);
-                message.put("content", content);
-                messages.put(message);
-                return; // Don;t process lastMessage as it's already included.
+            if (image != null && index == chat.getMessages().size() - 1) {
+                System.out.println("PASSED");
+                if (image.exists() && image.isFile()) {
+                    System.out.println("PASSED 1");
+                    App.logger.debug("Processing bas64 data...");
+                    try {
+                        System.out.println("Processing base64 data");
+                        byte[] fileContent = FileUtils.readFileToByteArray(image);
+                        String iData = Base64.getEncoder().encodeToString(fileContent);
+                        JSONObject imgPart = new JSONObject();
+
+                        imgPart.put("type", "image_url");
+                        imgPart.put("image_url", new JSONObject().put("url", "data:image/" + getImageType() + ";base64," + iData));
+                        contentArray.put(imgPart);
+                    } catch (IOException e) {
+                        App.logger.error("Error reading image file for base64 encoding: {}", image, e);
+                    }
+                } else {
+                    System.out.println("Nope!");
+                }
             }
+            chatMessageContext.put("content", contentArray);
+            messages.put(chatMessageContext);
+            index++;
         }
-
     }
 
     public int getIndex() {
@@ -164,6 +173,9 @@ public class Response {
         String fileName = image.getName();
         if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
             return "jpeg";
+        }
+        if (fileName.endsWith(".png")) {
+            return "png";
         }
 
         return "";

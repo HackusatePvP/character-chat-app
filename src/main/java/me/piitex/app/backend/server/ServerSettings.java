@@ -20,7 +20,6 @@ public class ServerSettings {
     private boolean installed = true;
     private String lastModel = "";
     private String modelPath = "%APPDATA%/chat-app/models/";
-    private String mmProjModel = "";
     private LinkedList<String> devices = new LinkedList<>();
     private boolean astrixEnabled = true;
     private boolean flashAttention = false;
@@ -72,11 +71,6 @@ public class ServerSettings {
             this.modelPath = infoFile.get("model-path");
         } else {
             infoFile.set("model-path", modelPath);
-        }
-        if (infoFile.hasKey("mmproj")) {
-            this.mmProjModel = infoFile.get("mmproj");
-        } else {
-            infoFile.set("mmproj", "");
         }
         if (infoFile.hasKey("last-model")) {
             lastModel = infoFile.get("last-model");
@@ -204,29 +198,9 @@ public class ServerSettings {
 
     public void setLastModel(String lastModel) {
         this.lastModel = lastModel;
-        mmProjModel = "";
         infoFile.set("last-model", lastModel);
     }
 
-    public Model getMmProjModel() {
-        if (mmProjModel.isEmpty()) {
-            return null;
-        }
-        return new Model(new File(mmProjModel));
-    }
-
-    public String getMMprojString() {
-        if (mmProjModel.isEmpty() || getMmProjModel() == null) {
-            return "";
-        }
-
-        return getMmProjModel().getFile().getName();
-    }
-
-    public void setMmProjModel(String mmProjModel) {
-        this.mmProjModel = mmProjModel;
-        infoFile.set("mmproj", mmProjModel);
-    }
 
     public boolean isInstalled() {
         return installed;
