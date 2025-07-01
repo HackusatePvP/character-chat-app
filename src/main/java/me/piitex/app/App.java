@@ -36,6 +36,7 @@ public class App {
 
     // Doesn't support natively ran mobile, but can at least make it viewable with remote connection.
     public static boolean mobile = false;
+    public static boolean vulkanDisable = false;
 
     public static final Logger logger = LogManager.getLogger(App.class);
 
@@ -118,7 +119,7 @@ public class App {
     }
 
     public Model getDefaultModel() {
-        for (Model model : getModels()) {
+        for (Model model : getModels("exclude")) {
             if (model.getSettings().isDefault()) {
                 return model;
             }
@@ -158,31 +159,74 @@ public class App {
         return new File(getAppDirectory(), "images/");
     }
 
-    public static List<Model> getModels() {
+    public static List<Model> getModels(String filterType) {
         List<Model> models = new ArrayList<>();
-        if (App.getInstance().getSettings().getModelPath().isEmpty()) return models;
-        File modelPath = new File(App.getInstance().getSettings().getModelPath().replace("%APPDATA%", System.getenv("APPDATA")));
-        if (!modelPath.isDirectory()) return models;
-        modelPath.mkdirs();
-        for (File file : modelPath.listFiles()) {
-            if (file.getName().endsWith("gguf")) {
-                Model model = new Model(file);
-                models.add(model);
-            }
+
+        if (App.getInstance().getSettings().getModelPath().isEmpty()) {
+            System.out.println("Model path is empty.");
+            return models;
         }
 
+        String path = App.getInstance().getSettings().getModelPath().replace("%APPDATA%", System.getenv("APPDATA"));
+        File modelPath = new File(path);
+
+        if (!modelPath.exists()) {
+            System.out.println("Model directory does not exist. Creating: " + modelPath.getAbsolutePath());
+            modelPath.mkdirs();
+            return models;
+        }
+
+        if (!modelPath.isDirectory()) {
+            System.out.println("Model path is not a directory: " + modelPath.getAbsolutePath());
+            return models;
+        }
+        findGGUFModelsRecursive(modelPath, models, filterType);
         return models;
     }
 
-    public static Set<String> getModelNames() {
+    public static List<Model> getModels() {
+        return getModels(null); // Call the overloaded method with null to get all.
+    }
+
+
+    private static void findGGUFModelsRecursive(File directory, List<Model> models, String filterType) {
+        File[] files = directory.listFiles();
+        String actualFilterType = (filterType == null || filterType.isEmpty()) ? "all" : filterType.toLowerCase();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                findGGUFModelsRecursive(file, models, filterType);
+            } else if (file.isFile() && file.getName().endsWith(".gguf")) {
+                String fileName = file.getName();
+                boolean isMMProj = fileName.contains("mmproj");
+                switch (actualFilterType) {
+                    case "mmproj":
+                        if (isMMProj) {
+                            models.add(new Model(file));
+                        }
+                        break;
+                    case "exclude":
+                        if (!isMMProj) {
+                            models.add(new Model(file));
+                        }
+                        break;
+                    case "all":
+                    default:
+                        models.add(new Model(file));
+                        break;
+                }
+            }
+        }
+    }
+
+    public static Set<String> getModelNames(String filter) {
         Set<String> toReturn = new TreeSet<>();
-        for (Model model : getModels()) {
+        for (Model model : getModels(filter)) {
             toReturn.add(model.getFile().getName());
         }
         return toReturn;
     }
 
     public static Model getModelByName(String name) {
-        return getModels().stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name)).findAny().orElse(null);
+        return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name)).findAny().orElse(null);
     }
 }
