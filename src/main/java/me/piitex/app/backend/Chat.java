@@ -12,12 +12,10 @@ import java.util.LinkedList;
 
 public class Chat {
     private final File file;
-
-    private LinkedList<String> lines = new LinkedList<>();
-
     private Response response;
-
+    private final LinkedList<ChatMessage> messages = new LinkedList<>();
     private final boolean dev = false;
+
 
     public Chat(File file) {
         this.file = file;
@@ -25,17 +23,21 @@ public class Chat {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to create chat file: " + file.getAbsolutePath(), e);
             }
-
-        // Vibe coded with Gemini. It somehow works. If it doesn't work bring it with CEO of google.
-        } else if (file.length() > 0 && !dev) { // Only attempt decryption if the file has content
-            File out = new File(file.getParent(), "out.dat");
+        } else if (file.length() > 0 && !dev) {
+            File out = new File(file.getParent(), "out.dat"); // Temporary decrypted file
             try {
                 FileCrypter.decryptFile(file, out);
-                lines.addAll(Files.readAllLines(out.toPath()));
+                Files.readAllLines(out.toPath()).forEach(rawLine -> {
+                    ChatMessage msg = parseLineToChatMessage(rawLine);
+                    if (msg != null) {
+                        messages.add(msg);
+                    }
+                });
             } catch (IOException | IllegalBlockSizeException e) {
-                App.logger.error("Error decrypting file: ", e);
+                System.err.println("Error decrypting or reading chat file: " + file.getAbsolutePath());
+                e.printStackTrace();
             } finally {
                 if (out.exists()) {
                     out.delete();
@@ -43,8 +45,16 @@ public class Chat {
             }
         } else {
             try {
-                lines.addAll(Files.readAllLines(file.toPath()));
+                if (file.length() > 0) {
+                    Files.readAllLines(file.toPath()).forEach(rawLine -> {
+                        ChatMessage msg = parseLineToChatMessage(rawLine);
+                        if (msg != null) {
+                            messages.add(msg);
+                        }
+                    });
+                }
             } catch (IOException e) {
+                System.err.println("Error reading chat file in dev mode: " + file.getAbsolutePath());
                 e.printStackTrace();
             }
         }
@@ -54,106 +64,133 @@ public class Chat {
         return file;
     }
 
-    public Role getSender(String line) {
-        //user:Hello
-        if (line.startsWith("assistant:")) {
-            return Role.ASSISTANT;
+    private ChatMessage parseLineToChatMessage(String rawLine) {
+        Role sender;
+        String contentPart;
+
+        if (rawLine.startsWith("assistant:")) {
+            sender = Role.ASSISTANT;
+            contentPart = rawLine.substring("assistant:".length());
+        } else if (rawLine.startsWith("user:")) {
+            sender = Role.USER;
+            contentPart = rawLine.substring("user:".length());
         } else {
-            return Role.USER;
+            // Unrecognized format, skip or log an error
+            System.err.println("Warning: Unrecognized chat line format: " + rawLine);
+            return null; // Or throw an exception
         }
+        String content;
+        String imageUrl = null;
+        int imgDelimiterIndex = contentPart.indexOf("!!IMG!!");
+
+        if (imgDelimiterIndex != -1) {
+            content = contentPart.substring(0, imgDelimiterIndex);
+            if (imgDelimiterIndex + "!!IMG!!".length() < contentPart.length()) {
+                imageUrl = contentPart.substring(imgDelimiterIndex + "!!IMG!!".length());
+            }
+            if (imageUrl != null && imageUrl.isBlank()) {
+                imageUrl = null;
+            }
+        } else {
+            content = contentPart;
+        }
+
+        content = content.replace("!@!", "\n");
+
+        return new ChatMessage(sender, content, imageUrl);
     }
 
-    public String getContent(String line) {
-        line = line.replace("!@!", "\n");
-        if (line.startsWith("user:")) {
-            line = line.replaceFirst("user:", "");
+    private String chatMessageToRawLine(ChatMessage message) {
+        String formattedContent = message.getContent().replace("\n", "!@!");
+        StringBuilder rawLineBuilder = new StringBuilder();
+        rawLineBuilder.append(message.getSender().name().toLowerCase()).append(":");
+        rawLineBuilder.append(formattedContent);
+
+        if (message.hasImage()) {
+            rawLineBuilder.append("!!IMG!!").append(message.getImageUrl());
         }
-        if (line.startsWith("assistant:")) {
-            line = line.replaceFirst("assistant:", "");
-        }
-        return line;
+        return rawLineBuilder.toString();
+    }
+
+
+    public ChatMessage addLine(Role role, String content, String imageUrl) {
+        ChatMessage newMessage = new ChatMessage(role, content, imageUrl);
+        messages.add(newMessage);
+        update();
+
+        return newMessage;
     }
 
     public void addLine(Role role, String content) {
-        // Special character replacements
-        // Sometimes models will produce special characters like ”
-        content = content.replace("”", "\"");
-
-        content = content.replace("\n", "!@!");
-        lines.add(role.name().toLowerCase() + ":" + content);
-        update();
+        addLine(role, content, null);
     }
 
-    public LinkedList<String> getLines() {
-        LinkedList<String> toReturn = new LinkedList<>();
-        lines.forEach(s -> {
-            s = s.replace("!@!", "\n");
-            toReturn.add(s);
-        });
-
-        return toReturn;
+    public LinkedList<ChatMessage> getMessages() {
+        return new LinkedList<>(messages);
     }
 
-    public LinkedList<String> getRawLines() {
-        return lines;
-    }
-
-    public int getIndex(String line) {
-        return lines.indexOf(line);
-    }
-
-    public String getLastLine(int index) {
-        return lines.get(index - 1);
-    }
-
-    public void removeLine(int index) {
-        lines.remove(index);
-    }
-
-    public String getLine(int index) {
-        return lines.get(index);
-    }
-
-    public void replaceLine(String line, String newLine) {
-        line = line.replace("\n", "!@!");
-        newLine = newLine.replace("\n", "!@!");
-        int index = lines.indexOf(line);
-        lines.set(index, newLine);
-    }
-
-    public boolean containsLine(String line) {
-        for (String s : getRawLines()) {
-            if (s.toLowerCase().contains(line.toLowerCase())) {
-                return true;
-            }
+    public ChatMessage getMessage(int index) {
+        if (index >= 0 && index < messages.size()) {
+            return messages.get(index);
         }
+        return null;
+    }
 
-        return false;
+    public void removeMessage(int index) {
+        if (index >= 0 && index < messages.size()) {
+            messages.remove(index);
+            update();
+        }
+    }
+
+    public ChatMessage replaceMessage(int index, ChatMessage newMessage) {
+        if (index >= 0 && index < messages.size()) {
+            ChatMessage oldMessage = messages.set(index, newMessage);
+            update();
+            return oldMessage;
+        } else {
+            return null;
+        }
+    }
+
+    public ChatMessage replaceMessageContent(int index, String newContent) {
+        ChatMessage existingMessage = getMessage(index);
+        if (existingMessage != null) {
+            ChatMessage updatedMessage = new ChatMessage(
+                    existingMessage.getSender(),
+                    newContent, // New content
+                    existingMessage.getImageUrl()
+            );
+            return replaceMessage(index, updatedMessage);
+        }
+        return null;
+    }
+
+    public ChatMessage getLastLine(int currentIndex) {
+        int previousIndex = currentIndex - 1;
+        return getMessage(previousIndex);
     }
 
     public void update() {
-        File tempIn = new File(file.getParent(), "temp_in.dat"); // Use a different temporary file
+        File tempIn = new File(file.getParent(), "temp_in.dat");
         if (dev) {
             tempIn = file;
         }
-        try {
-            FileWriter writer = new FileWriter(tempIn);
-            for (String s : lines) {
-                writer.write(s + "\n");
+        try (FileWriter writer = new FileWriter(tempIn)) {
+            for (ChatMessage msg : messages) {
+                writer.write(chatMessageToRawLine(msg) + "\n");
             }
-            writer.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error writing chat data to temporary file: " + tempIn.getAbsolutePath(), e);
         } finally {
             if (!dev) {
                 FileCrypter.encryptFile(tempIn, file);
             }
             if (tempIn.exists() && !dev) {
-                tempIn.delete(); // Delete the temporary input file
+                tempIn.delete();
             }
         }
     }
-
     public Response getResponse() {
         return response;
     }
