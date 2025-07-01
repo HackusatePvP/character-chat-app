@@ -49,13 +49,14 @@ public class ModelsView {
         layout.setSpacing(0);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        double height = 500 + (200 * App.getModels().size());
-        layout.setPrefSize(1000, height);
+        //double height = 500 + (200 * App.getModels(true).size());
+        layout.setPrefSize(1000, 0);
         layout.setY(20);
         layout.setX(200);
 
         //FIXME: If the scroller breaks it's probably because of changes to VerticalLayout. setPrefSize() does not work with the scroller and will break it. Only use setMinSize.
-        scrollContainer = new ScrollContainer(layout, 0, 0, 1670, 800);
+        scrollContainer = new ScrollContainer(layout, 0, 0, 1670, 1000);
+        scrollContainer.setMaxSize(1670, 1000);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -104,7 +105,7 @@ public class ModelsView {
 
         boolean def = false;
 
-        for (Model model : App.getModels()) {
+        for (Model model : App.getModels("exclude")) {
             if (model.getSettings().isDefault()) {
                 if (!def) {
                     def = true;
@@ -155,7 +156,7 @@ public class ModelsView {
                 // Also, re-render the view
 
                 // Reloop models and disable any defaults
-                for (Model m : App.getModels()) {
+                for (Model m : App.getModels("exclude")) {
                     if (m == model) continue;
                     if (m.getSettings().isDefault()) {
                         m.getSettings().setDefault(false);

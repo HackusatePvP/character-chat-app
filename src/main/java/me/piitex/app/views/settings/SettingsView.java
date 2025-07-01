@@ -209,7 +209,7 @@ public class SettingsView {
 
         List<String> items = new ArrayList<>();
         items.add("Default / Last Model");
-        items.addAll(App.getModelNames());
+        items.addAll(App.getModelNames("exclude"));
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
@@ -217,7 +217,7 @@ public class SettingsView {
         root.addElement(selection);
         selection.onItemSelect(event -> {
             if (event.getItem().startsWith("Default /")) {
-                for (Model model : App.getModels()) {
+                for (Model model : App.getModels("exclude")) {
                     if (model.getSettings().isDefault()) {
                         App.getInstance().getSettings().setLastModel(model.getFile().getAbsolutePath());
                         break;
@@ -262,13 +262,15 @@ public class SettingsView {
         selection.onItemSelect(event -> {
             String newBackend = event.getItem();
             if (newBackend == null) return;
-            if (newBackend.equalsIgnoreCase("vulkan")) {
-                ComboBox<String> comboBox = (ComboBox<String>) selection.getNode();
-                comboBox.getSelectionModel().select(settings.getBackend());
-                MessageOverlay warning = new MessageOverlay(0, 0, 600, 100, "Vulkan Support", "Due to BSOD issues with Vulkan the backend is disabled. We are currently waiting on a fix. Thank you for your understanding.", new TextOverlay(new FontIcon(Material2MZ.OUTLINED_FLAG)));
-                warning.addStyle(Styles.WARNING);
-                App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                return;
+            if (App.vulkanDisable) {
+                if (newBackend.equalsIgnoreCase("vulkan")) {
+                    ComboBox<String> comboBox = (ComboBox<String>) selection.getNode();
+                    comboBox.getSelectionModel().select(settings.getBackend());
+                    MessageOverlay warning = new MessageOverlay(0, 0, 600, 100, "Vulkan Support", "Due to BSOD issues with Vulkan the backend is disabled. We are currently waiting on a fix. Thank you for your understanding.", new TextOverlay(new FontIcon(Material2MZ.OUTLINED_FLAG)));
+                    warning.addStyle(Styles.WARNING);
+                    App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    return;
+                }
             }
 
             try {
