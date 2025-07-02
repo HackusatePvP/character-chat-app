@@ -2,10 +2,8 @@ package me.piitex.app;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.User;
-import me.piitex.app.backend.server.DeviceProcess;
-import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
-import me.piitex.app.backend.server.TestProcess;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.UserSettings;
 import me.piitex.engine.Window;
@@ -13,12 +11,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class App {
     private final ServerSettings settings;
     private final UserSettings userSettings;
+    private final AppSettings appSettings;
 
     // Character ID, Character object
     private final Map<String, Character> characters = new TreeMap<>();
@@ -53,6 +51,7 @@ public class App {
         loadUserTemplates();
         loadCharacters();
 
+        appSettings = new AppSettings();
         settings = new ServerSettings();
         settings.getInfoFile().set("main-pid", ProcessHandle.current().pid());
         userSettings = new UserSettings();
@@ -87,6 +86,10 @@ public class App {
                 }
             }
         }
+    }
+
+    public AppSettings getAppSettings() {
+        return appSettings;
     }
 
     public UserSettings getUserSettings() {
