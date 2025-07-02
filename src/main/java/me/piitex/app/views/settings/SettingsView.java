@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
@@ -36,8 +37,12 @@ public class SettingsView {
 
     private ButtonOverlay start, stop, reload;
 
+    private AppSettings appSettings = App.getInstance().getAppSettings();
+
     public SettingsView() {
-        container = new EmptyContainer(1670, 0);
+        int maxWidth = appSettings.getWidth();
+        container = new EmptyContainer(maxWidth - 300, 0);
+
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setSpacing(35);
         container.addElement(root);
@@ -49,8 +54,8 @@ public class SettingsView {
         layout.setSpacing(20);
 
         //FIXME: If the scroller breaks it's probably because of changes to VerticalLayout. setPrefSize() does not work with the scroller and will break it. Only use setMinSize.
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, 1670, 1000);
-        scrollContainer.setMaxSize(1670, 1000);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, maxWidth - 200, appSettings.getHeight() - 100);
+        scrollContainer.setMaxSize(maxWidth - 200, appSettings.getHeight() - 100);
 
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
@@ -72,8 +77,9 @@ public class SettingsView {
     }
 
     public CardContainer buildResolution() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        System.out.println("Width: " + appSettings.getWidth());
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -81,7 +87,7 @@ public class SettingsView {
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
-        TextFlowOverlay description = new TextFlowOverlay("Set the base resolution for the application. Will require a restart to have an affect.", 600, 200);
+        TextFlowOverlay description = new TextFlowOverlay("Set the base resolution for the application. This is still in development, some pages may not support different resolutions.", 600, 200);
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setMaxWidth(600);
@@ -97,18 +103,24 @@ public class SettingsView {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-        String current = (infoFile.hasKey("width") && infoFile.hasKey("height") ? infoFile.get("width") + "x" + infoFile.get("height") : "");
+        //String current = (infoFile.hasKey("width") && infoFile.hasKey("height") ? infoFile.get("width") + "x" + infoFile.get("height") : "");
+        AppSettings appSettings = App.getInstance().getAppSettings();
+        String current = appSettings.getWidth() + "x" + appSettings.getHeight();
         selection.setDefaultItem(current);
         root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
             int width = Integer.parseInt(item.split("x")[0]);
             int height = Integer.parseInt(item.split("x")[1]);
-            infoFile.set("width", width);
-            infoFile.set("height", height);
+            appSettings.setWidth(width);
+            appSettings.setHeight(height);
 
-            //TODO: RenEngine doesn't have API for changing window size dynamically.
+            App.window.setWidth(width);
+            App.window.setHeight(height);
+
+            App.window.clearContainers();
+            App.window.addContainer(new SettingsView().getContainer());
+            App.window.render();
         });
         card.setBody(root);
 
@@ -116,8 +128,8 @@ public class SettingsView {
     }
 
     public CardContainer buildChatSize() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -141,10 +153,11 @@ public class SettingsView {
         items.add("Extra Large");
         items.add("Extreme Large Ultimate");
 
+        AppSettings appSettings = App.getInstance().getAppSettings();;
+
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-        selection.setDefaultItem(infoFile.hasKey("chat-text-size") ? getTextKey(infoFile.get("chat-text-size")) : "Default");
+        selection.setDefaultItem(appSettings.getTextSize());
         root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
@@ -163,7 +176,7 @@ public class SettingsView {
             } else {
                 item = Styles.TEXT;
             }
-            infoFile.set("chat-text-size", item);
+            appSettings.setTextSize(item);
         });
         card.setBody(root);
 
@@ -190,8 +203,8 @@ public class SettingsView {
 
     public CardContainer buildModelSelection() {
         // Testing out card designs
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -233,8 +246,8 @@ public class SettingsView {
 
     public CardContainer buildBackend() {
         // Testing out card designs
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -298,8 +311,8 @@ public class SettingsView {
 
 
     public CardContainer buildGpuDevice() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -326,8 +339,8 @@ public class SettingsView {
     }
 
     public CardContainer buildGpuLayers() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -352,8 +365,8 @@ public class SettingsView {
     }
 
     public CardContainer buildMemoryLock() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -378,8 +391,8 @@ public class SettingsView {
     }
 
     public CardContainer buildFlashAttention() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setMaxSize(1600, 120);
@@ -404,7 +417,8 @@ public class SettingsView {
 
 
     public CardContainer buildDangerZone() {
-        CardContainer card = new CardContainer(0, 0, 1600, 150);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 150);
+        card.setMaxSize(appSettings.getWidth() - 300, 150);
 
         TextOverlay text = new TextOverlay("Danger Zone");
         text.setTextFill(Color.RED);
