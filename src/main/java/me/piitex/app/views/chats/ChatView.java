@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import me.piitex.app.App;
@@ -22,6 +23,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.SidebarView;
@@ -38,8 +40,7 @@ import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ChatView {
     private final Character character;
@@ -55,6 +56,9 @@ public class ChatView {
     private ButtonOverlay submit;
 
     private File image = null;
+
+    // Not sure if this is smart but for better control map the container to the index.
+    private final Map<Integer, CardContainer> containerMap = new HashMap<>();
 
     public ChatView(Character character, @Nullable Chat chat) {
         this.character = character;
@@ -175,7 +179,9 @@ public class ChatView {
     public void loadMessages() {
         int index = 0;
         for (ChatMessage message : chat.getMessages()) {
-            layout.addElement(buildChatBox(message, index));
+            CardContainer cardContainer = buildChatBox(message, index);
+            containerMap.put(index, cardContainer);
+            layout.addElement(cardContainer);
             index++;
         }
     }
@@ -283,6 +289,7 @@ public class ChatView {
                 ChatMessage updatedChatMessage = chat.getMessage(index);
                 if (updatedChatMessage != null) {
                     CardContainer responseBox = buildChatBox(updatedChatMessage, index);
+                    containerMap.put(index, responseBox);
                     layout.addElement(responseBox);
                     layout.getPane().getChildren().add(responseBox.build().getKey());
                 }
@@ -331,6 +338,7 @@ public class ChatView {
 
                 // Generate new box with
                 CardContainer responseBox = buildChatBox(chatMessage, chat.getMessages().size()); // Set content later
+                containerMap.put(chat.getMessages().size(), responseBox);
                 // Gen response
 
                 Response response = new Response(index, chat.getLastLine(index).getContent(), character, character.getUser(), chat);
@@ -392,8 +400,7 @@ public class ChatView {
         root.addElement(bottom);
 
         send = new TextAreaOverlay("", "Type your response.", 0, 0, 800, 150);
-        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-        send.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
+        send.addStyle(App.getInstance().getAppSettings().getTextSize());
         bottom.addElement(send);
 
         submit = new ButtonOverlay("submit", "Send");
@@ -566,11 +573,21 @@ public class ChatView {
         send.getNode().setDisable(true);
         submit.getNode().setDisable(true);
 
+        // Remove regen from previous card
+        CardContainer previous = containerMap.get(chat.getMessages().size() - 1);
+        Role previousSender = chat.getMessages().getLast().getSender();
+        if (previous != null && previousSender == Role.ASSISTANT) {
+            Card card = (Card) previous.getView();
+            HBox buttonLayout = (HBox) card.getFooter();
+            buttonLayout.getChildren().removeLast();
+        }
 
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
         ChatMessage chatMessage = chat.addLine(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
         chat.update();
-        CardContainer userBox = buildChatBox(chatMessage, chat.getMessages().size()); // <-- How??
+
+        CardContainer userBox = buildChatBox(chatMessage, chat.getMessages().size());
+        containerMap.put(chat.getMessages().size(), userBox);
 
 
         layout.addElement(userBox); // This doesn't render the user box, but it does add it to the layout for reference.
@@ -580,6 +597,7 @@ public class ChatView {
         int assistantIndex = chat.getMessages().size();
         ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", null);
         CardContainer responseBox = buildChatBox(newMsg, assistantIndex); // Set content later
+        containerMap.put(chat.getMessages().size(), responseBox);
 
         // Gen response
 
@@ -672,10 +690,16 @@ public class ChatView {
     public static TextFlowOverlay buildTextFlow(ChatMessage chatMessage, Chat chat, int index) {
         String content = Placeholder.applyDynamicBBCode(chatMessage.getContent());
 
-        TextFlowOverlay chatBox = new TextFlowOverlay(content, 1100, 0);
-        InfoFile infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-        chatBox.addStyle((infoFile.hasKey("chat-text-size") ? infoFile.get("chat-text-size") : ""));
-        chatBox.setMaxWidth(1100); // Set a little less than chatLayout
+        TextFlowOverlay chatBox;
+        if (App.mobile) {
+            chatBox = new TextFlowOverlay(content, 500, 0);
+            chatBox.setMaxWidth(500);
+        } else {
+            chatBox = new TextFlowOverlay(content, 1100, 0);
+            chatBox.setMaxWidth(1100); // Set a little less than chatLayout
+        }
+
+        chatBox.addStyle(App.getInstance().getAppSettings().getTextSize());
 
         // Right click menu
         ContextMenu contextMenu = new ContextMenu();
