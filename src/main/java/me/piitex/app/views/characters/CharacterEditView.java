@@ -90,10 +90,6 @@ public class CharacterEditView {
     private TabsContainer container;
 
     public CharacterEditView(@Nullable Character character) {
-        if (App.mobile) {
-            new CharacterEditMobileView(character);
-            return;
-        }
         this.infoFile = new InfoFile();
         this.character = character;
         if (character != null) {
@@ -106,10 +102,6 @@ public class CharacterEditView {
     }
 
     public CharacterEditView(@Nullable Character character, boolean duplicate) {
-        if (App.mobile) {
-            new CharacterEditMobileView(character, duplicate);
-            return;
-        }
         this.infoFile = new InfoFile();
         this.character = character;
         this.duplicate = duplicate;
@@ -123,10 +115,6 @@ public class CharacterEditView {
     }
 
     public CharacterEditView(@Nullable Character character, @Nullable User user, @Nullable InfoFile infoFile, @Nullable Tab tab) {
-        if (App.mobile) {
-            new CharacterEditMobileView(character, user, infoFile, tab);
-            return;
-        }
         this.character = character;
         this.infoFile = infoFile;
         this.user = user;

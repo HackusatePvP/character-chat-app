@@ -11,6 +11,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.views.HomeView;
+import me.piitex.app.views.chats.ChatMobileView;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
@@ -109,7 +110,11 @@ public class CharactersView {
                 if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
                     // Load chat window...
                     App.window.clearContainers();
-                    App.window.addContainer(new ChatView(character, character.getLastChat()).getContainer());
+                    if (App.mobile) {
+                        App.window.addContainer(new ChatMobileView(character, character.getLastChat()).getContainer());
+                    } else {
+                        App.window.addContainer(new ChatView(character, character.getLastChat()).getContainer());
+                    }
                     App.window.render();
                 }
 
