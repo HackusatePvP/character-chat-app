@@ -3,18 +3,13 @@ package me.piitex.app.views;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
+import me.piitex.app.views.characters.CharacterEditMobileView;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.app.views.users.UsersView;
-import me.piitex.engine.Container;
-import me.piitex.engine.containers.CardContainer;
-import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.TextOverlay;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.material2.Material2MZ;
 
 public class SidebarView {
     private final VerticalLayout root;
@@ -76,7 +71,11 @@ public class SidebarView {
         root.addElement(characters);
         characters.onClick(event -> {
             App.window.clearContainers();
-            App.window.addContainer(new CharacterEditView(null).getRoot());
+            if (App.mobile) {
+                App.window.addContainer(new CharacterEditMobileView(null).getRoot());
+            } else {
+                App.window.addContainer(new CharacterEditView(null).getRoot());
+            }
             App.window.render();
         });
     }
