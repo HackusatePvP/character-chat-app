@@ -4,14 +4,17 @@ import atlantafx.base.theme.PrimerDark;
 import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.engine.Container;
+import me.piitex.engine.RenConfiguration;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.loaders.ImageLoader;
@@ -27,20 +30,9 @@ public class JavaFXLoad extends Application {
     public void start(Stage s) {
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 
-        // Configure dimensions
-        int setWidth = 1280;
-        int setHeight = 720;
-        InfoFile appData = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
-        if (appData.hasKey("width")) {
-            setWidth = appData.getInteger("width");
-        } else {
-            appData.set("width", setWidth);
-        }
-        if (appData.hasKey("height")) {
-            setHeight = appData.getInteger("height");
-        } else {
-            appData.set("height", setHeight);
-        }
+        AppSettings appSettings = App.getInstance().getAppSettings();
+        int setWidth = appSettings.getWidth();
+        int setHeight = appSettings.getHeight();
 
         App.logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
 
@@ -48,14 +40,23 @@ public class JavaFXLoad extends Application {
 
         int width = dimension.width;
 
-        Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setDimensions(setWidth, setHeight).build();
-        window.updateBackground(Color.rgb(13, 17, 23));
+        // TODO: Testing, remove later
+//        setWidth = 700;
+//        setHeight = 1080;
+//        width = 700;
 
         // Always true, later set the width to dimension.getWidth()
         if (width < 720) {
+            App.logger.info("Using mobile layouts...");
             // Set mobile view
             App.mobile = true;
+            RenConfiguration.setWidth(700);
+            RenConfiguration.setHeight(1080);
         }
+
+
+        Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(false).setDimensions(setWidth, setHeight).build();
+        window.updateBackground(Color.rgb(13, 17, 23));
 
         App.window = window;
 
@@ -78,6 +79,15 @@ public class JavaFXLoad extends Application {
             // When exiting, can cause BSOD with Vulkan.
             Platform.exit();
             System.exit(0);
+        });
+
+        // Resets view back to home screen. Useful during testing if something doesn't render right.
+        stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.R && event.isControlDown()) {
+                App.window.clearContainers();
+                App.window.addContainer(new HomeView().getContainer());
+                App.window.render();
+            }
         });
 
         // Build home view
