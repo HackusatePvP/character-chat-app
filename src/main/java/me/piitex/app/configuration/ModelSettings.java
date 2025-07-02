@@ -5,7 +5,7 @@ import com.drew.lang.annotations.Nullable;
 
 public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only."; //TODO: Default
-    private int contextSize;
+    private int contextSize = 4096; // 4096 is a good baseline. Most modern models can go way higher (32k)
     private double temperature = 0.8; // min 0
     private double minP = 0.1; // min 0.05
     private int repeatTokens = 64; // min -1
