@@ -60,6 +60,8 @@ public class ChatView {
     // Not sure if this is smart but for better control map the container to the index.
     private final Map<Integer, CardContainer> containerMap = new HashMap<>();
 
+    private AppSettings appSettings = App.getInstance().getAppSettings();
+
     public ChatView(Character character, @Nullable Chat chat) {
         this.character = character;
         if (chat == null) {
@@ -100,26 +102,27 @@ public class ChatView {
     }
 
     public void build() {
-        container = new EmptyContainer(1920, 0);
+        container = new EmptyContainer(appSettings.getWidth(), 0);
 
-        HorizontalLayout main = new HorizontalLayout(1900, 0);
+        HorizontalLayout main = new HorizontalLayout(appSettings.getWidth(), 0);
         main.setSpacing(35);
         main.addElement(new SidebarView().getRoot());
 
         container.addElement(main);
 
         VerticalLayout chatView = new VerticalLayout(0, 0);
+        chatView.setAlignment(Pos.TOP_CENTER);
         chatView.setY(70);
-        chatView.setSpacing(50);
+        chatView.setSpacing(40);
         main.addElement(chatView);
 
-        layout = new VerticalLayout(1000, 0);
-        layout.setX(100);
+        layout = new VerticalLayout(appSettings.getWidth() - 300, 0);
+        //layout.setX(100);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        double scrollHeight = 720;
-        scrollContainer = new ScrollContainer(layout, 0, 0, 1500, scrollHeight);
-        scrollContainer.setMaxSize(1920, scrollHeight);
+        double scrollHeight = appSettings.getHeight() - 350;
+        scrollContainer = new ScrollContainer(layout, 0, 0, appSettings.getWidth() - 300, scrollHeight);
+        scrollContainer.setMaxSize(appSettings.getWidth(), scrollHeight);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -157,7 +160,7 @@ public class ChatView {
 
         ChoiceBoxOverlay selection = new ChoiceBoxOverlay(items);
         selection.setDefaultItem(chat.getFile().getName());
-        selection.setX(750);
+        selection.setX(appSettings.getWidth() / 2 - 100);
         selection.setY(20);
         selection.setMaxWidth(400);
         selection.setWidth(400);
@@ -187,12 +190,11 @@ public class ChatView {
     }
 
     public CardContainer buildChatBox(ChatMessage chatMessage, int index) {
-        CardContainer cardContainer = new CardContainer(1000, 0); // Width, height
-        cardContainer.setMaxSize(1300, 0);
+        CardContainer cardContainer = new CardContainer(appSettings.getWidth() - 300, 0); // Width, height
+        cardContainer.setMaxSize(appSettings.getWidth() - 300, 0);
         String iconPath = "";
         String displayName = "";
         Role role = chatMessage.getSender();
-        String content = chatMessage.getContent();
         if (role == Role.USER) {
             iconPath = character.getUser().getIconPath();
             displayName = character.getUser().getDisplayName();
@@ -386,8 +388,7 @@ public class ChatView {
 
     public VerticalLayout buildSendBox() {
         VerticalLayout root = new VerticalLayout(0, 0);
-        root.setMaxSize(1000, 250);
-        root.setX(200);
+        root.setMaxSize(700, 250);
 
         root.addElement(buildTopControls());
 
@@ -395,11 +396,11 @@ public class ChatView {
         //bottom.setX(200);
        //bottom.setY(100);
         bottom.setSpacing(20);
-        bottom.setMaxSize(1000, 150);
+        bottom.setMaxSize(700, 150);
 
         root.addElement(bottom);
 
-        send = new TextAreaOverlay("", "Type your response.", 0, 0, 800, 150);
+        send = new TextAreaOverlay("", "Type your response.", 0, 0, 600, 150);
         send.addStyle(App.getInstance().getAppSettings().getTextSize());
         bottom.addElement(send);
 
@@ -695,8 +696,8 @@ public class ChatView {
             chatBox = new TextFlowOverlay(content, 500, 0);
             chatBox.setMaxWidth(500);
         } else {
-            chatBox = new TextFlowOverlay(content, 1100, 0);
-            chatBox.setMaxWidth(1100); // Set a little less than chatLayout
+            chatBox = new TextFlowOverlay(content, App.getInstance().getAppSettings().getWidth() - 300, 0);
+            chatBox.setMaxWidth(App.getInstance().getAppSettings().getWidth() - 300); // Set a little less than chatLayout
         }
 
         chatBox.addStyle(App.getInstance().getAppSettings().getTextSize());
