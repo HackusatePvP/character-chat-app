@@ -1,8 +1,10 @@
 package me.piitex.app.views;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.views.characters.CharactersView;
 import me.piitex.engine.Container;
@@ -30,10 +32,47 @@ public class HomeView {
         container.addElement(root);
 
         root.addElement(new SidebarView().getRoot());
-        if (!App.getInstance().getCharacters().isEmpty()) {
-            root.addElement(new CharactersView().getRoot());
+
+        TextOverlay load = new TextOverlay("Loading data");
+        if (App.getInstance().isLoading()) {
+            root.addElement(load);
         } else {
-            root.addElement(buildInstructions());
+            if (!App.getInstance().getCharacters().isEmpty()) {
+                root.addElement(new CharactersView().getRoot());
+            } else {
+                root.addElement(buildInstructions());
+            }
+        }
+
+        // Not thread efficient of safe. To be fair the entire application is not efficient or thread safe so why care now.
+        if (App.getInstance().isLoading()) {
+            container.onRender(event -> {
+                new Thread(() -> {
+                    boolean loading = App.getInstance().isLoading();
+                    int buf = 0;
+                    while (loading) {
+                        loading = App.getInstance().isLoading();
+                        buf++;
+                        if (buf == 75) {
+                            Platform.runLater(() -> {
+                                Text text = (Text) load.getNode();
+                                if (text.getText().length() == 15) {
+                                    text.setText("Loading data");
+                                } else {
+                                    text.setText(text.getText() + ".");
+                                }
+                            });
+                        }
+                        if (!loading) break;
+                    }
+
+                    Platform.runLater(() -> {
+                        App.window.clearContainers();
+                        App.window.addContainer(new HomeView().getContainer());
+                        App.window.render();
+                    });
+                }).start();
+            });
         }
 
         // Prompt warning with Vulkan

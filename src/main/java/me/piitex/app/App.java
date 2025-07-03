@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class App {
     private final ServerSettings settings;
@@ -34,6 +35,11 @@ public class App {
 
     public static final Logger logger = LogManager.getLogger(App.class);
 
+    // Loading data things for threading
+    private final AtomicInteger activeLoadingTasks = new AtomicInteger(0);
+    private volatile boolean loading = false;
+
+
     public App() {
         logger.info("Initializing application...");
         instance = this;
@@ -45,12 +51,21 @@ public class App {
         getUsersDirectory().mkdirs();
 
         loadUserTemplates();
-        loadCharacters();
+
+        new Thread(() -> {
+            loading = true;
+            loadCharacters();
+            loading = false;
+        }).start();
 
         appSettings = new AppSettings();
         settings = new ServerSettings();
         settings.getInfoFile().set("main-pid", ProcessHandle.current().pid());
         userSettings = new UserSettings();
+    }
+
+    public boolean isLoading() {
+        return loading;
     }
 
     public void loadCharacters() {
