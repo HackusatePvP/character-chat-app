@@ -26,38 +26,14 @@ Only works with Windows 10/11. Linux and Mac are being explored.
 * [llama.cpp](https://github.com/ggml-org/llama.cpp) Backend server for the models.
 
 
-## Multimodal Support
-Multimodal is a type of model that supports vision (Image processing). The backend does support vision but there is no UI implementation for it.
+## Multimodal / Vision
+Vision is now supported as of version 1.0.1. Vision allows a model to process an image as context. Due to consumer hardware limitations only one image can be processed at a time.
+This is still being worked on and improved. Currently, there is no display for the image.
 
-This is coming soon.
+## Vulkan
+Vulkan has been re-enabled as of version 1.0.1. For Nvidia 50 series and 40 series it can still bluescreen when exiting the application. Please use Cuda if you encounter a crash.
 
-## Vulkan Issues
-Vulkan is known to cause BSOD if configured improperly. It also has segfault bugs that are being tracked. Because of these issues, Vulkan is disabled in the official release. Once the issues have been addressed and patched it will be re-enabled.
-
-The app uses llama.cpp to handle models. This issue is with llama.cpp and will have to be fixed by that scene.
-
-You can also re-enable Vulkan by modifying the source. Simply remove the follow lines in SettingsView.java and re-compile.
-
-```java
-public CardContainer buildBackend() {
-    // code ...
-    selection.onItemSelect(event -> {
-        String newBackend = event.getItem(); // DO NOT REMOVE
-        if (newBackend == null) return; // DO NOT REMOVE
-        // Remove the below
-        if (newBackend.equalsIgnoreCase("vulkan")) {
-            ComboBox<String> comboBox = (ComboBox<String>) selection.getNode();
-            comboBox.getSelectionModel().select(settings.getBackend());
-            MessageOverlay warning = new MessageOverlay(0, 0, 600, 100, "Vulkan Support", "Due to BSOD issues with Vulkan the backend is disabled. We are currently waiting on a fix. Thank you for your understanding.", new TextOverlay(new FontIcon(Material2MZ.OUTLINED_FLAG)));
-            warning.addStyle(Styles.WARNING);
-            App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-            return;
-        }
-        // DO NOT REMOVE PAST THE BRACKET
-    });
-    
-}
-```
+Vulkan works right out of the box. No installations needed apart from basic graphics drivers.
 
 ## 🚀 Installation
 
