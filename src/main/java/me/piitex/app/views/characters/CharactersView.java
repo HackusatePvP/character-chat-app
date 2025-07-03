@@ -6,10 +6,10 @@ import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
-import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.chats.ChatMobileView;
 import me.piitex.app.views.chats.ChatView;
@@ -35,6 +35,8 @@ public class CharactersView {
 
     private int spacing = 20;
 
+    private AppSettings appSettings = App.getInstance().getAppSettings();
+
     public CharactersView() {
         VerticalLayout layout = new VerticalLayout(0, 0);
         layout.setSpacing(20);
@@ -48,16 +50,15 @@ public class CharactersView {
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 20, 20, 1500, 0);
-            root.setMaxSize(1920, 1000);
+            root = new ScrollContainer(layout, 20, 20, appSettings.getWidth() - 300, 0);
+            root.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
             imageWidth = 256;
             imageHeight = 256;
-            cardWidth = 250;
+            cardWidth = 220;
             cardHeight = 380;
         }
-        root.setVerticalScroll(true);
         root.setScrollWhenNeeded(false);
-        root.setHorizontalScroll(false);
+        root.setVerticalScroll(true);
 
         //TODO build boxes
         HorizontalLayout base = new HorizontalLayout(0, 0);
@@ -65,7 +66,8 @@ public class CharactersView {
         layout.addElement(base);
 
         int i = 0;
-        int max = (App.mobile ? 3 : 6);
+        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
+        int max = (App.mobile ? 3 : (int) Math.round(6 * scaleFactor));
         for (Character character : App.getInstance().getCharacters().values()) {
             if (i == max) {
                 // Start a new horizontal row
