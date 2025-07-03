@@ -1,16 +1,11 @@
 package me.piitex.app.views.models;
 
 import atlantafx.base.theme.Styles;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextFlow;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
@@ -31,15 +26,13 @@ import java.text.DecimalFormat;
 
 public class ModelsView {
     private final Container container;
-    private final ServerSettings settings = App.getInstance().getSettings();
     private ScrollContainer scrollContainer;
 
-    // The amount of spacing between the description and the input.
-    private int layoutSpacing = 200;
+    private AppSettings appSettings = App.getInstance().getAppSettings();
 
     public ModelsView(double scrollPosition) {
-        container = new EmptyContainer(1670, 1500);
-        HorizontalLayout root = new HorizontalLayout(1920, 0);
+        container = new EmptyContainer(appSettings.getWidth() - 300, 1500);
+        HorizontalLayout root = new HorizontalLayout(appSettings.getWidth() - 100, 0);
         root.setSpacing(35);
         container.addElement(root);
 
@@ -48,15 +41,11 @@ public class ModelsView {
         VerticalLayout layout = new VerticalLayout(0, 0);
         layout.setSpacing(0);
         layout.setAlignment(Pos.TOP_CENTER);
-
-        //double height = 500 + (200 * App.getModels(true).size());
-        layout.setPrefSize(1000, 0);
-        layout.setY(20);
-        layout.setX(200);
+        layout.setPrefSize(appSettings.getWidth() - 300, 0);
 
         //FIXME: If the scroller breaks it's probably because of changes to VerticalLayout. setPrefSize() does not work with the scroller and will break it. Only use setMinSize.
-        scrollContainer = new ScrollContainer(layout, 0, 0, 1670, 1000);
-        scrollContainer.setMaxSize(1670, 1000);
+        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -70,7 +59,8 @@ public class ModelsView {
 
 
     public CardContainer buildModelLocation() {
-        CardContainer root = new CardContainer(400, 100);
+        CardContainer root = new CardContainer(800, 100);
+        root.setMaxSize(800, 200);
 
         HorizontalLayout body = new HorizontalLayout(400, 100);
         body.setAlignment(Pos.CENTER_LEFT);
@@ -120,9 +110,12 @@ public class ModelsView {
             // Format to two decimal places
             DecimalFormat df = new DecimalFormat("#.##");
             String formattedFileSize = df.format(fileSizeInGB);
-            TitledContainer root = new TitledContainer(model.getFile().getName() + " (" + formattedFileSize + "GB)", 800, 100);
+
+            TitledContainer root = new TitledContainer(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, 0);
+            root.setMaxSize(900, 250);
             root.setSpacing(30);
             root.setAlignment(Pos.TOP_CENTER);
+            root.setExpanded(model.getSettings().isDefault());
 
             HorizontalLayout body = new HorizontalLayout(800, 50);
             body.setSpacing(10);
@@ -145,7 +138,6 @@ public class ModelsView {
             body.addElement(location);
 
             HorizontalLayout footer = new HorizontalLayout(800, 50);
-            footer.setSpacing(80);
             root.addElement(footer);
 
             CheckBoxOverlay defaultModel = new CheckBoxOverlay(model.getSettings().isDefault(),"Set as default");
