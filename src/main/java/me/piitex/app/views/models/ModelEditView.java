@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
@@ -24,9 +25,11 @@ public class ModelEditView {
     private int layoutSpacing = 150;
     private final Container container;
 
+    private final AppSettings appSettings = App.getInstance().getAppSettings();
+
     public ModelEditView(Model model) {
         this.settings = model.getSettings();
-        container = new EmptyContainer(1670, 1500);
+        container = new EmptyContainer(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
         main.setSpacing(35);
@@ -35,8 +38,8 @@ public class ModelEditView {
 
         VerticalLayout layout = new VerticalLayout(0, 0);
 
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, 1670, 800);
-        scrollContainer.setMaxSize(1670, 1000);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -55,11 +58,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildInstructions() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 0);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 0);
+        card.setMaxSize(appSettings.getWidth() - 300, 0);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -89,11 +92,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildContextSize() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        HorizontalLayout root = new HorizontalLayout(0, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -122,15 +125,15 @@ public class ModelEditView {
     }
 
     private CardContainer buildModalFile() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
+        TextFlowOverlay description = new TextFlowOverlay("", 600, 120);
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
@@ -160,11 +163,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildTemperature() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -194,11 +197,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildMinP() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -227,11 +230,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildRepeatTokens() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -260,11 +263,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildRepeatPenalty() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -293,11 +296,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildChatTemplates() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -368,11 +371,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildReasoningTemplate() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
@@ -407,11 +410,11 @@ public class ModelEditView {
     }
 
     private CardContainer buildJinjaTemplate() {
-        CardContainer card = new CardContainer(0, 0, 1600, 120);
-        card.setMaxSize(1600, 120);
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
+        root.setMaxSize(appSettings.getWidth() - 300, 120);
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
