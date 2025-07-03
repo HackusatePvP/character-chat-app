@@ -156,7 +156,7 @@ public class SettingsView {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        selection.setDefaultItem(appSettings.getTextSize());
+        selection.setDefaultItem(getTextKey(appSettings.getTextSize()));
         root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
