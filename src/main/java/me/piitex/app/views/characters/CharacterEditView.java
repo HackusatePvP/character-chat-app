@@ -21,6 +21,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerProcess;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.HomeView;
@@ -89,6 +90,8 @@ public class CharacterEditView {
 
     private TabsContainer container;
 
+    private AppSettings appSettings = App.getInstance().getAppSettings();
+
     public CharacterEditView(@Nullable Character character) {
         this.infoFile = new InfoFile();
         this.character = character;
@@ -139,17 +142,17 @@ public class CharacterEditView {
             }
         }
 
-        this.root = new EmptyContainer(0, 0, 192, 1080);
+        this.root = new EmptyContainer(0, 0, 192, appSettings.getHeight());
 
-        HorizontalLayout layout = new HorizontalLayout(1920, 1080);
+        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         layout.addElement(new SidebarView().getRoot());
         root.addElement(layout);
 
-        VerticalLayout main = new VerticalLayout(1600, 1000);
+        VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
         layout.addElement(main);
 
         // Add the views
-        container = new TabsContainer(0, 0, 1000, 1000);
+        container = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         main.addElement(buildTopTab());
 
         if (tab != null) {
@@ -178,23 +181,28 @@ public class CharacterEditView {
 
     public Tab buildCharacterTab() {
         characterTab = new Tab("Character");
-        characterTab.setWidth(1000);
-        characterTab.setHeight(1600);
+        characterTab.setWidth(appSettings.getWidth() - 300);
+        characterTab.setHeight(appSettings.getHeight());
 
-        HorizontalLayout root = new HorizontalLayout(1000, 1000);
-        root.setX(400);
-        root.setY(20);
-        root.setSpacing(20);
+        VerticalLayout root = new VerticalLayout(appSettings.getWidth() - 300 , appSettings.getHeight());
+        root.setSpacing(50);
+        root.setAlignment(Pos.TOP_CENTER);
         characterTab.addElement(root);
 
-        CardContainer displayBox = buildCharacterDisplay();
+        HorizontalLayout displayBox = new HorizontalLayout(500, 200);
+        displayBox.setMaxSize(500, 200);
+        displayBox.addStyle(Styles.BORDER_SUBTLE);
+        displayBox.setSpacing(20);
         root.addElement(displayBox);
 
-        root.addElement(buildCharacterInput());
+        CardContainer displayCard = buildCharacterDisplay();
+        displayBox.addElement(displayCard);
+        displayBox.addElement(buildCharacterInput());
 
-        charDescription = new TextAreaOverlay((character != null ? character.getPersona() : characterPersona),400, 300, 600, 400);
+        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
+        charDescription = new TextAreaOverlay((character != null ? character.getPersona() : characterPersona),0, 0, 600, 400 * scaleFactor);
         charDescription.setHintText("Describe the character and provide key lore.");
-        characterTab.addElement(charDescription);
+        root.addElement(charDescription);
         charDescription.onInputSetEvent(event -> {
             characterPersona = event.getInput();
             infoFile.set("character-persona", characterPersona);
@@ -206,15 +214,13 @@ public class CharacterEditView {
         if (character != null) {
             importCard.setEnabled(false);
         }
-        importCard.setX(500);
-        importCard.setY(charDescription.getY() + charDescription.getHeight() + 25);
         importCard.addStyle(Styles.ACCENT);
         importCard.addStyle(Styles.BUTTON_OUTLINED);
         importCard.setWidth(400);
 
 
         FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
-        characterTab.addElement(fileSelector);
+        root.addElement(fileSelector);
         fileSelector.onFileSelect(event -> {
             // Import the card metadata using CharacterCardImporter
             File file = event.getDirectory(); // This is a file not a directory. The naming can be misleading
@@ -322,23 +328,28 @@ public class CharacterEditView {
 
     public Tab buildUserTab() {
         userTab = new Tab("User");
-        userTab.setWidth(1000);
-        userTab.setHeight(1600);
+        userTab.setWidth(appSettings.getWidth() - 300);
+        userTab.setHeight(appSettings.getHeight());
 
-        HorizontalLayout root = new HorizontalLayout(1000, 1000);
-        root.setX(400);
-        root.setY(20);
-        root.setSpacing(20);
+        VerticalLayout root = new VerticalLayout(appSettings.getWidth() - 300 , appSettings.getHeight());
+        root.setSpacing(50);
+        root.setAlignment(Pos.TOP_CENTER);
         userTab.addElement(root);
 
-        CardContainer displayBox = buildUserDisplay();
+        HorizontalLayout displayBox = new HorizontalLayout(500, 200);
+        displayBox.setMaxSize(500, 200);
+        displayBox.addStyle(Styles.BORDER_SUBTLE);
+        displayBox.setSpacing(20);
         root.addElement(displayBox);
 
-        root.addElement(buildUserInput());
+        CardContainer displayCard = buildUserDisplay();
+        displayBox.addElement(displayCard);
+        displayBox.addElement(buildUserInput());
 
-        TextAreaOverlay userDescription = new TextAreaOverlay(userPersona,400, 300, 600, 400);
+        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
+        TextAreaOverlay userDescription = new TextAreaOverlay(userPersona,0, 0, 600, 400 * scaleFactor);
         userDescription.setHintText("Describe the user and provide key lore.");
-        userTab.addElement(userDescription);
+        root.addElement(userDescription);
         userDescription.onInputSetEvent(event -> {
             userPersona = event.getInput();
             infoFile.set("user-persona", userPersona);
@@ -436,13 +447,23 @@ public class CharacterEditView {
     public Tab buildLorebookTab() {
         Tab tab = new Tab("Lorebook");
 
+        VerticalLayout root = new VerticalLayout(appSettings.getWidth() - 300 , appSettings.getHeight());
+        root.setSpacing(50);
+        root.setAlignment(Pos.TOP_CENTER);
+        tab.addElement(root);
+
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
         info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
         info.setX(200);
         info.setY(10);
-        tab.addElement(info);
+        root.addElement(info);
 
-        CardContainer addContainer = new CardContainer(20, 20, 400, 400);
+        HorizontalLayout displayBox = new HorizontalLayout(0, 0);
+        displayBox.setSpacing(100);
+        displayBox.setMaxSize(600, 0);
+        root.addElement(displayBox);
+
+        CardContainer addContainer = new CardContainer(0, 0, 400, 400);
         addContainer.setMaxSize(400, 400);
 
         InputFieldOverlay addKey = new InputFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
@@ -497,8 +518,8 @@ public class CharacterEditView {
             area.setText("");
         });
 
-        tab.addElement(addContainer);
-        tab.addElement(scrollLore);
+        displayBox.addElement(addContainer);
+        displayBox.addElement(scrollLore);
 
         tab.addElement(buildSubmitBox());
 
@@ -508,10 +529,10 @@ public class CharacterEditView {
     public ScrollContainer getLoreItems() {
         VerticalLayout scrollLayout = new VerticalLayout(0 ,0);
 
-        ScrollContainer root = new ScrollContainer(scrollLayout, 600, 20, 600, 800);
-        root.setMaxSize(600, 800);
+        ScrollContainer root = new ScrollContainer(scrollLayout, 0, 0, 450, 0);
+        root.setMaxSize(450, appSettings.getHeight() - 300);
         root.setVerticalScroll(true);
-        root.setScrollWhenNeeded(true);
+        root.setScrollWhenNeeded(false);
         root.setHorizontalScroll(false);
 
         App.logger.info("Building lore cache...");
@@ -558,7 +579,7 @@ public class CharacterEditView {
 
         int layoutSpacing = 200;
 
-        VerticalLayout layout = new VerticalLayout(1600, 1080);
+        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
         layout.setAlignment(Pos.TOP_CENTER);
         tab.addElement(layout);
 
@@ -567,16 +588,16 @@ public class CharacterEditView {
         layout.addElement(info);
 
         CardContainer firstCard = new CardContainer(0, 0, 0, 0);
-        firstCard.setMaxSize(1600, 200);
+        firstCard.setMaxSize(appSettings.getWidth() - 300, 200);
         layout.addElement(firstCard);
 
         HorizontalLayout firstBox = new HorizontalLayout(0, 0);
         firstBox.setAlignment(Pos.BASELINE_LEFT);
-        firstBox.setMaxSize(1600, 120);
+        firstBox.setMaxSize(appSettings.getWidth() - 300, 120);
         firstBox.setSpacing(layoutSpacing);
         firstCard.setBody(firstBox);
 
-        TextFlowOverlay firstDesc = new TextFlowOverlay("Set the first message from the assistant.", 600, 200);
+        TextFlowOverlay firstDesc = new TextFlowOverlay("Set the first message from the assistant.", (appSettings.getWidth() - 300) / 2, 200);
         firstDesc.setTextFillColor(Color.WHITE);
         firstBox.addElement(firstDesc);
 
@@ -589,16 +610,16 @@ public class CharacterEditView {
         });
 
         CardContainer scenarioCard = new CardContainer(0, 0, 0, 0);
-        scenarioCard.setMaxSize(1600, 200);
+        scenarioCard.setMaxSize(appSettings.getWidth() - 300, 200);
         layout.addElement(scenarioCard);
 
         HorizontalLayout scenarioBox = new HorizontalLayout(0, 0);
         scenarioBox.setAlignment(Pos.BASELINE_LEFT);
-        scenarioBox.setMaxSize(1600, 120);
+        scenarioBox.setMaxSize(appSettings.getWidth() - 300, 120);
         scenarioBox.setSpacing(layoutSpacing);
         scenarioCard.setBody(scenarioBox);
 
-        TextFlowOverlay scenarioDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", 600, 200);
+        TextFlowOverlay scenarioDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", (appSettings.getWidth() - 300) / 2, 50);
         scenarioDesc.setTextFillColor(Color.WHITE);
         scenarioBox.addElement(scenarioDesc);
 
@@ -611,16 +632,16 @@ public class CharacterEditView {
         });
 
         CardContainer contextCard = new CardContainer(0, 0, 0, 0);
-        contextCard.setMaxSize(1600, 50);
+        contextCard.setMaxSize(appSettings.getWidth() - 300, 50);
         layout.addElement(contextCard);
 
         HorizontalLayout contextBox = new HorizontalLayout(0, 0);
         contextBox.setAlignment(Pos.BASELINE_LEFT);
-        contextBox.setMaxSize(1600, 50);
+        contextBox.setMaxSize(appSettings.getWidth() - 300, 50);
         contextBox.setSpacing(layoutSpacing);
         contextCard.setBody(contextBox);
 
-        TextFlowOverlay contextDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", 600, 50);
+        TextFlowOverlay contextDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", (appSettings.getWidth() - 300) / 2, 50);
         contextDesc.setTextFillColor(Color.WHITE);
         contextBox.addElement(contextDesc);
 
@@ -648,9 +669,8 @@ public class CharacterEditView {
     }
 
     public HorizontalLayout buildSubmitBox() {
-        HorizontalLayout layout = new HorizontalLayout(1000, 200);
-        layout.setX(200);
-        layout.setY(820);
+        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 300, 200);
+        layout.setY(appSettings.getHeight() - 275);
         layout.setSpacing(20);
         layout.setAlignment(Pos.CENTER);
 
