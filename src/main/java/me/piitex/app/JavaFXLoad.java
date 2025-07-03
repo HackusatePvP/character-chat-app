@@ -45,7 +45,6 @@ public class JavaFXLoad extends Application {
 //        setHeight = 1080;
 //        width = 700;
 
-        // Always true, later set the width to dimension.getWidth()
         if (width < 720) {
             App.logger.info("Using mobile layouts...");
             // Set mobile view
@@ -114,6 +113,15 @@ public class JavaFXLoad extends Application {
             Platform.exit();
             System.exit(0);
         });
+        icon.setOnAction(event -> {
+            App.logger.info("Handling tray action");
+
+            // Not working
+            stage.show();
+            stage.toFront();
+            stage.setIconified(false);
+        });
+
         icon.show();
 
         window.render();
