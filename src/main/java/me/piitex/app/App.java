@@ -28,10 +28,6 @@ public class App {
 
     public static Window window;
 
-    // static abuse for buffered scaling
-    public static double width = 1920;
-    public static double height = 1080;
-
     // Doesn't support natively ran mobile, but can at least make it viewable with remote connection.
     public static boolean mobile = false;
     public static boolean vulkanDisable = false;
