@@ -77,7 +77,6 @@ public class SettingsView {
     }
 
     public CardContainer buildResolution() {
-        System.out.println("Width: " + appSettings.getWidth());
         CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
         card.setMaxSize(appSettings.getWidth() - 300, 120);
 
