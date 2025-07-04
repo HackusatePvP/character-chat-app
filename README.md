@@ -39,31 +39,12 @@ Vulkan works right out of the box. No installations needed apart from basic grap
 
 This section outlines the general steps to get you started. More detailed instructions for specific dependencies are provided in the sections that follow.
 
-1.  **Download Java 21:** Obtain and install the Java 21 Development Kit (JDK).
-2.  **Configure Java Path:** Add Java 21 to your system's environment path variables.
-3.  **Install Visual Studio (NVIDIA Only):** Download and install Visual Studio with the `Desktop development with C++` workload selected.
-4.  **Install GPU Drivers/Frameworks:**
-    *   **NVIDIA:** Download and install [CUDA 12.4](https://developer.nvidia.com/cuda-12-4-0-download-archive).
-    *   **AMD:** Install the necessary [HIP](https://www.amd.com/en/developer/resources/rocm-hub/hip-sdk.html) drivers (specific instructions may vary by OS).
-5.  **Download the Application:** Get the latest release from the [Releases](https://github.com/HackusatePvP/character-chat-app/releases/) page.
-6.  **Extract Application:** Extract the downloaded application files into your `%appdata%` directory (or equivalent on other OS).
-7.  **Run the Application:** Execute `start.bat` in the folder that was extracted.
-
-## Java Installation
-Please download **JDK 21**, the application was tested with [Corretto 21](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html).
-
-To verify your Java installation, open a command prompt/terminal/shell and type:
-```shell
-java --version
-```
-Ensure the output version starts with 21. You should see something like:
-
-`openjdk 21.0.7 2025-04-15 LTS`
-
-If you receive `'java' is not recognized as an internal or external command, operable program or batch file.` or an incorrect version, you'll need to configure your system paths.
-
-System Paths:
-TODO
+1. Download [Releases.zip](https://github.com/HackusatePvP/character-chat-app/releases).
+2. (Optional) Download the updated jar if applicable.
+3. (Optional) Download AI GPU drivers (Cuda, HIP)
+4. Extract all files into `%APPDATA%/chat-app`
+5. Enter `chat-app`
+6. Run `launch.bat`
 
 ## Install Application
 Download the official release from [Releases](https://github.com/HackusatePvP/character-chat-app/releases)
@@ -85,6 +66,8 @@ If you place a model inside the directory you will have to refresh the page. (Cl
 Make sure you have a model set as a default. This is a hard requirement.
 
 ## Compile Source
+You will have to have RenEngine compiled.
+
 In the project directory run the follow.
 ```bash
 mvnw clean install
