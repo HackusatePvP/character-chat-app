@@ -20,6 +20,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
@@ -54,6 +55,7 @@ public class ChatMobileView {
     private ButtonOverlay submit;
 
     private File image = null;
+    private AppSettings appSettings = App.getInstance().getAppSettings();
 
     public ChatMobileView(me.piitex.app.backend.Character character, @Nullable Chat chat) {
         this.character = character;
@@ -485,9 +487,11 @@ public class ChatMobileView {
 
             // Attach an image to the response
             FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File(appSettings.getImagesPath()));
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*.png"));
             image = fileChooser.showOpenDialog(App.window.getStage());
             if (image == null) return;
+            appSettings.setImagesPath(image.getParent());
 
             HorizontalLayout imgBox = new HorizontalLayout(100, 40);
             imgBox.setMaxSize(100, 40);

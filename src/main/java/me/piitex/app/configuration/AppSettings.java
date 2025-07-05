@@ -7,6 +7,7 @@ import java.io.File;
 public class AppSettings {
     private int width = 720, height = 1280;
     private String textSize = "default";
+    private String imagesPath = "";
 
     private final InfoFile infoFile;
 
@@ -21,6 +22,9 @@ public class AppSettings {
         }
         if (infoFile.hasKey("text-size")) {
             this.textSize = infoFile.get("text-size");
+        }
+        if (infoFile.hasKey("images-path")) {
+            this.imagesPath = infoFile.get("images-path");
         }
     }
 
@@ -49,5 +53,14 @@ public class AppSettings {
     public void setTextSize(String textSize) {
         this.textSize = textSize;
         infoFile.set("text-size", textSize);
+    }
+
+    public String getImagesPath() {
+        return imagesPath;
+    }
+
+    public void setImagesPath(String imagesPath) {
+        this.imagesPath = imagesPath;
+        infoFile.set("images-path", imagesPath);
     }
 }

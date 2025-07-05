@@ -499,9 +499,13 @@ public class ChatView {
 
             // Attach an image to the response
             FileChooser fileChooser = new FileChooser();
+            if (appSettings.getImagesPath() != null && !appSettings.getImagesPath().isEmpty()) {
+                fileChooser.setInitialDirectory(new File(appSettings.getImagesPath()));
+            }
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image", "*.png"));
             image = fileChooser.showOpenDialog(App.window.getStage());
             if (image == null) return;
+            appSettings.setImagesPath(image.getParent());
 
             HorizontalLayout imgBox = new HorizontalLayout(100, 40);
             imgBox.setMaxSize(100, 40);
