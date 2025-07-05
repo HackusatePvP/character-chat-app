@@ -580,11 +580,13 @@ public class ChatView {
 
         // Remove regen from previous card
         CardContainer previous = containerMap.get(chat.getMessages().size() - 1);
-        Role previousSender = chat.getMessages().getLast().getSender();
-        if (previous != null && previousSender == Role.ASSISTANT) {
-            Card card = (Card) previous.getView();
-            HBox buttonLayout = (HBox) card.getFooter();
-            buttonLayout.getChildren().removeLast();
+        if (!chat.getMessages().isEmpty()) {
+            Role previousSender = chat.getMessages().getLast().getSender();
+            if (previous != null && previousSender == Role.ASSISTANT) {
+                Card card = (Card) previous.getView();
+                HBox buttonLayout = (HBox) card.getFooter();
+                buttonLayout.getChildren().removeLast();
+            }
         }
 
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
