@@ -51,7 +51,7 @@ public class ChatView {
     private ScrollContainer scrollContainer;
     private HorizontalLayout topControls;
 
-    private TextAreaOverlay send;
+    private RichTextAreaOverlay send;
 
     private ButtonOverlay submit;
 
@@ -400,8 +400,10 @@ public class ChatView {
 
         root.addElement(bottom);
 
-        send = new TextAreaOverlay("", "Type your response.", 0, 0, 600, 150);
-        send.addStyle(App.getInstance().getAppSettings().getTextSize());
+        send = new RichTextAreaOverlay("", "Type your response.", 600, 150);
+        send.addStyle(Styles.BG_DEFAULT);
+        send.addStyle(appSettings.getTextSize());
+        send.addStyle(Styles.TEXT_MUTED);
         bottom.addElement(send);
 
         submit = new ButtonOverlay("submit", "Send");
