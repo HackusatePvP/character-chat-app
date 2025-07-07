@@ -57,6 +57,11 @@ public class JavaFXLoad extends Application {
             RenConfiguration.setHeight(1080);
         }
 
+        // Disable image caching.
+        // Useful for most app but not this one
+        // Causes issues when changing a user or character image.
+        ImageLoader.useCache = false;
+
 
         Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(true).setDimensions(setWidth, setHeight).build();
         window.updateBackground(Color.rgb(13, 17, 23));
