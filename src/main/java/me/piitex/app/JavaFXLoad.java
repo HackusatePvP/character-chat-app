@@ -38,6 +38,8 @@ public class JavaFXLoad extends Application {
 
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
+        App.logger.info("Screen Size ({},{})", dimension.width, dimension.height);
+
         int width = dimension.width;
 
         // TODO: Testing, remove later
@@ -49,12 +51,14 @@ public class JavaFXLoad extends Application {
             App.logger.info("Using mobile layouts...");
             // Set mobile view
             App.mobile = true;
+            setWidth = 700;
+            setHeight = 1080;
             RenConfiguration.setWidth(700);
             RenConfiguration.setHeight(1080);
         }
 
 
-        Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(false).setDimensions(setWidth, setHeight).build();
+        Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(true).setDimensions(setWidth, setHeight).build();
         window.updateBackground(Color.rgb(13, 17, 23));
 
         App.window = window;
