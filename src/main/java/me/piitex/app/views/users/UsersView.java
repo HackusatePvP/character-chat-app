@@ -61,7 +61,6 @@ public class UsersView {
         root.setScrollWhenNeeded(false);
         root.setHorizontalScroll(false);
 
-        //TODO build boxes
         HorizontalLayout base = new HorizontalLayout(0, 0);
         base.setSpacing(20);
         layout.addElement(base);
