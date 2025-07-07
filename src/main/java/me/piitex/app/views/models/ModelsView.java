@@ -59,11 +59,10 @@ public class ModelsView {
 
 
     public CardContainer buildModelLocation() {
-        CardContainer root = new CardContainer(800, 100);
-        root.setMaxSize(800, 200);
+        CardContainer root = new CardContainer(600, 100);
+        root.setMaxSize(800, 100);
 
         HorizontalLayout body = new HorizontalLayout(400, 100);
-        body.setAlignment(Pos.CENTER_LEFT);
         body.setSpacing(50);
         root.setBody(body);
 
