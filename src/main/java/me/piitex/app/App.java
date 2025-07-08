@@ -1,22 +1,22 @@
 package me.piitex.app;
+import javafx.application.Platform;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.User;
+import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
-import me.piitex.app.configuration.UserSettings;
 import me.piitex.engine.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class App {
     private final ServerSettings settings;
-    private final UserSettings userSettings;
     private final AppSettings appSettings;
 
     // Character ID, Character object
@@ -35,8 +35,6 @@ public class App {
 
     public static final Logger logger = LogManager.getLogger(App.class);
 
-    // Loading data things for threading
-    private final AtomicInteger activeLoadingTasks = new AtomicInteger(0);
     private volatile boolean loading = false;
 
 
@@ -44,11 +42,25 @@ public class App {
         logger.info("Initializing application...");
         instance = this;
 
-        getAppDirectory().mkdirs();
-        getBackendDirectory().mkdirs();
-        getModelsDirectory().mkdirs();
-        getCharactersDirectory().mkdirs();
-        getUsersDirectory().mkdirs();
+        if (getAppDirectory().mkdirs()) {
+            logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
+        }
+
+        if (getBackendDirectory().mkdirs()) {
+            logger.info("Created backend directory: {}", getBackendDirectory().getAbsolutePath());
+        }
+
+        if (getModelsDirectory().mkdirs()) {
+            logger.info("Created models directory: {}", getModelsDirectory().getAbsolutePath());
+        }
+
+        if (getCharactersDirectory().mkdirs()) {
+            logger.info("Created characters directory: {}", getCharactersDirectory().getAbsolutePath());
+        }
+
+        if (getUsersDirectory().mkdirs()) {
+            logger.info("Created users directory: {}", getUsersDirectory().getAbsolutePath());
+        }
 
         loadUserTemplates();
 
@@ -61,7 +73,6 @@ public class App {
         appSettings = new AppSettings();
         settings = new ServerSettings();
         settings.getInfoFile().set("main-pid", ProcessHandle.current().pid());
-        userSettings = new UserSettings();
     }
 
     public boolean isLoading() {
@@ -73,7 +84,7 @@ public class App {
         for (File file : getCharactersDirectory().listFiles()) {
             if (file.isDirectory()) {
                 String id = file.getName();
-                // Check if info file exsists
+                // Check if info file exists
                 File info = new File(file, "character.info");
                 if (info.exists()) {
                     InfoFile infoFile = new InfoFile(info, true);
@@ -88,7 +99,7 @@ public class App {
         for (File file : getUsersDirectory().listFiles()) {
             if (file.isDirectory()) {
                 String id = file.getName();
-                // Check if info file exsists
+                // Check if info file exists
                 File info = new File(file, "user.info");
                 if (info.exists()) {
                     InfoFile infoFile = new InfoFile(info, true);
@@ -101,10 +112,6 @@ public class App {
 
     public AppSettings getAppSettings() {
         return appSettings;
-    }
-
-    public UserSettings getUserSettings() {
-        return userSettings;
     }
 
     public ServerSettings getSettings() {
@@ -184,7 +191,9 @@ public class App {
         File modelPath = new File(path);
 
         if (!modelPath.exists()) {
-            modelPath.mkdirs();
+            if (modelPath.mkdirs()) {
+                App.logger.info("Created models directory.");
+            }
             return models;
         }
 
@@ -200,8 +209,9 @@ public class App {
     }
 
 
-    private static void findGGUFModelsRecursive(File directory, List<Model> models, String filterType) {
+    private static void findGGUFModelsRecursive(@NotNull File directory, List<Model> models, String filterType) {
         File[] files = directory.listFiles();
+        if (files == null) return;
         String actualFilterType = (filterType == null || filterType.isEmpty()) ? "all" : filterType.toLowerCase();
         for (File file : files) {
             if (file.isDirectory()) {
@@ -239,5 +249,25 @@ public class App {
 
     public static Model getModelByName(String name) {
         return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name)).findAny().orElse(null);
+    }
+
+    public static void shutdown() {
+        App.logger.info("Attempting shutdown...");
+        if (ServerProcess.getCurrentServer() != null) {
+            // This call will now block and wait for the server to stop
+            boolean stopped = ServerProcess.getCurrentServer().stop();
+            if (!stopped) {
+                App.logger.warn("Forcefully shutting down llama-server...");
+                // You might consider a short delay here before exiting the JVM
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        // When exiting, can cause BSOD with Vulkan.
+        Platform.exit();
+        System.exit(0);
     }
 }

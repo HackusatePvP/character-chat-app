@@ -3,7 +3,6 @@ package me.piitex.app;
 import atlantafx.base.theme.PrimerDark;
 import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -42,17 +41,12 @@ public class JavaFXLoad extends Application {
 
         int width = dimension.width;
 
-        // TODO: Testing, remove later
-//        setWidth = 700;
-//        setHeight = 1080;
-//        width = 700;
-
         if (width < 720) {
             App.logger.info("Using mobile layouts...");
             // Set mobile view
             App.mobile = true;
-            setWidth = 700;
-            setHeight = 1080;
+            setWidth = 600;
+            setHeight = 1200;
             RenConfiguration.setWidth(700);
             RenConfiguration.setHeight(1080);
         }
@@ -69,25 +63,7 @@ public class JavaFXLoad extends Application {
         App.window = window;
 
         Stage stage = window.getStage();
-        stage.setOnCloseRequest(windowEvent -> {
-            App.logger.info("Attempting shutdown...");
-            if (ServerProcess.getCurrentServer() != null) {
-                // This call will now block and wait for the server to stop
-                boolean stopped = ServerProcess.getCurrentServer().stop();
-                if (!stopped) {
-                    App.logger.warn("Forcefully shutting down llama-server...");
-                    // You might consider a short delay here before exiting the JVM
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
-            // When exiting, can cause BSOD with Vulkan.
-            Platform.exit();
-            System.exit(0);
-        });
+        stage.setOnCloseRequest(windowEvent -> App.shutdown());
 
         // Resets view back to home screen. Useful during testing if something doesn't render right.
         stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -104,24 +80,7 @@ public class JavaFXLoad extends Application {
         window.addContainer(container);
 
         FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
-        icon.addExitItem("Exit", e -> {
-            if (ServerProcess.getCurrentServer() != null) {
-                // This call will now block and wait for the server to stop
-                boolean stopped = ServerProcess.getCurrentServer().stop();
-                if (!stopped) {
-                    App.logger.warn("Forcefully shutting down llama-server...");
-                    // You might consider a short delay here before exiting the JVM
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e1) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
-            // When exiting, can cause BSOD with Vulkan.
-            Platform.exit();
-            System.exit(0);
-        });
+        icon.addExitItem("Exit", e -> App.shutdown());
         icon.setOnAction(event -> {
             App.logger.info("Handling tray action");
 
