@@ -14,9 +14,9 @@ import me.piitex.engine.overlays.ButtonOverlay;
 public class SidebarView {
     private final VerticalLayout root;
 
-    private int width, height;
-
     public SidebarView() {
+        int width;
+        int height;
         if (App.mobile) {
             width = 100;
             height = 1280;
@@ -28,10 +28,10 @@ public class SidebarView {
         root = new VerticalLayout(width, height);
         root.setAlignment(Pos.BASELINE_CENTER);
         root.setBackgroundColor(Color.rgb(10, 13, 18));
-        double width = 150;
+        double rootWidth = 150;
 
         ButtonOverlay home = new ButtonOverlay("home", "Home");
-        home.setWidth(width);
+        home.setWidth(rootWidth);
         root.addElement(home);
         home.onClick(event -> {
             App.window.clearContainers();
@@ -40,7 +40,7 @@ public class SidebarView {
         });
 
         ButtonOverlay settings = new ButtonOverlay("home", "Settings");
-        settings.setWidth(width);
+        settings.setWidth(rootWidth);
         root.addElement(settings);
         settings.onClick(event -> {
             App.window.clearContainers();
@@ -49,7 +49,7 @@ public class SidebarView {
         });
 
         ButtonOverlay models = new ButtonOverlay("models", "Models");
-        models.setWidth(width);
+        models.setWidth(rootWidth);
         root.addElement(models);
         models.onClick(event -> {
             App.window.clearContainers();
@@ -58,7 +58,7 @@ public class SidebarView {
         });
 
         ButtonOverlay users = new ButtonOverlay("users", "User Templates");
-        users.setWidth(width);
+        users.setWidth(rootWidth);
         root.addElement(users);
         users.onClick(event -> {
             App.window.clearContainers();
@@ -67,7 +67,7 @@ public class SidebarView {
         });
 
         ButtonOverlay characters = new ButtonOverlay("characters", "Create Character");
-        characters.setWidth(width);
+        characters.setWidth(rootWidth);
         root.addElement(characters);
         characters.onClick(event -> {
             App.window.clearContainers();
