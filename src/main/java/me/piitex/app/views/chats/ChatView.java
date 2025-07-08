@@ -403,7 +403,7 @@ public class ChatView {
         send = new RichTextAreaOverlay("", "Type your response.", 600, 150);
         send.addStyle(Styles.BG_DEFAULT);
         send.addStyle(appSettings.getTextSize());
-        send.addStyle(Styles.TEXT_MUTED);
+        send.addStyle(Styles.TEXT_ON_EMPHASIS);
         bottom.addElement(send);
 
         submit = new ButtonOverlay("submit", "Send");
