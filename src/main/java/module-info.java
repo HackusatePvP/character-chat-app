@@ -15,6 +15,8 @@ module me.piitex.app {
     requires atlantafx.base;
     requires java.logging;
     requires org.apache.logging.log4j;
+    requires annotations;
+    requires org.fxmisc.richtext;
 
     opens me.piitex.app to javafx.fxml;
     exports me.piitex.app;
