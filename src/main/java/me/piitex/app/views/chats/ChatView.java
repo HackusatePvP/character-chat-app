@@ -24,7 +24,6 @@ import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
@@ -34,6 +33,7 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
+import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
@@ -415,15 +415,15 @@ public class ChatView {
 
         send.onSubmit(event -> {
             // Handle submit action. Send the input to the model and generate a response
-            TextArea textArea = (TextArea) send.getNode();
+            StyledTextArea textArea = (StyledTextArea) send.getNode();
             handleSubmit(textArea.getText());
-            textArea.setText("");
+            textArea.replaceText("");
         });
 
         submit.onClick(event -> {
-            TextArea textArea = (TextArea) send.getNode();
+            StyledTextArea textArea = (StyledTextArea) send.getNode();
             handleSubmit(textArea.getText());
-            textArea.setText("");
+            textArea.replaceText("");
         });
 
 
@@ -462,7 +462,7 @@ public class ChatView {
 
                 // Copy user message and then remove it
                 ChatMessage content = chat.getMessage(index - 2);
-                ((TextArea) send.getNode()).setText(content.getContent());
+                ((StyledTextArea) send.getNode()).replaceText(content.getContent());
                 chat.removeMessage(index - 2);
 
                 chat.update();
@@ -632,7 +632,6 @@ public class ChatView {
             String received;
             try {
                 received = Server.generateResponseOAIStream(scrollContainer.getScrollPane(), card, response);
-                //TODO: Add stopping box
             } catch (IOException e) {
                 Platform.runLater(() -> {
                     MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");
