@@ -168,9 +168,7 @@ public class UsersView {
             ButtonOverlay cancel = new ButtonOverlay("cancel", "Keep");
             cancel.setWidth(150);
             cancel.addStyle(Styles.SUCCESS);
-            cancel.onClick(event1 -> {
-                App.window.removeContainer(dialogueContainer);
-            });
+            cancel.onClick(event1 -> App.window.removeContainer(dialogueContainer));
 
             ButtonOverlay confirm = new ButtonOverlay("confirm", "Delete");
             confirm.setWidth(150);

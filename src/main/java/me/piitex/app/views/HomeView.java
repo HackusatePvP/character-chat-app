@@ -46,33 +46,31 @@ public class HomeView {
 
         // Not thread efficient of safe. To be fair the entire application is not efficient or thread safe so why care now.
         if (App.getInstance().isLoading()) {
-            container.onRender(event -> {
-                new Thread(() -> {
-                    boolean loading = App.getInstance().isLoading();
-                    int buf = 0;
-                    while (loading) {
-                        loading = App.getInstance().isLoading();
-                        buf++;
-                        if (buf == 75) {
-                            Platform.runLater(() -> {
-                                Text text = (Text) load.getNode();
-                                if (text.getText().length() == 15) {
-                                    text.setText("Loading data");
-                                } else {
-                                    text.setText(text.getText() + ".");
-                                }
-                            });
-                        }
-                        if (!loading) break;
+            container.onRender(event -> new Thread(() -> {
+                boolean loading = App.getInstance().isLoading();
+                int buf = 0;
+                while (loading) {
+                    loading = App.getInstance().isLoading();
+                    buf++;
+                    if (buf == 75) {
+                        Platform.runLater(() -> {
+                            Text text = (Text) load.getNode();
+                            if (text.getText().length() == 15) {
+                                text.setText("Loading data");
+                            } else {
+                                text.setText(text.getText() + ".");
+                            }
+                        });
                     }
+                    if (!loading) break;
+                }
 
-                    Platform.runLater(() -> {
-                        App.window.clearContainers();
-                        App.window.addContainer(new HomeView().getContainer());
-                        App.window.render();
-                    });
-                }).start();
-            });
+                Platform.runLater(() -> {
+                    App.window.clearContainers();
+                    App.window.addContainer(new HomeView().getContainer());
+                    App.window.render();
+                });
+            }).start());
         }
 
         // Prompt warning with Vulkan
