@@ -60,7 +60,6 @@ public class CharactersView {
         root.setScrollWhenNeeded(false);
         root.setVerticalScroll(true);
 
-        //TODO build boxes
         HorizontalLayout base = new HorizontalLayout(0, 0);
         base.setSpacing(20);
         layout.addElement(base);

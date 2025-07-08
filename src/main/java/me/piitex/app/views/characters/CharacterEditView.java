@@ -791,8 +791,6 @@ public class CharacterEditView {
     }
 
     private void updateCharacterFields() {
-        //TODO: Set fields for character
-        // Only called if character is not null!
         characterIconPath = new File(character.getIconPath());
         characterId = character.getId();
         characterDisplay = character.getDisplayName();

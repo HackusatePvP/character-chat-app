@@ -603,7 +603,6 @@ public class ChatMobileView {
             String received;
             try {
                 received = Server.generateResponseOAIStream(scrollContainer.getScrollPane(), card, response);
-                //TODO: Add stopping box
             } catch (IOException e) {
                 Platform.runLater(() -> {
                     MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");

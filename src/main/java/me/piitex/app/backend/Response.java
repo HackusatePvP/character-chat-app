@@ -121,7 +121,6 @@ public class Response {
         //TODO: Add images to the chat data. That way each message can have an image as context.
         // This would take up significant token size. I believe in the near future, per message image is possible.
         // For now it will only use the last image uploaded.
-        //TODO: Add images to the chat data. That way each message can have an image as context.
         int index = 0;
         for (ChatMessage currentChatMessage : chatContext) {
             JSONObject chatMessageContext = new JSONObject();
