@@ -33,9 +33,16 @@ public class HomeView {
 
         root.addElement(new SidebarView().getRoot());
 
-        TextOverlay load = new TextOverlay("Loading data");
         if (App.getInstance().isLoading()) {
-            root.addElement(load);
+            VerticalLayout layout = new VerticalLayout(1920, 0);
+
+            TextOverlay text = new TextOverlay("Loading data...");
+            layout.addElement(text);
+
+            ProgressBarOverlay load = new ProgressBarOverlay();
+            layout.addElement(load);
+
+            root.addElement(layout);
         } else {
             if (!App.getInstance().getCharacters().isEmpty()) {
                 root.addElement(new CharactersView().getRoot());
@@ -48,20 +55,8 @@ public class HomeView {
         if (App.getInstance().isLoading()) {
             container.onRender(event -> new Thread(() -> {
                 boolean loading = App.getInstance().isLoading();
-                int buf = 0;
                 while (loading) {
                     loading = App.getInstance().isLoading();
-                    buf++;
-                    if (buf == 75) {
-                        Platform.runLater(() -> {
-                            Text text = (Text) load.getNode();
-                            if (text.getText().length() == 15) {
-                                text.setText("Loading data");
-                            } else {
-                                text.setText(text.getText() + ".");
-                            }
-                        });
-                    }
                     if (!loading) break;
                 }
 
