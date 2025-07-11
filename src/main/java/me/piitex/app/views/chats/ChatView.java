@@ -705,8 +705,8 @@ public class ChatView {
             chatBox = new TextFlowOverlay(content, 500, 0);
             chatBox.setMaxWidth(500);
         } else {
-            chatBox = new TextFlowOverlay(content, App.getInstance().getAppSettings().getWidth() - 300, 0);
-            chatBox.setMaxWidth(App.getInstance().getAppSettings().getWidth() - 300); // Set a little less than chatLayout
+            chatBox = new TextFlowOverlay(content, App.getInstance().getAppSettings().getWidth() - 320, 0);
+            chatBox.setMaxWidth(App.getInstance().getAppSettings().getWidth() - 320); // Set a little less than chatLayout
         }
 
         chatBox.addStyle(App.getInstance().getAppSettings().getTextSize());
