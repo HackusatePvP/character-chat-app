@@ -586,8 +586,10 @@ public class ChatView {
             Role previousSender = chat.getMessages().getLast().getSender();
             if (previous != null && previousSender == Role.ASSISTANT) {
                 Card card = (Card) previous.getView();
-                HBox buttonLayout = (HBox) card.getFooter();
-                buttonLayout.getChildren().removeLast();
+                if (card != null) {
+                    HBox buttonLayout = (HBox) card.getFooter();
+                    buttonLayout.getChildren().removeLast();
+                }
             }
         }
 
