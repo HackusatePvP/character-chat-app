@@ -1,6 +1,8 @@
 package me.piitex.app.views;
 
+import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.views.characters.CharacterEditMobileView;
@@ -8,6 +10,7 @@ import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.app.views.users.UsersView;
+import me.piitex.engine.Container;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
 
@@ -52,9 +55,16 @@ public class SidebarView {
         models.setWidth(rootWidth);
         root.addElement(models);
         models.onClick(event -> {
+            App.window.getStage().getScene().setCursor(Cursor.WAIT);
+
+            Container container = new ModelsView().getContainer();
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView().getContainer());
-            App.window.render();
+            App.window.addContainer(container);
+
+            Platform.runLater(() -> {
+                App.window.render();
+                App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+            });
         });
 
         ButtonOverlay users = new ButtonOverlay("users", "User Templates");
