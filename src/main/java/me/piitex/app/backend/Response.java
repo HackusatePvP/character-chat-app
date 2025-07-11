@@ -44,7 +44,8 @@ public class Response {
         responseFile = new InfoFile(file, true); // False for testing switch later.
 
         responseFile.getEntryMap().forEach((s, s2) -> {
-            responses.put(Integer.valueOf(s), s2);
+            //System.out.println("S: " + s);
+            //responses.put(Integer.valueOf(s), s2);
         });
     }
 
