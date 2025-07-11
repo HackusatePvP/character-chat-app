@@ -1,6 +1,7 @@
 package me.piitex.app.views.settings;
 
-import atlantafx.base.theme.Styles;
+import atlantafx.base.theme.*;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -63,6 +64,7 @@ public class SettingsView {
         layout.addElement(buildDangerZone());
         layout.addElement(buildResolution());
         layout.addElement(buildChatSize());
+        layout.addElement(buildTheme());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
         layout.addElement(buildGpuLayers());
@@ -171,6 +173,51 @@ public class SettingsView {
                 item = Styles.TEXT;
             }
             appSettings.setTextSize(item);
+        });
+        card.setBody(root);
+
+        return card;
+    }
+
+    public CardContainer buildTheme() {
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
+
+        HorizontalLayout root = new HorizontalLayout(0, 0);
+        root.setMaxSize(1600, 120);
+
+        root.setAlignment(Pos.BASELINE_LEFT);
+        root.setSpacing(layoutSpacing);
+
+        TextFlowOverlay description = new TextFlowOverlay("Change the theme of the application.", 600, 200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setTextFillColor(Color.WHITE);
+        root.addElement(description);
+
+        List<String> items = new ArrayList<>();
+        items.add("Primer Light");
+        items.add("Primer Dark");
+        items.add("Nord Light");
+        items.add("Nord Dark");
+        items.add("Cupertino Light");
+        items.add("Cupertino Dark");
+        items.add("Dracula");
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
+        selection.setMaxHeight(50);
+        //String current = (infoFile.hasKey("width") && infoFile.hasKey("height") ? infoFile.get("width") + "x" + infoFile.get("height") : "");
+        AppSettings appSettings = App.getInstance().getAppSettings();
+        selection.setDefaultItem(appSettings.getTheme());
+        root.addElement(selection);
+        selection.onItemSelect(event -> {
+            String item = event.getItem();
+            appSettings.setTheme(item);
+            App.logger.info("Switching theme to " + item);
+
+            Application.setUserAgentStylesheet(appSettings.getStyleTheme(item).getUserAgentStylesheet());
         });
         card.setBody(root);
 
