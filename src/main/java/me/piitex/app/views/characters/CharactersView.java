@@ -1,8 +1,10 @@
 package me.piitex.app.views.characters;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
@@ -182,15 +184,24 @@ public class CharactersView {
     }
 
     private void editCharacter(Character character) {
-        Container container;
-        if (App.mobile) {
-            container = new CharacterEditMobileView(character, false).getRoot();
-        } else {
-            container = new CharacterEditView(character, false).getRoot();
-        }
-        App.window.clearContainers();
-        App.window.addContainer(container);
-        App.window.render();
+        App.window.getStage().getScene().setCursor(Cursor.WAIT);
+
+        new Thread(() -> {
+            Container container;
+            if (App.mobile) {
+                container = new CharacterEditMobileView(character, false).getRoot();
+            } else {
+                container = new CharacterEditView(character, false).getRoot();
+            }
+
+            Platform.runLater(() -> {
+                App.window.clearContainers();
+                App.window.addContainer(container);
+                App.window.render();
+
+                App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+            });
+        }).start();
 
     }
 
