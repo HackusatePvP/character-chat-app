@@ -30,6 +30,7 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
+import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 import org.w3c.dom.Text;
@@ -307,12 +308,12 @@ public class CharacterEditView {
                     currentCharacterInstance = character;
                 }
 
-                currentCharacterInstance.setDisplayName(characterDisplay);
-                currentCharacterInstance.setPersona(characterPersona);
+                currentCharacterInstance.setDisplayName(((TextField) characterTabInstance.getCharDisplayName().getNode()).getText());
+                currentCharacterInstance.setPersona(((StyledTextArea<?, ?>) characterTabInstance.getCharDescription().getNode()).getText());
                 currentCharacterInstance.setLorebook(loreItems);
-                currentCharacterInstance.setFirstMessage(chatFirstMessage);
-                currentCharacterInstance.setChatScenario(chatScenario);
-                currentCharacterInstance.setChatContext(chatContextSize);
+                currentCharacterInstance.setFirstMessage(((StyledTextArea<?, ?>) chatTabInstance.getFirstMessageInput().getNode()).getText());
+                currentCharacterInstance.setChatScenario(((StyledTextArea<?, ?>) chatTabInstance.getChatScenarioInput().getNode()).getText());
+                currentCharacterInstance.setChatContext(((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).getValue().intValue());
 
                 // Handle character icon file copy
                 if (characterIconPath != null && characterIconPath.exists()) {
@@ -500,6 +501,10 @@ public class CharacterEditView {
         return userDisplay;
     }
 
+    public void setCharacterPersona(String characterPersona) {
+        this.characterPersona = characterPersona;
+    }
+
     public String getUserPersona() {
         return userPersona;
     }
@@ -543,10 +548,6 @@ public class CharacterEditView {
 
     public void setCharacterDisplay(String characterDisplay) {
         this.characterDisplay = characterDisplay;
-    }
-
-    public void setCharacterPersona(String characterPersona) {
-        this.characterPersona = characterPersona;
     }
 
     public void setUserDisplay(String userDisplay) {

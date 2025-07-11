@@ -80,10 +80,6 @@ public class CharacterTab extends Tab {
 
         charDescription = new RichTextAreaOverlay(characterPersona, 600, 400 * scaleFactor);
         charDescription.setMaxWidth(600);
-        charDescription.onInputSetEvent(event -> {
-            parentView.setCharacterPersona(event.getInput());
-            parentView.warnTokens();
-        });
         charDescription.addStyle(Styles.BG_DEFAULT);
         charDescription.addStyle(appSettings.getTextSize());
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
