@@ -2,6 +2,7 @@ package me.piitex.app.views.characters.tabs;
 
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
@@ -73,6 +74,9 @@ public class UserTab extends Tab {
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
         userDescription = new RichTextAreaOverlay(userPersona, 600, 400 * scaleFactor);
+        userDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
+        userDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
+        userDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
         userDescription.setMaxHeight(400 * scaleFactor);
         userDescription.setMaxWidth(600);
         userDescription.onInputSetEvent(event -> {

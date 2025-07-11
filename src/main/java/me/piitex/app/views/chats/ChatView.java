@@ -15,6 +15,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import me.piitex.app.App;
@@ -401,6 +402,10 @@ public class ChatView {
         root.addElement(bottom);
 
         send = new RichTextAreaOverlay("", "Type your response.", 600, 150);
+        send.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
+        send.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
+        send.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
+
         send.addStyle(Styles.BG_DEFAULT);
         send.addStyle(appSettings.getTextSize());
         send.addStyle(Styles.TEXT_ON_EMPHASIS);

@@ -79,8 +79,11 @@ public class CharacterTab extends Tab {
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
 
         charDescription = new RichTextAreaOverlay(characterPersona, 600, 400 * scaleFactor);
+        charDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
+        charDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
+        charDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
+
         charDescription.setMaxWidth(600);
-        charDescription.addStyle(Styles.BG_DEFAULT);
         charDescription.addStyle(appSettings.getTextSize());
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
         rootLayout.addElement(charDescription);

@@ -3,6 +3,7 @@ package me.piitex.app.views.characters.tabs;
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
+import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.ServerSettings;
@@ -72,6 +73,9 @@ public class ChatTab extends Tab {
         firstBox.addElement(firstDesc);
 
         firstMessageInput = new RichTextAreaOverlay(chatFirstMessage, TEXT_AREA_WIDTH, TEXT_AREA_HEIGHT);
+        firstMessageInput.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
+        firstMessageInput.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
+        firstMessageInput.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
         firstMessageInput.onInputSetEvent(event -> {
             parentView.setCharacterPersona(event.getInput());
             parentView.warnTokens();
@@ -95,6 +99,9 @@ public class ChatTab extends Tab {
         scenarioBox.addElement(scenarioDesc);
 
         chatScenarioInput = new RichTextAreaOverlay(chatScenario, TEXT_AREA_WIDTH, TEXT_AREA_HEIGHT);
+        chatScenarioInput.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
+        chatScenarioInput.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
+        chatScenarioInput.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
         scenarioBox.addElement(chatScenarioInput);
         chatScenarioInput.onInputSetEvent(event -> {
             parentView.setChatScenario(event.getInput());
