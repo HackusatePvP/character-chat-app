@@ -1,0 +1,188 @@
+cydonia-3:
+  description: Roleplay/Story telling model with 24B active parameters. Does not support vision.
+  name: Cydonia 24B v3.1
+  parameters: 24B
+  map:
+    Q2_K: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q2_K.gguf?download=true
+    Q3_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q3_K_M.gguf?download=true
+    Q4_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q4_K_M.gguf?download=true
+    Q5_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q8_0.gguf?download=true
+  tags: [mistral, no-vision, 20B, recommended]
+mistral-small-22B-arliAI-rpmax-v1-1:
+  name: Mistral-Small 22B ArliAI-RPMax v1.1
+  description: Trained exclusively for roleplay. Does not support vision.
+  parameters: 22B
+  map:
+    Q2_K: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q2_K.gguf?download=true
+    Q2_K_L: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q2_K_L.gguf?download=true
+    Q3_K_S: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q3_K_L.gguf?download=true
+    Q3_K_XL: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q3_K_XL.gguf?download=true
+    Q4_0: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q4_0.gguf?download=true
+    Q4_K_S: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q4_K_M.gguf?download=true
+    Q4_K_L: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q4_K_L.gguf?download=true
+    Q5_K_S: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q5_K_M.gguf?download=true
+    Q5_K_L: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q5_K_L.gguf?download=true
+    Q6_K: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q6_K.gguf?download=true
+    Q6_K_L: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q6_K_L.gguf?download=true
+    Q8_0: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-Q8_0.gguf?download=true
+    FP16: https://huggingface.co/bartowski/Mistral-Small-22B-ArliAI-RPMax-v1.1-GGUF/resolve/main/Mistral-Small-22B-ArliAI-RPMax-v1.1-f16.gguf?download=true
+  tags: [mistral, no-vision, 20B, recommended]
+mistrial-small-3:
+  name: Mistral Small 3.2 24B Instruct
+  description: Small instruction model with vision support.
+  map:
+    Q2_K: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q2_K.gguf?download=true
+    Q2_K_L: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q2_K_L.gguf?download=true
+    Q3_K_S: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q3_K_M.gguf?download=true
+    Q4_0: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q4_0.gguf?download=true
+    Q4_K_S: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q4_K_M.gguf?download=true
+    Q4_1: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q4_1.gguf?download=true
+    Q5_K_S: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/Mistral-Small-3.2-24B-Instruct-2506-Q8_0.gguf?download=true
+    mmproj-bf16: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/mmproj-BF16.gguf?download=true
+    mmproj-f16: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/mmproj-F16.gguf?download=true
+    mmproj-f32: https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF/resolve/main/mmproj-F32.gguf?download=true
+  tags: [vision, mistral, 20B]
+skywork-rv13-38B:
+  name: Skywork-R1V3-38B
+  description: Large instruct model with vision support.
+  parameters: 38B
+  map:
+    Q2_K: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q2_K.gguf?download=true
+    Q2_K_L: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q2_K_L.gguf?download=true
+    Q3_K_S: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q3_K_L.gguf?download=true
+    Q3_K_XL: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q3_K_XL.gguf?download=true
+    Q4_0: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q4_0.gguf?download=true
+    Q4_K_S: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q4_K_M.gguf?download=true
+    Q4_K_M: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q4_K_L.gguf?download=true
+    Q4_1: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q4_1.gguf?download=true
+    Q5_K_S: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/Skywork_Skywork-R1V3-38B-Q8_0.gguf?download=true
+    mmproj-bf16: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/mmproj-Skywork_Skywork-R1V3-38B-bf16.gguf?download=true
+    mmproj-f16: https://huggingface.co/bartowski/Skywork_Skywork-R1V3-38B-GGUF/resolve/main/mmproj-Skywork_Skywork-R1V3-38B-f16.gguf?download=true
+  tags: [vision, 30B]
+violet-lotus-12b:
+  name: Violet Lotus 12B
+  description: Best roleplay model under 20B parameters. Does not support vision.
+  parameters: 12B
+  map:
+    Q2_K: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q2_K.gguf?download=true
+    Q3_K_S: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q3_K_L.gguf?download=true
+    Q4_K_S: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q4_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/mradermacher/MN-Violet-Lotus-12B-GGUF/resolve/main/MN-Violet-Lotus-12B.Q8_0.gguf?download=true
+  tags: [no-vision, violet, recommended, 12B]
+violet-twilight-12b:
+  name: Violet Twilight 12B
+  description: Small model exceptional at roleplay. Does not support vision.
+  parameters: 12B
+  map:
+    Q3_K_S: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q3_K_L.gguf?download=true
+    Q4_K_S: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q4_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q5_K_M.gguf?download=true
+    Q5_1: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q5_1.gguf?download=true
+    Q6_K: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/Epiculous/Violet_Twilight-v0.2-GGUF/resolve/main/Violet_Twilight-v0.2.Q8_0.gguf?download=true
+  tags: [no-vision, violet, 12B]
+violet-captain-eris:
+  name: Captain Eris Violet 12B
+  description: Small model exceptional at roleplay. Does not support vision.
+  parameters: 12B
+  map:
+    Q2_K: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q2_K.gguf?download=true
+    Q3_K_S: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q3_K_L.gguf?download=true
+    Q4_K_S: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q4_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/mradermacher/Captain-Eris_Violet-V0.420-12B-GGUF/resolve/main/Captain-Eris_Violet-V0.420-12B.Q8_0.gguf?download=true
+  tags: [violet, no-vision, 12B]
+mn-lyra:
+  name: MN Lyra 12B v4
+  description: Small model exceptional at roleplay. Does not support vision.
+  parameters: 12B
+  map:
+    Q2_K: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q2_K.gguf?download=true
+    Q3_K_S: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q3_K_L.gguf?download=true
+    Q4_K_S: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q4_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/mradermacher/MN-12B-Lyra-v4-GGUF/resolve/main/MN-12B-Lyra-v4.Q8_0.gguf?download=true
+  tags: [no-vision, mn, 12B]
+mn-chinofun:
+  name: MN Chinofun 12B v4.1
+  description: Uncensored model exceptional at narration and roleplay. Does not support vision.
+  parameters: 12B
+  map:
+    IQ4_XS: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.IQ4_XS.gguf?download=true
+    Q2_K: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q2_K.gguf?download=true
+    Q3_K_L: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q3_K_L.gguf?download=true
+    Q3_K_M: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q3_K_M.gguf?download=true
+    Q3_K_S: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q3_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q4_K_M.gguf?download=true
+    Q4_K_S: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q4_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q5_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q5_K_S.gguf?download=true
+    Q6_K: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q8_0.gguf?download=true
+  tags: [no-vision, 12B]
+wayfarer-eris-noctis:
+  name: Wayfarer Eris Noctis 12B
+  description: Uncensored small model great at roleplay. Does not support vision.
+  map:
+    IQ1_M: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ1_M.gguf?download=true
+    IQ1_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ1_S.gguf?download=true
+    IQ2_M: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ2_M.gguf?download=true
+    IQ2_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ2_S.gguf?download=true
+    IQ2_XS: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ2_XS.gguf?download=true
+    IQ2_XXS: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ2_XXS.gguf?download=true
+    IQ3_M: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ3_M.gguf?download=true
+    IQ3_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ3_S.gguf?download=true
+    IQ3_XS: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ3_XS.gguf?download=true
+    IQ3_XXS: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ3_XXS.gguf?download=true
+    IQ4_NL: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ4_NL.gguf?download=true
+    IQ4_XS: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-IQ4_XS.gguf?download=true
+    Q2_K: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q2_K.gguf?download=true
+    Q2_K_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q2_K_S.gguf?download=true
+    Q3_K_L: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q3_K_L.gguf?download=true
+    Q3_K_M: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q3_K_M.gguf?download=true
+    Q3_K_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q3_K_S.gguf?download=true
+    Q4_0: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q4_0.gguf?download=true
+    Q4_1: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q4_1.gguf?download=true
+    Q4_K_M: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q4_K_M.gguf?download=true
+    Q4_K_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q4_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q5_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q5_K_S.gguf?download=true
+    Q6_K: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q6_K.gguf?download=true
+  tags: [no-vision, recommended, 12B]
