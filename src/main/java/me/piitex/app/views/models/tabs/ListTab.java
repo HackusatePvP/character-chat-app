@@ -1,6 +1,7 @@
 package me.piitex.app.views.models.tabs;
 
 import atlantafx.base.theme.Styles;
+import atlantafx.base.theme.Tweaks;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
@@ -37,7 +38,7 @@ public class ListTab extends Tab {
         layout.setSpacing(0);
         layout.setPrefSize(appSettings.getWidth() - 300, 0);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer = new ScrollContainer(layout, 20, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
         scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
@@ -69,10 +70,12 @@ public class ListTab extends Tab {
             String formattedFileSize = df.format(fileSizeInGB);
 
             TitledContainer root = new TitledContainer(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, 0);
+            root.setX(20);
             root.addStyle(Styles.DENSE);
             root.setMaxSize(900, 250);
             root.setSpacing(30);
             root.setAlignment(Pos.TOP_CENTER);
+            root.addStyle(Tweaks.ALT_ICON);
             root.setExpanded(model.getSettings().isDefault());
 
             HorizontalLayout body = new HorizontalLayout(800, 50);

@@ -18,7 +18,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -35,6 +35,9 @@ public class FileDownloadProcess {
     private DownloadCompleteListener downloadCompleteListener;
     private DownloadProgressListener downloadProgressListener;
     private FileInfoCompleteListener fileInfoCompleteListener;
+
+    private static final Map<String, FileDownloadProcess> currentDownloads = new HashMap<>();
+    private static final Map<String, DownloadTask> currentDownloadTasks = new HashMap<>();
 
     public void setDownloadCompleteListener(DownloadCompleteListener listener) {
         this.downloadCompleteListener = listener;
@@ -155,6 +158,7 @@ public class FileDownloadProcess {
 
     public DownloadTask downloadFileAsync(String fileUrl, Path destinationDirectory) {
         DownloadTask task = new DownloadTask(null);
+        currentDownloadTasks.put(fileUrl, task);
 
         Future<?> future = executorService.submit(() -> {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -166,6 +170,8 @@ public class FileDownloadProcess {
                 DownloadResult result = downloadFile(fileUrl, destinationDirectory, httpGet, httpClient);
                 if (downloadCompleteListener != null) {
                     downloadCompleteListener.onDownloadComplete(result);
+                    currentDownloads.remove(fileUrl);
+                    currentDownloadTasks.remove(fileUrl);
                 }
             } catch (IOException e) {
                 App.logger.error("Error occurred while downloading model!", e);
@@ -173,6 +179,8 @@ public class FileDownloadProcess {
                         Optional.of("Async task setup error: " + e.getMessage()), false);
                 if (downloadCompleteListener != null) {
                     downloadCompleteListener.onDownloadComplete(result);
+                    currentDownloads.remove(fileUrl);
+                    currentDownloadTasks.remove(fileUrl);
                 }
             }
         });
@@ -196,6 +204,8 @@ public class FileDownloadProcess {
             return new DownloadResult(false, Optional.empty(), Optional.empty(),
                     Optional.of("Failed to create destination directory: " + destinationDirectory), false);
         }
+
+        currentDownloads.put(fileUrl, this);
 
         try (CloseableHttpResponse response = httpClient.execute(httpRequest)) {
             int statusCode = response.getCode();
@@ -388,5 +398,13 @@ public class FileDownloadProcess {
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static Map<String, FileDownloadProcess> getCurrentDownloads() {
+        return currentDownloads;
+    }
+
+    public static Map<String, DownloadTask> getCurrentDownloadTasks() {
+        return currentDownloadTasks;
     }
 }

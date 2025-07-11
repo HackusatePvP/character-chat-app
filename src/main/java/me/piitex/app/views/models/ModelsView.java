@@ -3,6 +3,7 @@ package me.piitex.app.views.models;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
+import me.piitex.app.views.models.tabs.ConfigurationTab;
 import me.piitex.app.views.models.tabs.DownloadTab;
 import me.piitex.app.views.models.tabs.ListTab;
 import me.piitex.engine.Container;
@@ -29,6 +30,7 @@ public class ModelsView {
         TabsContainer tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         main.addElement(tabsContainer);
 
+        tabsContainer.addTab(new ConfigurationTab(tabsContainer));
         tabsContainer.addTab(new ListTab());
         tabsContainer.addTab(new DownloadTab());
 

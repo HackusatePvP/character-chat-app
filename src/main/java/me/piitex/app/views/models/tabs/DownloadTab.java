@@ -5,6 +5,7 @@ import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DownloadTab extends Tab {
@@ -144,20 +146,32 @@ public class DownloadTab extends Tab {
         quantizationText.setTooltip("The smaller the quantization the better performance. Comes at the cost of quality.");
         tileLayout.addElement(quantizationText);
 
-        TextOverlay sizeText = new TextOverlay(""); // Will be updated asynchronously
+        TextOverlay sizeText = new TextOverlay("Unknown"); // Will be updated asynchronously
         sizeText.addStyle(Styles.BUTTON_OUTLINED);
         sizeText.addStyle(Styles.TEXT_MUTED);
         tileLayout.addElement(sizeText);
 
         AtomicReference<FileInfo> fileInfoRef = new AtomicReference<>();
-        setupFileInfoFetch(modelKey, url, sizeText, downloadIcon, fileInfoRef, tileLayout);
-        setupDownloadAction(downloadIcon, url, modelKey, fileInfoRef, tileLayout);
+        setupFileInfoFetch(tileLayout, modelKey, url, sizeText, downloadIcon, fileInfoRef);
+        setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+
+        tileLayout.onRender(event -> {
+            // This has to be done AFTER the layout has rendered.
+            // If the user left the download page the download will continue.
+            // When they re-enter the page check to see if the url is still being downloaded.
+            // If so re-apply the download indicators and controls.
+            if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                FileInfo fileInfo = new FileInfo(0, "Unknown", modelKey);
+                fileInfo.setDownloaded(false);
+                fileInfoRef.set(fileInfo);
+                createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+            }
+        });
 
         return tileLayout;
     }
 
-    private void setupFileInfoFetch(String key, String url, TextOverlay sizeText, ButtonOverlay downloadIcon,
-                                    AtomicReference<FileInfo> fileInfoRef, HorizontalLayout tileLayout) {
+    private void setupFileInfoFetch(HorizontalLayout tileLayout, String key, String url, TextOverlay sizeText, ButtonOverlay downloadIcon, AtomicReference<FileInfo> fileInfoRef) {
         FileDownloadProcess fileInfoFetcher = new FileDownloadProcess();
         fileInfoFetcher.getFileInfoByUrlAsync(url);
         fileInfoFetcher.setFileInfoCompleteListener(result -> Platform.runLater(() -> {
@@ -168,7 +182,7 @@ public class DownloadTab extends Tab {
 
             ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
 
-            if (fileInfo.isDownloaded()) {
+            if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
                 addDownloadedTag(tileLayout);
                 downloadIcon.getNode().setDisable(true);
             }
@@ -176,56 +190,88 @@ public class DownloadTab extends Tab {
         }));
     }
 
-    private void setupDownloadAction(ButtonOverlay downloadIcon, String url, String modelKey,
-                                     AtomicReference<FileInfo> fileInfoRef, HorizontalLayout tileLayout) {
+    private void setupDownloadAction(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef) {
         downloadIcon.onClick(event -> {
             FileInfo fileInfo = fileInfoRef.get();
-            if (fileInfo == null || fileInfo.isDownloaded()) {
+            if ((fileInfo == null || fileInfo.isDownloaded()) && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                System.out.println("Not downloading, already exists!");
                 return;
             }
 
-            downloadIcon.getNode().setDisable(true);
-
-            FileDownloadProcess downloadProcess = new FileDownloadProcess();
-            File destinationFile = new File(App.getInstance().getSettings().getModelPath(), modelKey);
-
-            RingProgressIndicator progressIndicator = new RingProgressIndicator(0, false);
-
-            FileDownloadProcess.DownloadTask currentTask = downloadProcess.downloadFileAsync(url, destinationFile.toPath());
-
-            TextOverlay stopButton = createStopButton(currentTask, destinationFile, downloadIcon, tileLayout, downloadProcess);
-
-            Platform.runLater(() -> {
-                tileLayout.getPane().getChildren().add(progressIndicator);
-                tileLayout.getPane().getChildren().add(stopButton.render());
-            });
-
-            downloadProcess.setDownloadProgressListener((totalBytesRead, totalFileSize, percent) ->
-                    Platform.runLater(() -> progressIndicator.progressProperty().set((double) totalBytesRead / totalFileSize))
-            );
-
-            downloadProcess.setDownloadCompleteListener(result -> Platform.runLater(() -> {
-                // Remove the download control buttons
-                tileLayout.getPane().getChildren().remove(progressIndicator);
-                tileLayout.getPane().getChildren().remove(stopButton.render());
-                downloadProcess.shutdown();
-
-                if (result.isSuccess()) {
-                    fileInfo.setDownloaded(true);
-                    addDownloadedTag(tileLayout);
-                } else {
-                    downloadIcon.getNode().setDisable(false);
-                }
-            }));
+            createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
         });
     }
 
-    private TextOverlay createStopButton(FileDownloadProcess.DownloadTask downloadTask, File fileToDelete,
-                                         ButtonOverlay downloadIcon, HorizontalLayout tileLayout, FileDownloadProcess downloadProcess) {
+    private void createDownloadInputs(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef) {
+
+        Platform.runLater(() -> {
+            downloadIcon.getNode().setDisable(true);
+        });
+
+
+        FileDownloadProcess downloadProcess;
+        FileDownloadProcess.DownloadTask currentTask;
+        File destinationFile = new File(App.getInstance().getSettings().getModelPath(), modelKey);
+        if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+            downloadProcess = FileDownloadProcess.getCurrentDownloads().get(url);
+            currentTask = FileDownloadProcess.getCurrentDownloadTasks().get(url);
+        } else {
+            downloadProcess = new FileDownloadProcess();
+            currentTask = downloadProcess.downloadFileAsync(url, destinationFile.toPath());
+        }
+
+        RingProgressIndicator progressIndicator = new RingProgressIndicator(0, false);
+
+        TextOverlay stopButton = createStopButton(currentTask, destinationFile, downloadIcon, tileLayout, downloadProcess, fileInfoRef);
+        stopButton.addStyle(Styles.LARGE);
+
+        TextField downloadSpeed = new TextField("");
+        downloadSpeed.setMaxWidth(100);
+        downloadSpeed.setEditable(false);
+        downloadSpeed.getStyleClass().add(Styles.ROUNDED);
+
+        Platform.runLater(() -> {
+            tileLayout.getPane().getChildren().add(progressIndicator);
+            tileLayout.getPane().getChildren().add(stopButton.render());
+            tileLayout.getPane().getChildren().add(downloadSpeed);
+        });
+
+        AtomicLong lastDownload = new AtomicLong(0L);
+        AtomicLong lastChecked = new AtomicLong(0L);
+
+        downloadProcess.setDownloadProgressListener((totalBytesRead, totalFileSize, percent) -> {
+            Platform.runLater(() -> {
+                progressIndicator.progressProperty().set((double) totalBytesRead / totalFileSize);
+                double speed = calculateDownloadSpeed(totalBytesRead, lastDownload, lastChecked);
+                double mb = speed / (1024 * 1024);
+                downloadSpeed.setText(String.format("%.2f", mb) + "MB/s");
+            });
+        });
+
+        downloadProcess.setDownloadCompleteListener(result -> Platform.runLater(() -> {
+            // Remove the download control buttons
+            tileLayout.getPane().getChildren().remove(progressIndicator);
+            tileLayout.getPane().getChildren().remove(stopButton.render());
+            tileLayout.getPane().getChildren().remove(downloadSpeed);
+
+            downloadProcess.shutdown();
+
+            if (result.isSuccess()) {
+                addDownloadedTag(tileLayout);
+            } else {
+                downloadIcon.getNode().setDisable(false);
+            }
+        }));
+
+    }
+
+    private TextOverlay createStopButton(FileDownloadProcess.DownloadTask downloadTask, File fileToDelete, ButtonOverlay downloadIcon, HorizontalLayout tileLayout, FileDownloadProcess downloadProcess, AtomicReference<FileInfo> fileInfoRef) {
         TextOverlay stop = new TextOverlay(new FontIcon(Material2MZ.STOP_CIRCLE));
         stop.addStyle(Styles.DANGER);
         stop.addStyle(Styles.TITLE_4);
         stop.onClick(event -> {
+            App.logger.info("Attempting to stop current download...");
+
             downloadTask.cancel();
             if (fileToDelete.exists()) {
                 fileToDelete.delete();
@@ -236,6 +282,8 @@ public class DownloadTab extends Tab {
                 downloadIcon.getNode().setDisable(false);
             });
             downloadProcess.shutdown();
+
+            fileInfoRef.get().setDownloaded(false);
         });
         return stop;
     }
@@ -247,6 +295,31 @@ public class DownloadTab extends Tab {
         Platform.runLater(() -> tileLayout.getPane().getChildren().add(tag.render()));
     }
 
+
+    private double calculateDownloadSpeed(long totalBytesRead, AtomicLong lastDownloadBytes, AtomicLong lastDownloadTime) {
+        long currentTime = System.currentTimeMillis();
+
+        // Calculate bytes downloaded since the last update
+        long bytesDownloadedSinceLastUpdate = totalBytesRead - lastDownloadBytes.get();
+
+        // Calculate time elapsed since the last update
+        long timeElapsedSinceLastUpdate = currentTime - lastDownloadTime.get();
+
+        double bytesPerSecond = 0.0;
+
+        // Ensure both time has passed and bytes have been downloaded to avoid division by zero
+        // and to get a meaningful speed.
+        if (timeElapsedSinceLastUpdate > 0 && bytesDownloadedSinceLastUpdate > 0) {
+            // Convert milliseconds to seconds (timeElapsedSinceLastUpdate / 1000.0)
+            bytesPerSecond = (double) bytesDownloadedSinceLastUpdate / (timeElapsedSinceLastUpdate / 1000.0);
+        }
+
+        // IMPORTANT: Update the 'last' values for the next calculation
+        lastDownloadBytes.set(totalBytesRead);
+        lastDownloadTime.set(currentTime);
+
+        return bytesPerSecond;
+    }
     protected static class DownloadModel {
         private final String key;
         private final String name;
