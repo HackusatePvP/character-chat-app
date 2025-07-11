@@ -7,10 +7,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
-import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
@@ -65,12 +63,9 @@ public class SettingsView {
         layout.addElement(buildDangerZone());
         layout.addElement(buildResolution());
         layout.addElement(buildChatSize());
-        layout.addElement(buildModelSelection());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
         layout.addElement(buildGpuLayers());
-        layout.addElement(buildMemoryLock());
-        layout.addElement(buildFlashAttention());
 
         // If the server is currently running but not active display progress bar
         handleServerLoad();
@@ -200,49 +195,6 @@ public class SettingsView {
         }
     }
 
-    public CardContainer buildModelSelection() {
-        // Testing out card designs
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
-
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Select the model to use. Keeping it default will use the model configured as default or the last model used.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        List<String> items = new ArrayList<>();
-        items.add("Default / Last Model");
-        items.addAll(App.getModelNames("exclude"));
-
-        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
-        selection.setMaxHeight(50);
-        selection.setDefaultItem((settings.getLastModel() != null ? settings.getLastModel().getFile().getName() : "Default / Last Model"));
-        root.addElement(selection);
-        selection.onItemSelect(event -> {
-            if (event.getItem().startsWith("Default /")) {
-                for (Model model : App.getModels("exclude")) {
-                    if (model.getSettings().isDefault()) {
-                        App.getInstance().getSettings().setLastModel(model.getFile().getAbsolutePath());
-                        break;
-                    }
-                }
-                return;
-            }
-            App.getInstance().getSettings().setLastModel(App.getModelByName(event.getItem()).getFile().getAbsolutePath());
-        });
-        card.setBody(root);
-        return card;
-    }
-
     public CardContainer buildBackend() {
         // Testing out card designs
         CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
@@ -358,57 +310,6 @@ public class SettingsView {
         });
         root.addElement(input);
 
-        card.setBody(root);
-
-        return card;
-    }
-
-    public CardContainer buildMemoryLock() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
-
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Locks model in RAM. Can improve generation times. Disables model swapping.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isMemoryLock());
-        switchOverlay.onToggle(event -> {
-            settings.setMemoryLock(!settings.isMemoryLock());
-        });
-        root.addElement(switchOverlay);
-
-        card.setBody(root);
-
-        return card;
-    }
-
-    public CardContainer buildFlashAttention() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
-
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Toggles flash attention. Designed to speed up training and inference while reducing memory usage. In some rare cases it can greatly reduce quality.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isFlashAttention());
-        switchOverlay.onToggle(event -> {
-            settings.setFlashAttention(!settings.isFlashAttention());
-        });
-        root.addElement(switchOverlay);
         card.setBody(root);
 
         return card;
