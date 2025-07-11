@@ -1,69 +1,58 @@
 package me.piitex.app.views.characters;
 
-
 import atlantafx.base.theme.Styles;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.annotations.Nullable;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import me.piitex.app.App;
-import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerProcess;
+import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
-import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.SidebarView;
+import me.piitex.app.views.characters.tabs.*;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
-import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.EmptyContainer;
-import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.containers.tabs.TabsContainer;
+import me.piitex.app.backend.Character;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
-import me.piitex.engine.overlays.*;
-import org.json.JSONObject;
+import me.piitex.engine.overlays.ButtonOverlay;
+import me.piitex.engine.overlays.MessageOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class CharacterEditView {
     private Container root;
 
     private InfoFile infoFile;
 
-    @Nullable private Character character;
-    @Nullable private User user;
+    @Nullable
+    private Character character;
+    @Nullable
+    private User user;
 
     private boolean duplicate = false;
 
-    /* Tabs to be saved so rendering can work again */
-    private Tab characterTab = null;
-    private Tab userTab = null;
-
-    // Fields for boxes
     private File characterIconPath;
     private File userIconPath;
     private String characterId = "";
@@ -75,33 +64,20 @@ public class CharacterEditView {
     private String chatScenario = "";
     private int chatContextSize = 4096;
 
-    /*
-        Required fields for validation and importing
-     */
-    private InputFieldOverlay charIdInput;
-    private InputFieldOverlay charDisplayName;
-    private TextAreaOverlay charDescription;
-    private TextAreaOverlay firstMessageInput;
-    private TextAreaOverlay chatScenarioInput;
-
-    private InputFieldOverlay userDisplayName;
-
     private final Map<String, String> loreItems = new TreeMap<>();
 
-    private TabsContainer container;
+    private TabsContainer tabsContainer;
 
     private AppSettings appSettings = App.getInstance().getAppSettings();
+    private ServerSettings serverSettings = App.getInstance().getSettings();
+
+    private CharacterTab characterTabInstance;
+    private UserTab userTabInstance;
+    private ChatTab chatTabInstance;
+
 
     public CharacterEditView(@Nullable Character character) {
-        this.infoFile = new InfoFile();
-        this.character = character;
-        if (character != null) {
-            updateCharacterFields();
-            warnTokens();
-        }
-        build(null);
-
-        warnTokens();
+        this(character, false);
     }
 
     public CharacterEditView(@Nullable Character character, boolean duplicate) {
@@ -109,563 +85,169 @@ public class CharacterEditView {
         this.character = character;
         this.duplicate = duplicate;
         infoFile.set("duplicate", duplicate);
-        if (character != null) {
-            updateCharacterFields();
-        }
-        build(null);
 
-        warnTokens();
+        initializeFields();
+        if (character != null) {
+            updateFieldsFromCharacter();
+        }
+
+        build(null);
     }
 
     public CharacterEditView(@Nullable Character character, @Nullable User user, @Nullable InfoFile infoFile, @Nullable Tab tab) {
         this.character = character;
-        this.infoFile = infoFile;
         this.user = user;
-        if (character != null) {
-            updateCharacterFields();
-        }
-        if (infoFile != null) {
-            updateInfoFields();
-        }
-        build(tab);
+        this.infoFile = (infoFile != null) ? infoFile : new InfoFile();
 
-        warnTokens();
+        initializeFields();
+        if (character != null) {
+            updateFieldsFromCharacter();
+        }
+        if (user != null) {
+            System.out.println("Validate: " + user.getId());
+            System.out.println("Updating user fields...");
+            updateFieldsFromUser();
+        }
+        if (this.infoFile.getFile() != null) {
+            updateFieldsFromInfoFile();
+        }
+
+        build(tab);
     }
 
-    public void build(@Nullable Tab tab) {
+    private void initializeFields() {
+        characterId = "";
+        characterDisplay = "";
+        characterPersona = "";
+        characterIconPath = new File(App.getAppDirectory(), "icons/character.png");
+        userDisplay = "";
+        userPersona = "";
+        userIconPath = new File(App.getAppDirectory(), "icons/character.png");
+        chatFirstMessage = "";
+        chatScenario = "";
+        chatContextSize = 4096;
+        loreItems.clear();
+    }
+
+    private void updateFieldsFromCharacter() {
+        this.characterId = character.getId();
+        this.characterDisplay = character.getDisplayName();
+        this.characterPersona = character.getPersona();
+        this.characterIconPath = new File(character.getIconPath());
+        this.loreItems.clear();
+        this.loreItems.putAll(character.getLorebook());
+        this.user = character.getUser();
+        this.chatFirstMessage = character.getFirstMessage();
+        this.chatScenario = character.getChatScenario();
+        this.chatContextSize = character.getChatContext();
+
+        infoFile.set("character-id", character.getId());
+        infoFile.set("character-display", character.getDisplayName());
+        infoFile.set("character-persona", character.getPersona());
+        infoFile.set("icon-path", character.getIconPath());
+        infoFile.set("lore", character.getLorebook());
+        infoFile.set("first-message", character.getFirstMessage());
+        infoFile.set("scenario", character.getChatScenario());
+        infoFile.set("chat-context-size", character.getChatContext());
+        if (character.getUser() != null) {
+            infoFile.set("user-id", character.getUser().getId());
+        }
+    }
+
+    private void updateFieldsFromInfoFile() {
+        if (infoFile.hasKey("character-id")) {
+            characterId = infoFile.get("character-id");
+        }
+        if (infoFile.hasKey("character-display")) {
+            characterDisplay = infoFile.get("character-display");
+        }
+        if (infoFile.hasKey("character-persona")) {
+            characterPersona = infoFile.get("character-persona");
+        }
+        if (infoFile.hasKey("icon-path")) {
+            characterIconPath = new File(infoFile.get("icon-path"));
+        }
+        if (infoFile.hasKey("user-id")) {
+            user = App.getInstance().getUser(infoFile.get("user-id"));
+        }
+        if (infoFile.hasKey("user-display")) {
+            userDisplay = infoFile.get("user-display");
+        }
+        if (infoFile.hasKey("user-persona")) {
+            userPersona = infoFile.get("user-persona");
+        }
+        if (infoFile.hasKey("icon-path-user")) {
+            userIconPath = new File(infoFile.get("icon-path-user"));
+        }
+        if (infoFile.hasKey("lore")) {
+            loreItems.clear();
+            loreItems.putAll(infoFile.getStringMap("lore"));
+        }
+        if (infoFile.hasKey("first-message")) {
+            chatFirstMessage = infoFile.get("first-message");
+        }
+        if (infoFile.hasKey("scenario")) {
+            chatScenario = infoFile.get("scenario");
+        }
+        if (infoFile.hasKey("chat-context-size")) {
+            chatContextSize = infoFile.getInteger("chat-context-size");
+        }
+        if (infoFile.hasKey("duplicate")) {
+            duplicate = infoFile.getBoolean("duplicate");
+        }
+    }
+
+    private void updateFieldsFromUser() {
         if (user != null) {
-            updateUserFields();
+            userDisplay = user.getDisplayName();
+            userPersona = user.getPersona();
+            userIconPath = new File(user.getIconPath());
+            // Update infoFile as well
+            infoFile.set("user-display", userDisplay);
+            infoFile.set("user-persona", userPersona);
+            infoFile.set("icon-path-user", userIconPath.getAbsolutePath());
+
+        }
+    }
+
+    public void build(@Nullable Tab tabToSelect) {
+        if (user != null) {
+            updateFieldsFromUser();
         } else {
-            if (character != null && character.getUser() != null) {
-                user = character.getUser();
-                updateUserFields();
-            }
+            userDisplay = "";
+            userPersona = "";
+            userIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
         this.root = new EmptyContainer(0, 0, 192, appSettings.getHeight());
 
-        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        layout.addElement(new SidebarView().getRoot());
-        root.addElement(layout);
+        HorizontalLayout mainLayout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
+        mainLayout.addElement(new SidebarView().getRoot());
+        root.addElement(mainLayout);
 
-        VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
-        layout.addElement(main);
+        VerticalLayout contentLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
+        mainLayout.addElement(contentLayout);
 
-        // Add the views
-        container = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
-        main.addElement(buildTopTab());
+        tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
+        contentLayout.addElement(tabsContainer);
 
-        if (tab != null) {
-            container.setSelectedTab(tab.getText());
-        }
-    }
+        characterTabInstance = new CharacterTab(appSettings, infoFile, character, user, duplicate, characterIconPath, characterId, characterDisplay, characterPersona, loreItems, this);
+        tabsContainer.addTab(characterTabInstance);
 
-    public TabsContainer buildTopTab() {
-        Tab character = buildCharacterTab();
-        container.addTab(character);
+        userTabInstance = new UserTab(appSettings, infoFile, character, user, userIconPath, userDisplay, userPersona, loreItems, this);
+        tabsContainer.addTab(userTabInstance);
 
-        Tab user = buildUserTab();
-        container.addTab(user);
+        tabsContainer.addTab(new LorebookTab(appSettings, infoFile, character, user, loreItems, this));
+        chatTabInstance = new ChatTab(appSettings, infoFile, serverSettings, character, user, chatFirstMessage, chatScenario, chatContextSize, this);
+        tabsContainer.addTab(chatTabInstance);
+        tabsContainer.addTab(new ModelTab(appSettings, infoFile, serverSettings, character, user, this));
 
-        Tab lorebook = buildLorebookTab();
-        container.addTab(lorebook);
-
-        Tab chat = buildChatTab();
-        container.addTab(chat);
-
-        Tab model = buildModelTab();
-        container.addTab(model);
-
-        return container;
-    }
-
-    public Tab buildCharacterTab() {
-        characterTab = new Tab("Character");
-        characterTab.setWidth(appSettings.getWidth() - 300);
-        characterTab.setHeight(appSettings.getHeight());
-
-        VerticalLayout root = new VerticalLayout(appSettings.getWidth() - 300 , appSettings.getHeight());
-        root.setSpacing(50);
-        root.setAlignment(Pos.TOP_CENTER);
-        characterTab.addElement(root);
-
-        HorizontalLayout displayBox = new HorizontalLayout(500, 200);
-        displayBox.setMaxSize(500, 200);
-        displayBox.addStyle(Styles.BORDER_SUBTLE);
-        displayBox.setSpacing(20);
-        root.addElement(displayBox);
-
-        CardContainer displayCard = buildCharacterDisplay();
-        displayBox.addElement(displayCard);
-        displayBox.addElement(buildCharacterInput());
-
-        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        charDescription = new TextAreaOverlay((character != null ? character.getPersona() : characterPersona),0, 0, 600, 400 * scaleFactor);
-        charDescription.setHintText("Describe the character and provide key lore.");
-        root.addElement(charDescription);
-        charDescription.onInputSetEvent(event -> {
-            characterPersona = event.getInput();
-            infoFile.set("character-persona", characterPersona);
-            warnTokens();
-        });
-
-        // Make this a file chooser
-        ButtonOverlay importCard = new ButtonOverlay("import", "Import Character Card");
-        if (character != null) {
-            importCard.setEnabled(false);
-        }
-        importCard.addStyle(Styles.ACCENT);
-        importCard.addStyle(Styles.BUTTON_OUTLINED);
-        importCard.setWidth(400);
-
-
-        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
-        root.addElement(fileSelector);
-        fileSelector.onFileSelect(event -> {
-            // Import the card metadata using CharacterCardImporter
-            File file = event.getDirectory(); // This is a file not a directory. The naming can be misleading
-            try {
-                JSONObject metadata = CharacterCardImporter.getImageMetaData(file);
-                infoFile.set("character-id", CharacterCardImporter.getCharacterId(metadata));
-                infoFile.set("character-display", CharacterCardImporter.getCharacterDisplayName(metadata));
-                infoFile.set("character-persona", CharacterCardImporter.getCharacterPersona(metadata));
-                infoFile.set("lore", CharacterCardImporter.getLoreItems(metadata));
-                infoFile.set("first-message", CharacterCardImporter.getFirstMessage(metadata));
-                infoFile.set("scenario", CharacterCardImporter.getChatScenario(metadata));
-                infoFile.set("icon-path", file.getAbsolutePath());
-
-                loreItems.clear();
-                loreItems.putAll(CharacterCardImporter.getLoreItems(metadata));
-
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(character, user, infoFile, characterTab).getRoot());
-                App.window.render();
-
-            } catch (ImageProcessingException | IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        });
-
-        characterTab.addElement(buildSubmitBox());
-
-        return characterTab;
-    }
-
-    public CardContainer buildCharacterDisplay() {
-        CardContainer root = new CardContainer(0, 0,200, 200);
-        root.setMaxSize(200, 200);
-
-        VerticalLayout layout = new VerticalLayout(200,200);
-        layout.setMaxSize(200, 200);
-
-        layout.setX(-10);
-        layout.setY(-10);
-        root.setBody(layout);
-        layout.setAlignment(Pos.BASELINE_CENTER);
-        layout.setSpacing(25);
-
-        if (characterIconPath == null) {
-            characterIconPath = new File(App.getAppDirectory(), "icons/character.png");
+        if (tabToSelect != null) {
+            tabsContainer.setSelectedTab(tabToSelect.getText());
         }
 
-        ImageOverlay image = new ImageOverlay(new ImageLoader(characterIconPath));
-        image.setWidth(128);
-        image.setHeight(128);
-        image.setPreserveRatio(false);
-        layout.addElement(image, 2);
-
-        TextOverlay upload = new TextOverlay("Click to upload image");
-        upload.setTextFill(Color.WHITE);
-        upload.setUnderline(true);
-        layout.addElement(upload, 5);
-
-
-        root.onClick(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg"));
-            File directory = chooser.showOpenDialog(App.window.getStage());
-            if (directory != null) {
-                // This is the full directory of the selected file.
-                characterIconPath = directory;
-                infoFile.set("icon-path", directory.getAbsolutePath());
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(character, user, infoFile, characterTab).getRoot());
-                App.window.render();
-            }
-        });
-
-        return root;
-    }
-
-    public VerticalLayout buildCharacterInput() {
-        VerticalLayout root = new VerticalLayout(250, 150);
-        root.setAlignment(Pos.BASELINE_CENTER);
-        root.setMaxSize(250, 200);
-        root.setSpacing(10);
-
-        charIdInput = new InputFieldOverlay(characterId, 0, 0, 200, 50);
-        if (character != null && !duplicate) {
-            charIdInput.setEnabled(false);
-        }
-        charIdInput.setHintText("Character ID (Must be unique)");
-        charIdInput.onInputSetEvent(event -> {
-            characterId = event.getInput();
-            infoFile.set("character-id", characterId);
-        });
-        root.addElement(charIdInput);
-
-        charDisplayName = new InputFieldOverlay((character != null ? character.getDisplayName() : characterDisplay), 0, 0, 200, 50);
-        charDisplayName.setHintText("Display Name");
-        charDisplayName.onInputSetEvent(event -> {
-            characterDisplay = event.getInput();
-            infoFile.set("character-display", characterDisplay);
-        });
-        root.addElement(charDisplayName);
-
-        return root;
-    }
-
-    public Tab buildUserTab() {
-        userTab = new Tab("User");
-        userTab.setWidth(appSettings.getWidth() - 300);
-        userTab.setHeight(appSettings.getHeight());
-
-        VerticalLayout root = new VerticalLayout(appSettings.getWidth() - 300 , appSettings.getHeight());
-        root.setSpacing(50);
-        root.setAlignment(Pos.TOP_CENTER);
-        userTab.addElement(root);
-
-        HorizontalLayout displayBox = new HorizontalLayout(500, 200);
-        displayBox.setMaxSize(500, 200);
-        displayBox.addStyle(Styles.BORDER_SUBTLE);
-        displayBox.setSpacing(20);
-        root.addElement(displayBox);
-
-        CardContainer displayCard = buildUserDisplay();
-        displayBox.addElement(displayCard);
-        displayBox.addElement(buildUserInput());
-
-        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        TextAreaOverlay userDescription = new TextAreaOverlay(userPersona,0, 0, 600, 400 * scaleFactor);
-        userDescription.setHintText("Describe the user and provide key lore.");
-        root.addElement(userDescription);
-        userDescription.onInputSetEvent(event -> {
-            userPersona = event.getInput();
-            infoFile.set("user-persona", userPersona);
-            warnTokens();
-        });
-
-        userTab.addElement(buildSubmitBox());
-
-        return userTab;
-    }
-
-    public CardContainer buildUserDisplay() {
-        CardContainer root = new CardContainer(0, 0,200, 200);
-        root.setMaxSize(200, 200);
-
-        VerticalLayout layout = new VerticalLayout(200, 200);
-        layout.setX(-10);
-        layout.setY(-10);
-        root.setBody(layout);
-        layout.setAlignment(Pos.BASELINE_CENTER);
-        layout.setSpacing(25);
-
-        if (userIconPath == null ||!userIconPath.exists()) {
-            userIconPath = new File(App.getAppDirectory(), "icons/character.png");
-        }
-
-        ImageOverlay image = new ImageOverlay(new ImageLoader(userIconPath));
-        image.setWidth(128);
-        image.setHeight(128);
-        image.setPreserveRatio(false);
-        layout.addElement(image, 2);
-
-        TextOverlay upload = new TextOverlay("Click to upload image");
-        upload.setTextFill(Color.WHITE);
-        upload.setUnderline(true);
-        layout.addElement(upload, 5);
-
-
-        root.onClick(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg"));
-            File directory = chooser.showOpenDialog(App.window.getStage());
-            if (directory != null) {
-                // This is the full directory of the selected file.
-                userIconPath = directory;
-                infoFile.set("icon-path", directory.getAbsolutePath());
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(character, user, infoFile, userTab).getRoot());
-                App.window.render();
-            }
-        });
-
-        return root;
-    }
-
-    public VerticalLayout buildUserInput() {
-        VerticalLayout root = new VerticalLayout(250, 150);
-        root.setAlignment(Pos.BASELINE_CENTER);
-        root.setMaxSize(250, 200);
-        root.setSpacing(10);
-
-        List<String> users = new ArrayList<>();
-        users.add("None");
-        users.addAll(App.getInstance().getUserTemplates().keySet());
-
-        ChoiceBoxOverlay templates = new ChoiceBoxOverlay(users, 200, 50);
-        root.addElement(templates);
-
-        userDisplayName = new InputFieldOverlay((user != null ? user.getDisplayName() : userDisplay), 0, 0, 200, 50);
-        userDisplayName.setHintText("Display Name");
-        userDisplayName.onInputSetEvent(event -> {
-            userDisplay = event.getInput();
-            infoFile.set("user-display", userDisplay);
-        });
-        root.addElement(userDisplayName);
-
-        templates.onItemSelect(event -> {
-            String item = event.getItem();
-            if (item.isEmpty()) return;
-            if (item.equalsIgnoreCase("none")) {
-                user = null;
-            } else {
-                user = App.getInstance().getUser(item);
-            }
-
-            // Also want to render the user tab
-            App.window.clearContainers();
-            App.window.addContainer(new CharacterEditView(character, user, infoFile, userTab).getRoot());
-            App.window.render();
-        });
-
-        return root;
-    }
-
-    public Tab buildLorebookTab() {
-        Tab tab = new Tab("Lorebook");
-
-        VerticalLayout root = new VerticalLayout(appSettings.getWidth() - 300 , appSettings.getHeight());
-        root.setSpacing(50);
-        root.setAlignment(Pos.TOP_CENTER);
-        tab.addElement(root);
-
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
-        info.setX(200);
-        info.setY(10);
-        root.addElement(info);
-
-        HorizontalLayout displayBox = new HorizontalLayout(0, 0);
-        displayBox.setSpacing(100);
-        displayBox.setMaxSize(600, 0);
-        root.addElement(displayBox);
-
-        CardContainer addContainer = new CardContainer(0, 0, 400, 400);
-        addContainer.setMaxSize(400, 400);
-
-        InputFieldOverlay addKey = new InputFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
-        addKey.setId("key");
-        addContainer.setHeader(addKey);
-
-        TextAreaOverlay addValue = new TextAreaOverlay("", "Enter the lore info", 0, 0, 400, 200);
-        addKey.setId("value");
-        addContainer.setBody(addValue);
-
-        HorizontalLayout buttonBox = new HorizontalLayout(200, 50);
-        buttonBox.setAlignment(Pos.CENTER);
-
-        ButtonOverlay add = new ButtonOverlay("add", "Add");
-        add.addStyle(Styles.SUCCESS);
-        add.addStyle(Styles.BUTTON_OUTLINED);
-        buttonBox.addElement(add);
-
-        addContainer.setFooter(buttonBox);
-
-        // Got to make this the scroll pane is modifiable.
-        ScrollContainer scrollLore = getLoreItems();
-        add.onClick(event -> {
-            if (addKey.getCurrentText().isEmpty() || addValue.getCurrentText().isEmpty()) {
-                return;
-            }
-
-            ScrollPane pane = scrollLore.getScrollPane();
-            if (pane == null) {
-                return;
-            }
-            VBox vBox = (VBox) pane.getContent();
-            if (vBox == null) {
-                return;
-            }
-
-            // Now make card container for the added lore
-            loreItems.put(addKey.getCurrentText(), addValue.getCurrentText());
-
-            CardContainer toAdd = buildLoreEntry(addKey.getCurrentText(), (VerticalLayout) scrollLore.getLayout());
-            scrollLore.getLayout().addElement(toAdd);
-
-            Node node = toAdd.build().getKey();
-            vBox.getChildren().add(node);
-            // ALSO ADD TO RENDERED
-            scrollLore.getLayout().getRenderedNodes().put(addKey.getCurrentText(), node);
-
-            TextField input = (TextField) addKey.getNode();
-            input.setText("");
-
-            TextArea area = (TextArea) addValue.getNode();
-            area.setText("");
-        });
-
-        displayBox.addElement(addContainer);
-        displayBox.addElement(scrollLore);
-
-        tab.addElement(buildSubmitBox());
-
-        return tab;
-    }
-
-    public ScrollContainer getLoreItems() {
-        VerticalLayout scrollLayout = new VerticalLayout(0 ,0);
-
-        ScrollContainer root = new ScrollContainer(scrollLayout, 0, 0, 450, 0);
-        root.setMaxSize(450, appSettings.getHeight() - 300);
-        root.setVerticalScroll(true);
-        root.setScrollWhenNeeded(false);
-        root.setHorizontalScroll(false);
-
-        App.logger.info("Building lore cache...");
-        for (String key : loreItems.keySet()) {
-            scrollLayout.addElement(buildLoreEntry(key, scrollLayout));
-        }
-        return root;
-    }
-
-    private CardContainer buildLoreEntry(String key, @Nullable VerticalLayout scrollContainer) {
-        CardContainer card = new CardContainer(0, 0, 400, 300);
-        card.setId(key);
-
-        InputFieldOverlay entry = new InputFieldOverlay(key, 0, 0, 400, 50);
-        card.setHeader(entry);
-
-        TextAreaOverlay value = new TextAreaOverlay(loreItems.get(key), 0, 0, 400, 200);
-        card.setBody(value);
-
-        ButtonOverlay remove = new ButtonOverlay("remove", "Remove");
-        remove.setX(170);
-        remove.addStyle(Styles.DANGER);
-        remove.addStyle(Styles.BUTTON_OUTLINED);
-        card.setFooter(remove);
-
-        remove.onClick(event -> {
-            loreItems.remove(key);
-            // Update the layout
-            if (scrollContainer != null) {
-                VBox vBox = (VBox) scrollContainer.getPane();
-                Node toRemove = scrollContainer.getNode(key);
-                if (toRemove == null) {
-                    return;
-                }
-                vBox.getChildren().remove(toRemove);
-            }
-        });
-
-        return card;
-    }
-
-    public Tab buildChatTab() {
-        Tab tab = new Tab("Chat");
-
-        int layoutSpacing = 200;
-
-        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
-        layout.setAlignment(Pos.TOP_CENTER);
-        tab.addElement(layout);
-
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
-        layout.addElement(info);
-
-        CardContainer firstCard = new CardContainer(0, 0, 0, 0);
-        firstCard.setMaxSize(appSettings.getWidth() - 300, 200);
-        layout.addElement(firstCard);
-
-        HorizontalLayout firstBox = new HorizontalLayout(0, 0);
-        firstBox.setAlignment(Pos.BASELINE_LEFT);
-        firstBox.setMaxSize(appSettings.getWidth() - 300, 120);
-        firstBox.setSpacing(layoutSpacing);
-        firstCard.setBody(firstBox);
-
-        TextFlowOverlay firstDesc = new TextFlowOverlay("Set the first message from the assistant.", (appSettings.getWidth() - 300) / 2, 200);
-        firstDesc.setTextFillColor(Color.WHITE);
-        firstBox.addElement(firstDesc);
-
-        firstMessageInput = new TextAreaOverlay(chatFirstMessage, 0, 0, 800, 400);
-        firstBox.addElement(firstMessageInput);
-        firstMessageInput.onInputSetEvent(event -> {
-            chatFirstMessage = event.getInput();
-            infoFile.set("first-message", event.getInput());
-            warnTokens();
-        });
-
-        CardContainer scenarioCard = new CardContainer(0, 0, 0, 0);
-        scenarioCard.setMaxSize(appSettings.getWidth() - 300, 200);
-        layout.addElement(scenarioCard);
-
-        HorizontalLayout scenarioBox = new HorizontalLayout(0, 0);
-        scenarioBox.setAlignment(Pos.BASELINE_LEFT);
-        scenarioBox.setMaxSize(appSettings.getWidth() - 300, 120);
-        scenarioBox.setSpacing(layoutSpacing);
-        scenarioCard.setBody(scenarioBox);
-
-        TextFlowOverlay scenarioDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", (appSettings.getWidth() - 300) / 2, 50);
-        scenarioDesc.setTextFillColor(Color.WHITE);
-        scenarioBox.addElement(scenarioDesc);
-
-        chatScenarioInput = new TextAreaOverlay(chatScenario, 0, 0, 800, 400);
-        scenarioBox.addElement(chatScenarioInput);
-        chatScenarioInput.onInputSetEvent(event -> {
-            chatScenario = event.getInput();
-            infoFile.set("scenario", event.getInput());
-            warnTokens();
-        });
-
-        CardContainer contextCard = new CardContainer(0, 0, 0, 0);
-        contextCard.setMaxSize(appSettings.getWidth() - 300, 50);
-        layout.addElement(contextCard);
-
-        HorizontalLayout contextBox = new HorizontalLayout(0, 0);
-        contextBox.setAlignment(Pos.BASELINE_LEFT);
-        contextBox.setMaxSize(appSettings.getWidth() - 300, 50);
-        contextBox.setSpacing(layoutSpacing);
-        contextCard.setBody(contextBox);
-
-        TextFlowOverlay contextDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", (appSettings.getWidth() - 300) / 2, 50);
-        contextDesc.setTextFillColor(Color.WHITE);
-        contextBox.addElement(contextDesc);
-
-        SpinnerNumberOverlay context = new SpinnerNumberOverlay(1024, Integer.MAX_VALUE, chatContextSize);
-        contextBox.addElement(context);
-        context.onValueChange(event -> {
-            chatContextSize = (int) event.getNewValue();
-            infoFile.set("context", chatContextSize);
-        });
-
-        tab.addElement(buildSubmitBox());
-
-        return tab;
-    }
-
-    public Tab buildModelTab() {
-        Tab tab = new Tab("Model");
-
-        TextOverlay test = new TextOverlay("Under development. Use the ' Models ' page instead.");
-        tab.addElement(test);
-
-        tab.addElement(buildSubmitBox());
-
-        return tab;
+        contentLayout.addElement(buildSubmitBox());
+        warnTokens();
     }
 
     public HorizontalLayout buildSubmitBox() {
@@ -685,22 +267,19 @@ public class CharacterEditView {
         layout.addElements(submit);
 
         cancel.onClick(event -> {
-            // Confirm the cancel before leaving!!!
-            DialogueContainer dialogueContainer = new DialogueContainer("Do you want to exit?", 500, 500);
+            DialogueContainer dialogueContainer = new DialogueContainer("Do you want to exit without saving?", 500, 500);
 
-            ButtonOverlay stay = new ButtonOverlay("cancel", "Stay");
+            ButtonOverlay stay = new ButtonOverlay("stay", "Stay");
             stay.setWidth(150);
             stay.addStyle(Styles.SUCCESS);
             stay.onClick(event1 -> {
-                // Close dialogue
                 App.window.removeContainer(dialogueContainer);
             });
 
-            ButtonOverlay leave = new ButtonOverlay("cancel", "Leave");
+            ButtonOverlay leave = new ButtonOverlay("leave", "Leave");
             leave.setWidth(150);
             leave.addStyle(Styles.DANGER);
             leave.onClick(event1 -> {
-                // Close dialogue and return to home page
                 App.window.clearContainers();
                 App.window.addContainer(new HomeView().getContainer());
                 App.window.render();
@@ -710,260 +289,294 @@ public class CharacterEditView {
             dialogueContainer.setConfirmButton(leave);
 
             App.window.renderPopup(dialogueContainer, PopupPosition.CENTER, 500, 500);
-
         });
 
         submit.onClick(event -> {
             if (!validate()) return;
-            // Handle creation
 
-            // Write the files
-            if (character == null) {
-                character = new Character(characterId);
-            }
-            if (duplicate) {
-                // Duplicating is a little weird.
-                // Since the id is editable when duplicating it has to be reflected.
-                // However, character id is a final and should not be changed after creation
-                // This is how the id is used for creating the folders and files
+            try {
+                Character currentCharacterInstance;
+                if (character == null) {
+                    currentCharacterInstance = new Character(characterId);
+                    App.getInstance().getCharacters().put(characterId, currentCharacterInstance);
+                } else if (duplicate) {
+                    currentCharacterInstance = new Character(characterId);
+                    currentCharacterInstance.copy(character);
+                    App.getInstance().getCharacters().put(characterId, currentCharacterInstance);
+                } else {
+                    currentCharacterInstance = character;
+                }
 
-                // Create a new character that acts as the final duplication
-                // This allows us to set the chara id since it's a final.
-                Character dupe = new Character(characterId);
+                currentCharacterInstance.setDisplayName(characterDisplay);
+                currentCharacterInstance.setPersona(characterPersona);
+                currentCharacterInstance.setLorebook(loreItems);
+                currentCharacterInstance.setFirstMessage(chatFirstMessage);
+                currentCharacterInstance.setChatScenario(chatScenario);
+                currentCharacterInstance.setChatContext(chatContextSize);
 
-                // Copy the duplicated character info into the new character with the configured id
-                dupe.copy(character);
-
-                // Change character into the dupe
-                character = dupe;
-            }
-
-            character.setDisplayName(characterDisplay);
-            character.setPersona(characterPersona);
-            if (characterIconPath != null) {
-                File output = new File(character.getCharacterDirectory(), "character.png");
-                try {
+                // Handle character icon file copy
+                if (characterIconPath != null && characterIconPath.exists()) {
+                    File output = new File(currentCharacterInstance.getCharacterDirectory(), "character.png");
                     Files.copy(characterIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    character.setIconPath(output.getAbsolutePath());
+                    currentCharacterInstance.setIconPath(output.getAbsolutePath());
                 }
-            }
-            character.setLorebook(loreItems);
-            character.setFirstMessage(chatFirstMessage);
-            character.setChatScenario(chatScenario);
-            character.setChatContext(chatContextSize);
-            if (user == null) {
-                InfoFile newInfo = new InfoFile(new File(character.getUserDirectory(), "user.info"), true);
-                user = new User(newInfo);
-            } else {
-                // Copy user template into character
-                try {
-                    Files.copy(user.getInfoFile().getFile().toPath(), new File(character.getUserDirectory(), "user.info").toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+
+                if (user != null) {
+                    InfoFile characterUserInfoFile = new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true);
+                    User characterSpecificUser = new User(characterUserInfoFile);
+
+                    characterSpecificUser.setDisplayName(userDisplay);
+                    characterSpecificUser.setPersona(userPersona);
+
+                    if (userIconPath != null && userIconPath.exists()) {
+                        File output = new File(currentCharacterInstance.getUserDirectory(), userIconPath.getName());
+                        Files.copy(userIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        characterSpecificUser.setIconPath(output.getAbsolutePath());
+                    }
+
+                    currentCharacterInstance.setUser(characterSpecificUser);
+                } else {
+                    File userDestFile = new File(currentCharacterInstance.getUserDirectory(), "user.info");
+                    if (userDestFile.exists()) {
+                        Files.delete(userDestFile.toPath());
+                    }
+                    currentCharacterInstance.setUser(null);
                 }
+
+                this.character = currentCharacterInstance;
+
+                App.window.clearContainers();
+                App.window.addContainer(new HomeView().getContainer());
+                App.window.render();
+
+            } catch (IOException e) {
+                App.logger.error("Failed to save character: ", e);
             }
-            user.setDisplayName(userDisplay);
-            user.setPersona(userPersona);
-            if (userIconPath != null) {
-                File output = new File(character.getUserDirectory(), userIconPath.getName());
-                try {
-                    Files.copy(userIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    user.setIconPath(output.getAbsolutePath());
-                }
-            }
-            character.setUser(user);
-
-            App.getInstance().getCharacters().put(characterId, character);
-
-            App.window.clearContainers();
-            App.window.addContainer(new HomeView().getContainer());
-            App.window.render();
-
         });
 
         return layout;
     }
 
-    private void updateCharacterFields() {
-        characterIconPath = new File(character.getIconPath());
-        characterId = character.getId();
-        characterDisplay = character.getDisplayName();
-        characterPersona = character.getPersona();
-        loreItems.putAll(character.getLorebook());
-
-        chatFirstMessage = character.getFirstMessage();
-        chatScenario = character.getChatScenario();
-        chatContextSize = character.getChatContext();
-    }
-
-    private void updateUserFields() {
-        userIconPath = new File(user.getIconPath());
-        userDisplay = user.getDisplayName();
-        userPersona = user.getPersona();
-        loreItems.putAll(user.getLorebook());
-    }
-
-    public void updateInfoFields() {
-        // Only call if info is not null!
-        if (infoFile.hasKey("icon-path")) {
-            characterIconPath = new File(infoFile.get("icon-path").replace("!@!", "\n"));
-        }
-        if (infoFile.hasKey("character-id")) {
-            characterId = infoFile.get("character-id").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("character-display")) {
-            characterDisplay = infoFile.get("character-display").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("character-persona")) {
-            characterPersona = infoFile.get("character-persona").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("user-display")) {
-            userDisplay = infoFile.get("user-display").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("user-persona")) {
-            userPersona = infoFile.get("user-persona").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("lore")) {
-            loreItems.putAll(infoFile.getStringMap("lore"));
-        }
-        if (infoFile.hasKey("first-message")) {
-            chatFirstMessage = infoFile.get("first-message").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("scenario")) {
-            chatScenario = infoFile.get("scenario").replace("!@!", "\n");
-        }
-        if (infoFile.hasKey("context")) {
-            chatContextSize = infoFile.getInteger("context");
-        }
-        if (infoFile.hasKey("duplicate")) {
-            duplicate = infoFile.getBoolean("duplicate");
-        }
-    }
-
     public boolean validate() {
-        // When validating make sure all of the required fields are set.
-        // Which are: char id, char display, user display, chat context,
-
-        if (characterId.isEmpty() || charIdInput == null) {
-            // Go to character selection, and select the char box
-            container.getTabPane().getSelectionModel().select(characterTab.getJfxTab());
-
-            // Prompt them with a warning
-            MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"Character ID", "Character ID is required");
+        if (characterId.isEmpty() || ((TextField) characterTabInstance.getCharIdInput().getNode()).getText().isEmpty()) {
+            tabsContainer.getTabPane().getSelectionModel().select(characterTabInstance.getJfxTab());
+            MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "Character ID", "Character ID is required.");
             required.addStyle(Styles.WARNING);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
-
-            charIdInput.getNode().requestFocus();
+            characterTabInstance.getCharIdInput().getNode().requestFocus();
             return false;
         }
-        if (character == null && App.getInstance().containsCharacter(characterId)) {
-            container.getTabPane().getSelectionModel().select(characterTab.getJfxTab());
-
-            // Prompt them with a warning
-            MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"Character ID", "Character ID already exists!");
+        if ((character == null || (duplicate && !character.getId().equals(characterId))) && App.getInstance().containsCharacter(characterId)) {
+            tabsContainer.getTabPane().getSelectionModel().select(characterTabInstance.getJfxTab());
+            MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "Character ID", "Character ID already exists!");
             required.addStyle(Styles.WARNING);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
-
-            charIdInput.getNode().requestFocus();
+            characterTabInstance.getCharIdInput().getNode().requestFocus();
             return false;
         }
-        if (characterDisplay.isEmpty() || charDisplayName == null) {
-            // Go to character selection, and select the char box
-            container.getTabPane().getSelectionModel().select(characterTab.getJfxTab());
-
-            // Prompt them with a warning
-            MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"Character Display Name", "Character display name is required");
+        if (characterDisplay.isEmpty() || ((TextField) characterTabInstance.getCharDisplayName().getNode()).getText().isEmpty()) {
+            tabsContainer.getTabPane().getSelectionModel().select(characterTabInstance.getJfxTab());
+            MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "Character Display Name", "Character display name is required.");
             required.addStyle(Styles.WARNING);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
-
-            charDisplayName.getNode().requestFocus();
-            return false;
-        }
-        if (userDisplay.isEmpty() || userDisplayName == null) {
-            // Go to character selection, and select the char box
-            container.getTabPane().getSelectionModel().select(userTab.getJfxTab());
-
-            // Prompt them with a warning
-            MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"User Display Name", "User display name is required");
-            required.addStyle(Styles.WARNING);
-            App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
-
-            userDisplayName.getNode().requestFocus();
+            characterTabInstance.getCharDisplayName().getNode().requestFocus();
             return false;
         }
 
+        if (userDisplay.isEmpty() || ((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText().isEmpty()) {
+            tabsContainer.getTabPane().getSelectionModel().select(userTabInstance.getJfxTab());
+            MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "User Display Name", "User display name is required.");
+            required.addStyle(Styles.WARNING);
+            App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
+            userTabInstance.getUserDisplayNameInput().getNode().requestFocus();
+            return false;
+        }
+
+        try {
+            int contextSize = ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).getValue().intValue();
+            if (contextSize <= 0) {
+                tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
+                MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Context size must be a positive number.");
+                error.addStyle(Styles.DANGER);
+                App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
+                ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).requestFocus();
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
+            MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Please enter a valid number for context size.");
+            error.addStyle(Styles.DANGER);
+            App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
+            ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).requestFocus();
+            return false;
+        }
 
         return true;
     }
 
-    private void warnTokens() {
-        // This part of the method (checking currentServer and isLoading) can safely
-        // run on any thread that calls warnTokens, as it only accesses volatile fields.
-        if (character == null) return;
+    public void warnTokens() {
         ServerProcess currentServer = ServerProcess.getCurrentServer();
-
-        // If the server is not configured (null), there's no point in retrying.
         if (currentServer == null || (!currentServer.isAlive() && !currentServer.isLoading())) {
-            // UI operation: must be on JavaFX thread
             Platform.runLater(() -> {
-                MessageOverlay configWarning = new MessageOverlay(0, 0, 600, 100,"Server Not Configured", "Backend server is not configured. Please set up your model in settings.");
+                MessageOverlay configWarning = new MessageOverlay(0, 0, 600, 100, "Server Not Configured", "Backend server is not configured. Please set up your model in settings.");
                 configWarning.addStyle(Styles.DANGER);
                 App.window.renderPopup(configWarning, 650, 870, 600, 100, false, null);
             });
             return;
         }
 
-        // If the server exists but is still loading, schedule a retry.
         if (currentServer.isLoading()) {
             App.logger.info("Backend server is still loading. Retrying token check in 10 seconds...");
-            // UI operation (creating and playing PauseTransition): must be on JavaFX thread
             Platform.runLater(() -> {
-                PauseTransition delay = new PauseTransition(Duration.seconds(10)); // Increased delay for potentially long loading times
-                delay.setOnFinished(event -> {
-                    warnTokens(); // Recursively call this method after delay
-                });
+                PauseTransition delay = new PauseTransition(Duration.seconds(10));
+                delay.setOnFinished(event -> warnTokens());
                 delay.play();
             });
-            return; // Exit this call if server is loading
+            return;
         }
 
-        // Server is configured and not loading, proceed with tokenization on a background thread
+        StringBuilder textToTokenize = new StringBuilder();
+        if (characterPersona != null && !characterPersona.isEmpty()) {
+            textToTokenize.append(characterPersona).append("\n");
+        }
+        if (userPersona != null && !userPersona.isEmpty()) {
+            textToTokenize.append(userPersona).append("\n");
+        }
+        if (chatFirstMessage != null && !chatFirstMessage.isEmpty()) {
+            textToTokenize.append(chatFirstMessage).append("\n");
+        }
+        if (chatScenario != null && !chatScenario.isEmpty()) {
+            textToTokenize.append(chatScenario).append("\n");
+        }
+        loreItems.forEach((key, value) -> textToTokenize.append(key).append(": ").append(value).append("\n"));
+
         new Thread(() -> {
             try {
-                int tokenSize = Server.tokenize(characterPersona + userPersona + chatFirstMessage + chatScenario);
+                int tokenSize = Server.tokenize(textToTokenize.toString());
 
-                // UI updates must be on the JavaFX Application Thread
                 Platform.runLater(() -> {
-
                     if (tokenSize > (chatContextSize / 2)) {
-                        MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50,"Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + ")");
+                        MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + ")");
                         tokenWarning.addStyle(Styles.WARNING);
                         tokenWarning.setIcon(new FontIcon(Material2MZ.OUTLINED_FLAG));
-
                         App.window.renderPopup(tokenWarning, 650, 870, 500, 50, false, null);
                     }
                 });
 
             } catch (Exception e) {
-                // Handle any exceptions from Server.tokenize() (e.g., IOException, JSONException)
                 Platform.runLater(() -> {
                     App.logger.error("Error during tokenization: ", e);
-                    // Show an error message overlay if tokenization fails
-                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50,"Tokenization Failed", "Could not calculate token size: " + e.getMessage() + ". Please check server status.");
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Tokenization Failed", "Could not calculate token size: " + e.getMessage() + ". Please check server status.");
                     errorOverlay.addStyle(Styles.DANGER);
                     App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
                 });
             }
-        }, "Tokenization-Thread").start(); // Give the thread a name for easier debugging
+        }, "Tokenization-Thread").start();
     }
 
     public Container getRoot() {
         return root;
+    }
+
+    public File getCharacterIconPath() {
+        return characterIconPath;
+    }
+
+    public File getUserIconPath() {
+        return userIconPath;
+    }
+
+    public String getCharacterId() {
+        return characterId;
+    }
+
+    public String getCharacterDisplay() {
+        return characterDisplay;
+    }
+
+    public String getCharacterPersona() {
+        return characterPersona;
+    }
+
+    public String getUserDisplay() {
+        return userDisplay;
+    }
+
+    public String getUserPersona() {
+        return userPersona;
+    }
+
+    public String getChatFirstMessage() {
+        return chatFirstMessage;
+    }
+
+    public String getChatScenario() {
+        return chatScenario;
+    }
+
+    public int getChatContextSize() {
+        return chatContextSize;
+    }
+
+    public Map<String, String> getLoreItems() {
+        return loreItems;
+    }
+
+    public Character getCharacter() {
+        return character;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+
+    public void setCharacterIconPath(File characterIconPath) {
+        this.characterIconPath = characterIconPath;
+    }
+
+    public void setUserIconPath(File userIconPath) {
+        this.userIconPath = userIconPath;
+    }
+
+    public void setCharacterId(String characterId) {
+        this.characterId = characterId;
+    }
+
+    public void setCharacterDisplay(String characterDisplay) {
+        this.characterDisplay = characterDisplay;
+    }
+
+    public void setCharacterPersona(String characterPersona) {
+        this.characterPersona = characterPersona;
+    }
+
+    public void setUserDisplay(String userDisplay) {
+        this.userDisplay = userDisplay;
+    }
+
+    public void setUserPersona(String userPersona) {
+        this.userPersona = userPersona;
+    }
+
+    public void setChatFirstMessage(String chatFirstMessage) {
+        this.chatFirstMessage = chatFirstMessage;
+    }
+
+    public void setChatScenario(String chatScenario) {
+        this.chatScenario = chatScenario;
+    }
+
+    public void setChatContextSize(int chatContextSize) {
+        this.chatContextSize = chatContextSize;
+    }
+
+    public void setLoreItems(Map<String, String> loreItems) {
+        this.loreItems.clear();
+        this.loreItems.putAll(loreItems);
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
