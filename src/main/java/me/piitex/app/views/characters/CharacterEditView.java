@@ -336,11 +336,9 @@ public class CharacterEditView {
 
                     currentCharacterInstance.setUser(characterSpecificUser);
                 } else {
-                    File userDestFile = new File(currentCharacterInstance.getUserDirectory(), "user.info");
-                    if (userDestFile.exists()) {
-                        Files.delete(userDestFile.toPath());
-                    }
-                    currentCharacterInstance.setUser(null);
+                    user = new User(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText(), new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true));
+                    user.setDisplayName(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText());
+                    character.setUser(user);
                 }
 
                 this.character = currentCharacterInstance;
