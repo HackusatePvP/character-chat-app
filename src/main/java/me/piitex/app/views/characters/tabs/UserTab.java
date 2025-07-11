@@ -35,7 +35,7 @@ public class UserTab extends Tab {
 
     // UI elements
     private InputFieldOverlay userDisplayNameInput;
-    private TextAreaOverlay userDescription;
+    private RichTextAreaOverlay userDescription;
 
     public UserTab(AppSettings appSettings, InfoFile infoFile, Character character, User user, File userIconPath, String userDisplay, String userPersona, Map<String, String> loreItems, CharacterEditView parentView) {
         super("User");
@@ -72,13 +72,15 @@ public class UserTab extends Tab {
         displayBox.addElement(buildUserInput(character));
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        userDescription = new TextAreaOverlay(userPersona, 0, 0, 600, 400 * scaleFactor);
-        userDescription.setHintText("Describe the user and provide key lore.");
-        rootLayout.addElement(userDescription);
+        userDescription = new RichTextAreaOverlay(userPersona, 600, 400 * scaleFactor);
         userDescription.onInputSetEvent(event -> {
             parentView.setUserPersona(event.getInput());
-            parentView.warnTokens(); // Call warnTokens on parent view
+            parentView.warnTokens();
         });
+        userDescription.addStyle(Styles.BG_DEFAULT);
+        userDescription.addStyle(appSettings.getTextSize());
+        userDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
+        rootLayout.addElement(userDescription);
 
         this.addElement(parentView.buildSubmitBox());
     }
@@ -176,7 +178,7 @@ public class UserTab extends Tab {
         return userDisplayNameInput;
     }
 
-    public TextAreaOverlay getUserDescription() {
+    public RichTextAreaOverlay getUserDescription() {
         return userDescription;
     }
 }

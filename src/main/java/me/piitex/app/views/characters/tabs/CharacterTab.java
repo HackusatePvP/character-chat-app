@@ -38,7 +38,7 @@ public class CharacterTab extends Tab {
     private String characterPersona;
     private final Map<String, String> loreItems;
 
-    private TextAreaOverlay charDescription;
+    private RichTextAreaOverlay charDescription;
     private InputFieldOverlay charIdInput;
     private InputFieldOverlay charDisplayName;
 
@@ -77,13 +77,17 @@ public class CharacterTab extends Tab {
         displayBox.addElement(buildCharacterInput(character, duplicate));
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        charDescription = new TextAreaOverlay(characterPersona, 0, 0, 600, 400 * scaleFactor);
-        charDescription.setHintText("Describe the character and provide key lore.");
-        rootLayout.addElement(charDescription);
+
+        charDescription = new RichTextAreaOverlay(characterPersona, 600, 400 * scaleFactor);
+        charDescription.setMaxWidth(600);
         charDescription.onInputSetEvent(event -> {
             parentView.setCharacterPersona(event.getInput());
             parentView.warnTokens();
         });
+        charDescription.addStyle(Styles.BG_DEFAULT);
+        charDescription.addStyle(appSettings.getTextSize());
+        charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
+        rootLayout.addElement(charDescription);
 
         ButtonOverlay importCard = new ButtonOverlay("import", "Import Character Card");
         if (character != null) {
@@ -202,7 +206,7 @@ public class CharacterTab extends Tab {
         return charDisplayName;
     }
 
-    public TextAreaOverlay getCharDescription() {
+    public RichTextAreaOverlay getCharDescription() {
         return charDescription;
     }
 }

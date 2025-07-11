@@ -1,5 +1,6 @@
 package me.piitex.app.views.characters.tabs;
 
+import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.backend.Character;
@@ -26,9 +27,12 @@ public class ChatTab extends Tab {
     private final Character character;
 
     // UI elements
-    private TextAreaOverlay firstMessageInput;
-    private TextAreaOverlay chatScenarioInput;
+    private RichTextAreaOverlay firstMessageInput;
+    private RichTextAreaOverlay chatScenarioInput;
     private SpinnerNumberOverlay chatContextSpinner;
+
+    private final double TEXT_AREA_WIDTH = 600;
+    private final double TEXT_AREA_HEIGHT = 200;
 
     public ChatTab(AppSettings appSettings, InfoFile infoFile, ServerSettings serverSettings, Character character, User user, String chatFirstMessage, String chatScenario, int chatContextSize, CharacterEditView parentView) {
         super("Chat");
@@ -42,6 +46,8 @@ public class ChatTab extends Tab {
     }
 
     private void buildChatTabContent(String chatFirstMessage, String chatScenario, int chatContextSize) {
+        this.setWidth(appSettings.getWidth() - 300);
+        this.setHeight(appSettings.getHeight());
         int layoutSpacing = 200;
 
         VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
@@ -53,12 +59,11 @@ public class ChatTab extends Tab {
         layout.addElement(info);
 
         CardContainer firstCard = new CardContainer(0, 0, 0, 0);
-        firstCard.setMaxSize(appSettings.getWidth() - 300, 200);
+        firstCard.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
         layout.addElement(firstCard);
 
-        HorizontalLayout firstBox = new HorizontalLayout(0, 0);
-        firstBox.setAlignment(Pos.BASELINE_LEFT);
-        firstBox.setMaxSize(appSettings.getWidth() - 300, 120);
+        HorizontalLayout firstBox = new HorizontalLayout(0, TEXT_AREA_HEIGHT);
+        firstBox.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
         firstBox.setSpacing(layoutSpacing);
         firstCard.setBody(firstBox);
 
@@ -66,21 +71,22 @@ public class ChatTab extends Tab {
         firstDesc.setTextFillColor(Color.WHITE);
         firstBox.addElement(firstDesc);
 
-        firstMessageInput = new TextAreaOverlay(chatFirstMessage, 0, 0, 800, 400);
-        firstBox.addElement(firstMessageInput);
+        firstMessageInput = new RichTextAreaOverlay(chatFirstMessage, TEXT_AREA_WIDTH, TEXT_AREA_HEIGHT);
         firstMessageInput.onInputSetEvent(event -> {
-            parentView.setChatFirstMessage(event.getInput());
-            infoFile.set("first-message", event.getInput());
+            parentView.setCharacterPersona(event.getInput());
             parentView.warnTokens();
         });
+        firstMessageInput.addStyle(Styles.BG_DEFAULT);
+        firstMessageInput.addStyle(appSettings.getTextSize());
+        firstMessageInput.addStyle(Styles.TEXT_ON_EMPHASIS);
+        firstBox.addElement(firstMessageInput);
 
         CardContainer scenarioCard = new CardContainer(0, 0, 0, 0);
-        scenarioCard.setMaxSize(appSettings.getWidth() - 300, 200);
+        scenarioCard.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
         layout.addElement(scenarioCard);
 
-        HorizontalLayout scenarioBox = new HorizontalLayout(0, 0);
-        scenarioBox.setAlignment(Pos.BASELINE_LEFT);
-        scenarioBox.setMaxSize(appSettings.getWidth() - 300, 120);
+        HorizontalLayout scenarioBox = new HorizontalLayout(0, TEXT_AREA_HEIGHT);
+        scenarioBox.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
         scenarioBox.setSpacing(layoutSpacing);
         scenarioCard.setBody(scenarioBox);
 
@@ -88,21 +94,24 @@ public class ChatTab extends Tab {
         scenarioDesc.setTextFillColor(Color.WHITE);
         scenarioBox.addElement(scenarioDesc);
 
-        chatScenarioInput = new TextAreaOverlay(chatScenario, 0, 0, 800, 400);
+        chatScenarioInput = new RichTextAreaOverlay(chatScenario, TEXT_AREA_WIDTH, TEXT_AREA_HEIGHT);
         scenarioBox.addElement(chatScenarioInput);
         chatScenarioInput.onInputSetEvent(event -> {
             parentView.setChatScenario(event.getInput());
             infoFile.set("scenario", event.getInput());
             parentView.warnTokens();
         });
+        chatScenarioInput.addStyle(Styles.BG_DEFAULT);
+        chatScenarioInput.addStyle(appSettings.getTextSize());
+        chatScenarioInput.addStyle(Styles.TEXT_ON_EMPHASIS);
 
         CardContainer contextCard = new CardContainer(0, 0, 0, 0);
-        contextCard.setMaxSize(appSettings.getWidth() - 300, 50);
+        contextCard.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
         layout.addElement(contextCard);
 
         HorizontalLayout contextBox = new HorizontalLayout(0, 0);
         contextBox.setAlignment(Pos.BASELINE_LEFT);
-        contextBox.setMaxSize(appSettings.getWidth() - 300, 50);
+        contextBox.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
         contextBox.setSpacing(layoutSpacing);
         contextCard.setBody(contextBox);
 
@@ -122,11 +131,11 @@ public class ChatTab extends Tab {
         this.addElement(parentView.buildSubmitBox());
     }
 
-    public TextAreaOverlay getFirstMessageInput() {
+    public RichTextAreaOverlay getFirstMessageInput() {
         return firstMessageInput;
     }
 
-    public TextAreaOverlay getChatScenarioInput() {
+    public RichTextAreaOverlay getChatScenarioInput() {
         return chatScenarioInput;
     }
 
