@@ -27,9 +27,9 @@ public class JavaFXLoad extends Application {
 
     @Override
     public void start(Stage s) {
-        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-
         AppSettings appSettings = App.getInstance().getAppSettings();
+        Application.setUserAgentStylesheet(appSettings.getStyleTheme(appSettings.getTheme()).getUserAgentStylesheet());
+
         int setWidth = appSettings.getWidth();
         int setHeight = appSettings.getHeight();
 
@@ -58,7 +58,6 @@ public class JavaFXLoad extends Application {
 
 
         Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(true).setDimensions(setWidth, setHeight).build();
-        window.updateBackground(Color.rgb(13, 17, 23));
 
         App.window = window;
 
