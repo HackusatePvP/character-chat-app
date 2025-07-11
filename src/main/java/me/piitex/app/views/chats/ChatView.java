@@ -196,10 +196,10 @@ public class ChatView {
         String displayName = "";
         Role role = chatMessage.getSender();
         if (role == Role.USER) {
-            iconPath = character.getUser().getIconPath();
+            iconPath = (character.getUser() != null && character.getUser().getIconPath() != null && !character.getUser().getIconPath().isEmpty()? character.getUser().getIconPath() :  new File(App.getAppDirectory(), "icons/character.png").getAbsolutePath());
             displayName = character.getUser().getDisplayName();
         } else {
-            iconPath = character.getIconPath();
+            iconPath = (character != null && character.getIconPath() != null && !character.getIconPath().isEmpty() ? character.getIconPath() : new File(App.getAppDirectory(), "icons/character.png").getAbsolutePath());
             displayName = character.getDisplayName();
         }
 
