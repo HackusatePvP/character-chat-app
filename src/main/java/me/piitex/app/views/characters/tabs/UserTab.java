@@ -139,7 +139,6 @@ public class UserTab extends Tab {
         ChoiceBoxOverlay templates = new ChoiceBoxOverlay(users, 200, 50);
         root.addElement(templates);
 
-        System.out.println("User: " + parentView.getUserDisplay());
         userDisplayNameInput = new InputFieldOverlay(parentView.getUserDisplay(), 0, 0, 200, 50);
         userDisplayNameInput.setHintText("Display Name");
         userDisplayNameInput.onInputSetEvent(event -> {
