@@ -73,6 +73,8 @@ public class UserTab extends Tab {
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
         userDescription = new RichTextAreaOverlay(userPersona, 600, 400 * scaleFactor);
+        userDescription.setMaxHeight(400 * scaleFactor);
+        userDescription.setMaxWidth(600);
         userDescription.onInputSetEvent(event -> {
             parentView.setUserPersona(event.getInput());
             parentView.warnTokens();
