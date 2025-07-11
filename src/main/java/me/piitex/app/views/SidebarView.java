@@ -53,7 +53,7 @@ public class SidebarView {
         root.addElement(models);
         models.onClick(event -> {
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView(0).getContainer());
+            App.window.addContainer(new ModelsView().getContainer());
             App.window.render();
         });
 
