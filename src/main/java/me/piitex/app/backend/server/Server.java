@@ -141,7 +141,7 @@ public class Server {
                         textFlow.setNode(fxFlow);
                         fxFlow.setOnMouseClicked(event -> {
                             if (textFlow.getOnClick() != null) {
-                                textFlow.getOnClick().onClick(new OverlayClickEvent(textFlow, event));
+                                textFlow.getOnClick().onClick(new OverlayClickEvent(textFlow, event, event.getSceneX(), event.getSceneY()));
                             }
                         });
 
