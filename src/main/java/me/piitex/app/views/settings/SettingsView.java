@@ -67,7 +67,6 @@ public class SettingsView {
         layout.addElement(buildTheme());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
-        layout.addElement(buildGpuLayers());
 
         // If the server is currently running but not active display progress bar
         handleServerLoad();
@@ -307,7 +306,6 @@ public class SettingsView {
         return card;
     }
 
-
     public CardContainer buildGpuDevice() {
         CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
         card.setMaxSize(appSettings.getWidth() - 300, 120);
@@ -335,33 +333,6 @@ public class SettingsView {
 
         return card;
     }
-
-    public CardContainer buildGpuLayers() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
-
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, 200, settings.getGpuLayers());
-        input.onValueChange(event -> {
-            settings.setGpuLayers((int) event.getNewValue());
-        });
-        root.addElement(input);
-
-        card.setBody(root);
-
-        return card;
-    }
-
 
     public CardContainer buildDangerZone() {
         CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 150);

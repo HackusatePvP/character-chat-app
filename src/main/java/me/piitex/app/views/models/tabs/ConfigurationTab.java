@@ -13,6 +13,7 @@ import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.ComboBoxOverlay;
+import me.piitex.engine.overlays.SpinnerNumberOverlay;
 import me.piitex.engine.overlays.ToggleSwitchOverlay;
 
 import java.io.File;
@@ -46,6 +47,7 @@ public class ConfigurationTab extends Tab {
 
         layout.addElement(buildModelPathTile());
         layout.addElement(buildCurrentModel());
+        layout.addElement(buildGpuLayers());
         layout.addElement(buildMemoryLock());
         layout.addElement(buildFlashAttention());
 
@@ -108,6 +110,21 @@ public class ConfigurationTab extends Tab {
             }
             settings.setLastModel(App.getModelByName(event.getItem()).getFile().getAbsolutePath());
         });
+
+        return container;
+    }
+
+    public TileContainer buildGpuLayers() {
+        TileContainer container = new TileContainer(0, 0);
+        container.setMaxSize(layout.getWidth(), 100);
+        container.setTitle("GPU Layers");
+        container.setDescription("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.");
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, 200, settings.getGpuLayers());
+        input.onValueChange(event -> {
+            settings.setGpuLayers((int) event.getNewValue());
+        });
+        container.setAction(input);
 
         return container;
     }
