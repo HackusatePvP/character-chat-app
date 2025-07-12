@@ -22,7 +22,6 @@ import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -377,10 +376,10 @@ public class SettingsView {
             renderProgress();
 
             new Thread(() -> {
-                ServerProcess newProcess = new ServerProcess((settings.getLastModel() == null ? App.getInstance().getDefaultModel() : settings.getLastModel()));
+                ServerProcess newProcess = new ServerProcess((settings.getGlobalModel() == null ? App.getInstance().getDefaultModel() : settings.getGlobalModel()));
                 Platform.runLater(() -> {
                     if (newProcess.isError()) {
-                        if (settings.getLastModel() == null && App.getInstance().getDefaultModel() == null) {
+                        if (settings.getGlobalModel() == null && App.getInstance().getDefaultModel() == null) {
                             MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "You do not have an active model. Set a model as default to start the server.");
                             errorOverlay.addStyle(Styles.DANGER);
                             App.window.renderPopup(errorOverlay, PopupPosition.BOTTOM_CENTER, 600, 100, false);
@@ -408,7 +407,7 @@ public class SettingsView {
             if (ServerProcess.getCurrentServer() != null) {
                 ServerProcess.getCurrentServer().stop();
             }
-            if (settings.getLastModel() == null) {
+            if (settings.getGlobalModel() == null) {
                 return;
             }
 
@@ -423,7 +422,7 @@ public class SettingsView {
             renderProgress();
 
             new Thread(() -> {
-                ServerProcess process = new ServerProcess(settings.getLastModel());
+                ServerProcess process = new ServerProcess(settings.getGlobalModel());
                 Platform.runLater(() -> {
                     if (process.isError()) {
                         MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");

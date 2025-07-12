@@ -18,7 +18,7 @@ public class ServerSettings {
     private boolean jinja = false;
     private boolean thinkMode;
     private boolean installed = true;
-    private String lastModel = "";
+    private String globalModel = "";
     private String modelPath = "%APPDATA%/chat-app/models/";
     private LinkedList<String> devices = new LinkedList<>();
     private boolean astrixEnabled = true;
@@ -72,8 +72,8 @@ public class ServerSettings {
         } else {
             infoFile.set("model-path", modelPath);
         }
-        if (infoFile.hasKey("last-model")) {
-            lastModel = infoFile.get("last-model");
+        if (infoFile.hasKey("global-model")) {
+            globalModel = infoFile.get("global-model");
         }
         if (infoFile.hasKey("installed")) {
             installed = infoFile.getBoolean("installed");
@@ -181,24 +181,24 @@ public class ServerSettings {
         infoFile.set("model-path", modelPath);
     }
 
-    public Model getLastModel() {
-        if (lastModel.isEmpty()) {
+    public Model getGlobalModel() {
+        if (globalModel.isEmpty()) {
             return null;
         }
-        return new Model(new File(lastModel));
+        return new Model(new File(globalModel));
     }
 
-    public String getLastModelString() {
-        if (lastModel.isEmpty() || getLastModel() == null) {
+    public String getGlobalModelString() {
+        if (globalModel.isEmpty() || getGlobalModel() == null) {
             return "";
         }
 
-        return getLastModel().getFile().getName();
+        return getGlobalModel().getFile().getName();
     }
 
-    public void setLastModel(String lastModel) {
-        this.lastModel = lastModel;
-        infoFile.set("last-model", lastModel);
+    public void setGlobalModel(String globalModel) {
+        this.globalModel = globalModel;
+        infoFile.set("global-model", globalModel);
     }
 
 

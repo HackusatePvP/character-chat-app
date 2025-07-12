@@ -102,8 +102,8 @@ public class JavaFXLoad extends Application {
             }
 
             App.logger.info("Looking for model to load...");
-            if (App.getInstance().getSettings().getLastModel() != null) {
-                new ServerProcess(App.getInstance().getSettings().getLastModel());
+            if (App.getInstance().getSettings().getGlobalModel() != null) {
+                new ServerProcess(App.getInstance().getSettings().getGlobalModel());
             } else {
                 for (Model model : App.getModels("exclude")) {
                     if (model.getSettings().isDefault()) {

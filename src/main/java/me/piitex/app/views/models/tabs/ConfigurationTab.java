@@ -84,7 +84,7 @@ public class ConfigurationTab extends Tab {
         TileContainer container = new TileContainer(0, 0);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Current Model");
-        container.setDescription("Set the current model. This will the default model.");
+        container.setDescription("Set the current model. This will override the default model.");
 
         List<String> items = new ArrayList<>();
         items.add("Default / Last Model");
@@ -94,21 +94,21 @@ public class ConfigurationTab extends Tab {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        selection.setDefaultItem((settings.getLastModel() != null ? settings.getLastModel().getFile().getName() : "Default / Last Model"));
+        selection.setDefaultItem((settings.getGlobalModel() != null ? settings.getGlobalModel().getFile().getName() : "Default / Last Model"));
         container.setAction(selection);
 
         selection.onItemSelect(event -> {
             if (event.getItem().startsWith("Default /")) {
                 for (Model model : App.getModels("exclude")) {
                     if (model.getSettings().isDefault()) {
-                        App.getInstance().getSettings().setLastModel(model.getFile().getAbsolutePath());
+                        App.getInstance().getSettings().setGlobalModel(model.getFile().getAbsolutePath());
                         break;
                     }
                 }
-                settings.setLastModel("");
+                settings.setGlobalModel("");
                 return;
             }
-            settings.setLastModel(App.getModelByName(event.getItem()).getFile().getAbsolutePath());
+            settings.setGlobalModel(App.getModelByName(event.getItem()).getFile().getAbsolutePath());
         });
 
         return container;
