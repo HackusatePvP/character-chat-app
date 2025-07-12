@@ -8,15 +8,15 @@ import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.models.ModelEditView;
 import me.piitex.app.views.models.ModelsView;
+import me.piitex.engine.PopupPosition;
+import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TitledContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.CheckBoxOverlay;
-import me.piitex.engine.overlays.InputFieldOverlay;
-import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
@@ -145,6 +145,45 @@ public class ListTab extends Tab {
             subFooter.addElement(delete);
             delete.onClick(event -> {
                 // Confirm the model deletion.
+
+                DialogueContainer dialogueContainer = new DialogueContainer("Are you sure you want to delete this model?", 500, 500);
+
+                ButtonOverlay stay = new ButtonOverlay("cancel", "Cancel");
+                stay.setWidth(150);
+                stay.addStyle(Styles.SUCCESS);
+                stay.onClick(event1 -> {
+                    App.window.removeContainer(dialogueContainer);
+                });
+
+                ButtonOverlay leave = new ButtonOverlay("delete", "Delete");
+                leave.setWidth(150);
+                leave.addStyle(Styles.DANGER);
+                leave.onClick(event1 -> {
+                    App.window.removeContainer(dialogueContainer);
+
+                    // Delete the model
+                    if (model.getFile().delete()) {
+                        App.logger.info("Deleted model '{}'", model.getFile().getAbsolutePath());
+
+                        // Refresh view? Maybe just re-render
+                        layout.removeAllElements();
+                        buildModelCards(layout);
+                        App.window.render();
+
+                    } else {
+                        App.logger.error("Could not delete model '{}'", model.getFile().getAbsolutePath());
+                        MessageOverlay messageOverlay = new MessageOverlay("Error", "Could not delete the model file. Make sure the model is not being used.");
+                        messageOverlay.addStyle(Styles.DANGER);
+                        App.window.renderPopup(messageOverlay, PopupPosition.BOTTOM_CENTER, 400, 200, false);
+                    }
+                });
+
+                dialogueContainer.setCancelButton(stay);
+                dialogueContainer.setConfirmButton(leave);
+
+                System.out.println("X,Y: " + event.getX() + ", " + event.getY());
+
+                App.window.renderPopup(dialogueContainer, event.getHandler().getSceneX(), event.getHandler().getSceneY(), 500, 500);
             });
 
             layout.addElement(root);
