@@ -1,16 +1,11 @@
 package me.piitex.app.views.models;
 
 import atlantafx.base.theme.Styles;
-import javafx.geometry.Pos;
-import javafx.scene.paint.Color;
 import me.piitex.app.App;
-import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.ModelSettings;
-import me.piitex.app.views.HomeView;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
-import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
@@ -97,7 +92,10 @@ public class ModelEditView {
         info.setTooltip("Supports placeholders for both character and user. {chara} {character} {char} {user} {usr}");
         tileContainer.setGraphic(info);
 
-        TextAreaOverlay input = new TextAreaOverlay(instructions, 0, 0, 800, 200);
+        RichTextAreaOverlay input = new RichTextAreaOverlay(instructions, 600, 200);
+        input.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
+        input.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
+        input.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
         input.onInputSetEvent(event -> {
             this.instructions = event.getInput();
         });
