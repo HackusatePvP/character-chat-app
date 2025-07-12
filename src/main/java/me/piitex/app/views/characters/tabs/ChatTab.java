@@ -32,7 +32,7 @@ public class ChatTab extends Tab {
     private RichTextAreaOverlay chatScenarioInput;
     private SpinnerNumberOverlay chatContextSpinner;
 
-    private final double TEXT_AREA_WIDTH = 600;
+    private final double TEXT_AREA_WIDTH = 500;
     private final double TEXT_AREA_HEIGHT = 200;
 
     public ChatTab(AppSettings appSettings, InfoFile infoFile, ServerSettings serverSettings, Character character, User user, String chatFirstMessage, String chatScenario, int chatContextSize, CharacterEditView parentView) {
