@@ -1,11 +1,13 @@
 package me.piitex.app.views.characters;
 
+import atlantafx.base.controls.ToggleSwitch;
 import atlantafx.base.theme.Styles;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.annotations.Nullable;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.util.Duration;
@@ -30,6 +32,7 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
+import me.piitex.engine.overlays.ToggleSwitchOverlay;
 import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
@@ -75,6 +78,7 @@ public class CharacterEditView {
     private CharacterTab characterTabInstance;
     private UserTab userTabInstance;
     private ChatTab chatTabInstance;
+    private ModelTab modelTabInstance;
 
 
     public CharacterEditView(@Nullable Character character) {
@@ -241,7 +245,9 @@ public class CharacterEditView {
         tabsContainer.addTab(new LorebookTab(appSettings, infoFile, character, user, loreItems, this));
         chatTabInstance = new ChatTab(appSettings, infoFile, serverSettings, character, user, chatFirstMessage, chatScenario, chatContextSize, this);
         tabsContainer.addTab(chatTabInstance);
-        tabsContainer.addTab(new ModelTab(appSettings, infoFile, serverSettings, character, user, this));
+
+        modelTabInstance = new ModelTab(appSettings, infoFile, serverSettings, character, user, this);
+        tabsContainer.addTab(modelTabInstance);
 
         if (tabToSelect != null) {
             tabsContainer.setSelectedTab(tabToSelect.getText());
@@ -314,6 +320,12 @@ public class CharacterEditView {
                 currentCharacterInstance.setFirstMessage(((StyledTextArea<?, ?>) chatTabInstance.getFirstMessageInput().getNode()).getText());
                 currentCharacterInstance.setChatScenario(((StyledTextArea<?, ?>) chatTabInstance.getChatScenarioInput().getNode()).getText());
                 currentCharacterInstance.setChatContext(((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).getValue().intValue());
+
+                currentCharacterInstance.setOverride(((ToggleSwitch) modelTabInstance.getModelOverride().getNode()).isSelected());
+                currentCharacterInstance.setModel(((ComboBox) modelTabInstance.getModelSelection().getNode()).getSelectionModel().getSelectedItem().toString());
+
+                System.out.println("Validate: " + currentCharacterInstance.isOverride());
+                System.out.println("Validate: " + currentCharacterInstance.getModel());
 
                 // Handle character icon file copy
                 if (characterIconPath != null && characterIconPath.exists()) {

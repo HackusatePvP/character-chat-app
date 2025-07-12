@@ -27,8 +27,8 @@ public class ModelEditView {
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
-    public ModelEditView(Model model) {
-        this.settings = model.getSettings();
+    public ModelEditView(ModelSettings settings) {
+        this.settings = settings;
         container = new EmptyContainer(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
 
         HorizontalLayout main = new HorizontalLayout(0, 0);

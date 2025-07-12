@@ -22,6 +22,8 @@ public class Character {
 
     private Chat lastChat;
 
+    private boolean override = false;
+    private String model;
     private ModelSettings modelSettings;
 
     private InfoFile infoFile;
@@ -94,6 +96,12 @@ public class Character {
             user = new User(userInfo);
         }
 
+        if (infoFile.hasKey("override")) {
+            this.override = infoFile.getBoolean("override");
+        }
+        if (infoFile.hasKey("model")) {
+            this.model = infoFile.get("model");
+        }
         File modelFile = new File(getCharacterDirectory(), "model-settings.info");
         if (modelFile.exists()) {
             modelSettings = new ModelSettings(new InfoFile(modelFile, false));
@@ -215,6 +223,24 @@ public class Character {
     public void setLastChat(Chat lastChat) {
         this.lastChat = lastChat;
         infoFile.set("last-chat", lastChat.getFile().getName());
+    }
+
+    public boolean isOverride() {
+        return override;
+    }
+
+    public void setOverride(boolean override) {
+        this.override = override;
+        infoFile.set("override", override);
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+        infoFile.set("model", model);
     }
 
     public ModelSettings getModelSettings() {
