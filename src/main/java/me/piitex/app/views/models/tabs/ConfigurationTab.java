@@ -38,8 +38,8 @@ public class ConfigurationTab extends Tab {
         layout.setSpacing(0);
         layout.setPrefSize(appSettings.getWidth() - 500, 0);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 400, appSettings.getHeight() - 200);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 200);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);

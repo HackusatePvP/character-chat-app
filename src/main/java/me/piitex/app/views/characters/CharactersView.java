@@ -41,6 +41,7 @@ public class CharactersView {
 
     public CharactersView() {
         VerticalLayout layout = new VerticalLayout(0, 0);
+        layout.setMaxSize(appSettings.getWidth() - 400, 0);
         layout.setSpacing(20);
 
         if (App.mobile) {
@@ -52,7 +53,7 @@ public class CharactersView {
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 20, 20, appSettings.getWidth() - 300, 0);
+            root = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, 0);
             root.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
             imageWidth = 256;
             imageHeight = 256;
@@ -60,6 +61,7 @@ public class CharactersView {
             cardHeight = 380;
         }
         root.setScrollWhenNeeded(false);
+        root.setHorizontalScroll(false);
         root.setVerticalScroll(true);
 
         HorizontalLayout base = new HorizontalLayout(0, 0);
@@ -157,6 +159,7 @@ public class CharactersView {
         editIcon.setIconSize(16);
         TextOverlay edit = new TextOverlay(editIcon);
         edit.setTooltip("Edit the character");
+        edit.addStyle(Styles.ACCENT);
         edit.onClick(event -> {
             editCharacter(character);
         });
@@ -166,6 +169,7 @@ public class CharactersView {
         duplicateIcon.setIconSize(16);
         TextOverlay duplicate = new TextOverlay(duplicateIcon);
         duplicate.setTooltip("Duplicate the character.");
+        duplicate.addStyle(Styles.WARNING);
         duplicate.onClick(event -> {
             duplicateCharacter(character);
         });

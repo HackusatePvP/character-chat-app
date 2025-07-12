@@ -35,11 +35,12 @@ public class ListTab extends Tab {
 
         // Build the list view for the models.
         VerticalLayout layout = new VerticalLayout(0, 0);
+        layout = new VerticalLayout(0, 0);
         layout.setSpacing(0);
-        layout.setPrefSize(appSettings.getWidth() - 300, 0);
+        layout.setPrefSize(appSettings.getWidth() - 500, 0);
 
-        scrollContainer = new ScrollContainer(layout, 20, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 200);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);

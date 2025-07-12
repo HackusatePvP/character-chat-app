@@ -35,15 +35,13 @@ public class DownloadTab extends Tab {
     private final ScrollContainer scrollContainer;
     private final VerticalLayout downloadListLayout;
 
-    private static final int LAYOUT_SPACING = 0;
     private static final int SCROLL_CONTAINER_PADDING = 20;
     private static final int TILE_LAYOUT_WIDTH = 400;
     private static final int TILE_LAYOUT_HEIGHT = 75;
     private static final int ICON_X_OFFSET = 20;
     private static final int QUANT_WIDTH = 100;
     private static final int CONTAINER_SPACING = 15;
-    private static final int PREF_WIDTH_OFFSET = 300;
-    private static final int SCROLL_MAX_WIDTH_OFFSET = 250;
+    private static final int SCROLL_MAX_WIDTH_OFFSET = 300;
     private static final int SCROLL_MAX_HEIGHT_OFFSET = 200;
 
 
@@ -60,18 +58,18 @@ public class DownloadTab extends Tab {
     }
 
     private VerticalLayout createMainLayout() {
-        VerticalLayout layout = new VerticalLayout(LAYOUT_SPACING, LAYOUT_SPACING);
-        layout.setSpacing(LAYOUT_SPACING);
-        layout.setPrefSize(appSettings.getWidth() - PREF_WIDTH_OFFSET, LAYOUT_SPACING);
+        VerticalLayout layout = new VerticalLayout(0, 0);
+        layout.setSpacing(0);
+        layout.setPrefSize(appSettings.getWidth() - 500, 0);
         return layout;
     }
 
     private ScrollContainer createScrollContainer(VerticalLayout contentLayout) {
         ScrollContainer container = new ScrollContainer(
                 contentLayout,
-                SCROLL_CONTAINER_PADDING,
-                SCROLL_CONTAINER_PADDING,
-                appSettings.getWidth() - PREF_WIDTH_OFFSET,
+                0,
+                0,
+                appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET,
                 appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET
         );
         container.setMaxSize(appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET, appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET);
@@ -107,7 +105,7 @@ public class DownloadTab extends Tab {
     }
 
     private TitledContainer createDownloadContainer(String title, String description, DownloadModel downloadModel) {
-        TitledContainer titledContainer = new TitledContainer(title, LAYOUT_SPACING, LAYOUT_SPACING);
+        TitledContainer titledContainer = new TitledContainer(title, 0, 0);
         titledContainer.addStyle(Styles.DENSE);
         titledContainer.addStyle(Tweaks.ALT_ICON);
         titledContainer.setSpacing(CONTAINER_SPACING);

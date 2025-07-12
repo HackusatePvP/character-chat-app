@@ -118,11 +118,10 @@ public class ChatView {
         main.addElement(chatView);
 
         layout = new VerticalLayout(appSettings.getWidth() - 300, 0);
-        //layout.setX(100);
         layout.setAlignment(Pos.TOP_CENTER);
 
         double scrollHeight = appSettings.getHeight() - 350;
-        scrollContainer = new ScrollContainer(layout, 0, 0, appSettings.getWidth() - 300, scrollHeight);
+        scrollContainer = new ScrollContainer(layout, 0, 0, appSettings.getWidth() - 250, scrollHeight);
         scrollContainer.setMaxSize(appSettings.getWidth(), scrollHeight);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
@@ -191,8 +190,8 @@ public class ChatView {
     }
 
     public CardContainer buildChatBox(ChatMessage chatMessage, int index) {
-        CardContainer cardContainer = new CardContainer(appSettings.getWidth() - 300, 0); // Width, height
-        cardContainer.setMaxSize(appSettings.getWidth() - 300, 0);
+        CardContainer cardContainer = new CardContainer(appSettings.getWidth() - 350, 0); // Width, height
+        cardContainer.setMaxSize(appSettings.getWidth() - 350, 0);
         String iconPath = "";
         String displayName = "";
         Role role = chatMessage.getSender();
@@ -326,6 +325,7 @@ public class ChatView {
         String firstMsg = (character.getFirstMessage() == null || character.getFirstMessage().isEmpty() ? "null" : character.getFirstMessage());
         if (chatMessage.getSender() == Role.ASSISTANT && !firstMsg.equalsIgnoreCase(chatMessage.getContent())) {
             TextOverlay regenerate = new TextOverlay(new FontIcon(Material2MZ.REFRESH));
+            regenerate.addStyle(Styles.WARNING);
             regenerate.setTooltip("Regenerate the response.");
             root.addElement(regenerate);
             regenerate.onClick(event -> {
@@ -444,6 +444,7 @@ public class ChatView {
         topControls.setMaxSize(1000, 50);
 
         TextOverlay undo = new TextOverlay(new FontIcon(Material2MZ.UNDO));
+        undo.addStyle(Styles.DANGER);
         undo.setTooltip("Undo the last message.");
         topControls.addElement(undo);
         undo.onClick(event -> {
@@ -484,6 +485,7 @@ public class ChatView {
         });
 
         TextOverlay impersonate = new TextOverlay(new FontIcon(Material2AL.BRUSH));
+        impersonate.addStyle(Styles.ACCENT);
         impersonate.setTooltip("Generate your response.");
         topControls.addElement(impersonate);
         impersonate.onClick(event -> {
@@ -491,6 +493,7 @@ public class ChatView {
         });
 
         TextOverlay addMedia = new TextOverlay(new FontIcon(Material2AL.ADD));
+        addMedia.addStyle(Styles.WARNING);
         addMedia.setTooltip("Attach an image to your prompt.");
         topControls.addElement(addMedia);
         addMedia.onClick(event -> {
@@ -743,8 +746,8 @@ public class ChatView {
             chatBox = new TextFlowOverlay(content, 500, 0);
             chatBox.setMaxWidth(500);
         } else {
-            chatBox = new TextFlowOverlay(content, App.getInstance().getAppSettings().getWidth() - 320, 0);
-            chatBox.setMaxWidth(App.getInstance().getAppSettings().getWidth() - 320); // Set a little less than chatLayout
+            chatBox = new TextFlowOverlay(content, App.getInstance().getAppSettings().getWidth() - 370, 0);
+            chatBox.setMaxWidth(App.getInstance().getAppSettings().getWidth() - 370); // Set a little less than chatLayout
         }
 
         chatBox.addStyle(App.getInstance().getAppSettings().getTextSize());
