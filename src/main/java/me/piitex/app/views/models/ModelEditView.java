@@ -7,14 +7,18 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.ModelSettings;
+import me.piitex.app.views.HomeView;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
+import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.material2.Material2AL;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,8 +31,20 @@ public class ModelEditView {
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
+    private String instructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
+    private int contextSize = 4096;
+    private String multimodal = "None / Disabled";
+    private double temperature = 0.8;
+    private double minP = 0.1;
+    private double repeatPenalty = 1.1;
+    private int repeatTokens = 64;
+    private String chatTemplate = "default";
+    private String reasoningTemplate = "disabled";
+    private boolean jinja = false;
+
     public ModelEditView(ModelSettings settings) {
         this.settings = settings;
+        initializeSettings();
         container = new EmptyContainer(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
@@ -55,267 +71,177 @@ public class ModelEditView {
         layout.addElement(buildChatTemplates());
         layout.addElement(buildReasoningTemplate());
         layout.addElement(buildJinjaTemplate());
+        layout.addElement(buildSubmitBox());
     }
 
-    private CardContainer buildInstructions() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 0);
-        card.setMaxSize(appSettings.getWidth() - 300, 0);
+    private void initializeSettings() {
+        this.instructions = settings.getModelInstructions();
+        this.contextSize = settings.getContextSize();
+        this.multimodal = settings.getMmProj();
+        this.temperature = settings.getTemperature();
+        this.minP = settings.getMinP();
+        this.repeatPenalty = settings.getRepeatPenalty();
+        this.repeatTokens = settings.getRepeatTokens();
+        this.chatTemplate = settings.getChatTemplate();
+        this.reasoningTemplate = settings.getReasoningTemplate();
+        this.jinja = settings.isJinja();
+    }
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+    public TileContainer buildInstructions() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setTitle("Model Instructions");
+        tileContainer.setDescription("Provide base instructions for the model.");
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Supports placeholders for both character and user. {chara} {character} {char} {user} {usr}");
+        tileContainer.setGraphic(info);
 
-        TextOverlay key = new TextOverlay("Model Instructions: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Provide custom instructions or a system prompt for the model. This defines the model's persona, behavior, or specific task goals for all interactions. Only modify if you are familiar with prompt engineering.");
-        description.add(value);
-
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextAreaOverlay input = new TextAreaOverlay(settings.getModelInstructions(), 0, 0, 800, 200);
-        root.addElement(input);
+        TextAreaOverlay input = new TextAreaOverlay(instructions, 0, 0, 800, 200);
         input.onInputSetEvent(event -> {
-            settings.setModelInstructions(event.getInput());
+            this.instructions = event.getInput();
         });
+        tileContainer.setAction(input);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildContextSize() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildContextSize() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.setTitle("Context Size");
+        tileContainer.setDescription("The size of the prompts tokens.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 120);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Different models will support different sizes. Recommend setting this between 4096 - 16384");
+        tileContainer.setGraphic(info);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Context Size: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("The size of the prompts tokens. 0 will be model default. It is recommended to set this as some models will require an industrial GPU for default.");
-        description.add(value);
-
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, settings.getContextSize());
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, contextSize);
         input.onValueChange(event -> {
-            settings.setContextSize((int) event.getNewValue());
+            this.contextSize = (int) event.getNewValue();
         });
-        root.addElement(input);
+        tileContainer.setAction(input);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildModalFile() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildModalFile() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.setTitle("Multimodal Support");
+        tileContainer.setDescription("Set multimodal file.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 120);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Multimodal Support: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Set the MM-Proj file for vision support. The file will have to contain 'mmproj' . Only works if the model has a supported MM-Proj. Without setting this, image processing won't work.");
-        description.add(value);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Set the MM-Proj file for vision support. The file will have to contain 'mmproj' . Only works if the model has a supported MM-Proj. Without setting this, image processing won't work");
+        tileContainer.setGraphic(info);
 
         List<String> items = new ArrayList<>();
         items.add("None / Disabled");
         items.addAll(App.getModelNames("mmproj"));
 
-        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
-        selection.setDefaultItem(settings.getMmProj());
-        root.addElement(selection);
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 250, 50);
+        selection.setDefaultItem(multimodal);
         selection.onItemSelect(event -> {
-            settings.setMmProj(event.getItem());
+            this.multimodal = event.getItem();
         });
 
-        card.setBody(root);
+        tileContainer.setAction(selection);
 
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildTemperature() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildTemperature() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Temperature");
+        tileContainer.setDescription("Set the temperature for the model.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Controls the creativity and randomness of the model's output. Higher values make the output more diverse and surprising, while lower values make it more focused, deterministic.");
+        tileContainer.setGraphic(info);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Temperature: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        // Updated description for Temperature
-        TextOverlay value = new TextOverlay("Controls the creativity and randomness of the model's output. Higher values (e.g, 0.8-1.0) make the output more diverse and surprising, while lower values (e.g, 0.2-0.5) make it more focused, deterministic, and less prone to unexpected phrasing. A value of 0 makes the output completely deterministic.");
-        description.add(value);
-
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, settings.getTemperature());
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, temperature);
         input.onValueChange(event -> {
-            settings.setTemperature(event.getNewValue());
+            this.temperature = event.getNewValue();
         });
-        root.addElement(input);
+        tileContainer.setAction(input);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildMinP() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildMinP() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Min-P");
+        tileContainer.setDescription("Filters out less likely tokens during generation.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Min-P keeps only tokens whose probability is at least 'p' times the probability of the most likely token. A value of 0 disables this filtering.");
+        tileContainer.setGraphic(info);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Min-P: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Filters out less likely tokens during generation. `Min-P` (minimum probability) keeps only tokens whose probability is at least `p` times the probability of the most likely token. A value of 0 disables this filtering. Higher values can lead to more coherent but less diverse text.");
-        description.add(value);
-
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, settings.getMinP());
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, minP);
         input.onValueChange(event -> {
-            settings.setMinP(event.getNewValue());
+            this.minP = event.getNewValue();
         });
-        root.addElement(input);
+        tileContainer.setAction(input);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildRepeatTokens() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildRepeatPenalty() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Repeat Penalty");
+        tileContainer.setDescription("Adjusts how strongly the model is penalized for repeating tokens that have appeared recently in the generated text.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Higher values (e.g, 1.1-1.5) aggressively discourage repetition, while a value of 1.0 applies no penalty. This helps in generating more varied and natural-sounding responses.");
+        tileContainer.setGraphic(info);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Repeat Tokens: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Specifies the number of recent tokens (from the model's output history) to consider when applying the repetition penalty. A larger value means the model will look further back in its generated text to avoid repeating phrases or patterns.");
-        description.add(value);
-
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, settings.getRepeatTokens());
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, repeatPenalty);
         input.onValueChange(event -> {
-            settings.setRepeatTokens((int) event.getNewValue());
+            this.repeatPenalty = event.getNewValue();
         });
-        root.addElement(input);
+        tileContainer.setAction(input);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildRepeatPenalty() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildRepeatTokens() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Repeat Tokens");
+        tileContainer.setDescription("Specifies the number of recent tokens (from the model's output history) to consider when applying the repetition penalty.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("A larger value means the model will look further back in its generated text to avoid repeating phrases or patterns.");
+        tileContainer.setGraphic(info);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Repeat Penalty: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Adjusts how strongly the model is penalized for repeating tokens that have appeared recently in the generated text. Higher values (e.g, 1.1-1.5) aggressively discourage repetition, while a value of 1.0 applies no penalty. This helps in generating more varied and natural-sounding responses.");
-        description.add(value);
-
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, settings.getRepeatPenalty());
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, repeatTokens);
         input.onValueChange(event -> {
-            settings.setRepeatPenalty(event.getNewValue());
+            this.repeatTokens = (int) event.getNewValue();
         });
-        root.addElement(input);
+        tileContainer.setAction(input);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildChatTemplates() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildChatTemplates() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Chat Template");
+        tileContainer.setDescription("Set the chat format template.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Chat Template: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Defines the specific format and structure for how prompts and responses are presented to and generated by the model. This is crucial for the model to correctly interpret user input and generate appropriate replies. Only change if you know the correct template for your specific model. `Default` attempts to auto-detect.");
-        description.add(value);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Changing this could drastically effect generation quality.");
+        tileContainer.setGraphic(info);
 
         String[] templates = {
                 "default",
@@ -358,39 +284,27 @@ public class ModelEditView {
                 "zephyr"
         };
 
-        ComboBoxOverlay selection = new ComboBoxOverlay(templates, 400, 50);
-        selection.setDefaultItem(settings.getChatTemplate());
-        root.addElement(selection);
+        ComboBoxOverlay selection = new ComboBoxOverlay(templates, 250, 50);
+        selection.setDefaultItem(chatTemplate);
         selection.onItemSelect(event -> {
-            settings.setChatTemplate(event.getItem());
+            this.chatTemplate = event.getItem();
         });
 
-        card.setBody(root);
+        tileContainer.setAction(selection);
 
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildReasoningTemplate() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildReasoningTemplate() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Reasoning Template");
+        tileContainer.setDescription("Set the reasoning format template. Only works for models that support reasoning.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Reasoning Template: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Controls the integration and extraction of internal 'thought' processes from the model's output. When enabled, the model might include special tags (e.g, `<thought>...</thought>`) showing its reasoning steps. `Disabled` will prevent the model from generating these internal thoughts.");
-        description.add(value);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Controls the integration and extraction of internal 'thought' processes from the model's output. When enabled, the model might include special tags (e.g, `<thought>...</thought>`) showing its reasoning steps.");
+        tileContainer.setGraphic(info);
 
         LinkedList<String> items = new LinkedList<>();
         items.add("deepseek");
@@ -398,48 +312,74 @@ public class ModelEditView {
         items.add("disabled");
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
-        selection.setDefaultItem(settings.getReasoningTemplate());
-        root.addElement(selection);
+        selection.setDefaultItem(reasoningTemplate);
         selection.onItemSelect(event -> {
-            settings.setReasoningTemplate(event.getItem());
+            this.reasoningTemplate = event.getItem();
         });
+        tileContainer.setAction(selection);
 
-        card.setBody(root);
-
-        return card;
+        return tileContainer;
     }
 
-    private CardContainer buildJinjaTemplate() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    private TileContainer buildJinjaTemplate() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Jinja Template");
+        tileContainer.setDescription("Enables or disables the use of Jinja templating for chat formatting.");
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(appSettings.getWidth() - 300, 120);
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Only enable if your model explicitly supports Jinja templating, as incorrect usage can lead to malformed outputs.");
+        tileContainer.setGraphic(info);
 
-        TextFlowOverlay description = new TextFlowOverlay("", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        root.addElement(description);
-
-        TextOverlay key = new TextOverlay("Jinja: ");
-        key.addStyle(Styles.TEXT_BOLD);
-        description.add(key);
-
-        TextOverlay value = new TextOverlay("Enables or disables the use of Jinja templating for chat formatting. If enabled, the model will expect and generate chat messages structured according to Jinja syntax, overriding the standard chat template. Only enable if your model explicitly supports Jinja templating, as incorrect usage can lead to malformed outputs.");
-        description.add(value);
-
-        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isJinja());
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(jinja);
         switchOverlay.onToggle(event -> {
-            settings.setJinja(!settings.isJinja());
+            this.jinja = event.getNewValue(); // ???
         });
-        root.addElement(switchOverlay);
+        tileContainer.setAction(switchOverlay);
 
-        card.setBody(root);
+        return tileContainer;
+    }
 
-        return card;
+    public HorizontalLayout buildSubmitBox() {
+        HorizontalLayout layout = new HorizontalLayout(300, 150);
+        layout.setY(20); // Offset the y axis
+        layout.setMaxSize(300, 150);
+        layout.setSpacing(50);
+        layout.setX((appSettings.getWidth() - 300) / 2);
+
+        ButtonOverlay discard = new ButtonOverlay("disc", "Discard");
+        discard.addStyle(Styles.DANGER);
+        discard.addStyle(Styles.BUTTON_OUTLINED);
+        discard.onClick(event -> {
+            App.window.clearContainers();
+            App.window.addContainer(new ModelsView().getContainer());
+            App.window.render();
+        });
+
+        ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
+        submit.addStyle(Styles.SUCCESS);
+        submit.addStyle(Styles.BUTTON_OUTLINED);
+        submit.onClick(event -> {
+            settings.setModelInstructions(instructions);
+            settings.setContextSize(contextSize);
+            settings.setMmProj(multimodal);
+            settings.setTemperature(minP);
+            settings.setMinP(minP);
+            settings.setRepeatPenalty(repeatPenalty);
+            settings.setRepeatTokens(repeatTokens);
+            settings.setChatTemplate(chatTemplate);
+            settings.setReasoningTemplate(reasoningTemplate);
+            settings.setJinja(jinja);
+
+            App.window.clearContainers();
+            App.window.addContainer(new ModelsView().getContainer());
+            App.window.render();
+        });
+
+        layout.addElements(discard, submit);
+
+        return layout;
     }
 
     public Container getContainer() {
