@@ -134,7 +134,7 @@ public class ListTab extends Tab {
             settings.addStyle(Styles.LARGE);
             settings.onClick(event -> {
                 App.window.clearContainers();
-                App.window.addContainer(new ModelEditView(model).getContainer());
+                App.window.addContainer(new ModelEditView(model.getSettings()).getContainer());
                 App.window.render();
             });
 
