@@ -231,7 +231,6 @@ public class ServerProcess {
                         if (line.contains("starting the main loop")) {
                             App.logger.info("Backend server stated!");
                             started = true;
-                            App.getInstance().getSettings().setLastModel(model.getFile().getAbsolutePath());
                             break;
                         }
                     }

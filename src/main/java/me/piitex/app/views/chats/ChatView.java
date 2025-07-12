@@ -537,38 +537,71 @@ public class ChatView {
     }
 
     private void checkServer() {
-        // If the server is currently running but not active display progress bar
-        if (ServerProcess.getCurrentServer() != null) {
-            ServerProcess serverProcess = ServerProcess.getCurrentServer();
-            // Show progress bar only if still loading
-            if (serverProcess.isLoading()) {
-                send.getNode().setDisable(true);
-                submit.getNode().setDisable(true);
-                renderProgress(); // Call renderProgress() to show your popup
+        ServerProcess serverProcess = ServerProcess.getCurrentServer();
 
-                // Add a listener to be notified when loading is complete
-                serverProcess.addServerLoadingListener(new ServerLoadingListener() {
-                    @Override
-                    public void onServerLoadingComplete(boolean success) {
-                        // Ensure UI updates are on the JavaFX Application Thread
-                        Platform.runLater(() -> {
-                            if (App.window.getCurrentPopup() != null) { // Check if popup still exists
-                                App.window.removeContainer(App.window.getCurrentPopup());
-                                App.window.render();
+        // Check if model override is active.
+        // If it is, shutdown the current server if it's not running the same model.
+        String model = character.getModel();
+        if (model != null && !model.isEmpty() && character.isOverride()) {
+            Model m = App.getModelByName(model);
+            if (m != null) {
+                if (serverProcess != null) {
+                    Model check = serverProcess.getModel();
+                    if (!check.getFile().getName().equalsIgnoreCase(m.getFile().getName())) {
+                        serverProcess.stop();
+                        new Thread(() -> {
+                            new ServerProcess(m);
+                        }).start();
 
-                                send.getNode().setDisable(false);
-                                submit.getNode().setDisable(false);
-                            }
-                        });
-                        // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
-                        serverProcess.removeServerLoadingListener(this);
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        handleServerLoad(serverProcess);
+                        return;
                     }
-                });
+                }
+
             }
+        }
+        // Show progress bar only if still loading
+        serverProcess = ServerProcess.getCurrentServer();
+        handleServerLoad(serverProcess);
+    }
+
+    private void handleServerLoad(ServerProcess serverProcess) {
+        // Show progress bar only if still loading
+        serverProcess = ServerProcess.getCurrentServer();
+        if (serverProcess != null && serverProcess.isLoading()) {
+            renderProgress(); // Call renderProgress() to show your popup
+
+            // Add a listener to be notified when loading is complete
+            serverProcess.addServerLoadingListener(new ServerLoadingListener() {
+                @Override
+                public void onServerLoadingComplete(boolean success) {
+                    // Ensure UI updates are on the JavaFX Application Thread
+                    Platform.runLater(() -> {
+                        if (App.window.getCurrentPopup() != null) { // Check if popup still exists
+                            App.window.removeContainer(App.window.getCurrentPopup());
+                            App.window.render();
+
+                            send.getNode().setDisable(false);
+                            submit.getNode().setDisable(false);
+                        }
+                    });
+                    // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
+                    ServerProcess.getCurrentServer().removeServerLoadingListener(this);
+                }
+            });
         }
     }
 
+
     private void renderProgress() {
+        send.getNode().setDisable(true);
+        submit.getNode().setDisable(true);
+
         // Display progress bar for backend loading
         ProgressBarOverlay progress = new ProgressBarOverlay();
         progress.setWidth(120);
