@@ -57,7 +57,7 @@ public class CharactersView {
             root.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
             imageWidth = 256;
             imageHeight = 256;
-            cardWidth = 220;
+            cardWidth = 250;
             cardHeight = 380;
         }
         root.setScrollWhenNeeded(false);
@@ -84,8 +84,6 @@ public class CharactersView {
             card.setMaxSize(cardWidth, cardHeight);
 
             VerticalLayout displayBox = new VerticalLayout(0, 0);
-            displayBox.setX(-10);
-            displayBox.setY(-10);
 
             TextOverlay helper = new TextOverlay("Click to chat");
             helper.setUnderline(true);

@@ -137,6 +137,11 @@ public class User {
 
         ImageLoader loader = new ImageLoader(file);
         ImageOverlay overlay = new ImageOverlay(loader);
+
+        // General off set for images.
+        // They always seem to be too far to the right.
+        overlay.setX(-10);
+
         overlay.setWidth(width);
         overlay.setHeight(height);
         return overlay;
