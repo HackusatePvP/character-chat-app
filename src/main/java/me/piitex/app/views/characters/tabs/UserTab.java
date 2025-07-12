@@ -166,8 +166,6 @@ public class UserTab extends Tab {
             if (item.isEmpty()) return;
             User template = null;
             if (!item.equalsIgnoreCase("none")) {
-                System.out.println("Item: " + item);
-                System.out.println("User: " + App.getInstance().getUser(item));
                 template = App.getInstance().getUser(item); // Set user object in parentView
             }
             // Re-render the CharacterEditView to reflect the selected user template

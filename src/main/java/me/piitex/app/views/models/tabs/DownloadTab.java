@@ -194,7 +194,6 @@ public class DownloadTab extends Tab {
         downloadIcon.onClick(event -> {
             FileInfo fileInfo = fileInfoRef.get();
             if ((fileInfo == null || fileInfo.isDownloaded()) && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-                System.out.println("Not downloading, already exists!");
                 return;
             }
 

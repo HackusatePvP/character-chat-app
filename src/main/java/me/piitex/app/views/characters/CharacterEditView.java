@@ -109,8 +109,6 @@ public class CharacterEditView {
             updateFieldsFromCharacter();
         }
         if (user != null) {
-            System.out.println("Validate: " + user.getId());
-            System.out.println("Updating user fields...");
             updateFieldsFromUser();
         }
         if (this.infoFile.getFile() != null) {
@@ -323,9 +321,6 @@ public class CharacterEditView {
 
                 currentCharacterInstance.setOverride(((ToggleSwitch) modelTabInstance.getModelOverride().getNode()).isSelected());
                 currentCharacterInstance.setModel(((ComboBox) modelTabInstance.getModelSelection().getNode()).getSelectionModel().getSelectedItem().toString());
-
-                System.out.println("Validate: " + currentCharacterInstance.isOverride());
-                System.out.println("Validate: " + currentCharacterInstance.getModel());
 
                 // Handle character icon file copy
                 if (characterIconPath != null && characterIconPath.exists()) {
