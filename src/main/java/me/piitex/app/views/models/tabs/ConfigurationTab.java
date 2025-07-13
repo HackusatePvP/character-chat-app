@@ -1,5 +1,6 @@
 package me.piitex.app.views.models.tabs;
 
+import atlantafx.base.theme.Styles;
 import javafx.stage.DirectoryChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
@@ -9,7 +10,6 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.containers.tabs.TabsContainer;
-import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.ComboBoxOverlay;
@@ -36,6 +36,7 @@ public class ConfigurationTab extends Tab {
         // Build the list view for the models.
         layout = new VerticalLayout(0, 0);
         layout.setSpacing(0);
+        layout.setX(20);
         layout.setPrefSize(appSettings.getWidth() - 500, 0);
 
         scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
@@ -58,6 +59,9 @@ public class ConfigurationTab extends Tab {
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Model Path");
         container.setDescription("Select the folder for your models.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+
         ButtonOverlay button = new ButtonOverlay("location", "Select Location");
         button.setTooltip(settings.getModelPath());
         container.setAction(button);
@@ -85,6 +89,8 @@ public class ConfigurationTab extends Tab {
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Current Model");
         container.setDescription("Set the current model. This will override the default model.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
 
         List<String> items = new ArrayList<>();
         items.add("Default / Last Model");
@@ -119,6 +125,8 @@ public class ConfigurationTab extends Tab {
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("GPU Layers");
         container.setDescription("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
 
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, 200, settings.getGpuLayers());
         input.onValueChange(event -> {
@@ -134,6 +142,8 @@ public class ConfigurationTab extends Tab {
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Memory Lock");
         container.setDescription("Locks model in RAM. Can improve generation times. Disables model swapping.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isMemoryLock());
         switchOverlay.onToggle(event -> {
@@ -149,6 +159,8 @@ public class ConfigurationTab extends Tab {
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Flash Attention");
         container.setDescription("Toggles flash attention. Designed to speed up training and inference while reducing memory usage. In some rare cases it can greatly reduce quality.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isFlashAttention());
         switchOverlay.onToggle(event -> {
