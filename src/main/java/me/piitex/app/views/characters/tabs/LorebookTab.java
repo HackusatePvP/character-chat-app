@@ -26,6 +26,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 public class LorebookTab extends Tab {
 
@@ -33,18 +34,23 @@ public class LorebookTab extends Tab {
     private final InfoFile infoFile;
     private final CharacterEditView parentView;
 
-    private final Map<String, String> loreItems;
-
     private InputFieldOverlay addKeyInput;
     private TextAreaOverlay addValueInput;
     private ScrollContainer scrollLoreContainer;
 
-    public LorebookTab(AppSettings appSettings, InfoFile infoFile, Character character, User user, Map<String, String> loreItems, CharacterEditView parentView) {
+    private final Map<String, String> loreItems = new TreeMap<>();
+
+    public LorebookTab(AppSettings appSettings, InfoFile infoFile, Character character, User user, CharacterEditView parentView) {
         super("Lorebook");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
         this.parentView = parentView;
-        this.loreItems = loreItems;
+        if (character != null) {
+            this.loreItems.putAll(character.getLorebook());
+        }
+        if (user != null) {
+            this.loreItems.putAll(user.getLorebook());
+        }
         buildLorebookTabContent();
     }
 

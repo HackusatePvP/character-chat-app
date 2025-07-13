@@ -2,7 +2,6 @@ package me.piitex.app.views.characters.tabs;
 
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
@@ -28,27 +27,14 @@ public class UserTab extends Tab {
     private final InfoFile infoFile;
     private final CharacterEditView parentView;
 
-    // Fields to be managed by CharacterEditView
-    private File userIconPath;
-    private String userDisplay;
-    private String userPersona;
-    private User user; // Reference to the User object in parentView
-
-    // UI elements
     private InputFieldOverlay userDisplayNameInput;
     private RichTextAreaOverlay userDescription;
 
-    public UserTab(AppSettings appSettings, InfoFile infoFile, Character character, User user, File userIconPath, String userDisplay, String userPersona, Map<String, String> loreItems, CharacterEditView parentView) {
+    public UserTab(AppSettings appSettings, InfoFile infoFile, Character character, CharacterEditView parentView) {
         super("User");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
         this.parentView = parentView;
-
-        // Initialize local fields from parentView's state
-        this.user = user; // This is the User object from parentView
-        this.userIconPath = userIconPath;
-        this.userDisplay = userDisplay;
-        this.userPersona = userPersona;
 
         buildUserTabContent(character);
     }
@@ -73,7 +59,7 @@ public class UserTab extends Tab {
         displayBox.addElement(buildUserInput(character));
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        userDescription = new RichTextAreaOverlay(userPersona, 600, 400 * scaleFactor);
+        userDescription = new RichTextAreaOverlay(parentView.getUserPersona(), 600, 400 * scaleFactor);
         userDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         userDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         userDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));

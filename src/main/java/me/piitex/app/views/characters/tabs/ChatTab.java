@@ -3,10 +3,6 @@ package me.piitex.app.views.characters.tabs;
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
-import me.piitex.app.App;
-import me.piitex.app.backend.Character;
-import me.piitex.app.backend.User;
-import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
@@ -23,9 +19,7 @@ public class ChatTab extends Tab {
 
     private final AppSettings appSettings;
     private final InfoFile infoFile;
-    private final ServerSettings serverSettings;
     private final CharacterEditView parentView;
-    private final Character character;
 
     // UI elements
     private RichTextAreaOverlay firstMessageInput;
@@ -35,15 +29,13 @@ public class ChatTab extends Tab {
     private final double TEXT_AREA_WIDTH = 500;
     private final double TEXT_AREA_HEIGHT = 200;
 
-    public ChatTab(AppSettings appSettings, InfoFile infoFile, ServerSettings serverSettings, Character character, User user, String chatFirstMessage, String chatScenario, int chatContextSize, CharacterEditView parentView) {
+    public ChatTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("Chat");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
-        this.serverSettings = serverSettings;
-        this.character = character;
         this.parentView = parentView;
 
-        buildChatTabContent(chatFirstMessage, chatScenario, chatContextSize);
+        buildChatTabContent(parentView.getChatFirstMessage(), parentView.getChatScenario(), parentView.getChatContextSize());
     }
 
     private void buildChatTabContent(String chatFirstMessage, String chatScenario, int chatContextSize) {

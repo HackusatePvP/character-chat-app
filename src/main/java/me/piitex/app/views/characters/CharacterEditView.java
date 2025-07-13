@@ -234,17 +234,17 @@ public class CharacterEditView {
         tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         contentLayout.addElement(tabsContainer);
 
-        characterTabInstance = new CharacterTab(appSettings, infoFile, character, user, duplicate, characterIconPath, characterId, characterDisplay, characterPersona, loreItems, this);
+        characterTabInstance = new CharacterTab(appSettings, infoFile, character, user, duplicate, this);
         tabsContainer.addTab(characterTabInstance);
 
-        userTabInstance = new UserTab(appSettings, infoFile, character, user, userIconPath, userDisplay, userPersona, loreItems, this);
+        userTabInstance = new UserTab(appSettings, infoFile, character, this);
         tabsContainer.addTab(userTabInstance);
 
-        tabsContainer.addTab(new LorebookTab(appSettings, infoFile, character, user, loreItems, this));
-        chatTabInstance = new ChatTab(appSettings, infoFile, serverSettings, character, user, chatFirstMessage, chatScenario, chatContextSize, this);
+        tabsContainer.addTab(new LorebookTab(appSettings, infoFile, character, user, this));
+        chatTabInstance = new ChatTab(appSettings, infoFile,this);
         tabsContainer.addTab(chatTabInstance);
 
-        modelTabInstance = new ModelTab(appSettings, infoFile, serverSettings, character, user, this);
+        modelTabInstance = new ModelTab(appSettings, infoFile, character, this);
         tabsContainer.addTab(modelTabInstance);
 
         if (tabToSelect != null) {

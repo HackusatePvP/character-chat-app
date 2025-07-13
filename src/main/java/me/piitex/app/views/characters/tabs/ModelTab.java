@@ -5,11 +5,8 @@ import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Model;
-import me.piitex.app.backend.User;
-import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
-import me.piitex.app.views.HomeView;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelEditView;
 import me.piitex.engine.PopupPosition;
@@ -32,23 +29,19 @@ public class ModelTab extends Tab {
 
     private final AppSettings appSettings;
     private final InfoFile infoFile;
-    private final ServerSettings serverSettings;
     private final CharacterEditView parentView;
     private final Character character;
-    private final User user;
 
     private ToggleSwitchOverlay modelOverride;
     private ComboBoxOverlay modelSelection;
     private Layout layout;
 
-    public ModelTab(AppSettings appSettings, InfoFile infoFile, ServerSettings serverSettings, Character character, User user, CharacterEditView parentView) {
+    public ModelTab(AppSettings appSettings, InfoFile infoFile, Character character, CharacterEditView parentView) {
         super("Model");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
-        this.serverSettings = serverSettings;
         this.parentView = parentView;
         this.character = character;
-        this.user = user;
 
         buildModelTabContent();
     }

@@ -24,7 +24,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 public class CharacterTab extends Tab {
 
@@ -32,27 +31,16 @@ public class CharacterTab extends Tab {
     private final InfoFile infoFile;
     private final CharacterEditView parentView;
 
-    private File characterIconPath;
-    private String characterId;
-    private String characterDisplay;
-    private String characterPersona;
-    private final Map<String, String> loreItems;
 
     private RichTextAreaOverlay charDescription;
     private InputFieldOverlay charIdInput;
     private InputFieldOverlay charDisplayName;
 
-    public CharacterTab(AppSettings appSettings, InfoFile infoFile, @Nullable Character character, @Nullable User user, boolean duplicate, File characterIconPath, String characterId, String characterDisplay, String characterPersona, Map<String, String> loreItems, CharacterEditView parentView) {
+    public CharacterTab(AppSettings appSettings, InfoFile infoFile, @Nullable Character character, @Nullable User user, boolean duplicate, CharacterEditView parentView) {
         super("Character");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
         this.parentView = parentView;
-
-        this.characterIconPath = characterIconPath;
-        this.characterId = characterId;
-        this.characterDisplay = characterDisplay;
-        this.characterPersona = characterPersona;
-        this.loreItems = loreItems;
 
         buildCharacterTabContent(character, duplicate, user);
     }
@@ -78,7 +66,7 @@ public class CharacterTab extends Tab {
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
 
-        charDescription = new RichTextAreaOverlay(characterPersona, 600, 400 * scaleFactor);
+        charDescription = new RichTextAreaOverlay(parentView.getCharacterPersona(), 600, 400 * scaleFactor);
         charDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         charDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         charDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
