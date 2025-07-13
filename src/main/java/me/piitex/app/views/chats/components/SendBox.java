@@ -44,7 +44,7 @@ public class SendBox extends VerticalLayout {
         send.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
 
         send.addStyle(Styles.BG_DEFAULT);
-        send.addStyle(appSettings.getTextSize());
+        send.addStyle(appSettings.getChatTextSize());
         send.addStyle(Styles.TEXT_ON_EMPHASIS);
         bottom.addElement(send);
 

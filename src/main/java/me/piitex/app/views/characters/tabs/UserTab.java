@@ -19,7 +19,6 @@ import me.piitex.engine.overlays.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class UserTab extends Tab {
 
@@ -70,7 +69,7 @@ public class UserTab extends Tab {
             parentView.warnTokens();
         });
         userDescription.addStyle(Styles.BG_DEFAULT);
-        userDescription.addStyle(appSettings.getTextSize());
+        userDescription.addStyle(appSettings.getChatTextSize());
         userDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
         rootLayout.addElement(userDescription);
 

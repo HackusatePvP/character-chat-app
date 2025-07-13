@@ -389,7 +389,7 @@ public class ChatMobileView {
         root.addElement(bottom);
 
         send = new TextAreaOverlay("", "Type your response.", 0, 0, 500, 150);
-        send.addStyle(App.getInstance().getAppSettings().getTextSize());
+        send.addStyle(App.getInstance().getAppSettings().getChatTextSize());
         bottom.addElement(send);
 
         submit = new ButtonOverlay("submit", "Send");

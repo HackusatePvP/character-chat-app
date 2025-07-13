@@ -151,7 +151,7 @@ public class SettingsView {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        selection.setDefaultItem(getTextKey(appSettings.getTextSize()));
+        selection.setDefaultItem(getTextKey(appSettings.getChatTextSize()));
         root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
@@ -170,7 +170,63 @@ public class SettingsView {
             } else {
                 item = Styles.TEXT;
             }
-            appSettings.setTextSize(item);
+            appSettings.setChatTextSize(item);
+        });
+        card.setBody(root);
+
+        return card;
+    }
+
+    public CardContainer buildGlobalChatSize() {
+        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
+        card.setMaxSize(appSettings.getWidth() - 300, 120);
+
+        HorizontalLayout root = new HorizontalLayout(0, 0);
+        root.setMaxSize(1600, 120);
+
+        root.setAlignment(Pos.BASELINE_LEFT);
+        root.setSpacing(layoutSpacing);
+
+        TextFlowOverlay description = new TextFlowOverlay("Set the text size for the general UI.", 600, 200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setMaxWidth(600);
+        description.setMaxHeight(200);
+        description.setTextFillColor(Color.WHITE);
+        root.addElement(description);
+
+        List<String> items = new ArrayList<>();
+        items.add("Small");
+        items.add("Default");
+        items.add("Large");
+        items.add("Larger");
+        items.add("Extra Large");
+        items.add("Extreme Large Ultimate");
+
+        AppSettings appSettings = App.getInstance().getAppSettings();;
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
+        selection.setMaxHeight(50);
+        selection.setDefaultItem(getTextKey(appSettings.getChatTextSize()));
+        root.addElement(selection);
+        selection.onItemSelect(event -> {
+            String item = event.getItem();
+            if (item.equalsIgnoreCase("small")) {
+                item = Styles.TEXT_SMALL;
+            } else if (item.equalsIgnoreCase("Default")) {
+                item = Styles.TEXT;
+            } else if (item.equalsIgnoreCase("large")) {
+                item = Styles.TITLE_4;
+            } else if (item.equalsIgnoreCase("larger")) {
+                item = Styles.TITLE_3;
+            } else if (item.equalsIgnoreCase("extra large")) {
+                item = Styles.TITLE_2;
+            } else if (item.equalsIgnoreCase("extreme large ultimate")) {
+                item = Styles.TITLE_1;
+            } else {
+                item = Styles.TEXT;
+            }
+            appSettings.setChatTextSize(item);
         });
         card.setBody(root);
 

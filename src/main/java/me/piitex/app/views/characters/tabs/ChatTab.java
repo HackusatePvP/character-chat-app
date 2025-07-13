@@ -73,7 +73,7 @@ public class ChatTab extends Tab {
             parentView.warnTokens();
         });
         firstMessageInput.addStyle(Styles.BG_DEFAULT);
-        firstMessageInput.addStyle(appSettings.getTextSize());
+        firstMessageInput.addStyle(appSettings.getChatTextSize());
         firstMessageInput.addStyle(Styles.TEXT_ON_EMPHASIS);
         firstBox.addElement(firstMessageInput);
 
@@ -101,7 +101,7 @@ public class ChatTab extends Tab {
             parentView.warnTokens();
         });
         chatScenarioInput.addStyle(Styles.BG_DEFAULT);
-        chatScenarioInput.addStyle(appSettings.getTextSize());
+        chatScenarioInput.addStyle(appSettings.getChatTextSize());
         chatScenarioInput.addStyle(Styles.TEXT_ON_EMPHASIS);
 
         CardContainer contextCard = new CardContainer(0, 0, 0, 0);

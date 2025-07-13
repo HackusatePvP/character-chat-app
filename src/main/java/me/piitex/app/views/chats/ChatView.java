@@ -1,11 +1,8 @@
 package me.piitex.app.views.chats;
 
 import atlantafx.base.controls.Card;
-import atlantafx.base.layout.ModalBox;
 import atlantafx.base.theme.Styles;
 import com.drew.lang.annotations.Nullable;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -15,7 +12,6 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.*;
@@ -33,9 +29,7 @@ import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
@@ -459,7 +453,7 @@ public class ChatView {
             chatBox.setMaxWidth(App.getInstance().getAppSettings().getWidth() - 370); // Set a little less than chatLayout
         }
 
-        chatBox.addStyle(App.getInstance().getAppSettings().getTextSize());
+        chatBox.addStyle(App.getInstance().getAppSettings().getChatTextSize());
 
         // Right click menu
         ContextMenu contextMenu = new ContextMenu();

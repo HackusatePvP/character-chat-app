@@ -72,7 +72,7 @@ public class CharacterTab extends Tab {
         charDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
 
         charDescription.setMaxWidth(600);
-        charDescription.addStyle(appSettings.getTextSize());
+        charDescription.addStyle(appSettings.getChatTextSize());
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
         rootLayout.addElement(charDescription);
 

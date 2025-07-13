@@ -8,7 +8,7 @@ import java.io.File;
 
 public class AppSettings {
     private int width = 720, height = 1280;
-    private String textSize = "default";
+    private String chatTextSize = "default";
     private String imagesPath = "";
     private String theme = "Primer Dark";
 
@@ -24,7 +24,7 @@ public class AppSettings {
             this.height = infoFile.getInteger("height");
         }
         if (infoFile.hasKey("text-size")) {
-            this.textSize = infoFile.get("text-size");
+            this.chatTextSize = infoFile.get("text-size");
         }
         if (infoFile.hasKey("theme")) {
             this.theme = infoFile.get("theme");
@@ -52,13 +52,13 @@ public class AppSettings {
         infoFile.set("height", height);
     }
 
-    public String getTextSize() {
-        return textSize;
+    public String getChatTextSize() {
+        return chatTextSize;
     }
 
-    public void setTextSize(String textSize) {
-        this.textSize = textSize;
-        infoFile.set("text-size", textSize);
+    public void setChatTextSize(String chatTextSize) {
+        this.chatTextSize = chatTextSize;
+        infoFile.set("text-size", chatTextSize);
     }
 
     public String getImagesPath() {
