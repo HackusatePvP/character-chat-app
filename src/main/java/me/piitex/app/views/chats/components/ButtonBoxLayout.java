@@ -87,6 +87,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
             String contentForEdit = originalMessage.getContent();
 
             VerticalLayout verticalLayout = new VerticalLayout(0, 0);
+            verticalLayout.addStyle(Styles.BG_INSET);
 
             ModalContainer modalContainer = new ModalContainer(verticalLayout, 400, 400);
             modalContainer.addStyle(Styles.ELEVATED_1);
