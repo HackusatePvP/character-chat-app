@@ -35,12 +35,11 @@ public class CharactersView {
     private final int imageWidth, imageHeight;
     private final double cardWidth, cardHeight;
 
-    private int spacing = 20;
-
-    private AppSettings appSettings = App.getInstance().getAppSettings();
+    private final int spacing = 20;
 
     public CharactersView() {
         VerticalLayout layout = new VerticalLayout(0, 0);
+        AppSettings appSettings = App.getInstance().getAppSettings();
         layout.setMaxSize(appSettings.getWidth() - 400, 0);
         layout.setSpacing(20);
 
@@ -220,7 +219,6 @@ public class CharactersView {
         // Create a copy of the character.
         Character duplicated = new Character(newId, null);
         duplicated.copy(character);
-
 
         CharacterEditView editView = new CharacterEditView(duplicated, true);
         App.window.clearContainers();
