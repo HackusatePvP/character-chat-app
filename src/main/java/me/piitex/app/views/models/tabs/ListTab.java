@@ -35,7 +35,7 @@ public class ListTab extends Tab {
 
         // Build the list view for the models.
         VerticalLayout layout = new VerticalLayout(0, 0);
-        layout = new VerticalLayout(0, 0);
+        layout.setX(20);
         layout.setSpacing(0);
         layout.setPrefSize(appSettings.getWidth() - 500, 0);
 
@@ -71,7 +71,6 @@ public class ListTab extends Tab {
             String formattedFileSize = df.format(fileSizeInGB);
 
             TitledContainer root = new TitledContainer(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, 0);
-            root.setX(20);
             root.addStyle(Styles.DENSE);
             root.setMaxSize(900, 250);
             root.setSpacing(30);
