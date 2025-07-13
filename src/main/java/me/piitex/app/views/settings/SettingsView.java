@@ -62,6 +62,7 @@ public class SettingsView {
 
         layout.addElement(buildDangerZone());
         layout.addElement(buildResolution());
+        layout.addElement(buildGlobalChatSize());
         layout.addElement(buildChatSize());
         layout.addElement(buildTheme());
         layout.addElement(buildBackend());
@@ -87,6 +88,7 @@ public class SettingsView {
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
+        description.addStyle(appSettings.getGlobalTextSize());
         root.addElement(description);
 
         List<String> items = new ArrayList<>();
@@ -137,6 +139,7 @@ public class SettingsView {
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
+        description.addStyle(appSettings.getGlobalTextSize());
         root.addElement(description);
 
         List<String> items = new ArrayList<>();
@@ -187,12 +190,13 @@ public class SettingsView {
         root.setAlignment(Pos.BASELINE_LEFT);
         root.setSpacing(layoutSpacing);
 
-        TextFlowOverlay description = new TextFlowOverlay("Set the text size for the general UI.", 600, 200);
+        TextFlowOverlay description = new TextFlowOverlay("Set the text size for the general UI. This is still in development, may cause issues or incompatible with some components.", 600, 200);
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
+        description.addStyle(appSettings.getGlobalTextSize());
         root.addElement(description);
 
         List<String> items = new ArrayList<>();
@@ -207,7 +211,7 @@ public class SettingsView {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        selection.setDefaultItem(getTextKey(appSettings.getChatTextSize()));
+        selection.setDefaultItem(getTextKey(appSettings.getGlobalTextSize()));
         root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
@@ -226,7 +230,7 @@ public class SettingsView {
             } else {
                 item = Styles.TEXT;
             }
-            appSettings.setChatTextSize(item);
+            appSettings.setGlobalTextSize(item);
         });
         card.setBody(root);
 
@@ -249,6 +253,7 @@ public class SettingsView {
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
+        description.addStyle(appSettings.getGlobalTextSize());
         root.addElement(description);
 
         List<String> items = new ArrayList<>();
@@ -313,6 +318,7 @@ public class SettingsView {
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
+        description.addStyle(appSettings.getGlobalTextSize());
         root.addElement(description);
 
         List<String> items = new ArrayList<>();
@@ -374,6 +380,7 @@ public class SettingsView {
         description.setMaxWidth(600);
         description.setMaxHeight(200);
         description.setTextFillColor(Color.WHITE);
+        description.addStyle(appSettings.getGlobalTextSize());
         root.addElement(description);
 
 
@@ -399,6 +406,7 @@ public class SettingsView {
         card.setHeader(text);
 
         TextOverlay desc = new TextOverlay("Any changes made to model settings will require a reload. Please wait until a notification appears to ensure everything worked properly.");
+        desc.addStyle(appSettings.getGlobalTextSize());
         card.setBody(desc);
 
         HorizontalLayout layout = new HorizontalLayout(0, 0);
