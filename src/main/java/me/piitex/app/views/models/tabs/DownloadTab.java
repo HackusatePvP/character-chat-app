@@ -53,12 +53,12 @@ public class DownloadTab extends Tab {
 
         this.scrollContainer = createScrollContainer(downloadListLayout);
         addElement(scrollContainer);
-
         loadAndBuildDownloadList();
     }
 
     private VerticalLayout createMainLayout() {
         VerticalLayout layout = new VerticalLayout(0, 0);
+        layout.setX(20);
         layout.setSpacing(0);
         layout.setPrefSize(appSettings.getWidth() - 500, 0);
         return layout;
@@ -68,7 +68,7 @@ public class DownloadTab extends Tab {
         ScrollContainer container = new ScrollContainer(
                 contentLayout,
                 0,
-                0,
+                20,
                 appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET,
                 appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET
         );
