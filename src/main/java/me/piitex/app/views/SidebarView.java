@@ -4,7 +4,6 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.views.characters.CharacterEditMobileView;
 import me.piitex.app.views.characters.CharacterEditView;
@@ -32,6 +31,7 @@ public class SidebarView {
         root = new VerticalLayout(width, height);
         root.setAlignment(Pos.BASELINE_CENTER);
         root.addStyle(Styles.BORDER_DEFAULT);
+        root.addStyle(Styles.BG_INSET);
         double rootWidth = 150;
 
         ButtonOverlay home = new ButtonOverlay("home", "Home");

@@ -1,5 +1,6 @@
 package me.piitex.app.views.models;
 
+import atlantafx.base.theme.Styles;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
@@ -18,6 +19,7 @@ public class ModelsView {
 
     public ModelsView() {
         container = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
+        container.addStyle(Styles.BG_INSET);
 
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         layout.addElement(new SidebarView().getRoot());

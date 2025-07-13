@@ -2,7 +2,6 @@ package me.piitex.app.views.characters;
 
 import atlantafx.base.controls.ToggleSwitch;
 import atlantafx.base.theme.Styles;
-import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.annotations.Nullable;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -15,7 +14,6 @@ import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.HomeView;
@@ -32,11 +30,9 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
-import me.piitex.engine.overlays.ToggleSwitchOverlay;
 import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +69,6 @@ public class CharacterEditView {
     private TabsContainer tabsContainer;
 
     private AppSettings appSettings = App.getInstance().getAppSettings();
-    private ServerSettings serverSettings = App.getInstance().getSettings();
 
     private CharacterTab characterTabInstance;
     private UserTab userTabInstance;
@@ -223,6 +218,7 @@ public class CharacterEditView {
         }
 
         this.root = new EmptyContainer(0, 0, 192, appSettings.getHeight());
+        root.addStyle(Styles.BG_INSET);
 
         HorizontalLayout mainLayout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         mainLayout.addElement(new SidebarView().getRoot());

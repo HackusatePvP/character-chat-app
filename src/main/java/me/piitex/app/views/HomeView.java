@@ -27,6 +27,7 @@ public class HomeView {
             container = new EmptyContainer(1920, 1080);
             root = new HorizontalLayout(1920, 1080);
         }
+        root.addStyle(Styles.BG_INSET);
 
         root.setSpacing(35);
         container.addElement(root);
