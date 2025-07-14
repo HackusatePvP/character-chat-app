@@ -56,12 +56,10 @@ public class TopControlBox extends HorizontalLayout {
 
             Role role = lastLine.getSender();
             if (role == Role.ASSISTANT) {
-                System.out.println("Removing 2 entries.");
                 parentView.getLayout().getPane().getChildren().removeLast();
                 parentView.getLayout().getPane().getChildren().removeLast();
 
                 if (lastLine.hasImage()) {
-                    System.out.println("Removing image.");
                     parentView.getLayout().getPane().getChildren().removeLast();
                 }
 
@@ -77,11 +75,9 @@ public class TopControlBox extends HorizontalLayout {
             } else {
                 // The last message is user
                 // Just remove the message from the chat and put it back into the box.
-                System.out.println("Removing user entry.");
                 parentView.getLayout().getPane().getChildren().removeLast();
 
                 if (lastLine.hasImage()) {
-                    System.out.println("Removing image.");
                     parentView.getLayout().getPane().getChildren().removeLast();
                 }
 

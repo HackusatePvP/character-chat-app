@@ -180,8 +180,6 @@ public class ListTab extends Tab {
                 dialogueContainer.setCancelButton(stay);
                 dialogueContainer.setConfirmButton(leave);
 
-                System.out.println("X,Y: " + event.getX() + ", " + event.getY());
-
                 App.window.renderPopup(dialogueContainer, event.getHandler().getSceneX(), event.getHandler().getSceneY(), 500, 500);
             });
 

@@ -334,7 +334,6 @@ public class ChatView {
 
         int assistantIndex = chat.getMessages().size();
         ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", (image != null ? image.getAbsolutePath() : null));
-        System.out.println("Image Vali: " + newMsg.hasImage());
         CardContainer responseBox = buildChatBox(newMsg, assistantIndex, true); // Set content later
 
         // Gen response
