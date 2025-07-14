@@ -90,7 +90,7 @@ public class UserTab extends Tab {
 
         // Use parentView's userIconPath
         File currentIconPath = parentView.getUserIconPath();
-        if (currentIconPath == null || !currentIconPath.exists()) {
+        if (currentIconPath == null || !currentIconPath.exists() || currentIconPath.isDirectory()) {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
@@ -113,7 +113,6 @@ public class UserTab extends Tab {
             }
             File selectedFile = chooser.showOpenDialog(App.window.getStage());
             if (selectedFile != null) {
-
                 parentView.setUserIconPath(selectedFile);
                 parentView.updateInfoData();
                 App.window.clearContainers();

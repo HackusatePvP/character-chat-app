@@ -126,9 +126,11 @@ public class CharacterEditView {
         characterDisplay = "";
         characterPersona = "";
         characterIconPath = new File(App.getAppDirectory(), "icons/character.png");
+
         userDisplay = "";
         userPersona = "";
         userIconPath = new File(App.getAppDirectory(), "icons/character.png");
+
         chatFirstMessage = "";
         chatScenario = "";
         chatContextSize = 4096;
@@ -203,13 +205,13 @@ public class CharacterEditView {
         infoFile.set("duplicate", duplicate);
         infoFile.set("character-id", characterId);
         infoFile.set("character-display", characterDisplay);
-        if (characterIconPath != null) {
+        if (characterIconPath != null && characterIconPath.isFile()) {
             infoFile.set("icon-path", characterIconPath.getAbsolutePath());
         }
         infoFile.set("character-persona", characterPersona);
         infoFile.set("user-display", userDisplay);
         infoFile.set("user-persona", userPersona);
-        if (userIconPath != null) {
+        if (userIconPath != null && !userIconPath.isFile()) {
             infoFile.set("icon-path-user", userIconPath.getAbsolutePath());
         }
         infoFile.set("lore", loreItems);
