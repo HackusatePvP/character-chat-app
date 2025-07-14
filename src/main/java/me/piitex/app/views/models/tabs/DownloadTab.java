@@ -5,6 +5,7 @@ import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.text.Text;
@@ -99,7 +100,13 @@ public class DownloadTab extends Tab {
 
                 TitledContainer downloadContainer = createDownloadContainer(name, description, downloadModel);
 
-                Platform.runLater(() -> downloadListLayout.getPane().getChildren().add(downloadContainer.build().getKey()));
+                Platform.runLater(() -> {
+                    Node node = downloadContainer.build().getKey();
+                    // Check is needed for race condition. If a download is in progress the container may already be mapped to children.
+                    if (!downloadListLayout.getPane().getChildren().contains(node)) {
+                        downloadListLayout.getPane().getChildren().add(node);
+                    }
+                });
             }
         }).start();
     }
@@ -166,6 +173,10 @@ public class DownloadTab extends Tab {
                 fileInfo.setDownloaded(false);
                 fileInfoRef.set(fileInfo);
                 createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+
+                // Add downloads to the top of the view.
+                downloadListLayout.getPane().getChildren().remove(titledPane);
+                downloadListLayout.getPane().getChildren().addFirst(titledPane);
             }
         });
 
