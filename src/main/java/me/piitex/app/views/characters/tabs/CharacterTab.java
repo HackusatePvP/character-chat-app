@@ -157,6 +157,7 @@ public class CharacterTab extends Tab {
             if (selectedFile != null) {
                 parentView.setCharacterIconPath(selectedFile);
                 parentView.getInfoFile().set("icon-path", selectedFile.getAbsolutePath());
+                appSettings.setImagesPath(selectedFile.getParent());
 
                 parentView.updateInfoData();
                 App.window.clearContainers();

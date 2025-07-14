@@ -114,6 +114,8 @@ public class UserTab extends Tab {
             File selectedFile = chooser.showOpenDialog(App.window.getStage());
             if (selectedFile != null) {
                 parentView.setUserIconPath(selectedFile);
+                appSettings.setImagesPath(selectedFile.getParent());
+
                 parentView.updateInfoData();
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, parentView.getUser(), infoFile, this).getRoot());
