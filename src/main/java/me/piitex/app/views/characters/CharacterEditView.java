@@ -322,6 +322,8 @@ public class CharacterEditView {
                     currentCharacterInstance.setIconPath(output.getAbsolutePath());
                 }
 
+                this.character = currentCharacterInstance;
+
                 if (user != null) {
                     InfoFile characterUserInfoFile = new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true);
                     User characterSpecificUser = new User(characterUserInfoFile);
@@ -335,14 +337,12 @@ public class CharacterEditView {
                         characterSpecificUser.setIconPath(output.getAbsolutePath());
                     }
 
-                    currentCharacterInstance.setUser(characterSpecificUser);
+                    character.setUser(characterSpecificUser);
                 } else {
                     user = new User(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText(), new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true));
                     user.setDisplayName(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText());
                     character.setUser(user);
                 }
-
-                this.character = currentCharacterInstance;
 
                 App.window.clearContainers();
                 App.window.addContainer(new HomeView().getContainer());
