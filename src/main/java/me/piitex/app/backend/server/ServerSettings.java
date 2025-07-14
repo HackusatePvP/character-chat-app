@@ -173,6 +173,7 @@ public class ServerSettings {
     }
 
     public String getModelPath() {
+        modelPath = modelPath.replace("%APPDATA%", System.getenv("APPDATA"));
         return modelPath;
     }
 
