@@ -6,6 +6,7 @@ import atlantafx.base.theme.Tweaks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
@@ -35,7 +36,6 @@ public class DownloadTab extends Tab {
     private final ScrollContainer scrollContainer;
     private final VerticalLayout downloadListLayout;
 
-    private static final int SCROLL_CONTAINER_PADDING = 20;
     private static final int TILE_LAYOUT_WIDTH = 400;
     private static final int TILE_LAYOUT_HEIGHT = 75;
     private static final int ICON_X_OFFSET = 20;
@@ -117,14 +117,14 @@ public class DownloadTab extends Tab {
         titledContainer.addElement(descriptionOverlay);
 
         downloadModel.getLinks().forEach((quantization, url) -> {
-            HorizontalLayout tileLayout = createDownloadTile(quantization, url, downloadModel.getKey());
+            HorizontalLayout tileLayout = createDownloadTile(titledContainer, quantization, url, downloadModel.getKey());
             titledContainer.addElement(tileLayout);
         });
 
         return titledContainer;
     }
 
-    private HorizontalLayout createDownloadTile(String quantization, String url, String modelKey) {
+    private HorizontalLayout createDownloadTile(TitledContainer titledContainer, String quantization, String url, String modelKey) {
         HorizontalLayout tileLayout = new HorizontalLayout(TILE_LAYOUT_WIDTH, TILE_LAYOUT_HEIGHT);
         tileLayout.setAlignment(Pos.CENTER_LEFT);
         tileLayout.addStyle(Styles.BORDER_MUTED);
@@ -159,6 +159,9 @@ public class DownloadTab extends Tab {
             // When they re-enter the page check to see if the url is still being downloaded.
             // If so re-apply the download indicators and controls.
             if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                TitledPane titledPane = (TitledPane) titledContainer.getView();
+                titledPane.setExpanded(true);
+
                 FileInfo fileInfo = new FileInfo(0, "Unknown", modelKey);
                 fileInfo.setDownloaded(false);
                 fileInfoRef.set(fileInfo);
