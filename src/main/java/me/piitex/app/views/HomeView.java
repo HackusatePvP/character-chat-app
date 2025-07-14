@@ -6,6 +6,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.text.Text;
 import me.piitex.app.App;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharactersView;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
@@ -17,6 +18,8 @@ import me.piitex.engine.overlays.*;
 
 public class HomeView {
     private final Container container;
+
+    private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public HomeView() {
         HorizontalLayout root;
@@ -80,8 +83,8 @@ public class HomeView {
     }
 
     public CardContainer buildInstructions() {
-        CardContainer card = new CardContainer(400, 50,0, 0);
-        card.setMaxSize(600, 800);
+        CardContainer card = new CardContainer(20, 20,0, 0);
+        card.setMaxSize(600, appSettings.getHeight() - 100);
 
         VerticalLayout headerLayout = new VerticalLayout(600, 50);
         headerLayout.setAlignment(Pos.TOP_CENTER);
@@ -100,19 +103,17 @@ public class HomeView {
 
         TextFlowOverlay body = new TextFlowOverlay("", 600, 500);
         body.addStyle(Styles.TITLE_4);
-        body.add(new TextOverlay("\n\n"));
         body.add(new TextOverlay("1. Navigate to settings.\n\n"));
         body.add(new TextOverlay("2. Set a compatible backend. If you do not want to download drivers select Vulkan.\n\n"));
         body.add(new TextOverlay("3. Set a GPU. Ensure there is another option besides auto.\n\n"));
-        body.add(new TextOverlay("3a. (Optional) Configure the rest of the settings on the page.\n\n"));
         body.add(new TextOverlay("4. Navigate to Models.\n\n"));
         body.add(new TextOverlay("5. Set the directory for your models.\n\n"));
-        body.add(new TextOverlay("6. Download a GGUF model and place it inside the folder.\n\n"));
+        body.add(new TextOverlay("6. Download a GGUF model from the \" Download \" tab."));
         body.add(new TextOverlay("7. Set the model as a default (REQUIRED).\n\n"));
         body.add(new TextOverlay("7a. (Optional) Configure the model settings by clicking the blue gear.\n\n"));
         body.add(new TextOverlay("8. Go back to settings and start the server.\n\n"));
         body.add(new TextOverlay("9. (Optional) Create a User Template.\n\n"));
-        body.add(new TextOverlay("10. Create a character.\n\n"));
+        body.add(new TextOverlay("10. Create a character.\n"));
         bodyLayout.addElement(body);
 
         card.setBody(bodyLayout);
@@ -121,7 +122,6 @@ public class HomeView {
         footerLayout.setAlignment(Pos.BOTTOM_CENTER);
 
         TextOverlay footer = new TextOverlay("These instructions will remain on this page until a character is created.");
-        footer.setX(200);
         footerLayout.addElement(footer);
 
         card.setFooter(footerLayout);
