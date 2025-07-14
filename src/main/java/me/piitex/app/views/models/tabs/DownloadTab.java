@@ -232,8 +232,8 @@ public class DownloadTab extends Tab {
 
         Platform.runLater(() -> {
             tileLayout.getPane().getChildren().add(progressIndicator);
-            tileLayout.getPane().getChildren().add(stopButton.render());
             tileLayout.getPane().getChildren().add(downloadSpeed);
+            tileLayout.getPane().getChildren().add(stopButton.render());
         });
 
         AtomicLong lastDownload = new AtomicLong(0L);
@@ -244,7 +244,7 @@ public class DownloadTab extends Tab {
                 progressIndicator.progressProperty().set((double) totalBytesRead / totalFileSize);
                 double speed = calculateDownloadSpeed(totalBytesRead, lastDownload, lastChecked);
                 double mb = speed / (1024 * 1024);
-                downloadSpeed.setText(String.format("%.2f", mb) + "MB/s");
+                downloadSpeed.setText(String.format("%.2f", mb) + " MB/s");
             });
         });
 
