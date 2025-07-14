@@ -115,6 +115,7 @@ public class UserTab extends Tab {
             if (selectedFile != null) {
                 parentView.setUserIconPath(selectedFile);
                 appSettings.setImagesPath(selectedFile.getParent());
+                infoFile.set("icon-path-user", selectedFile.getAbsolutePath());
 
                 parentView.updateInfoData();
                 App.window.clearContainers();
