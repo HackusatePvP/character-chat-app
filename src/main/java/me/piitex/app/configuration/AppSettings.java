@@ -7,7 +7,7 @@ import me.piitex.app.App;
 import java.io.File;
 
 public class AppSettings {
-    private int width = 720, height = 1280;
+    private int width = 1280, height = 720;
     private String chatTextSize = "default";
     private String globalTextSize = "default";
     private String imagesPath = "";
