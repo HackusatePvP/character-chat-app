@@ -37,20 +37,15 @@ public class LorebookTab extends Tab {
     private InputFieldOverlay addKeyInput;
     private TextAreaOverlay addValueInput;
     private ScrollContainer scrollLoreContainer;
+    private final Map<String, String> loreItems ;
 
-    private final Map<String, String> loreItems = new TreeMap<>();
 
-    public LorebookTab(AppSettings appSettings, InfoFile infoFile, Character character, User user, CharacterEditView parentView) {
+    public LorebookTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("Lorebook");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
         this.parentView = parentView;
-        if (character != null) {
-            this.loreItems.putAll(character.getLorebook());
-        }
-        if (user != null) {
-            this.loreItems.putAll(user.getLorebook());
-        }
+        this.loreItems = parentView.getLoreItems();
         buildLorebookTabContent();
     }
 

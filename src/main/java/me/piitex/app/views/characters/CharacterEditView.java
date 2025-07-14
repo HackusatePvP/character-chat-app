@@ -100,13 +100,16 @@ public class CharacterEditView {
         this.infoFile = (infoFile != null) ? infoFile : new InfoFile();
 
         initializeFields();
+
         if (character != null) {
             updateFieldsFromCharacter();
         }
+
         if (user != null) {
             updateFieldsFromUser();
         }
-        if (this.infoFile.getFile() != null) {
+
+        if (infoFile != null) {
             updateFieldsFromInfoFile();
         }
 
@@ -138,18 +141,6 @@ public class CharacterEditView {
         this.chatFirstMessage = character.getFirstMessage();
         this.chatScenario = character.getChatScenario();
         this.chatContextSize = character.getChatContext();
-
-        infoFile.set("character-id", character.getId());
-        infoFile.set("character-display", character.getDisplayName());
-        infoFile.set("character-persona", character.getPersona());
-        infoFile.set("icon-path", character.getIconPath());
-        infoFile.set("lore", character.getLorebook());
-        infoFile.set("first-message", character.getFirstMessage());
-        infoFile.set("scenario", character.getChatScenario());
-        infoFile.set("chat-context-size", character.getChatContext());
-        if (character.getUser() != null) {
-            infoFile.set("user-id", character.getUser().getId());
-        }
     }
 
     private void updateFieldsFromInfoFile() {
@@ -200,23 +191,29 @@ public class CharacterEditView {
             userDisplay = user.getDisplayName();
             userPersona = user.getPersona();
             userIconPath = new File(user.getIconPath());
-            // Update infoFile as well
-            infoFile.set("user-display", userDisplay);
-            infoFile.set("user-persona", userPersona);
-            infoFile.set("icon-path-user", userIconPath.getAbsolutePath());
-
         }
     }
 
-    public void build(@Nullable Tab tabToSelect) {
-        if (user != null) {
-            updateFieldsFromUser();
-        } else {
-            userDisplay = "";
-            userPersona = "";
-            userIconPath = new File(App.getAppDirectory(), "icons/character.png");
+    public void updateInfoData() {
+        infoFile.set("duplicate", duplicate);
+        infoFile.set("character-id", characterId);
+        infoFile.set("character-display", characterDisplay);
+        if (characterIconPath != null) {
+            infoFile.set("icon-path", characterIconPath.getAbsolutePath());
         }
+        infoFile.set("character-persona", characterPersona);
+        infoFile.set("user-display", userDisplay);
+        infoFile.set("user-persona", userPersona);
+        if (userIconPath != null) {
+            infoFile.set("icon-path-user", userIconPath.getAbsolutePath());
+        }
+        infoFile.set("lore", loreItems);
+        infoFile.set("first-message", chatFirstMessage);
+        infoFile.set("scenario", chatScenario);
+        infoFile.set("chat-context-size", chatContextSize);
+    }
 
+    public void build(@Nullable Tab tabToSelect) {
         this.root = new EmptyContainer(0, 0, 192, appSettings.getHeight());
         root.addStyle(Styles.BG_INSET);
 
@@ -230,13 +227,13 @@ public class CharacterEditView {
         tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         contentLayout.addElement(tabsContainer);
 
-        characterTabInstance = new CharacterTab(appSettings, infoFile, character, user, duplicate, this);
+        characterTabInstance = new CharacterTab(appSettings, character, user, duplicate, this);
         tabsContainer.addTab(characterTabInstance);
 
         userTabInstance = new UserTab(appSettings, infoFile, character, this);
         tabsContainer.addTab(userTabInstance);
 
-        tabsContainer.addTab(new LorebookTab(appSettings, infoFile, character, user, this));
+        tabsContainer.addTab(new LorebookTab(appSettings, infoFile, this));
         chatTabInstance = new ChatTab(appSettings, infoFile,this);
         tabsContainer.addTab(chatTabInstance);
 
@@ -571,6 +568,10 @@ public class CharacterEditView {
 
     public void setChatContextSize(int chatContextSize) {
         this.chatContextSize = chatContextSize;
+    }
+
+    public InfoFile getInfoFile() {
+        return infoFile;
     }
 
     public void setLoreItems(Map<String, String> loreItems) {

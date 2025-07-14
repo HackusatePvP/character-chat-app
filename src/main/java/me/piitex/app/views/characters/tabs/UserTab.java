@@ -71,6 +71,7 @@ public class UserTab extends Tab {
         userDescription.addStyle(Styles.BG_DEFAULT);
         userDescription.addStyle(appSettings.getChatTextSize());
         userDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
+
         rootLayout.addElement(userDescription);
 
         this.addElement(parentView.buildSubmitBox());
@@ -109,7 +110,9 @@ public class UserTab extends Tab {
             chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg"));
             File selectedFile = chooser.showOpenDialog(App.window.getStage());
             if (selectedFile != null) {
+
                 parentView.setUserIconPath(selectedFile);
+                parentView.updateInfoData();
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, parentView.getUser(), infoFile, this).getRoot());
                 App.window.render();
@@ -154,8 +157,9 @@ public class UserTab extends Tab {
                 template = App.getInstance().getUser(item); // Set user object in parentView
             }
             // Re-render the CharacterEditView to reflect the selected user template
+            parentView.updateInfoData();
             App.window.clearContainers();
-            App.window.addContainer(new CharacterEditView(character, template, infoFile, this).getRoot());
+            App.window.addContainer(new CharacterEditView(character, template, parentView.getInfoFile(), this).getRoot());
             App.window.render();
         });
 

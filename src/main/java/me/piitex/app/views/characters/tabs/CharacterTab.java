@@ -28,7 +28,6 @@ import java.io.IOException;
 public class CharacterTab extends Tab {
 
     private final AppSettings appSettings;
-    private final InfoFile infoFile;
     private final CharacterEditView parentView;
 
 
@@ -36,10 +35,9 @@ public class CharacterTab extends Tab {
     private InputFieldOverlay charIdInput;
     private InputFieldOverlay charDisplayName;
 
-    public CharacterTab(AppSettings appSettings, InfoFile infoFile, @Nullable Character character, @Nullable User user, boolean duplicate, CharacterEditView parentView) {
+    public CharacterTab(AppSettings appSettings, @Nullable Character character, @Nullable User user, boolean duplicate, CharacterEditView parentView) {
         super("Character");
         this.appSettings = appSettings;
-        this.infoFile = infoFile;
         this.parentView = parentView;
 
         buildCharacterTabContent(character, duplicate, user);
@@ -70,6 +68,9 @@ public class CharacterTab extends Tab {
         charDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         charDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         charDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
+        charDescription.onInputSetEvent(event -> {
+            parentView.setCharacterPersona(event.getInput());
+        });
 
         charDescription.setMaxWidth(600);
         charDescription.addStyle(appSettings.getChatTextSize());
@@ -99,8 +100,9 @@ public class CharacterTab extends Tab {
                 parentView.setChatScenario(CharacterCardImporter.getChatScenario(metadata));
                 parentView.setCharacterIconPath(file);
 
+                parentView.updateInfoData();
                 App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(parentView.getCharacter(), parentView.getUser(), infoFile, this).getRoot());
+                App.window.addContainer(new CharacterEditView(parentView.getCharacter(), parentView.getUser(), parentView.getInfoFile(), this).getRoot());
                 App.window.render();
 
             } catch (ImageProcessingException | IOException e) {
@@ -151,8 +153,11 @@ public class CharacterTab extends Tab {
             File selectedFile = chooser.showOpenDialog(App.window.getStage());
             if (selectedFile != null) {
                 parentView.setCharacterIconPath(selectedFile);
+                parentView.getInfoFile().set("icon-path", selectedFile.getAbsolutePath());
+
+                parentView.updateInfoData();
                 App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(character, user, infoFile, this).getRoot());
+                App.window.addContainer(new CharacterEditView(character, user, parentView.getInfoFile(), this).getRoot());
                 App.window.render();
             }
         });

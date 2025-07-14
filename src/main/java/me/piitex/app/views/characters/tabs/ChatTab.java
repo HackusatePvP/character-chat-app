@@ -69,7 +69,7 @@ public class ChatTab extends Tab {
         firstMessageInput.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         firstMessageInput.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
         firstMessageInput.onInputSetEvent(event -> {
-            parentView.setCharacterPersona(event.getInput());
+            parentView.setChatFirstMessage(event.getInput());
             parentView.warnTokens();
         });
         firstMessageInput.addStyle(Styles.BG_DEFAULT);
