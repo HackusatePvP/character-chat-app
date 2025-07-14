@@ -15,10 +15,15 @@ public class Chat {
     private Response response;
     private final LinkedList<ChatMessage> messages = new LinkedList<>();
     private final boolean dev = false;
+    private boolean initialized = false;
 
 
     public Chat(File file) {
         this.file = file;
+    }
+
+    public void loadChat() {
+        if (initialized) return;
         if (!file.exists()) {
             try {
                 file.createNewFile();

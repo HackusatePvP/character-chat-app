@@ -72,6 +72,7 @@ public class ChatView {
             }
         }
         this.chat = chat;
+        chat.loadChat();
         character.setLastChat(chat);
         build();
     }
@@ -166,6 +167,7 @@ public class ChatView {
         selection.onItemSelect(event -> {
             String item = event.getItem();
             Chat next = character.getChat(item);
+            next.loadChat();
 
             App.window.clearContainers();
             App.window.addContainer(new ChatView(character, next, true).getContainer());
