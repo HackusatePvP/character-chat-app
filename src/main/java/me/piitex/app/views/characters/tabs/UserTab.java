@@ -108,6 +108,7 @@ public class UserTab extends Tab {
         root.onClick(event -> {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg"));
+            chooser.setInitialDirectory(new File(appSettings.getImagesPath()));
             File selectedFile = chooser.showOpenDialog(App.window.getStage());
             if (selectedFile != null) {
 
