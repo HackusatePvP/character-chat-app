@@ -92,6 +92,27 @@ public class AppSettings {
         return theme;
     }
 
+    /*
+        Utility functions for getting theme coloring.
+        Needed for RichTextFX components and BBCode
+     */
+
+    public String getQuotationColor(String theme) {
+        if (theme.toLowerCase().contains("light")) {
+            return "gold";
+        } else {
+            return "lightyellow";
+        }
+    }
+
+    public String getAstrixColor(String theme) {
+        if (theme.toLowerCase().contains("light")) {
+            return "darkblue";
+        } else {
+            return "dodgerblue";
+        }
+    }
+
     public Theme getStyleTheme(String name) {
         if (name.equalsIgnoreCase("primer light")) {
             return new PrimerLight();
@@ -109,11 +130,6 @@ public class AppSettings {
             return new PrimerDark();
         }
     }
-
-    /*
-        Utility functions for getting theme coloring.
-        Needed for RichTextFX components
-     */
 
     public String getThemeBorderColor(String theme) {
         if (theme.equalsIgnoreCase("primer light")) {

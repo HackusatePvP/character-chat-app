@@ -4,6 +4,7 @@ import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
+import me.piitex.app.configuration.AppSettings;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +44,10 @@ public class Placeholder {
             return plainText;
         }
 
+        AppSettings appSettings = App.getInstance().getAppSettings();
+        String astrixColor = appSettings.getAstrixColor(appSettings.getTheme());
+        String quoteColor = appSettings.getQuotationColor(appSettings.getTheme());
+
         String result = plainText;
 
         Pattern quotePattern = Pattern.compile("(\"[^\"]*\")");
@@ -52,7 +57,7 @@ public class Placeholder {
         StringBuilder sbQuote = new StringBuilder();
         while (quoteMatcher.find()) {
             String matchedQuote = quoteMatcher.group(1).trim(); // e.g., "Hello, player."
-            String replacement = "[color=lightyellow]" + matchedQuote.trim() + "[/color]";
+            String replacement = "[color=" + quoteColor + "]" + matchedQuote.trim() + "[/color]";
             quoteMatcher.appendReplacement(sbQuote, Matcher.quoteReplacement(replacement));
         }
         quoteMatcher.appendTail(sbQuote);
@@ -62,7 +67,7 @@ public class Placeholder {
         StringBuilder sbAsterisk = new StringBuilder();
         while (asteriskMatcher.find()) {
             String matchedAsterisk = asteriskMatcher.group(1).trim(); // e.g., *Waves*
-            String replacement = "[color=lightblue]" + matchedAsterisk.trim() + "[/color]";
+            String replacement = "[color=" + astrixColor + "]" + matchedAsterisk.trim() + "[/color]";
             asteriskMatcher.appendReplacement(sbAsterisk, Matcher.quoteReplacement(replacement));
         }
         asteriskMatcher.appendTail(sbAsterisk);
