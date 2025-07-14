@@ -26,8 +26,7 @@ public class ChatTab extends Tab {
     private RichTextAreaOverlay chatScenarioInput;
     private SpinnerNumberOverlay chatContextSpinner;
 
-    private final double TEXT_AREA_WIDTH = 500;
-    private final double TEXT_AREA_HEIGHT = 200;
+    private final double TEXT_AREA_HEIGHT = 150;
 
     public ChatTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("Chat");
@@ -52,19 +51,21 @@ public class ChatTab extends Tab {
         layout.addElement(info);
 
         CardContainer firstCard = new CardContainer(0, 0, 0, 0);
-        firstCard.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
+        firstCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         layout.addElement(firstCard);
 
         HorizontalLayout firstBox = new HorizontalLayout(0, TEXT_AREA_HEIGHT);
-        firstBox.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
+        firstBox.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         firstBox.setSpacing(layoutSpacing);
         firstCard.setBody(firstBox);
 
-        TextFlowOverlay firstDesc = new TextFlowOverlay("Set the first message from the assistant.", (appSettings.getWidth() - 300) / 2, 200);
+        TextFlowOverlay firstDesc = new TextFlowOverlay("Set the first message from the assistant.", (int) firstCard.getMaxWidth() / 2 - 20, 200);
         firstDesc.setTextFillColor(Color.WHITE);
         firstBox.addElement(firstDesc);
 
-        firstMessageInput = new RichTextAreaOverlay(chatFirstMessage, TEXT_AREA_WIDTH, TEXT_AREA_HEIGHT);
+        firstMessageInput = new RichTextAreaOverlay(chatFirstMessage, (int) firstCard.getMaxWidth() / 2 - 20, TEXT_AREA_HEIGHT);
+        firstMessageInput.setMaxWidth((int) firstCard.getMaxWidth() / 2 - 20);
+        firstMessageInput.setMaxHeight(TEXT_AREA_HEIGHT);
         firstMessageInput.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         firstMessageInput.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         firstMessageInput.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
@@ -78,19 +79,19 @@ public class ChatTab extends Tab {
         firstBox.addElement(firstMessageInput);
 
         CardContainer scenarioCard = new CardContainer(0, 0, 0, 0);
-        scenarioCard.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
+        scenarioCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         layout.addElement(scenarioCard);
 
         HorizontalLayout scenarioBox = new HorizontalLayout(0, TEXT_AREA_HEIGHT);
-        scenarioBox.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
+        scenarioBox.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         scenarioBox.setSpacing(layoutSpacing);
         scenarioCard.setBody(scenarioBox);
 
-        TextFlowOverlay scenarioDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", (appSettings.getWidth() - 300) / 2, 50);
+        TextFlowOverlay scenarioDesc = new TextFlowOverlay("Set the chat scenario. Can be used to define the tone or story of the chat.", (int) scenarioCard.getMaxWidth() / 2 - 20, 50);
         scenarioDesc.setTextFillColor(Color.WHITE);
         scenarioBox.addElement(scenarioDesc);
 
-        chatScenarioInput = new RichTextAreaOverlay(chatScenario, TEXT_AREA_WIDTH, TEXT_AREA_HEIGHT);
+        chatScenarioInput = new RichTextAreaOverlay(chatScenario, (int) scenarioCard.getMaxWidth() / 2 - 20, TEXT_AREA_HEIGHT);
         chatScenarioInput.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         chatScenarioInput.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         chatScenarioInput.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
@@ -105,16 +106,16 @@ public class ChatTab extends Tab {
         chatScenarioInput.addStyle(Styles.TEXT_ON_EMPHASIS);
 
         CardContainer contextCard = new CardContainer(0, 0, 0, 0);
-        contextCard.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
+        contextCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         layout.addElement(contextCard);
 
         HorizontalLayout contextBox = new HorizontalLayout(0, 0);
         contextBox.setAlignment(Pos.BASELINE_LEFT);
-        contextBox.setMaxSize(appSettings.getWidth() - 300, TEXT_AREA_HEIGHT);
+        contextBox.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         contextBox.setSpacing(layoutSpacing);
         contextCard.setBody(contextBox);
 
-        TextFlowOverlay contextDesc = new TextFlowOverlay("Set the chat context size.", (appSettings.getWidth() - 300) / 2, 50);
+        TextFlowOverlay contextDesc = new TextFlowOverlay("Set the chat context size.", (int) contextCard.getMaxWidth() / 2- 20, 50);
         contextDesc.setTextFillColor(Color.WHITE);
         contextBox.addElement(contextDesc);
 
