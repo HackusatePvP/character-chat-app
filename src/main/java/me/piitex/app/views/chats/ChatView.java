@@ -198,11 +198,13 @@ public class ChatView {
         // If there is an image attached to the response build the image card
         if (chatMessage.getSender() == Role.USER && chatMessage.hasImage()) {
             File file = new File(chatMessage.getImageUrl());
-            ImageCard imageCard = new ImageCard(chatMessage, file.getName(), appSettings.getWidth() - 350, 0);
-            layout.addElement(imageCard);
+            if (file.exists()) {
+                ImageCard imageCard = new ImageCard(chatMessage, file.getName(), appSettings.getWidth() - 350, 0);
+                layout.addElement(imageCard);
 
-            if (render) {
-                layout.getPane().getChildren().add(imageCard.build().getKey());
+                if (render) {
+                    layout.getPane().getChildren().add(imageCard.build().getKey());
+                }
             }
 
         }
