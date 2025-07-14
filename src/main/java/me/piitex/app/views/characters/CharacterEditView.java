@@ -88,7 +88,12 @@ public class CharacterEditView {
 
         initializeFields();
         if (character != null) {
+            this.user = character.getUser();
             updateFieldsFromCharacter();
+        }
+
+        if (user != null) {
+            updateFieldsFromUser();
         }
 
         build(null);
@@ -341,6 +346,7 @@ public class CharacterEditView {
                 } else {
                     user = new User(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText(), new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true));
                     user.setDisplayName(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText());
+                    user.setPersona(((StyledTextArea) userTabInstance.getUserDescription().getNode()).getText());
                     character.setUser(user);
                 }
 
