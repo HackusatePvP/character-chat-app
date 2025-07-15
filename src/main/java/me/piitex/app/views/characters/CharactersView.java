@@ -109,20 +109,23 @@ public class CharactersView {
             contextMenu.getItems().add(delete);
 
             displayBox.setClickEvent(event -> {
-                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
-                    // Load chat window...
-                    App.window.clearContainers();
-                    if (App.mobile) {
-                        App.window.addContainer(new ChatMobileView(character, character.getLastChat()).getContainer());
-                    } else {
-                        App.window.addContainer(new ChatView(character, character.getLastChat()).getContainer());
-                    }
-                    App.window.render();
-                }
-
                 if (event.getFxClick().getButton() == MouseButton.SECONDARY) {
                     if (contextMenu.isShowing()) return;
                     contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
+                }
+
+                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
+                    App.window.getStage().getScene().setCursor(Cursor.WAIT);
+
+                    // Load chat window...
+                    App.window.clearContainers();
+                    Container container = new ChatView(character, character.getLastChat()).getContainer();
+                    App.window.addContainer(container);
+
+                    Platform.runLater(() -> {
+                        App.window.render();
+                        App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+                    });
                 }
 
             });
