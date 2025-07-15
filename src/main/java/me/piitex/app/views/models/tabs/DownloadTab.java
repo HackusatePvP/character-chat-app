@@ -157,7 +157,23 @@ public class DownloadTab extends Tab {
         tileLayout.addElement(sizeText);
 
         AtomicReference<FileInfo> fileInfoRef = new AtomicReference<>();
-        setupFileInfoFetch(tileLayout, modelKey, url, sizeText, downloadIcon, fileInfoRef);
+
+        File file = new File(App.getModelsDirectory(), "download-cache.dat");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        ConfigUtil configUtil;
+        try {
+            configUtil = new ConfigUtil(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        setupFileInfoFetch(configUtil, tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
         setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
 
         tileLayout.onRender(event -> {
@@ -183,23 +199,60 @@ public class DownloadTab extends Tab {
         return tileLayout;
     }
 
-    private void setupFileInfoFetch(HorizontalLayout tileLayout, String key, String url, TextOverlay sizeText, ButtonOverlay downloadIcon, AtomicReference<FileInfo> fileInfoRef) {
-        FileDownloadProcess fileInfoFetcher = new FileDownloadProcess();
-        fileInfoFetcher.getFileInfoByUrlAsync(url);
-        fileInfoFetcher.setFileInfoCompleteListener(result -> Platform.runLater(() -> {
-            String fileName = result.getFileName().orElse("Unknown");
-            long fileSize = result.getFileSizeInBytes().orElse(0L);
-            FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
-            fileInfoRef.set(fileInfo);
+    private void setupFileInfoFetch(ConfigUtil configUtil, HorizontalLayout tileLayout, String key, String url, String quant, TextOverlay sizeText, ButtonOverlay downloadIcon, AtomicReference<FileInfo> fileInfoRef) {
+        long lastCheck;
+        String dlKey = key + quant;
+        if (configUtil.has(dlKey)) {
+           lastCheck = configUtil.getLong(dlKey + ".fetch");
+        } else {
+            lastCheck = 0;
+        }
+        long instant = System.currentTimeMillis();
 
-            ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
+        // If the time difference is greater than a day re-check
+        long difference = instant - lastCheck;
+        long millisInDay = 1000L * 60 * 60 * 24;
+        if (lastCheck != 0 && difference < millisInDay) {
+            if (configUtil.has(dlKey)) {
+                String name = configUtil.getString(dlKey + ".name");
+                long size = configUtil.getLong(dlKey + ".size");
+                FileInfo fileInfo = new FileInfo(size, name, key);
+                fileInfoRef.set(fileInfo);
 
-            if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-                addDownloadedTag(tileLayout);
-                downloadIcon.getNode().setDisable(true);
+                tileLayout.onRender(event -> {
+                    System.out.println("Calling!");
+
+                    ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
+
+                    if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                        addDownloadedTag(tileLayout);
+                        downloadIcon.getNode().setDisable(true);
+                    }
+                });
             }
-            fileInfoFetcher.shutdown();
-        }));
+        } else {
+            FileDownloadProcess fileInfoFetcher = new FileDownloadProcess();
+            fileInfoFetcher.getFileInfoByUrlAsync(url);
+            fileInfoFetcher.setFileInfoCompleteListener(result -> Platform.runLater(() -> {
+                String fileName = result.getFileName().orElse("Unknown");
+                long fileSize = result.getFileSizeInBytes().orElse(0L);
+                FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
+                fileInfoRef.set(fileInfo);
+
+                ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
+
+                if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                    addDownloadedTag(tileLayout);
+                    downloadIcon.getNode().setDisable(true);
+                }
+                fileInfoFetcher.shutdown();
+
+                // Write long
+                configUtil.set(dlKey + ".name", fileName);
+                configUtil.set(dlKey + ".size", (Long) fileSize);
+                configUtil.set(dlKey + ".fetch", (Long) System.currentTimeMillis());
+            }));
+        }
     }
 
     private void setupDownloadAction(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef) {
