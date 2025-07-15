@@ -92,6 +92,7 @@ public class ChatView {
             }
             this.chat = chat;
         }
+        chat.loadChat();
         character.setLastChat(chat);
         build();
     }
