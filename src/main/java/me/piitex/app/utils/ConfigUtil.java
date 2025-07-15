@@ -2,15 +2,12 @@ package me.piitex.app.utils;
 
 import me.piitex.app.App;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
 
 public class ConfigUtil {
     private Map<String, Object> configData;
+    private final File configFile;
 
     /**
      * Constructs a ConfigUtil instance by reading and parsing the configuration content
@@ -21,6 +18,7 @@ public class ConfigUtil {
      * or if the configuration format is invalid.
      */
     public ConfigUtil(File configFile) throws IOException {
+        this.configFile = configFile;
         // Check if the file exists and is readable before attempting to read.
         if (!configFile.exists()) {
             throw new IOException("Configuration file not found: " + configFile.getAbsolutePath());
@@ -131,6 +129,12 @@ public class ConfigUtil {
      */
     private Object parseValue(String value) {
         try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ignored) {
+
+        }
+
+        try {
             return Integer.parseInt(value);
         } catch (NumberFormatException ignored) {
 
@@ -237,6 +241,10 @@ public class ConfigUtil {
         return get(keyPath, Float.class);
     }
 
+    public Long getLong(String keyPath) {
+        return get(keyPath, Long.class);
+    }
+
     /**
      * Retrieves a Boolean value from the configuration.
      *
@@ -270,6 +278,10 @@ public class ConfigUtil {
     @SuppressWarnings("unchecked") // Cast is safe due to type checking in get()
     public List<Object> getList(String keyPath) {
         return get(keyPath, List.class);
+    }
+
+    public boolean has(String key) {
+        return getRawConfigData().containsKey(key);
     }
 
     /**
@@ -319,6 +331,138 @@ public class ConfigUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Sets a value in the configuration at the specified dot-separated key path.
+     * This method will create intermediate sections (Maps) if they do not exist.
+     *
+     * @param keyPath The dot-separated path to set the value (e.g., "section.subsection.key").
+     * @param value The value to set. Null values will remove the key if it exists, but will not create new sections.
+     */
+    @SuppressWarnings("unchecked")
+    public void set(String keyPath, Object value) {
+        if (keyPath == null || keyPath.isEmpty()) {
+            throw new IllegalArgumentException("Key path cannot be null or empty.");
+        }
+
+        String[] pathParts = keyPath.split("\\.");
+        Map<String, Object> currentMap = this.configData;
+
+        for (int i = 0; i < pathParts.length - 1; i++) {
+            String part = pathParts[i];
+            Object next = currentMap.get(part);
+
+            if (next == null) {
+                Map<String, Object> newSection = new LinkedHashMap<>();
+                currentMap.put(part, newSection);
+                currentMap = newSection;
+            } else if (next instanceof Map) {
+                currentMap = (Map<String, Object>) next;
+            } else {
+                throw new IllegalArgumentException("Cannot set value at path '" + keyPath + "'. Intermediate key '" + part + "' is a value, not a section.");
+            }
+        }
+
+        String finalKey = pathParts[pathParts.length - 1];
+        if (value == null) {
+            currentMap.remove(finalKey);
+        } else {
+            currentMap.put(finalKey, value);
+        }
+
+        try {
+            save();
+        } catch (IOException e) {
+            App.logger.error("Could not write to file.");
+        }
+    }
+
+    /**
+     * Saves the current in-memory configuration data back to the original file.
+     * The file will be overwritten with the new configuration.
+     *
+     * @throws IOException If an I/O error occurs during file writing.
+     */
+    public void save() throws IOException {
+        if (!configFile.exists()) {
+            configFile.createNewFile();
+        }
+        if (!configFile.canWrite()) {
+            throw new IOException("Cannot write to configuration file: " + configFile.getAbsolutePath());
+        }
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(configFile, true))) {
+            writeMapToFile(configData, writer, 0);
+        } catch (IOException e) {
+            throw new IOException("Failed to save configuration file: " + configFile.getAbsolutePath() + ". " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Recursively writes the map content to the PrintWriter with proper indentation.
+     *
+     * @param map The map to write.
+     * @param writer The PrintWriter to write to.
+     * @param indentation The current indentation level (number of spaces).
+     */
+    @SuppressWarnings("unchecked")
+    private void writeMapToFile(Map<String, Object> map, PrintWriter writer, int indentation) {
+        String indentString = " ".repeat(indentation);
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            writer.print(indentString);
+            writer.print(entry.getKey());
+            writer.print(": ");
+
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                writer.println(); // New line for nested section
+                writeMapToFile((Map<String, Object>) value, writer, indentation + 4); // Increase indentation for nested map
+            } else if (value instanceof List) {
+                writer.println(formatList((List<Object>) value));
+            } else {
+                writer.println(formatValue(value));
+            }
+        }
+    }
+
+    /**
+     * Formats a List of Objects into a string suitable for saving (e.g., "[item1, item2]").
+     *
+     * @param list The list to format.
+     * @return A string representation of the list.
+     */
+    private String formatList(List<Object> list) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(formatValue(list.get(i)));
+            if (i < list.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
+     * Formats an Object value into its string representation for saving.
+     * This handles special cases like booleans and numbers.
+     *
+     * @param value The object to format.
+     * @return The string representation of the value.
+     */
+    private String formatValue(Object value) {
+        if (value instanceof String) {
+            return (String) value; // Assuming no special escaping needed for simple strings
+        } else if (value instanceof Boolean) {
+            return value.toString();
+        } else if (value instanceof Number) {
+            // Numbers are fine as-is
+            return value.toString();
+        }
+        // Fallback for any other object type
+        return value.toString();
     }
 
     /**
