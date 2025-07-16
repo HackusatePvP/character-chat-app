@@ -176,7 +176,7 @@ public class DownloadTab extends Tab {
         setupFileInfoFetch(configUtil, tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
         setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
 
-        tileLayout.onRender(event -> {
+        tileLayout.addRenderEvent(event -> {
             // This has to be done AFTER the layout has rendered.
             // If the user left the download page the download will continue.
             // When they re-enter the page check to see if the url is still being downloaded.
@@ -219,9 +219,7 @@ public class DownloadTab extends Tab {
                 FileInfo fileInfo = new FileInfo(size, name, key);
                 fileInfoRef.set(fileInfo);
 
-                tileLayout.onRender(event -> {
-                    System.out.println("Calling!");
-
+                tileLayout.addRenderEvent(event -> {
                     ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
 
                     if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
@@ -249,8 +247,8 @@ public class DownloadTab extends Tab {
 
                 // Write long
                 configUtil.set(dlKey + ".name", fileName);
-                configUtil.set(dlKey + ".size", (Long) fileSize);
-                configUtil.set(dlKey + ".fetch", (Long) System.currentTimeMillis());
+                configUtil.set(dlKey + ".size", fileSize);
+                configUtil.set(dlKey + ".fetch", System.currentTimeMillis());
             }));
         }
     }
