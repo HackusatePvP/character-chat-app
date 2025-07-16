@@ -19,9 +19,10 @@ public class ConfigUtil {
      */
     public ConfigUtil(File configFile) throws IOException {
         this.configFile = configFile;
+
         // Check if the file exists and is readable before attempting to read.
         if (!configFile.exists()) {
-            throw new IOException("Configuration file not found: " + configFile.getAbsolutePath());
+            configFile.createNewFile();
         }
         if (!configFile.isFile()) {
             throw new IOException("Path is not a file: " + configFile.getAbsolutePath());
