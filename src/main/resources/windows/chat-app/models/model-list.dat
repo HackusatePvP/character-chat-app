@@ -1,5 +1,5 @@
 cydonia-3:
-  description: Roleplay/Story telling model with 24B active parameters. Does not support vision.
+  description: Best roleplay model at 20B parameters.
   name: Cydonia 24B v3.1
   parameters: 24B
   map:
@@ -145,7 +145,6 @@ mn-chinofun:
   description: Uncensored model exceptional at narration and roleplay. Does not support vision.
   parameters: 12B
   map:
-    IQ4_XS: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.IQ4_XS.gguf?download=true
     Q2_K: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q2_K.gguf?download=true
     Q3_K_L: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q3_K_L.gguf?download=true
     Q3_K_M: https://huggingface.co/mradermacher/MN-Chinofun-12B-4.1-GGUF/resolve/main/MN-Chinofun-12B-4.1.Q3_K_M.gguf?download=true
@@ -186,3 +185,35 @@ wayfarer-eris-noctis:
     Q5_K_S: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q5_K_S.gguf?download=true
     Q6_K: https://huggingface.co/mradermacher/Wayfarer_Eris_Noctis-12B-alt-v0.420-i1-GGUF/resolve/main/Wayfarer_Eris_Noctis-12B-alt-v0.420.i1-Q6_K.gguf?download=true
   tags: [no-vision, recommended, 12B]
+psyonic-cetacean-ultra:
+  name: Psyonic-Cetacean Ultra-Quality 20b
+  description: A very high quality roleplay/story telling model. Does not support vision.
+  map:
+    Q2_K: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q2_k.gguf?download=true
+    Q3_K_S: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q3_k_s.gguf?download=true
+    Q3_K_M: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q3_k_m.gguf?download=true
+    Q3_K_L: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q3_k_l.gguf?download=true
+    IQ4_NL: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-IQ4_NL.gguf?download=true
+    IQ4_XS: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-IQ4_XS.gguf?download=true
+    Q4_K_M: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q4_k_m.gguf?download=true
+    Q5_K_S: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q5_k_s.gguf?download=true
+    Q5_K_M: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-q5_k_m.gguf?download=true
+    Q6_K: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q6_k.gguf?download=true
+    Q8_0: https://huggingface.co/DavidAU/Psyonic-Cetacean-Ultra-Quality-20b-GGUF/resolve/main/Psyonic-Cetacean-Ultra-Quality-20b-Q8_0.gguf?download=true
+  tags: [recommended, no-vision, 20B]
+pinecone-sage:
+  name: Pinecone Sage 24B
+  description: A High quality roleplay model. Does not support vision.
+  map:
+    Q2_K: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q2_K.gguf?download=true
+    Q3_K_S: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q3_K_S.gguf?download=true
+    Q3_K_M: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q3_K_M.gguf?download=true
+    Q3_K_L: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q3_K_L.gguf?download=true
+    IQ4_XS: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.IQ4_XS.gguf?download=true
+    Q4_K_S: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q4_K_S.gguf?download=true
+    Q4_K_M: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q4_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q5_K_S.gguf?download=true
+    Q5_K_M: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q5_K_M.gguf?download=true
+    Q6_K: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q6_K.gguf?download=true
+    Q8_0: https://huggingface.co/mradermacher/Pinecone-sage-24b-GGUF/resolve/main/Pinecone-sage-24b.Q8_0.gguf?download=true
+  tags: [recommended, no-vision, 20B]
