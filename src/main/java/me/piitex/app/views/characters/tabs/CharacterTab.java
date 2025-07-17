@@ -48,7 +48,7 @@ public class CharacterTab extends Tab {
         this.setHeight(appSettings.getHeight());
 
         VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
-        rootLayout.setSpacing(50);
+        rootLayout.setSpacing(40);
         rootLayout.setAlignment(Pos.TOP_CENTER);
         this.addElement(rootLayout);
 
@@ -76,45 +76,6 @@ public class CharacterTab extends Tab {
         charDescription.addStyle(appSettings.getChatTextSize());
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
         rootLayout.addElement(charDescription);
-
-        ButtonOverlay importCard = new ButtonOverlay("import", "Import Character Card");
-        if (character != null) {
-            importCard.setEnabled(false);
-        }
-        importCard.addStyle(Styles.ACCENT);
-        importCard.addStyle(Styles.BUTTON_OUTLINED);
-        importCard.setWidth(400);
-
-        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
-        rootLayout.addElement(fileSelector);
-        fileSelector.onFileSelect(event -> {
-            File file = event.getDirectory();
-            try {
-                JSONObject metadata = CharacterCardImporter.getImageMetaData(file);
-
-                parentView.setCharacterId(CharacterCardImporter.getCharacterId(metadata));
-                parentView.setCharacterDisplay(CharacterCardImporter.getCharacterDisplayName(metadata));
-                parentView.setCharacterPersona(CharacterCardImporter.getCharacterPersona(metadata));
-                parentView.setLoreItems(CharacterCardImporter.getLoreItems(metadata));
-                parentView.setChatFirstMessage(CharacterCardImporter.getFirstMessage(metadata));
-                parentView.setChatScenario(CharacterCardImporter.getChatScenario(metadata));
-                parentView.setCharacterIconPath(file);
-
-                parentView.updateInfoData();
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(parentView.getCharacter(), parentView.getUser(), parentView.getInfoFile(), this).getRoot());
-                App.window.render();
-
-            } catch (ImageProcessingException | IOException e) {
-                App.logger.error("Error importing character card: ", e);
-                Platform.runLater(() -> {
-                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
-                    errorOverlay.addStyle(Styles.DANGER);
-                    errorOverlay.addStyle(Styles.BG_DEFAULT);
-                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
-                });
-            }
-        });
 
         this.addElement(parentView.buildSubmitBox());
     }
@@ -191,6 +152,46 @@ public class CharacterTab extends Tab {
             parentView.setCharacterDisplay(event.getInput());
         });
         root.addElement(charDisplayName);
+
+        ButtonOverlay importCard = new ButtonOverlay("import", "Import Character Card");
+        if (character != null) {
+            importCard.setEnabled(false);
+        }
+        importCard.addStyle(Styles.ACCENT);
+        importCard.addStyle(Styles.BUTTON_OUTLINED);
+        importCard.setWidth(200);
+        importCard.setHeight(50);
+
+        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
+        root.addElement(fileSelector);
+        fileSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                JSONObject metadata = CharacterCardImporter.getImageMetaData(file);
+
+                parentView.setCharacterId(CharacterCardImporter.getCharacterId(metadata));
+                parentView.setCharacterDisplay(CharacterCardImporter.getCharacterDisplayName(metadata));
+                parentView.setCharacterPersona(CharacterCardImporter.getCharacterPersona(metadata));
+                parentView.setLoreItems(CharacterCardImporter.getLoreItems(metadata));
+                parentView.setChatFirstMessage(CharacterCardImporter.getFirstMessage(metadata));
+                parentView.setChatScenario(CharacterCardImporter.getChatScenario(metadata));
+                parentView.setCharacterIconPath(file);
+
+                parentView.updateInfoData();
+                App.window.clearContainers();
+                App.window.addContainer(new CharacterEditView(parentView.getCharacter(), parentView.getUser(), parentView.getInfoFile(), this).getRoot());
+                App.window.render();
+
+            } catch (ImageProcessingException | IOException e) {
+                App.logger.error("Error importing character card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
+        });
 
         return root;
     }
