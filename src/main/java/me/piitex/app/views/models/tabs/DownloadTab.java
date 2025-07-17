@@ -45,10 +45,28 @@ public class DownloadTab extends Tab {
     private static final int SCROLL_MAX_WIDTH_OFFSET = 300;
     private static final int SCROLL_MAX_HEIGHT_OFFSET = 200;
 
+    private ConfigUtil downloadCache;
+
 
     public DownloadTab() {
         super("Download");
         this.appSettings = App.getInstance().getAppSettings();
+
+        File file = new File(App.getModelsDirectory(), "download-cache.dat");
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        try {
+            downloadCache = new ConfigUtil(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         this.downloadListLayout = createMainLayout();
 
@@ -166,14 +184,8 @@ public class DownloadTab extends Tab {
                 throw new RuntimeException(e);
             }
         }
-        ConfigUtil configUtil;
-        try {
-            configUtil = new ConfigUtil(file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        setupFileInfoFetch(configUtil, tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
+        setupFileInfoFetch(tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
         setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
 
         tileLayout.addRenderEvent(event -> {
@@ -199,23 +211,23 @@ public class DownloadTab extends Tab {
         return tileLayout;
     }
 
-    private void setupFileInfoFetch(ConfigUtil configUtil, HorizontalLayout tileLayout, String key, String url, String quant, TextOverlay sizeText, ButtonOverlay downloadIcon, AtomicReference<FileInfo> fileInfoRef) {
+    private void setupFileInfoFetch(HorizontalLayout tileLayout, String key, String url, String quant, TextOverlay sizeText, ButtonOverlay downloadIcon, AtomicReference<FileInfo> fileInfoRef) {
         long lastCheck;
         String dlKey = key + quant;
-        if (configUtil.has(dlKey)) {
-           lastCheck = configUtil.getLong(dlKey + ".fetch");
+        if (downloadCache.has(dlKey)) {
+            lastCheck = downloadCache.getLong(dlKey + ".fetch");
         } else {
-            lastCheck = 0;
+            lastCheck = 0; // Or System.currentTimeMillis() if you want the first check to be instant
         }
-        long instant = System.currentTimeMillis();
 
-        // If the time difference is greater than a day re-check
+        long instant = System.currentTimeMillis();
         long difference = instant - lastCheck;
         long millisInDay = 1000L * 60 * 60 * 24;
-        if (lastCheck != 0 && difference < millisInDay) {
-            if (configUtil.has(dlKey)) {
-                String name = configUtil.getString(dlKey + ".name");
-                long size = configUtil.getLong(dlKey + ".size");
+
+        if (difference < millisInDay) {
+            if (downloadCache.has(dlKey)) {
+                String name = downloadCache.getString(dlKey + ".name");
+                long size = downloadCache.getLong(dlKey + ".size");
                 FileInfo fileInfo = new FileInfo(size, name, key);
                 fileInfoRef.set(fileInfo);
 
@@ -246,9 +258,15 @@ public class DownloadTab extends Tab {
                 fileInfoFetcher.shutdown();
 
                 // Write long
-                configUtil.set(dlKey + ".name", fileName);
-                configUtil.set(dlKey + ".size", fileSize);
-                configUtil.set(dlKey + ".fetch", System.currentTimeMillis());
+                downloadCache.set(dlKey + ".name", fileName);
+                downloadCache.set(dlKey + ".size", fileSize);
+                downloadCache.set(dlKey + ".fetch", System.currentTimeMillis());
+
+                try {
+                    downloadCache.save();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }));
         }
     }
