@@ -131,6 +131,11 @@ public class Chat {
         return newMessage;
     }
 
+    public void addLine(ChatMessage chatMessage) {
+        messages.add(chatMessage);
+        update();
+    }
+
     public void addLine(Role role, String content) {
         addLine(role, content, null);
     }

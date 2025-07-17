@@ -66,7 +66,7 @@ public class ChatBoxCard extends CardContainer {
         header.addElement(display);
 
         this.setBody(buildTextFlow(chatMessage, chat, index));
-        this.setFooter(parentView.buildButtonBox(chatMessage, index));
+        this.setFooter(parentView.buildButtonBox(this, chatMessage, index));
     }
 
 }

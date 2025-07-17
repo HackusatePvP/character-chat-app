@@ -216,8 +216,8 @@ public class ChatView {
         return cardContainer;
     }
 
-    public HorizontalLayout buildButtonBox(ChatMessage chatMessage, int index) {
-        HorizontalLayout buttonBox = new ButtonBoxLayout(character, chatMessage, chat, index, this, 900, 50);
+    public HorizontalLayout buildButtonBox(CardContainer container, ChatMessage chatMessage, int index) {
+        HorizontalLayout buttonBox = new ButtonBoxLayout(container, character, chatMessage, chat, index, this, 900, 50);
         return buttonBox;
     }
 
@@ -337,10 +337,10 @@ public class ChatView {
         }
 
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
-        ChatMessage chatMessage = chat.addLine(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
-        chat.update();
+        ChatMessage chatMessage = new ChatMessage(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
 
         buildChatBox(chatMessage, chat.getMessages().size(), true);
+        chat.addLine(chatMessage);
 
         int assistantIndex = chat.getMessages().size();
         ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", (image != null ? image.getAbsolutePath() : null));

@@ -13,6 +13,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.ChatView;
+import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ModalContainer;
@@ -25,8 +26,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
-
 public class ButtonBoxLayout extends HorizontalLayout {
+    private final Container container;
     private final Character character;
     private final ChatMessage chatMessage;
     private final Chat chat;
@@ -34,8 +35,9 @@ public class ButtonBoxLayout extends HorizontalLayout {
     private final ChatView parentView;
 
 
-    public ButtonBoxLayout(Character character, ChatMessage chatMessage, Chat chat, int index, ChatView parentView, double width, double height) {
+    public ButtonBoxLayout(Container container, Character character, ChatMessage chatMessage, Chat chat, int index, ChatView parentView, double width, double height) {
         super(width, height);
+        this.container = container;
         this.character = character;
         this.chatMessage = chatMessage;
         this.chat = chat;
@@ -106,7 +108,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
                 chat.replaceMessageContent(index, contentToStore);
 
-                parentView.getLayout().getPane().getChildren().removeLast(); // Re-evaluate this line for correctness in your UI setup
+                parentView.getLayout().getPane().getChildren().remove(container.getView());
 
                 ChatMessage updatedChatMessage = chat.getMessage(index);
                 if (updatedChatMessage != null) {
