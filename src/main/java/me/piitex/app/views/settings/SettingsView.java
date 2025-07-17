@@ -36,7 +36,7 @@ public class SettingsView {
 
     private ButtonOverlay start, stop, reload;
 
-    private AppSettings appSettings = App.getInstance().getAppSettings();
+    private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public SettingsView() {
         int maxWidth = appSettings.getWidth();
@@ -151,7 +151,7 @@ public class SettingsView {
         items.add("Extra Large");
         items.add("Extreme Large Ultimate");
 
-        AppSettings appSettings = App.getInstance().getAppSettings();;
+        AppSettings appSettings = App.getInstance().getAppSettings();
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
@@ -208,7 +208,7 @@ public class SettingsView {
         items.add("Extra Large");
         items.add("Extreme Large Ultimate");
 
-        AppSettings appSettings = App.getInstance().getAppSettings();;
+        AppSettings appSettings = App.getInstance().getAppSettings();
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
@@ -442,10 +442,14 @@ public class SettingsView {
             renderProgress();
 
             App.getInstance().getThreadPoolManager().submitTask(() -> {
-                ServerProcess newProcess = new ServerProcess((settings.getGlobalModel() == null ? App.getInstance().getDefaultModel() : settings.getGlobalModel()));
+                Model model = settings.getGlobalModel();
+                if (model == null) {
+                    model = App.getDefaultModel();
+                }
+                ServerProcess newProcess = new ServerProcess(model);
                 Platform.runLater(() -> {
                     if (newProcess.isError()) {
-                        if (settings.getGlobalModel() == null && App.getInstance().getDefaultModel() == null) {
+                        if (settings.getGlobalModel() == null && App.getDefaultModel() == null) {
                             MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "You do not have an active model. Set a model as default to start the server.");
                             errorOverlay.addStyle(Styles.DANGER);
                             errorOverlay.addStyle(Styles.BG_DEFAULT);

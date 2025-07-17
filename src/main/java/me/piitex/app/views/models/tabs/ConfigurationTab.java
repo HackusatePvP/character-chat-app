@@ -100,18 +100,19 @@ public class ConfigurationTab extends Tab {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        selection.setDefaultItem((settings.getGlobalModel() != null ? settings.getGlobalModel().getFile().getName() : "Default / Last Model"));
+        String defaultModel = "Default / Last Model";
+        if (settings.getGlobalModel() != null) {
+            defaultModel = new File(settings.getGlobalModel().getFile().getParent()).getName() + "/" + settings.getGlobalModel().getFile().getName();
+        }
+        selection.setDefaultItem(defaultModel);
         container.setAction(selection);
 
         selection.onItemSelect(event -> {
             if (event.getItem().startsWith("Default /")) {
-                for (Model model : App.getModels("exclude")) {
-                    if (model.getSettings().isDefault()) {
-                        App.getInstance().getSettings().setGlobalModel(model.getFile().getAbsolutePath());
-                        break;
-                    }
+                Model model = App.getDefaultModel();
+                if (model != null) {
+                    settings.setGlobalModel(model.getFile().getAbsolutePath());
                 }
-                settings.setGlobalModel("");
                 return;
             }
             String dir = event.getItem().split("/")[0];

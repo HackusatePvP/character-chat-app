@@ -145,15 +145,6 @@ public class App {
         return false;
     }
 
-    public Model getDefaultModel() {
-        for (Model model : getModels("exclude")) {
-            if (model.getSettings().isDefault()) {
-                return model;
-            }
-        }
-        return null;
-    }
-
     public Map<String, User> getUserTemplates() {
         return userTemplates;
     }
@@ -184,6 +175,15 @@ public class App {
 
     public static File getImagesDirectory() {
         return new File(getAppDirectory(), "images/");
+    }
+
+    public static Model getDefaultModel() {
+        for (Model model : getModels("exclude")) {
+            if (model.getSettings().isDefault()) {
+                return model;
+            }
+        }
+        return null;
     }
 
     public static List<Model> getModels(String filterType) {
