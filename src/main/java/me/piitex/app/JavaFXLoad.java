@@ -64,12 +64,19 @@ public class JavaFXLoad extends Application {
         Stage stage = window.getStage();
         stage.setOnCloseRequest(windowEvent -> App.shutdown());
 
-        // Resets view back to home screen. Useful during testing if something doesn't render right.
+        // Debug hot keys.
         stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.R && event.isControlDown()) {
+            if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown()) {
+                App.logger.debug("Resetting view...");
                 App.window.clearContainers();
                 App.window.addContainer(new HomeView().getContainer());
                 App.window.render();
+            }
+            if (event.getCode() == KeyCode.C && event.isControlDown() && event.isShiftDown()) {
+                App.logger.debug("Resetting character data...");
+                App.getInstance().getCharacters().clear();
+                App.getInstance().getUserTemplates().clear();
+                App.getInstance().loadCharacters();
             }
         });
 
