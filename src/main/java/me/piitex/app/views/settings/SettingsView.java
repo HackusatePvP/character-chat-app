@@ -487,6 +487,11 @@ public class SettingsView {
 
             Model model = (settings.getGlobalModel() != null ? settings.getGlobalModel() : ServerProcess.getCurrentServer().getModel());
             if (model == null) {
+                // Lastly, look for the default model.
+                model = App.getModels("exlude").stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
+            }
+
+            if (model == null) {
                 MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "No model was detected. Please set a default model.");
                 error.addStyle(Styles.DANGER);
                 error.addStyle(Styles.BG_DEFAULT);
@@ -503,8 +508,9 @@ public class SettingsView {
 
             renderProgress();
 
+            Model finalModel = model;
             new Thread(() -> {
-                ServerProcess process = new ServerProcess(model);
+                ServerProcess process = new ServerProcess(finalModel);
                 Platform.runLater(() -> {
                     if (process.isError()) {
                         MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
