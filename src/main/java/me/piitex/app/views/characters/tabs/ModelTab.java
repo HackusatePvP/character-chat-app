@@ -124,6 +124,7 @@ public class ModelTab extends Tab {
             if (character == null) {
                 MessageOverlay messageOverlay = new MessageOverlay("Warning", "You must create the character before editing the model settings.");
                 messageOverlay.addStyle(Styles.WARNING);
+                messageOverlay.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(messageOverlay, PopupPosition.BOTTOM_CENTER, 400, 100, false);
                 return;
             }

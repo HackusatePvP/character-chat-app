@@ -369,6 +369,7 @@ public class CharacterEditView {
             tabsContainer.getTabPane().getSelectionModel().select(characterTabInstance.getJfxTab());
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "Character ID", "Character ID is required.");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
             characterTabInstance.getCharIdInput().getNode().requestFocus();
             return false;
@@ -377,6 +378,7 @@ public class CharacterEditView {
             tabsContainer.getTabPane().getSelectionModel().select(characterTabInstance.getJfxTab());
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "Character ID", "Character ID already exists!");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
             characterTabInstance.getCharIdInput().getNode().requestFocus();
             return false;
@@ -385,6 +387,7 @@ public class CharacterEditView {
             tabsContainer.getTabPane().getSelectionModel().select(characterTabInstance.getJfxTab());
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "Character Display Name", "Character display name is required.");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
             characterTabInstance.getCharDisplayName().getNode().requestFocus();
             return false;
@@ -394,6 +397,7 @@ public class CharacterEditView {
             tabsContainer.getTabPane().getSelectionModel().select(userTabInstance.getJfxTab());
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100, "User Display Name", "User display name is required.");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
             userTabInstance.getUserDisplayNameInput().getNode().requestFocus();
             return false;
@@ -405,6 +409,7 @@ public class CharacterEditView {
                 tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
                 MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Context size must be a positive number.");
                 error.addStyle(Styles.DANGER);
+                error.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
                 ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).requestFocus();
                 return false;
@@ -413,6 +418,7 @@ public class CharacterEditView {
             tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
             MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Please enter a valid number for context size.");
             error.addStyle(Styles.DANGER);
+            error.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
             ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).requestFocus();
             return false;
@@ -426,7 +432,8 @@ public class CharacterEditView {
         if (currentServer == null || (!currentServer.isAlive() && !currentServer.isLoading())) {
             Platform.runLater(() -> {
                 MessageOverlay configWarning = new MessageOverlay(0, 0, 600, 100, "Server Not Configured", "Backend server is not configured. Please set up your model in settings.");
-                configWarning.addStyle(Styles.DANGER);
+                configWarning.addStyle(Styles.WARNING);
+                configWarning.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(configWarning, 650, 870, 600, 100, false, null);
             });
             return;
@@ -465,6 +472,7 @@ public class CharacterEditView {
                     if (tokenSize > (chatContextSize / 2)) {
                         MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + ")");
                         tokenWarning.addStyle(Styles.WARNING);
+                        tokenWarning.addStyle(Styles.BG_DEFAULT);
                         tokenWarning.setIcon(new FontIcon(Material2MZ.OUTLINED_FLAG));
                         App.window.renderPopup(tokenWarning, 650, 870, 500, 50, false, null);
                     }
@@ -475,6 +483,7 @@ public class CharacterEditView {
                     App.logger.error("Error during tokenization: ", e);
                     MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Tokenization Failed", "Could not calculate token size: " + e.getMessage() + ". Please check server status.");
                     errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
                 });
             }

@@ -366,6 +366,7 @@ public class ChatView {
                 Platform.runLater(() -> {
                     MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");
                     error.addStyle(Styles.DANGER);
+                    error.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, true);
 
                     topControls.getPane().getChildren().removeLast();

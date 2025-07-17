@@ -250,6 +250,7 @@ public class ServerProcess {
                 Platform.runLater(() -> {
                     MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred when starting the backend server. The process never started or failed to start.");
                     errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(errorOverlay, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                 });
                 break;

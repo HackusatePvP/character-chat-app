@@ -173,6 +173,7 @@ public class ListTab extends Tab {
                         App.logger.error("Could not delete model '{}'", model.getFile().getAbsolutePath());
                         MessageOverlay messageOverlay = new MessageOverlay("Error", "Could not delete the model file. Make sure the model is not being used.");
                         messageOverlay.addStyle(Styles.DANGER);
+                        messageOverlay.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(messageOverlay, PopupPosition.BOTTOM_CENTER, 400, 200, false);
                     }
                 });

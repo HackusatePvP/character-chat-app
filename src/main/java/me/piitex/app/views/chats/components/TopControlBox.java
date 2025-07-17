@@ -106,7 +106,7 @@ public class TopControlBox extends HorizontalLayout {
             if (model.getSettings().getMmProj().equalsIgnoreCase("None / Disabled")) {
                 MessageOverlay error = new MessageOverlay(-100, 0, 600, 100,"Image Error", "This model is not configured to support images. Set the MM-Proj file if it's a vision supported model.");
                 error.addStyle(Styles.DANGER);
-                error.addStyle(Styles.ELEVATED_4);
+                error.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, true);
                 return;
             }

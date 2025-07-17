@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
+import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
@@ -339,6 +340,7 @@ public class SettingsView {
                     comboBox.getSelectionModel().select(settings.getBackend());
                     MessageOverlay warning = new MessageOverlay(0, 0, 600, 100, "Vulkan Support", "Due to BSOD issues with Vulkan the backend is disabled. We are currently waiting on a fix. Thank you for your understanding.", new TextOverlay(new FontIcon(Material2MZ.OUTLINED_FLAG)));
                     warning.addStyle(Styles.WARNING);
+                    warning.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                     return;
                 }
@@ -446,16 +448,19 @@ public class SettingsView {
                         if (settings.getGlobalModel() == null && App.getInstance().getDefaultModel() == null) {
                             MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "You do not have an active model. Set a model as default to start the server.");
                             errorOverlay.addStyle(Styles.DANGER);
+                            errorOverlay.addStyle(Styles.BG_DEFAULT);
                             App.window.renderPopup(errorOverlay, PopupPosition.BOTTOM_CENTER, 600, 100, false);
 
                         } else {
                             MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
                             error.addStyle(Styles.DANGER);
+                            error.addStyle(Styles.BG_DEFAULT);
                             App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                         }
                     } else {
                         MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
                         started.addStyle(Styles.SUCCESS);
+                        started.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                     }
                     startButton.setDisable(false);
@@ -471,8 +476,21 @@ public class SettingsView {
             if (ServerProcess.getCurrentServer() != null) {
                 ServerProcess.getCurrentServer().stop();
             }
-            if (settings.getGlobalModel() == null) {
+
+            if (settings.getGlobalModel() == null && ServerProcess.getCurrentServer() == null) {
+                MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "No model was detected. Please set a default model.");
+                error.addStyle(Styles.DANGER);
+                error.addStyle(Styles.BG_DEFAULT);
+                App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                 return;
+            }
+
+            Model model = (settings.getGlobalModel() != null ? settings.getGlobalModel() : ServerProcess.getCurrentServer().getModel());
+            if (model == null) {
+                MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "No model was detected. Please set a default model.");
+                error.addStyle(Styles.DANGER);
+                error.addStyle(Styles.BG_DEFAULT);
+                App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
             }
 
             Button startButton = (Button) start.getNode();
@@ -486,15 +504,17 @@ public class SettingsView {
             renderProgress();
 
             new Thread(() -> {
-                ServerProcess process = new ServerProcess(settings.getGlobalModel());
+                ServerProcess process = new ServerProcess(model);
                 Platform.runLater(() -> {
                     if (process.isError()) {
                         MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
                         error.addStyle(Styles.DANGER);
+                        error.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                     } else {
                         MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
                         started.addStyle(Styles.SUCCESS);
+                        started.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                     }
                     startButton.setDisable(false);
@@ -512,17 +532,18 @@ public class SettingsView {
 
             ServerProcess.getCurrentServer().stop();
 
-            // Lock buttons???
             new Thread(() -> {
                 ServerProcess process = ServerProcess.getCurrentServer();
                 Platform.runLater(() -> {
                     if (process.isAlive()) {
                         MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while stopping the server. Please close or restart the app to shutdown the server.");
                         error.addStyle(Styles.DANGER);
+                        error.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                     } else {
                         MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server was shutdown.");
                         started.addStyle(Styles.SUCCESS);
+                        started.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                     }
                 });

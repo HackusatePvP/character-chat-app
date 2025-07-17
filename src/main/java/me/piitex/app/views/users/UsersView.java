@@ -92,6 +92,7 @@ public class UsersView {
                 // Load chat window...
                 MessageOverlay warning = new MessageOverlay(0, 0, 600, 100,"Warning", "This feature is still in development");
                 warning.addStyle(Styles.WARNING);
+                warning.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
             });
 

@@ -110,6 +110,7 @@ public class CharacterTab extends Tab {
                 Platform.runLater(() -> {
                     MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
                     errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
                 });
             }

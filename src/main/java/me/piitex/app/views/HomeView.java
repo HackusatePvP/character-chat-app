@@ -75,7 +75,8 @@ public class HomeView {
         // Prompt warning with Vulkan
         if (App.getInstance().getSettings().getBackend().equalsIgnoreCase("vulkan")) {
             MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Warning", "Vulkan is known to cause BSOD (Blue screen). To minimize this issue, do not max out gpu layers. The issue is known and reported to LLamaCPP.");
-            error.addStyle(Styles.WARNING);
+            error.addStyle(Styles.DANGER);
+            error.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
         }
 

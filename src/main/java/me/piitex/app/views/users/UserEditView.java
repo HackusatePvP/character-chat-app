@@ -461,6 +461,7 @@ public class UserEditView {
             // Prompt them with a warning
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"User ID", "User ID is required");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
 
             userId.getNode().requestFocus();
@@ -472,6 +473,7 @@ public class UserEditView {
             // Prompt them with a warning
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"User Display Name", "User display name is required");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
 
             userDisplayName.getNode().requestFocus();
