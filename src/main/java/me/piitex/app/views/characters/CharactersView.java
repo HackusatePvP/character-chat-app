@@ -190,7 +190,7 @@ public class CharactersView {
     private void editCharacter(Character character) {
         App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
-        new Thread(() -> {
+        App.getInstance().getThreadPoolManager().submitTask(() -> {
             Container container;
             if (App.mobile) {
                 container = new CharacterEditMobileView(character, false).getRoot();
@@ -205,7 +205,7 @@ public class CharactersView {
 
                 App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
             });
-        }).start();
+        });
 
     }
 

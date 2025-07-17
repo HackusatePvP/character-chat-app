@@ -35,6 +35,7 @@ import org.kordamp.ikonli.material2.Material2MZ;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Future;
 
 public class ChatView {
     private final Character character;
@@ -251,9 +252,9 @@ public class ChatView {
                     Model check = serverProcess.getModel();
                     if (!check.getFile().getName().equalsIgnoreCase(m.getFile().getName())) {
                         serverProcess.stop();
-                        new Thread(() -> {
+                        App.getInstance().getThreadPoolManager().submitTask(() -> {
                             new ServerProcess(m);
-                        }).start();
+                        });
 
                         try {
                             Thread.sleep(500);
@@ -358,7 +359,7 @@ public class ChatView {
             response.setImage(image);
         }
 
-        Thread thread = new Thread(() -> {
+        Future<?> thread = App.getInstance().getThreadPoolManager().submitTask(() -> {
             // Generate response!
             response.setPrompt(chatMessage.getContent());
             String received;
@@ -408,7 +409,7 @@ public class ChatView {
             App.logger.info("Force stopping response...");
             stopNode.setDisable(true);
 
-            thread.interrupt(); // Does not stop input stream
+            thread.cancel(true); // Does not stop input stream
             Platform.runLater(() -> {
                 ProgressBarOverlay progress = new ProgressBarOverlay();
                 progress.setWidth(120);
@@ -420,8 +421,6 @@ public class ChatView {
         });
 
         topControls.getPane().getChildren().add(stopNode);
-
-        thread.start();
     }
 
     public Container getContainer() {

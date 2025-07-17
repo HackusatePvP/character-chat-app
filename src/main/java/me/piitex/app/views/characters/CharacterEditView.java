@@ -464,7 +464,7 @@ public class CharacterEditView {
         }
         loreItems.forEach((key, value) -> textToTokenize.append(key).append(": ").append(value).append("\n"));
 
-        new Thread(() -> {
+        App.getInstance().getThreadPoolManager().submitTask(() -> {
             try {
                 int tokenSize = Server.tokenize(textToTokenize.toString());
 
@@ -487,7 +487,7 @@ public class CharacterEditView {
                     App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
                 });
             }
-        }, "Tokenization-Thread").start();
+        });
     }
 
     public Container getRoot() {

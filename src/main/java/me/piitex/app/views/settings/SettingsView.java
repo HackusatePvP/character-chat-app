@@ -441,7 +441,7 @@ public class SettingsView {
 
             renderProgress();
 
-            new Thread(() -> {
+            App.getInstance().getThreadPoolManager().submitTask(() -> {
                 ServerProcess newProcess = new ServerProcess((settings.getGlobalModel() == null ? App.getInstance().getDefaultModel() : settings.getGlobalModel()));
                 Platform.runLater(() -> {
                     if (newProcess.isError()) {
@@ -468,7 +468,7 @@ public class SettingsView {
                     stopButton.setDisable(false);
                 });
 
-            }).start();
+            });
         });
 
         reload.onClick(event -> {
@@ -509,7 +509,7 @@ public class SettingsView {
             renderProgress();
 
             Model finalModel = model;
-            new Thread(() -> {
+            App.getInstance().getThreadPoolManager().submitTask(() -> {
                 ServerProcess process = new ServerProcess(finalModel);
                 Platform.runLater(() -> {
                     if (process.isError()) {
@@ -528,7 +528,7 @@ public class SettingsView {
                     stopButton.setDisable(false);
                 });
 
-            }).start();
+            });
         });
 
         stop.onClick(event -> {
@@ -538,7 +538,7 @@ public class SettingsView {
 
             ServerProcess.getCurrentServer().stop();
 
-            new Thread(() -> {
+            App.getInstance().getThreadPoolManager().submitTask(() -> {
                 ServerProcess process = ServerProcess.getCurrentServer();
                 Platform.runLater(() -> {
                     if (process.isAlive()) {
@@ -555,7 +555,7 @@ public class SettingsView {
                 });
 
 
-            }).start();
+            });
         });
 
         layout.addElements(start, reload, stop);

@@ -94,7 +94,7 @@ public class JavaFXLoad extends Application {
         window.render();
 
         // Sub thread as not to block JavaFX from initializing.
-        new Thread(() -> {
+        App.getInstance().getThreadPoolManager().submitTask(() -> {
             try {
                 new DeviceProcess(App.getInstance().getSettings().getBackend());
             } catch (IOException e) {
@@ -112,7 +112,7 @@ public class JavaFXLoad extends Application {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     public static void main(String[] args) {

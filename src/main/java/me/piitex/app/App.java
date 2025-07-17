@@ -24,6 +24,7 @@ public class App {
     private final Map<String, User> userTemplates = new TreeMap<>();
 
     private static App instance;
+    private ThreadPoolManager threadPoolManager;
 
     public static boolean dev = false;
 
@@ -41,6 +42,7 @@ public class App {
     public App() {
         logger.info("Initializing application...");
         instance = this;
+        threadPoolManager = new ThreadPoolManager();
 
         if (getAppDirectory().mkdirs()) {
             logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
@@ -62,13 +64,13 @@ public class App {
             logger.info("Created users directory: {}", getUsersDirectory().getAbsolutePath());
         }
 
-        loadUserTemplates();
-
-        new Thread(() -> {
+        threadPoolManager.submitTask(() -> {
+            loadUserTemplates();
             loading = true;
             loadCharacters();
             loading = false;
-        }).start();
+        });
+
 
         appSettings = new AppSettings();
         settings = new ServerSettings();
@@ -116,6 +118,10 @@ public class App {
 
     public ServerSettings getSettings() {
         return settings;
+    }
+
+    public ThreadPoolManager getThreadPoolManager() {
+        return threadPoolManager;
     }
 
     public Map<String, Character> getCharacters() {

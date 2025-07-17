@@ -99,7 +99,7 @@ public class DownloadTab extends Tab {
     }
 
     private void loadAndBuildDownloadList() {
-        new Thread(() -> {
+        App.getInstance().getThreadPoolManager().submitTask(() -> {
             App.logger.info("Initiated httpclient thread.");
             ConfigUtil configUtil;
             try {
@@ -126,7 +126,7 @@ public class DownloadTab extends Tab {
                     }
                 });
             }
-        }).start();
+        });
     }
 
     private TitledContainer createDownloadContainer(String title, String description, DownloadModel downloadModel) {

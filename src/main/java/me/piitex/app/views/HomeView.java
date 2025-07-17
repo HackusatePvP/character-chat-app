@@ -57,7 +57,7 @@ public class HomeView {
 
         // Not thread efficient of safe. To be fair the entire application is not efficient or thread safe so why care now.
         if (App.getInstance().isLoading()) {
-            container.onRender(event -> new Thread(() -> {
+            container.onRender(event -> App.getInstance().getThreadPoolManager().submitTask(() -> {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
@@ -69,7 +69,7 @@ public class HomeView {
                     App.window.addContainer(new HomeView().getContainer());
                     App.window.render();
                 });
-            }).start());
+            }));
         }
 
         // Prompt warning with Vulkan
