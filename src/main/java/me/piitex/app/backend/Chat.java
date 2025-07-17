@@ -1,5 +1,6 @@
 package me.piitex.app.backend;
 
+import me.piitex.app.App;
 import me.piitex.app.utils.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -8,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Chat {
     private final File file;
@@ -22,6 +24,7 @@ public class Chat {
     }
 
     public void loadChat() {
+        messages.clear();
         if (initialized) return;
         if (!file.exists()) {
             try {
@@ -33,12 +36,15 @@ public class Chat {
             File out = new File(file.getParent(), "out.dat"); // Temporary decrypted file
             try {
                 FileCrypter.decryptFile(file, out);
+                AtomicInteger count = new AtomicInteger();
                 Files.readAllLines(out.toPath()).forEach(rawLine -> {
                     ChatMessage msg = parseLineToChatMessage(rawLine);
                     if (msg != null) {
+                        count.getAndIncrement();
                         messages.add(msg);
                     }
                 });
+                App.logger.debug("Loaded {} messages", count);
             } catch (IOException | IllegalBlockSizeException e) {
                 System.err.println("Error decrypting or reading chat file: " + file.getAbsolutePath());
                 e.printStackTrace();

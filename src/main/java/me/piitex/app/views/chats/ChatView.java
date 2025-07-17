@@ -169,7 +169,7 @@ public class ChatView {
         selection.onItemSelect(event -> {
             String item = event.getItem();
             Chat next = character.getChat(item);
-            if (next != null) {
+            if (next != null && !next.getFile().getName().equalsIgnoreCase(chat.getFile().getName())) {
                 next.loadChat();
             }
 
