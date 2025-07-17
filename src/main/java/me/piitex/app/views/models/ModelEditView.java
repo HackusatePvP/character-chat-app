@@ -362,7 +362,7 @@ public class ModelEditView {
             settings.setModelInstructions(instructions);
             settings.setContextSize(contextSize);
             settings.setMmProj(multimodal);
-            settings.setTemperature(minP);
+            settings.setTemperature(temperature);
             settings.setMinP(minP);
             settings.setRepeatPenalty(repeatPenalty);
             settings.setRepeatTokens(repeatTokens);
