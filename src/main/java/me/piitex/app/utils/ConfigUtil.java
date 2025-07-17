@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 public class ConfigUtil {
-    private Map<String, Object> configData;
+    private final Map<String, Object> configData;
     private final File configFile;
 
     /**
@@ -371,12 +371,6 @@ public class ConfigUtil {
         } else {
             currentMap.put(finalKey, value);
         }
-
-        try {
-            save();
-        } catch (IOException e) {
-            App.logger.error("Could not write to file.");
-        }
     }
 
     /**
@@ -393,7 +387,7 @@ public class ConfigUtil {
             throw new IOException("Cannot write to configuration file: " + configFile.getAbsolutePath());
         }
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(configFile, true))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
             writeMapToFile(configData, writer, 0);
         } catch (IOException e) {
             throw new IOException("Failed to save configuration file: " + configFile.getAbsolutePath() + ". " + e.getMessage(), e);
