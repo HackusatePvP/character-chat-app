@@ -248,13 +248,13 @@ public class App {
     public static Set<String> getModelNames(String filter) {
         Set<String> toReturn = new TreeSet<>();
         for (Model model : getModels(filter)) {
-            toReturn.add(model.getFile().getName());
+            toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
         }
         return toReturn;
     }
 
-    public static Model getModelByName(String name) {
-        return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name)).findAny().orElse(null);
+    public static Model getModelByName(String directory, String name) {
+        return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name) && new File(model.getFile().getParent()).getName().equalsIgnoreCase(directory)).findAny().orElse(null);
     }
 
     public static void shutdown() {
@@ -264,7 +264,6 @@ public class App {
             boolean stopped = ServerProcess.getCurrentServer().stop();
             if (!stopped) {
                 App.logger.warn("Forcefully shutting down llama-server...");
-                // You might consider a short delay here before exiting the JVM
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

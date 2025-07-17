@@ -114,7 +114,9 @@ public class ConfigurationTab extends Tab {
                 settings.setGlobalModel("");
                 return;
             }
-            settings.setGlobalModel(App.getModelByName(event.getItem()).getFile().getAbsolutePath());
+            String dir = event.getItem().split("/")[0];
+            String file = event.getItem().split("/")[1];
+            settings.setGlobalModel(App.getModelByName(dir, file).getFile().getAbsolutePath());
         });
 
         return container;

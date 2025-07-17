@@ -246,7 +246,9 @@ public class ChatView {
         // If it is, shutdown the current server if it's not running the same model.
         String model = character.getModel();
         if (model != null && !model.isEmpty() && character.isOverride()) {
-            Model m = App.getModelByName(model);
+            String dir = model.split("/")[0];
+            String file = model.split("/")[1];
+            Model m = App.getModelByName(dir, file);
             if (m != null) {
                 if (serverProcess != null) {
                     Model check = serverProcess.getModel();

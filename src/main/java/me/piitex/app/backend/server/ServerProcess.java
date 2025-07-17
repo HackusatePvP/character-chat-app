@@ -110,7 +110,7 @@ public class ServerProcess {
                 App.logger.warn("MMProj not specified.");
                 parameters.add("--no-mmproj");
             } else {
-                Model mmproj = App.getModelByName(model.getSettings().getMmProj());
+                Model mmproj = App.getModelByName(model.getFile().getParent(), model.getSettings().getMmProj());
                 App.logger.debug("MMPROJ: " + mmproj.getFile().getAbsolutePath());
                 parameters.add("--mmproj");
                 parameters.add(mmproj.getFile().getAbsolutePath());

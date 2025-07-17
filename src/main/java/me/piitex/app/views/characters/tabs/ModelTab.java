@@ -100,7 +100,9 @@ public class ModelTab extends Tab {
                 infoFile.set("model", "");
                 return;
             }
-            Model m = App.getModelByName(event.getItem());
+            String dir = event.getItem().split("/")[0];
+            String file = event.getItem().split("/")[1];
+            Model m = App.getModelByName(dir, file);
             if (m != null) {
                 infoFile.set("model", m.getFile().getName());
             } else {
