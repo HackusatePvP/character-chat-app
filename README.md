@@ -5,6 +5,34 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
 
 **Important:** You'll need a mid-range gaming GPU with 8GB VRAM or more!
 
+## Showcase
+
+### Home
+The homepage is where you can select which characters to chat with. You can also modify copy and delete characters.
+
+<img alt="Home" height="700" src="images/Home.png" width="1200"/>
+
+### Settings
+Settings page is where you can configure your device and backend. You can also modify general app settings.
+
+<img alt="Settings" height="700" src="images/Settings.png" width="1200"/>
+
+### Models
+Models is where you configure any model related setting. You can even download recommended models.
+
+<img alt="Models" height="700" src="images/Models.png" width="1200"/>
+
+### Creator
+The creator is where you can create and modify both characters and users.
+
+<img alt="Creator" height="700" src="images/Character%20Creator.png" width="1200"/>
+
+### Chat
+The chat offers basic functionality. There are controls to modify the individual messages. You can attach an image if the model supports vision.
+
+<img alt="Settings" height="700" src="images/Chat.png" width="1200"/>
+
+
 ## ✨ Features
 * **Role-Play Focused:** Optimized for engaging and immersive character interactions.
 * **Character Management:** Create and manage character templates, supporting imports from popular character card formats (SillyTavern, Backyard AI).
@@ -27,8 +55,7 @@ Only works with Windows 10/11. Linux and Mac are being explored.
 
 
 ## Multimodal / Vision
-Vision is now supported as of version 1.0.1. Vision allows a model to process an image as context. Due to consumer hardware limitations only one image can be processed at a time.
-This is still being worked on and improved. Currently, there is no display for the image.
+As of version 1.0.4 vision has been implemented into the chats. When sending an image it will now add the image to the chat window. You can close and expand the image when needed. The model can only process one image, it will prioritize the last sent message.
 
 ## Vulkan
 Vulkan has been re-enabled as of version 1.0.1. For Nvidia 50 series and 40 series it can still bluescreen when exiting the application. Please use Cuda if you encounter a crash.
