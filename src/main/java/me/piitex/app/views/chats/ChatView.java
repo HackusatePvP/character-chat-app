@@ -168,7 +168,9 @@ public class ChatView {
         selection.onItemSelect(event -> {
             String item = event.getItem();
             Chat next = character.getChat(item);
-            next.loadChat();
+            if (next != null) {
+                next.loadChat();
+            }
 
             App.window.clearContainers();
             App.window.addContainer(new ChatView(character, next, true).getContainer());
