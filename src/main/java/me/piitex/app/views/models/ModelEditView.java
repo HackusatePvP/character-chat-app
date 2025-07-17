@@ -44,7 +44,7 @@ public class ModelEditView {
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
         main.setSpacing(35);
-        main.addElement(new SidebarView().getRoot());
+        main.addElement(new SidebarView(main).getRoot());
         container.addElement(main);
 
         VerticalLayout layout = new VerticalLayout(0, 0);

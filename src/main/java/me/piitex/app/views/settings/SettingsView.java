@@ -46,7 +46,7 @@ public class SettingsView {
         root.setSpacing(35);
         container.addElement(root);
 
-        root.addElement(new SidebarView().getRoot());
+        root.addElement(new SidebarView(root).getRoot());
 
         VerticalLayout layout = new VerticalLayout(0, 0);
         layout.setOffsetX(20);

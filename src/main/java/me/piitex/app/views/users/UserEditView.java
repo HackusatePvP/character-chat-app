@@ -97,7 +97,7 @@ public class UserEditView {
         this.root = new EmptyContainer(0, 0, 192, 1080);
 
         HorizontalLayout layout = new HorizontalLayout(1920, 1080);
-        layout.addElement(new SidebarView().getRoot());
+        layout.addElement(new SidebarView(layout).getRoot());
         root.addElement(layout);
 
         VerticalLayout main = new VerticalLayout(1600, 1000);

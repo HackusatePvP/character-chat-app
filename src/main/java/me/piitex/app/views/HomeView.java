@@ -35,7 +35,7 @@ public class HomeView {
         root.setSpacing(35);
         container.addElement(root);
 
-        root.addElement(new SidebarView().getRoot());
+        root.addElement(new SidebarView(root).getRoot());
 
         if (App.getInstance().isLoading()) {
             VerticalLayout layout = new VerticalLayout(1920, 0);
