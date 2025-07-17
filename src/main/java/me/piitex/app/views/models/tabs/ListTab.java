@@ -2,6 +2,7 @@ package me.piitex.app.views.models.tabs;
 
 import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
@@ -161,21 +162,28 @@ public class ListTab extends Tab {
                     App.window.removeContainer(dialogueContainer);
 
                     // Delete the model
-                    if (model.getFile().delete()) {
-                        App.logger.info("Deleted model '{}'", model.getFile().getAbsolutePath());
+                    App.getInstance().getThreadPoolManager().submitTask(() -> {
+                        if (model.getFile().delete()) {
+                            App.logger.info("Deleted model '{}'", model.getFile().getAbsolutePath());
 
-                        // Refresh view? Maybe just re-render
-                        layout.removeAllElements();
-                        buildModelCards(layout);
-                        App.window.render();
+                            // Refresh view? Maybe just re-render
+                            Platform.runLater(() -> {
+                                layout.removeAllElements();
+                                buildModelCards(layout);
+                                App.window.render();
+                            });
 
-                    } else {
-                        App.logger.error("Could not delete model '{}'", model.getFile().getAbsolutePath());
-                        MessageOverlay messageOverlay = new MessageOverlay("Error", "Could not delete the model file. Make sure the model is not being used.");
-                        messageOverlay.addStyle(Styles.DANGER);
-                        messageOverlay.addStyle(Styles.BG_DEFAULT);
-                        App.window.renderPopup(messageOverlay, PopupPosition.BOTTOM_CENTER, 400, 200, false);
-                    }
+                        } else {
+                            App.logger.error("Could not delete model '{}'", model.getFile().getAbsolutePath());
+                            Platform.runLater(() -> {
+                                MessageOverlay messageOverlay = new MessageOverlay("Error", "Could not delete the model file. Make sure the model is not being used.");
+                                messageOverlay.addStyle(Styles.DANGER);
+                                messageOverlay.addStyle(Styles.BG_DEFAULT);
+                                App.window.renderPopup(messageOverlay, PopupPosition.BOTTOM_CENTER, 400, 200, false);
+                            });
+                        }
+                    });
+
                 });
 
                 dialogueContainer.setCancelButton(stay);
