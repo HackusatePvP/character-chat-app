@@ -52,8 +52,8 @@ public class ChatBoxCard extends CardContainer {
 
         ImageOverlay avatar = new ImageOverlay(new ImageLoader(new File(iconPath)));
         avatar.setPreserveRatio(false);
-        avatar.setWidth(64);
-        avatar.setHeight(64);
+        avatar.setWidth(128);
+        avatar.setHeight(128);
 
         HorizontalLayout header = new HorizontalLayout(900 ,0);
         header.setAlignment(Pos.CENTER_LEFT);
@@ -62,7 +62,7 @@ public class ChatBoxCard extends CardContainer {
         this.setHeader(header);
 
         TextOverlay display = new TextOverlay(displayName);
-        display.addStyle(Styles.TITLE_4);
+        display.addStyle(Styles.TITLE_3);
         header.addElement(display);
 
         this.setBody(buildTextFlow(chatMessage, chat, index));
