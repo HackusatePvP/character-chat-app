@@ -10,8 +10,6 @@ public class ThreadPoolManager {
     private final ExecutorService executorService;
 
     public ThreadPoolManager() {
-        // Using a cached thread pool for flexible background tasks.
-        // It creates new threads as needed and reuses idle ones.
         this.executorService = Executors.newCachedThreadPool();
     }
 
@@ -21,17 +19,15 @@ public class ThreadPoolManager {
 
     public Future<?> submitTask(Runnable task) {
         if (!executorService.isShutdown()) {
-            return executorService.submit(task); // Use submit()
+            return executorService.submit(task);
         } else {
-            return null; // Or throw an IllegalStateException
+            return null;
         }
     }
 
-
     public void shutdown() {
-        executorService.shutdown(); // Disable new tasks from being submitted
+        executorService.shutdown();
         try {
-            // Wait a reasonable time for tasks to complete their execution
             if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
                 executorService.shutdownNow();
             }
