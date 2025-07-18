@@ -40,15 +40,28 @@ public class JavaFXLoad extends Application {
         App.logger.info("Screen Size ({},{})", dimension.width, dimension.height);
 
         int width = dimension.width;
+        // Used to manually test mobile views.
+//        setWidth = 700;
+//        setHeight = 1280;
+//        width = 700;
 
         if (width < 720) {
             App.logger.info("Using mobile layouts...");
             // Set mobile view
             App.mobile = true;
-            setWidth = 600;
-            setHeight = 1200;
-            RenConfiguration.setWidth(700);
-            RenConfiguration.setHeight(1080);
+            RenConfiguration.setWidth(setWidth);
+            RenConfiguration.setHeight(setHeight);
+            App.getInstance().getAppSettings().setWidth(setWidth);
+            App.getInstance().getAppSettings().setHeight(setHeight);
+
+        // When changing from mobile to desktop view the configuration must be reverted.
+        // Application will default to 720p.
+        } else if (App.getInstance().getAppSettings().getWidth() <= 720) {
+            App.logger.info("Forcefully resetting view to 1280x720.");
+            setWidth = 1280;
+            setHeight = 720;
+            App.getInstance().getAppSettings().setWidth(1280);
+            App.getInstance().getAppSettings().setHeight(720);
         }
 
         // Disable image caching.
@@ -57,7 +70,7 @@ public class JavaFXLoad extends Application {
         ImageLoader.useCache = false;
 
 
-        Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(true).setDimensions(setWidth, setHeight).build();
+        Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(false).setDimensions(setWidth, setHeight).build();
 
         App.window = window;
 
