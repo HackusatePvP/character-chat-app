@@ -143,7 +143,7 @@ public class CharacterEditMobileView {
         this.root = new EmptyContainer(0, 0, 192, 1080);
 
         HorizontalLayout layout = new HorizontalLayout(600, 1080);
-        layout.addElement(new SidebarView().getRoot());
+        layout.addElement(new SidebarView(layout).getRoot());
         root.addElement(layout);
 
         VerticalLayout main = new VerticalLayout(600, 1000);
@@ -837,6 +837,7 @@ public class CharacterEditMobileView {
             // Prompt them with a warning
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"Character ID", "Character ID is required");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
 
             charIdInput.getNode().requestFocus();
@@ -848,6 +849,7 @@ public class CharacterEditMobileView {
             // Prompt them with a warning
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"Character ID", "Character ID already exists!");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
 
             charIdInput.getNode().requestFocus();
@@ -860,6 +862,7 @@ public class CharacterEditMobileView {
             // Prompt them with a warning
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"Character Display Name", "Character display name is required");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
 
             charDisplayName.getNode().requestFocus();
@@ -872,6 +875,7 @@ public class CharacterEditMobileView {
             // Prompt them with a warning
             MessageOverlay required = new MessageOverlay(0, 0, 600, 100,"User Display Name", "User display name is required");
             required.addStyle(Styles.WARNING);
+            required.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(required, PopupPosition.CENTER, 600, 100, true);
 
             userDisplayName.getNode().requestFocus();
@@ -892,7 +896,8 @@ public class CharacterEditMobileView {
             // UI operation: must be on JavaFX thread
             Platform.runLater(() -> {
                 MessageOverlay configWarning = new MessageOverlay(0, 0, 600, 100,"Server Not Configured", "Backend server is not configured. Please set up your model in settings.");
-                configWarning.addStyle(Styles.DANGER);
+                configWarning.addStyle(Styles.WARNING);
+                configWarning.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(configWarning, 650, 870, 600, 100, false, null);
             });
             return;
@@ -922,6 +927,7 @@ public class CharacterEditMobileView {
                     if (tokenSize > (chatContextSize / 2)) {
                         MessageOverlay tokenWarning = new MessageOverlay(0, 0, 600, 50,"Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + ")");
                         tokenWarning.addStyle(Styles.WARNING);
+                        tokenWarning.addStyle(Styles.BG_DEFAULT);
                         tokenWarning.setIcon(new FontIcon(Material2MZ.OUTLINED_FLAG));
 
                         App.window.renderPopup(tokenWarning, 650, 870, 600, 50, false, null);
@@ -935,6 +941,7 @@ public class CharacterEditMobileView {
                     // Show an error message overlay if tokenization fails
                     MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50,"Tokenization Failed", "Could not calculate token size: " + e.getMessage() + ". Please check server status.");
                     errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
                 });
             }
