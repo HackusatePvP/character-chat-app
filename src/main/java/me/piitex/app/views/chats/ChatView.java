@@ -126,7 +126,9 @@ public class ChatView {
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setPannable(true);
         scrollContainer.setScrollPosition(10000);
+
         chatView.addElement(scrollContainer);
         chatView.addElement(buildSendBox());
 
@@ -278,21 +280,19 @@ public class ChatView {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        handleServerLoad(serverProcess);
+                        handleServerLoad();
                         return;
                     }
                 }
 
             }
         }
-        // Show progress bar only if still loading
-        serverProcess = ServerProcess.getCurrentServer();
-        handleServerLoad(serverProcess);
+        handleServerLoad();
     }
 
-    private void handleServerLoad(ServerProcess serverProcess) {
+    private void handleServerLoad() {
         // Show progress bar only if still loading
-        serverProcess = ServerProcess.getCurrentServer();
+        ServerProcess serverProcess = ServerProcess.getCurrentServer();
         if (serverProcess != null && serverProcess.isLoading()) {
             renderProgress(); // Call renderProgress() to show your popup
 
@@ -304,7 +304,6 @@ public class ChatView {
                     Platform.runLater(() -> {
                         if (App.window.getCurrentPopup() != null) { // Check if popup still exists
                             App.window.removeContainer(App.window.getCurrentPopup());
-                            App.window.render();
 
                             send.getNode().setDisable(false);
                             submit.getNode().setDisable(false);
