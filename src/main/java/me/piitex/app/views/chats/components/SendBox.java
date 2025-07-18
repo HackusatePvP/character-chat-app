@@ -33,9 +33,9 @@ public class SendBox extends VerticalLayout {
 
         addElement(parentView.buildTopControls());
 
-        HorizontalLayout bottom = new HorizontalLayout(0, 0);
+        HorizontalLayout bottom = new HorizontalLayout(getWidth(), getHeight());
         bottom.setSpacing(20);
-        bottom.setMaxSize(700, 150);
+        bottom.setMaxSize(getWidth(), getHeight());
 
         addElement(bottom);
 
