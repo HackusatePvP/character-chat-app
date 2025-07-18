@@ -8,6 +8,7 @@ import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharactersView;
+import me.piitex.app.views.server.ServerLayout;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -27,15 +28,15 @@ public class HomeView {
             container = new EmptyContainer(600, 1080);
             root = new HorizontalLayout(600, 1080);
         } else {
-            container = new EmptyContainer(1920, 1080);
-            root = new HorizontalLayout(1920, 1080);
+            container = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
+            root = new HorizontalLayout(appSettings.getWidth(), appSettings.getHeight());
         }
         root.addStyle(Styles.BG_INSET);
 
+        root.addElement(new SidebarView(root).getRoot());
+
         root.setSpacing(35);
         container.addElement(root);
-
-        root.addElement(new SidebarView(root).getRoot());
 
         if (App.getInstance().isLoading()) {
             VerticalLayout layout = new VerticalLayout(1920, 0);
@@ -55,9 +56,11 @@ public class HomeView {
             }
         }
 
+        container.addElement(new ServerLayout(appSettings.getWidth(), 50));
+
         // Not thread efficient of safe. To be fair the entire application is not efficient or thread safe so why care now.
         if (App.getInstance().isLoading()) {
-            container.onRender(event -> App.getInstance().getThreadPoolManager().submitTask(() -> {
+            container.addRenderEvent(event -> App.getInstance().getThreadPoolManager().submitTask(() -> {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
