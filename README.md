@@ -47,6 +47,11 @@ The chat offers basic functionality. There are controls to modify the individual
 ## 💻 Compatibility
 Only works with Windows 10/11. Linux and Mac are being explored.
 
+### Mobile
+Some views are mobile supported but the application isn't. You will have to use remote desktop applications to connect to your pc remotely.
+
+The views are extremely experimental and may not function properly.
+
 ## Code Stack
 * [JavaFX](https://openjfx.io) The GUI library.
 * [AtlantaFX](https://github.com/mkpaz/atlantafx) Modernized styling for JavaFX.
@@ -71,7 +76,7 @@ This section outlines the general steps to get you started. More detailed instru
 3. (Optional) Download AI GPU drivers (Cuda, HIP)
 4. Extract all files into `%APPDATA%/chat-app`
 5. Enter `chat-app`
-6. Run `launch.bat`
+6. Run `run.bat`
 
 ## Install Application
 Download the official release from [Releases](https://github.com/HackusatePvP/character-chat-app/releases)
