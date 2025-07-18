@@ -21,11 +21,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 public class SidebarView {
-    private final Renderer parent;
     private final VerticalLayout root;
 
     public SidebarView(Renderer parent) {
-        this.parent = parent;
         int width;
         int height;
         if (App.mobile) {
@@ -33,7 +31,7 @@ public class SidebarView {
             height = 1280;
         } else {
             width = 200;
-            height = 1080;
+            height = 1000;
         }
 
         root = new VerticalLayout(width, height);
