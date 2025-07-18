@@ -4,6 +4,7 @@ import atlantafx.base.theme.Styles;
 import javafx.stage.DirectoryChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.engine.containers.ScrollContainer;
@@ -11,10 +12,7 @@ import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.ComboBoxOverlay;
-import me.piitex.engine.overlays.SpinnerNumberOverlay;
-import me.piitex.engine.overlays.ToggleSwitchOverlay;
+import me.piitex.engine.overlays.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,6 +49,7 @@ public class ConfigurationTab extends Tab {
         layout.addElement(buildGpuLayers());
         layout.addElement(buildMemoryLock());
         layout.addElement(buildFlashAttention());
+        layout.addElement(buildRunningModel());
 
     }
 
@@ -170,6 +169,28 @@ public class ConfigurationTab extends Tab {
             settings.setFlashAttention(!settings.isFlashAttention());
         });
         container.setAction(switchOverlay);
+
+        return container;
+    }
+
+    public TileContainer buildRunningModel() {
+        TileContainer container = new TileContainer(0, 0);
+        container.setMaxSize(layout.getWidth(), 100);
+        container.setTitle("Current Model");
+        container.setDescription("The current running model that is loaded. Will be null if no model is active.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+
+        Model model = (ServerProcess.getCurrentServer() != null && ServerProcess.getCurrentServer().getModel() != null ? ServerProcess.getCurrentServer().getModel() : settings.getGlobalModel());
+        if (model == null) {
+            model = App.getDefaultModel();
+        }
+        String input = (model != null ? model.getFile().getAbsolutePath() : "null");
+
+        InputFieldOverlay inputFieldOverlay = new InputFieldOverlay(input, 0, 0, 400, 50);
+        inputFieldOverlay.setEnabled(false);
+
+        container.setAction(inputFieldOverlay);
 
         return container;
     }
