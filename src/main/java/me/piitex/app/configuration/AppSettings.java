@@ -62,7 +62,7 @@ public class AppSettings {
 
     public void setChatTextSize(String chatTextSize) {
         this.chatTextSize = chatTextSize;
-        infoFile.set("text-size", chatTextSize);
+        infoFile.set("chat-text-size", chatTextSize);
     }
 
     public String getGlobalTextSize() {
