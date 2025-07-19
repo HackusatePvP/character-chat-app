@@ -1,20 +1,34 @@
 package me.piitex.app.views.models.tabs;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.app.backend.server.DeviceProcess;
+import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.settings.SettingsView;
+import me.piitex.engine.PopupPosition;
+import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.containers.tabs.TabsContainer;
+import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +37,8 @@ public class ConfigurationTab extends Tab {
     private final ScrollContainer scrollContainer;
     private VerticalLayout layout;
     private final TabsContainer tabsContainer;
+
+    private ButtonOverlay start, stop, reload;
 
     private final ServerSettings settings = App.getInstance().getSettings();
 
@@ -44,6 +60,9 @@ public class ConfigurationTab extends Tab {
         scrollContainer.setHorizontalScroll(false);
         addElement(scrollContainer); // Adds the scroll container
 
+        layout.addElement(buildDangerZone());
+        layout.addElement(buildBackend());
+        layout.addElement(buildGpuDevice());
         layout.addElement(buildModelPathTile());
         layout.addElement(buildCurrentModel());
         layout.addElement(buildGpuLayers());
@@ -193,6 +212,291 @@ public class ConfigurationTab extends Tab {
         container.setAction(inputFieldOverlay);
 
         return container;
+    }
+
+    public CardContainer buildDangerZone() {
+        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 150);
+        card.setMaxSize(layout.getWidth(), 150);
+
+        TextOverlay text = new TextOverlay("Danger Zone");
+        text.setTextFill(Color.RED);
+        text.addStyle(Styles.DANGER);
+        card.setHeader(text);
+
+        TextOverlay desc = new TextOverlay("Any changes made to model settings will require a reload. Please wait until a notification appears to ensure everything worked properly.");
+        desc.addStyle(appSettings.getGlobalTextSize());
+        card.setBody(desc);
+
+        HorizontalLayout layout = new HorizontalLayout(0, 0);
+        layout.setSpacing(20);
+        layout.setAlignment(Pos.CENTER);
+        card.setFooter(layout);
+
+        start = new ButtonOverlay("start", "Start");
+        start.addStyle(Styles.SUCCESS);
+        start.addStyle(Styles.BUTTON_OUTLINED);
+
+        reload = new ButtonOverlay("reload", "Reload");
+        reload.setTextFill(Color.YELLOW);
+        reload.addStyle(Styles.BUTTON_OUTLINED);
+
+        stop = new ButtonOverlay("stop", "Stop");
+        stop.addStyle(Styles.DANGER);
+        stop.addStyle(Styles.BUTTON_OUTLINED);
+
+        start.onClick(event -> {
+            ServerProcess process = ServerProcess.getCurrentServer();
+            if (process != null && process.isAlive()) return;
+            Button startButton = (Button) start.getNode();
+            Button reloadButton = (Button) reload.getNode();
+            Button stopButton = (Button) stop.getNode();
+
+            startButton.setDisable(true);
+            reloadButton.setDisable(true);
+            stopButton.setDisable(true);
+
+            renderProgress();
+
+            App.getInstance().getThreadPoolManager().submitTask(() -> {
+                Model model = settings.getGlobalModel();
+                if (model == null) {
+                    model = App.getDefaultModel();
+                }
+                ServerProcess newProcess = new ServerProcess(model);
+                Platform.runLater(() -> {
+                    if (newProcess.isError()) {
+                        if (settings.getGlobalModel() == null && App.getDefaultModel() == null) {
+                            MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "You do not have an active model. Set a model as default to start the server.");
+                            errorOverlay.addStyle(Styles.DANGER);
+                            errorOverlay.addStyle(Styles.BG_DEFAULT);
+                            App.window.renderPopup(errorOverlay, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+
+                        } else {
+                            MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
+                            error.addStyle(Styles.DANGER);
+                            error.addStyle(Styles.BG_DEFAULT);
+                            App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                        }
+                    } else {
+                        MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
+                        started.addStyle(Styles.SUCCESS);
+                        started.addStyle(Styles.BG_DEFAULT);
+                        App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    }
+                    startButton.setDisable(false);
+                    reloadButton.setDisable(false);
+                    stopButton.setDisable(false);
+                });
+
+            });
+        });
+
+        reload.onClick(event -> {
+            // Maybe attach a progress bar???
+            if (ServerProcess.getCurrentServer() != null) {
+                ServerProcess.getCurrentServer().stop();
+            }
+
+            if (settings.getGlobalModel() == null && ServerProcess.getCurrentServer() == null) {
+                MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "No model was detected. Please set a default model.");
+                error.addStyle(Styles.DANGER);
+                error.addStyle(Styles.BG_DEFAULT);
+                App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                return;
+            }
+
+            Model model = (settings.getGlobalModel() != null ? settings.getGlobalModel() : ServerProcess.getCurrentServer().getModel());
+            if (model == null) {
+                // Lastly, look for the default model.
+                model = App.getModels("exlude").stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
+            }
+
+            if (model == null) {
+                MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "No model was detected. Please set a default model.");
+                error.addStyle(Styles.DANGER);
+                error.addStyle(Styles.BG_DEFAULT);
+                App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+            }
+
+            Button startButton = (Button) start.getNode();
+            Button reloadButton = (Button) reload.getNode();
+            Button stopButton = (Button) stop.getNode();
+
+            startButton.setDisable(true);
+            reloadButton.setDisable(true);
+            stopButton.setDisable(true);
+
+            renderProgress();
+
+            Model finalModel = model;
+            App.getInstance().getThreadPoolManager().submitTask(() -> {
+                ServerProcess process = new ServerProcess(finalModel);
+                Platform.runLater(() -> {
+                    if (process.isError()) {
+                        MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
+                        error.addStyle(Styles.DANGER);
+                        error.addStyle(Styles.BG_DEFAULT);
+                        App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    } else {
+                        MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
+                        started.addStyle(Styles.SUCCESS);
+                        started.addStyle(Styles.BG_DEFAULT);
+                        App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    }
+                    startButton.setDisable(false);
+                    reloadButton.setDisable(false);
+                    stopButton.setDisable(false);
+                });
+
+            });
+        });
+
+        stop.onClick(event -> {
+            if (ServerProcess.getCurrentServer() == null) {
+                return;
+            }
+
+            ServerProcess.getCurrentServer().stop();
+
+            App.getInstance().getThreadPoolManager().submitTask(() -> {
+                ServerProcess process = ServerProcess.getCurrentServer();
+                Platform.runLater(() -> {
+                    if (process.isAlive()) {
+                        MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while stopping the server. Please close or restart the app to shutdown the server.");
+                        error.addStyle(Styles.DANGER);
+                        error.addStyle(Styles.BG_DEFAULT);
+                        App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    } else {
+                        MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server was shutdown.");
+                        started.addStyle(Styles.SUCCESS);
+                        started.addStyle(Styles.BG_DEFAULT);
+                        App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    }
+                });
+
+
+            });
+        });
+
+        layout.addElements(start, reload, stop);
+
+        return card;
+    }
+
+    private void handleServerLoad() {
+        if (ServerProcess.getCurrentServer() != null) {
+            ServerProcess serverProcess = ServerProcess.getCurrentServer();
+            // Show progress bar only if still loading
+            if (serverProcess.isLoading()) {
+                start.setEnabled(false);
+                stop.setEnabled(false);
+                reload.setEnabled(false);
+                renderProgress(); // Call renderProgress() to show your popup
+
+                // Add a listener to be notified when loading is complete
+                serverProcess.addServerLoadingListener(new ServerLoadingListener() {
+                    @Override
+                    public void onServerLoadingComplete(boolean success) {
+                        // Ensure UI updates are on the JavaFX Application Thread
+                        Platform.runLater(() -> {
+                            if (App.window.getCurrentPopup() != null) { // Check if popup still exists
+                                App.window.removeContainer(App.window.getCurrentPopup());
+                                App.window.render();
+
+                                start.getNode().setDisable(false);
+                                stop.getNode().setDisable(false);
+                                reload.getNode().setDisable(false);
+                            }
+                        });
+                        // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
+                        serverProcess.removeServerLoadingListener(this);
+                    }
+                });
+            }
+        }
+    }
+
+    public TileContainer buildBackend() {
+        TileContainer container = new TileContainer(0, 0);
+        container.setMaxSize(layout.getWidth(), 100);
+        container.setTitle("Backend Server");
+        container.setDescription("Select the compatible backend for your GPU device..");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+
+        List<String> items = new ArrayList<>();
+        items.add("Cuda");
+        items.add("HIP");
+        items.add("Vulkan");
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
+        selection.setMaxHeight(50);
+        selection.setDefaultItem(settings.getBackend());
+
+        selection.onItemSelect(event -> {
+            String newBackend = event.getItem();
+            if (newBackend == null) return;
+            if (App.vulkanDisable) {
+                if (newBackend.equalsIgnoreCase("vulkan")) {
+                    ComboBox<String> comboBox = (ComboBox<String>) selection.getNode();
+                    comboBox.getSelectionModel().select(settings.getBackend());
+                    MessageOverlay warning = new MessageOverlay(0, 0, 600, 100, "Vulkan Support", "Due to BSOD issues with Vulkan the backend is disabled. We are currently waiting on a fix. Thank you for your understanding.", new TextOverlay(new FontIcon(Material2MZ.OUTLINED_FLAG)));
+                    warning.addStyle(Styles.WARNING);
+                    warning.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    return;
+                }
+            }
+
+            try {
+                // Thread blocks until done
+                ComboBox<String> comboBox = (ComboBox<String>) selection.getNode();
+                comboBox.getSelectionModel().select(newBackend);
+                settings.setBackend(newBackend);
+                new DeviceProcess(newBackend);
+
+                settings.setDevice("Auto");
+
+                // Once done re-render
+                App.window.clearContainers();
+                App.window.addContainer(new SettingsView().getContainer());
+                App.window.render();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        container.setAction(selection);
+
+        return container;
+    }
+
+    public TileContainer buildGpuDevice() {
+        TileContainer container = new TileContainer(0, 0);
+        container.setMaxSize(layout.getWidth(), 100);
+        container.setTitle("Backend Server");
+        container.setDescription("Select the compatible GPU for your backend. Auto will automatically choose the GPU for you. Please verify that there is one more option than Auto.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+
+        ComboBoxOverlay selection = new ComboBoxOverlay(settings.getDevices(), 400, 50);
+        selection.setDefaultItem(settings.getDevice());
+        selection.onItemSelect(event -> {
+            settings.setDevice(event.getItem());
+        });
+        container.setAction(selection);
+
+        return container;
+    }
+
+    private void renderProgress() {
+        // Display progress bar for backend loading
+        ProgressBarOverlay progress = new ProgressBarOverlay();
+        progress.setWidth(120);
+        progress.setMaxHeight(50);
+        progress.setY(10);
+        TextOverlay label = new TextOverlay("Starting backend...");
+        App.window.renderPopup(progress, PopupPosition.BOTTOM_CENTER, 200, 100, false, label);
     }
 
 }

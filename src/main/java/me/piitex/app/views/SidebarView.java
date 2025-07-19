@@ -78,7 +78,7 @@ public class SidebarView {
             App.window.render();
         });
 
-        ButtonOverlay models = new ButtonOverlay("models", "Models");
+        ButtonOverlay models = new ButtonOverlay("models", "Models / Backend");
         models.setWidth(rootWidth);
         root.addElement(models);
         models.onClick(event -> {
