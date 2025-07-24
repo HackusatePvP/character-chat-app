@@ -86,8 +86,10 @@ public class Server {
                 // Check for interruption.
                 if (Thread.currentThread().isInterrupted()) {
                     App.logger.info("Response interrupted. Stopping...");
-                    // Re-set the interrupted status and throw InterruptedException
-                    Thread.currentThread().interrupt(); // Restore interrupted status
+                    Thread.currentThread().interrupt();
+                    response.setGenerating(false);
+                    response.setHalt(true);
+                    client.close();
                     throw new InterruptedException("Response generation was interrupted by user.");
                 }
 
