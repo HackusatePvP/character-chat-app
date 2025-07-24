@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.piitex.app.views.Positions.*;
+
 public class ConfigurationTab extends Tab {
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
@@ -48,13 +50,12 @@ public class ConfigurationTab extends Tab {
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
-        layout = new VerticalLayout(0, 0);
-        layout.setSpacing(0);
+        layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
+        layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
         layout.setX(20);
-        layout.setPrefSize(appSettings.getWidth() - 500, 0);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);

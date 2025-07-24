@@ -7,16 +7,20 @@ import me.piitex.app.configuration.AppSettings;
 // Must be initialized before GUI is rendered.
 public class Positions {
 
-    /*###########################
-    // ChatView positions
-    ############################*/
+    /*
+    ###########################
+        Sidebar positions
+    ############################
+    */
     public static int SIDEBAR_WIDTH;
     public static int SIDEBAR_WIDTH_COLLAPSE;
     public static int SIDEBAR_HEIGHT;
 
-    /*###########################
-    // ChatView positions
-    ############################*/
+    /*
+    ###########################
+        ChatView positions
+    ############################
+    */
     public static int CHAT_VIEW_SCROLL_X;
     public static int CHAT_VIEW_SCROLL_Y;
     public static int CHAT_VIEW_SCROLL_WIDTH;
@@ -32,6 +36,17 @@ public class Positions {
     public static int CHAT_BOX_BUTTON_BOX_HEIGHT;
     public static int CHAT_SEND_BOX_WIDTH;
     public static int CHAT_SEND_BOX_HEIGHT;
+
+    /*
+    ###########################
+        Model Tabs positions
+    ############################
+    */
+    public static int MODEL_CONFIGURATION_SCROLL_WIDTH;
+    public static int MODEL_CONFIGURATION_SCROLL_HEIGHT;
+    public static int MODEL_CONFIGURATION_LAYOUT_WIDTH;
+    public static int MODEL_CONFIGURATION_LAYOUT_HEIGHT;
+    public static int MODEL_CONFIGURATION_LAYOUT_SPACING;
 
 
     public static void initialize() {
@@ -64,13 +79,20 @@ public class Positions {
             CHAT_SEND_BOX_WIDTH =  800;
             CHAT_SEND_BOX_HEIGHT = 200;
         }
+
         SIDEBAR_WIDTH = 200;
         SIDEBAR_WIDTH_COLLAPSE = 50;
         SIDEBAR_HEIGHT = 1000;
+
+        MODEL_CONFIGURATION_SCROLL_WIDTH = appSettings.getWidth() - 300;
+        MODEL_CONFIGURATION_SCROLL_HEIGHT = appSettings.getHeight() - 200;
+        MODEL_CONFIGURATION_LAYOUT_WIDTH = MODEL_CONFIGURATION_SCROLL_WIDTH - 20;
+        MODEL_CONFIGURATION_LAYOUT_HEIGHT = 0;
+        MODEL_CONFIGURATION_LAYOUT_SPACING = 10;
     }
 
     private static void initializeMobile() {
-        // Assuming the view is 600 x 1200
+        // Assuming the view is 600 x 1200 (Vertical display)
         // Should work for other values but designed for that resolution
         AppSettings appSettings = App.getInstance().getAppSettings();
         CHAT_VIEW_SCROLL_HEIGHT = appSettings.getHeight() - 300;
