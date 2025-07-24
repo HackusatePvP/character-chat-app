@@ -4,6 +4,8 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import me.piitex.app.App;
 import me.piitex.app.views.characters.CharacterEditMobileView;
@@ -47,11 +49,15 @@ public class SidebarView {
             root.getPane().setMaxWidth(50);
             root.getPane().setMinWidth(50);
 
-            FontIcon fontIcon = new FontIcon(Material2AL.EXPAND_MORE);
-            root.getPane().getChildren().clear();
-            root.getPane().getChildren().addFirst(fontIcon);
+            ButtonOverlay buttonOverlay = new ButtonOverlay("expand", new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT));
+            buttonOverlay.setWidth(32);
+            buttonOverlay.setHeight(32);
 
-            fontIcon.addEventHandler(MouseEvent.MOUSE_CLICKED, event1 -> {
+            Node expand = buttonOverlay.render();
+            root.getPane().getChildren().clear();
+            root.getPane().getChildren().addFirst(expand);
+
+            expand.addEventHandler(MouseEvent.MOUSE_CLICKED, event1 -> {
                 if (parent instanceof Layout layout) {
                     layout.getPane().getChildren().removeFirst();
                     layout.getPane().getChildren().addFirst(new SidebarView(parent).getRoot().render());
