@@ -121,7 +121,6 @@ public class ChatView {
         layout.addStyle(Styles.BG_INSET);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        System.out.println("Scroll Height: " + CHAT_VIEW_SCROLL_HEIGHT);
         scrollContainer = new ScrollContainer(layout, CHAT_VIEW_SCROLL_X, CHAT_VIEW_SCROLL_Y, CHAT_VIEW_SCROLL_WIDTH, CHAT_VIEW_SCROLL_HEIGHT);
         scrollContainer.addStyle(Styles.BG_INSET);
         scrollContainer.setMaxSize(CHAT_VIEW_SCROLL_WIDTH, CHAT_VIEW_SCROLL_HEIGHT);
@@ -224,21 +223,6 @@ public class ChatView {
     }
 
     public VerticalLayout buildSendBox() {
-//        double width;
-//        double height;
-//        if (appSettings.getWidth() < 1280) {
-//            // Vertical mobile view
-//            width = 400;
-//            height = 200;
-//        } else if (appSettings.getWidth() >= 1280 && appSettings.getWidth() < 1920) {
-//            width = 600;
-//            height = 200;
-//        } else {
-//            width = 800;
-//            height = 200;
-//        }
-
-        System.out.println("Send Height: " + CHAT_SEND_BOX_HEIGHT);
         send = new RichTextAreaOverlay("", "Type your response.", CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         send.setMaxHeight(CHAT_SEND_BOX_HEIGHT);
         submit = new ButtonOverlay("submit", "Send");

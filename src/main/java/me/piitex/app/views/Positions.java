@@ -32,7 +32,6 @@ public class Positions {
 
     public static void initialize() {
         if (App.mobile) {
-            System.out.println("Using mobile positions...");
             initializeMobile();
         } else {
             initializeDesktop();
