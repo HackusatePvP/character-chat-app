@@ -5,9 +5,9 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import me.piitex.app.App;
+import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharacterEditMobileView;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
@@ -22,7 +22,6 @@ import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static me.piitex.app.views.Positions.*;
@@ -33,6 +32,9 @@ public class SidebarView {
 
     // Testing out consumer. Hopefully it's more efficient than interfaces.
     private Consumer<Boolean> onCollapseStateChange;
+
+    private static final AppSettings appSettings = App.getInstance().getAppSettings();
+
     public SidebarView(Renderer parent, boolean collapse) {
         this.parent = parent;
         root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
@@ -103,6 +105,7 @@ public class SidebarView {
         });
 
         ButtonOverlay home = new ButtonOverlay("home", "Home");
+        home.addStyle(appSettings.getGlobalTextSize());
         home.setWidth(rootWidth);
         root.addElement(home);
         home.onClick(event -> {
@@ -112,6 +115,7 @@ public class SidebarView {
         });
 
         ButtonOverlay settings = new ButtonOverlay("home", "Settings");
+        settings.addStyle(appSettings.getGlobalTextSize());
         settings.setWidth(rootWidth);
         root.addElement(settings);
         settings.onClick(event -> {
@@ -121,6 +125,7 @@ public class SidebarView {
         });
 
         ButtonOverlay models = new ButtonOverlay("models", "Models / Backend");
+        models.addStyle(appSettings.getGlobalTextSize());
         models.setWidth(rootWidth);
         root.addElement(models);
         models.onClick(event -> {
@@ -137,6 +142,7 @@ public class SidebarView {
         });
 
         ButtonOverlay users = new ButtonOverlay("users", "User Templates");
+        users.addStyle(appSettings.getGlobalTextSize());
         users.setWidth(rootWidth);
         root.addElement(users);
         users.onClick(event -> {
@@ -146,6 +152,7 @@ public class SidebarView {
         });
 
         ButtonOverlay characters = new ButtonOverlay("characters", "Create Character");
+        characters.addStyle(appSettings.getGlobalTextSize());
         characters.setWidth(rootWidth);
         root.addElement(characters);
         characters.onClick(event -> {

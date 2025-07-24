@@ -80,6 +80,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("Select the folder for your models.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         ButtonOverlay button = new ButtonOverlay("location", "Select Location");
         button.setTooltip(settings.getModelPath());
@@ -111,6 +112,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("Set the current model. This will override the default model.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         List<String> items = new ArrayList<>();
         items.add("Default / Last Model");
@@ -150,6 +152,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, 200, settings.getGpuLayers());
         input.onValueChange(event -> {
@@ -167,6 +170,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("Locks model in RAM. Can improve generation times. Disables model swapping.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isMemoryLock());
         switchOverlay.onToggle(event -> {
@@ -184,6 +188,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("Toggles flash attention. Designed to speed up training and inference while reducing memory usage. In some rare cases it can greatly reduce quality.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isFlashAttention());
         switchOverlay.onToggle(event -> {
@@ -201,6 +206,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("The current running model that is loaded. Will be null if no model is active.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         Model model = (ServerProcess.getCurrentServer() != null && ServerProcess.getCurrentServer().getModel() != null ? ServerProcess.getCurrentServer().getModel() : settings.getGlobalModel());
         if (model == null) {
@@ -425,6 +431,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("Select the compatible backend for your GPU device..");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         List<String> items = new ArrayList<>();
         items.add("Cuda");
@@ -482,6 +489,7 @@ public class ConfigurationTab extends Tab {
         container.setDescription("Select the compatible GPU for your backend. Auto will automatically choose the GPU for you. Please verify that there is one more option than Auto.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
 
         ComboBoxOverlay selection = new ComboBoxOverlay(settings.getDevices(), 400, 50);
         selection.setDefaultItem(settings.getDevice());

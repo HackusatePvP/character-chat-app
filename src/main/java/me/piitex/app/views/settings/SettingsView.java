@@ -2,15 +2,13 @@ package me.piitex.app.views.settings;
 
 import atlantafx.base.theme.*;
 import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.Pane;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
-import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
@@ -31,9 +29,12 @@ public class SettingsView {
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public SettingsView() {
-        int maxWidth = appSettings.getWidth();
-        container = new EmptyContainer(maxWidth - 300, 0);
+        container = new EmptyContainer(appSettings.getWidth() - 300, 0);
         container.addStyle(Styles.BG_INSET);
+        build();
+    }
+
+    public void build() {
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setSpacing(35);
@@ -45,8 +46,8 @@ public class SettingsView {
         layout.setOffsetX(20);
         layout.setSpacing(20);
 
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, maxWidth - 250, appSettings.getHeight() - 100);
-        scrollContainer.setMaxSize(maxWidth - 250, appSettings.getHeight() - 100);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
 
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
@@ -64,6 +65,7 @@ public class SettingsView {
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
 
         tileContainer.setTitle("Resolution");
         tileContainer.setDescription("Set the base resolution for the application. This is still in development, some pages may not support different resolutions.");
@@ -105,6 +107,7 @@ public class SettingsView {
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
 
         tileContainer.setTitle("Chat Text Size");
         tileContainer.setDescription("Set the text size for the chats. Can be helpful to those with visual impairments.");
@@ -152,9 +155,10 @@ public class SettingsView {
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
 
         tileContainer.setTitle("Global Text Size");
-        tileContainer.setDescription("Set the text size for the general UI. This is still in development, may cause issues or incompatible with some components.");
+        tileContainer.setDescription("Set the text size for the general UI. This is still in development, some components are incompatible.");
 
         List<String> items = new ArrayList<>();
         items.add("Small");
@@ -186,7 +190,16 @@ public class SettingsView {
             } else {
                 item = Styles.TEXT;
             }
+
             appSettings.setGlobalTextSize(item);
+
+            // Refresh view to reflect changes.
+            container.getElements().clear();
+            build();
+            Pane pane = (Pane) container.getView();
+            pane.getChildren().clear();
+            pane.getChildren().addAll(container.build().getValue());
+
         });
 
         tileContainer.setAction(selection);
@@ -199,6 +212,7 @@ public class SettingsView {
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
 
         tileContainer.setTitle("Theme");
         tileContainer.setDescription("Change the theme of the application.");

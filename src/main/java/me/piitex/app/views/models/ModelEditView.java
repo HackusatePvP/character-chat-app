@@ -40,11 +40,11 @@ public class ModelEditView {
     public ModelEditView(ModelSettings settings) {
         this.settings = settings;
         initializeSettings();
-        container = new EmptyContainer(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
+        container = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight() - 100);
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
         main.setSpacing(35);
-        main.addElement(new SidebarView(main, true).getRoot());
+        main.addElement(new SidebarView(main, false).getRoot());
         container.addElement(main);
 
         VerticalLayout layout = new VerticalLayout(0, 0);
@@ -85,6 +85,7 @@ public class ModelEditView {
     public TileContainer buildInstructions() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setTitle("Model Instructions");
         tileContainer.setDescription("Provide base instructions for the model.");
 
@@ -107,6 +108,7 @@ public class ModelEditView {
     private TileContainer buildContextSize() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.setTitle("Context Size");
         tileContainer.setDescription("The size of the prompts tokens.");
@@ -127,6 +129,7 @@ public class ModelEditView {
     private TileContainer buildModalFile() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.setTitle("Multimodal Support");
         tileContainer.setDescription("Set multimodal file.");
@@ -153,6 +156,7 @@ public class ModelEditView {
     private TileContainer buildTemperature() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Temperature");
         tileContainer.setDescription("Set the temperature for the model.");
@@ -173,6 +177,7 @@ public class ModelEditView {
     private TileContainer buildMinP() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Min-P");
         tileContainer.setDescription("Filters out less likely tokens during generation.");
@@ -193,6 +198,7 @@ public class ModelEditView {
     private TileContainer buildRepeatPenalty() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Repeat Penalty");
         tileContainer.setDescription("Adjusts how strongly the model is penalized for repeating tokens that have appeared recently in the generated text.");
@@ -213,6 +219,7 @@ public class ModelEditView {
     private TileContainer buildRepeatTokens() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Repeat Tokens");
         tileContainer.setDescription("Specifies the number of recent tokens (from the model's output history) to consider when applying the repetition penalty.");
@@ -233,6 +240,7 @@ public class ModelEditView {
     private TileContainer buildChatTemplates() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Chat Template");
         tileContainer.setDescription("Set the chat format template.");
@@ -296,6 +304,7 @@ public class ModelEditView {
     private TileContainer buildReasoningTemplate() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Reasoning Template");
         tileContainer.setDescription("Set the reasoning format template. Only works for models that support reasoning.");
@@ -322,6 +331,7 @@ public class ModelEditView {
     private TileContainer buildJinjaTemplate() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Jinja Template");
         tileContainer.setDescription("Enables or disables the use of Jinja templating for chat formatting.");

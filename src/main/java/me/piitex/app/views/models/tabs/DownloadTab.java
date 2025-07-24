@@ -153,6 +153,7 @@ public class DownloadTab extends Tab {
         HorizontalLayout tileLayout = new HorizontalLayout(TILE_LAYOUT_WIDTH, TILE_LAYOUT_HEIGHT);
         tileLayout.setAlignment(Pos.CENTER_LEFT);
         tileLayout.addStyle(Styles.BORDER_MUTED);
+        tileLayout.addStyle(appSettings.getGlobalTextSize());
         tileLayout.setSpacing(50);
 
         ButtonOverlay downloadIcon = new ButtonOverlay("download", new FontIcon(Material2MZ.SAVE_ALT));
