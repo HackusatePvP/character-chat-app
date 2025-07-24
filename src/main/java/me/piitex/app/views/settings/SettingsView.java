@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
@@ -98,6 +99,8 @@ public class SettingsView {
 
             App.window.setWidth(width);
             App.window.setHeight(height);
+
+            Positions.initialize();
 
             App.window.clearContainers();
             App.window.addContainer(new SettingsView().getContainer());

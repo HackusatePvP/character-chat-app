@@ -12,11 +12,13 @@ import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
+import me.piitex.app.views.Positions;
 import me.piitex.engine.Container;
 import me.piitex.engine.RenConfiguration;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.overlays.TextAreaOverlay;
 
 import java.awt.*;
 import java.io.File;
@@ -33,26 +35,25 @@ public class JavaFXLoad extends Application {
         int setWidth = appSettings.getWidth();
         int setHeight = appSettings.getHeight();
 
-        App.logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
-
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
-        App.logger.info("Screen Size ({},{})", dimension.width, dimension.height);
-
         int width = dimension.width;
-        // Used to manually test mobile views.
-//        setWidth = 700;
-//        setHeight = 1280;
-//        width = 700;
+        int height = dimension.height;
 
-        if (width < 720) {
+        // For testing, remove later.
+        //width = 600;
+        //height = 1200;
+
+        if (width < 900) {
             App.logger.info("Using mobile layouts...");
             // Set mobile view
             App.mobile = true;
-            RenConfiguration.setWidth(setWidth);
-            RenConfiguration.setHeight(setHeight);
-            App.getInstance().getAppSettings().setWidth(setWidth);
-            App.getInstance().getAppSettings().setHeight(setHeight);
+            RenConfiguration.setWidth(width);
+            RenConfiguration.setHeight(height);
+            App.getInstance().getAppSettings().setWidth(width);
+            App.getInstance().getAppSettings().setHeight(height);
+            setWidth = 600;
+            setHeight = 1250;
 
         // When changing from mobile to desktop view the configuration must be reverted.
         // Application will default to 720p.
@@ -64,9 +65,15 @@ public class JavaFXLoad extends Application {
             App.getInstance().getAppSettings().setHeight(720);
         }
 
+        App.logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
+        App.logger.info("Screen Size ({},{})", dimension.width, dimension.height);
+
+        // Initialize global positions. Needed for the rendering process.
+        Positions.initialize();
+
         // Disable image caching.
-        // Useful for most app but not this one
-        // Causes issues when changing a user or character image.
+        // Useful for most apps but not this one
+        // Causes issues when changing a user or character image as the path will remain the same.
         ImageLoader.useCache = false;
 
 

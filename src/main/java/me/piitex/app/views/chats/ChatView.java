@@ -37,6 +37,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Future;
 
+import static me.piitex.app.views.Positions.*;
+
 public class ChatView {
     private final Character character;
     private Chat chat;
@@ -119,10 +121,10 @@ public class ChatView {
         layout.addStyle(Styles.BG_INSET);
         layout.setAlignment(Pos.TOP_CENTER);
 
-        double scrollHeight = appSettings.getHeight() - (appSettings.getHeight() / 3.5);
-        scrollContainer = new ScrollContainer(layout, 0, 0, appSettings.getWidth() - (appSettings.getWidth() / 6), scrollHeight);
+        System.out.println("Scroll Height: " + CHAT_VIEW_SCROLL_HEIGHT);
+        scrollContainer = new ScrollContainer(layout, CHAT_VIEW_SCROLL_X, CHAT_VIEW_SCROLL_Y, CHAT_VIEW_SCROLL_WIDTH, CHAT_VIEW_SCROLL_HEIGHT);
         scrollContainer.addStyle(Styles.BG_INSET);
-        scrollContainer.setMaxSize(appSettings.getWidth() - (appSettings.getWidth() / 6), scrollHeight);
+        scrollContainer.setMaxSize(CHAT_VIEW_SCROLL_WIDTH, CHAT_VIEW_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -160,12 +162,11 @@ public class ChatView {
         items.add("New Chat");
         items.addAll(character.getChatFileNames());
 
-        ChoiceBoxOverlay selection = new ChoiceBoxOverlay(items);
+        ChoiceBoxOverlay selection = new ChoiceBoxOverlay(items, CHAT_VIEW_SELECTION_WIDTH, CHAT_VIEW_SELECTION_HEIGHT);
         selection.setDefaultItem(chat.getFile().getName());
-        selection.setX(appSettings.getWidth() / 2 - 100);
-        selection.setMaxWidth(appSettings.getWidth() - (appSettings.getWidth() / 2) );
-        selection.setWidth(400);
-        selection.setHeight(50);
+        selection.setX(CHAT_VIEW_SELECTION_X);
+        selection.setMaxWidth(CHAT_VIEW_SELECTION_WIDTH);
+        selection.setMaxHeight(CHAT_VIEW_SELECTION_HEIGHT);
 
         selection.onItemSelect(event -> {
             String item = event.getItem();
@@ -192,7 +193,7 @@ public class ChatView {
     }
 
     public CardContainer buildChatBox(ChatMessage chatMessage, int index, boolean render) {
-        CardContainer cardContainer = new ChatBoxCard(character, chat, chatMessage, index, this, scrollContainer.getWidth() - 10, 0);
+        CardContainer cardContainer = new ChatBoxCard(character, chat, chatMessage, index, this, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
         containerMap.put(index, cardContainer);
         layout.addElement(cardContainer);
 
@@ -204,7 +205,7 @@ public class ChatView {
         if (chatMessage.getSender() == Role.USER && chatMessage.hasImage()) {
             File file = new File(chatMessage.getImageUrl());
             if (file.exists()) {
-                ImageCard imageCard = new ImageCard(chatMessage, file.getName(), appSettings.getWidth() - (appSettings.getWidth() / 3), 0);
+                ImageCard imageCard = new ImageCard(chatMessage, file.getName(), CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_IMAGE_HEIGHT);
                 layout.addElement(imageCard);
 
                 if (render) {
@@ -218,32 +219,32 @@ public class ChatView {
     }
 
     public HorizontalLayout buildButtonBox(CardContainer container, ChatMessage chatMessage, int index) {
-        HorizontalLayout buttonBox = new ButtonBoxLayout(container, character, chatMessage, chat, index, this, 900, 50);
+        HorizontalLayout buttonBox = new ButtonBoxLayout(container, character, chatMessage, chat, index, this, CHAT_BOX_BUTTON_BOX_WIDTH, CHAT_BOX_BUTTON_BOX_HEIGHT);
         return buttonBox;
     }
 
     public VerticalLayout buildSendBox() {
-        double width;
-        double height;
-        if (appSettings.getWidth() < 1280) {
-            // Vertical mobile view
-            width = 400;
-            height = 200;
-        } else if (appSettings.getWidth() >= 1280 && appSettings.getWidth() < 1920) {
-            width = 600;
-            height = 200;
-        } else {
-            width = 800;
-            height = 200;
-        }
+//        double width;
+//        double height;
+//        if (appSettings.getWidth() < 1280) {
+//            // Vertical mobile view
+//            width = 400;
+//            height = 200;
+//        } else if (appSettings.getWidth() >= 1280 && appSettings.getWidth() < 1920) {
+//            width = 600;
+//            height = 200;
+//        } else {
+//            width = 800;
+//            height = 200;
+//        }
 
-        System.out.println("Height: " + height);
-        send = new RichTextAreaOverlay("", "Type your response.", width, height - 15);
-        send.setMaxHeight(height - 15);
+        System.out.println("Send Height: " + CHAT_SEND_BOX_HEIGHT);
+        send = new RichTextAreaOverlay("", "Type your response.", CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
+        send.setMaxHeight(CHAT_SEND_BOX_HEIGHT);
         submit = new ButtonOverlay("submit", "Send");
 
-        VerticalLayout sendBox = new SendBox(send, submit, this, width, height);
-        sendBox.setMaxSize(width, height);
+        VerticalLayout sendBox = new SendBox(send, submit, this, CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
+        sendBox.setMaxSize(CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         return sendBox;
     }
 
@@ -468,14 +469,10 @@ public class ChatView {
         AppSettings appSettings = App.getInstance().getAppSettings();
 
         TextFlowOverlay chatBox;
-        int width = appSettings.getWidth() - (appSettings.getWidth() / 6);
-        if (App.mobile) {
-            chatBox = new TextFlowOverlay(content, width - 30, 0);
-            chatBox.setMaxWidth(width - 30);
-        } else {
-            chatBox = new TextFlowOverlay(content, width - 30, 0);
-            chatBox.setMaxWidth(width - 30); // Set a little less than chatLayout
-        }
+        int width = CHAT_BOX_WIDTH;
+        // Set a little less than chatLayout
+        chatBox = new TextFlowOverlay(content, width - 30, 0);
+        chatBox.setMaxWidth(width - 30);
 
         chatBox.addStyle(appSettings.getChatTextSize());
 
