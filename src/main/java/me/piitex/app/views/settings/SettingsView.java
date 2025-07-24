@@ -13,6 +13,7 @@ import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
+import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
@@ -32,6 +33,7 @@ public class SettingsView {
     public SettingsView() {
         int maxWidth = appSettings.getWidth();
         container = new EmptyContainer(maxWidth - 300, 0);
+        container.addStyle(Styles.BG_INSET);
 
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setSpacing(35);
@@ -43,7 +45,6 @@ public class SettingsView {
         layout.setOffsetX(20);
         layout.setSpacing(20);
 
-        //FIXME: If the scroller breaks it's probably because of changes to VerticalLayout. setPrefSize() does not work with the scroller and will break it. Only use setMinSize.
         ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, maxWidth - 250, appSettings.getHeight() - 100);
         scrollContainer.setMaxSize(maxWidth - 250, appSettings.getHeight() - 100);
 
@@ -58,24 +59,14 @@ public class SettingsView {
         layout.addElement(buildTheme());
     }
 
-    public CardContainer buildResolution() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    public TileContainer buildResolution() {
+        TileContainer tileContainer = new TileContainer(0, 0, appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Set the base resolution for the application. This is still in development, some pages may not support different resolutions.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        description.addStyle(appSettings.getGlobalTextSize());
-        root.addElement(description);
+        tileContainer.setTitle("Resolution");
+        tileContainer.setDescription("Set the base resolution for the application. This is still in development, some pages may not support different resolutions.");
 
         List<String> items = new ArrayList<>();
         items.add("1280x720");
@@ -85,11 +76,8 @@ public class SettingsView {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        //String current = (infoFile.hasKey("width") && infoFile.hasKey("height") ? infoFile.get("width") + "x" + infoFile.get("height") : "");
-        AppSettings appSettings = App.getInstance().getAppSettings();
         String current = appSettings.getWidth() + "x" + appSettings.getHeight();
         selection.setDefaultItem(current);
-        root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
             int width = Integer.parseInt(item.split("x")[0]);
@@ -106,29 +94,20 @@ public class SettingsView {
             App.window.addContainer(new SettingsView().getContainer());
             App.window.render();
         });
-        card.setBody(root);
 
-        return card;
+        tileContainer.setAction(selection);
+
+        return tileContainer;
     }
 
-    public CardContainer buildChatSize() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    public TileContainer buildChatSize() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Set the text size for the chats. Can be helpful to those with visual impairments.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        description.addStyle(appSettings.getGlobalTextSize());
-        root.addElement(description);
+        tileContainer.setTitle("Chat Text Size");
+        tileContainer.setDescription("Set the text size for the chats. Can be helpful to those with visual impairments.");
 
         List<String> items = new ArrayList<>();
         items.add("Small");
@@ -143,7 +122,6 @@ public class SettingsView {
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
         selection.setDefaultItem(getTextKey(appSettings.getChatTextSize()));
-        root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
             if (item.equalsIgnoreCase("small")) {
@@ -163,29 +141,20 @@ public class SettingsView {
             }
             appSettings.setChatTextSize(item);
         });
-        card.setBody(root);
 
-        return card;
+        tileContainer.setAction(selection);
+
+        return tileContainer;
     }
 
-    public CardContainer buildGlobalChatSize() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    public TileContainer buildGlobalChatSize() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Set the text size for the general UI. This is still in development, may cause issues or incompatible with some components.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        description.addStyle(appSettings.getGlobalTextSize());
-        root.addElement(description);
+        tileContainer.setTitle("Global Text Size");
+        tileContainer.setDescription("Set the text size for the general UI. This is still in development, may cause issues or incompatible with some components.");
 
         List<String> items = new ArrayList<>();
         items.add("Small");
@@ -200,7 +169,6 @@ public class SettingsView {
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
         selection.setDefaultItem(getTextKey(appSettings.getGlobalTextSize()));
-        root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
             if (item.equalsIgnoreCase("small")) {
@@ -220,29 +188,20 @@ public class SettingsView {
             }
             appSettings.setGlobalTextSize(item);
         });
-        card.setBody(root);
 
-        return card;
+        tileContainer.setAction(selection);
+
+        return tileContainer;
     }
 
-    public CardContainer buildTheme() {
-        CardContainer card = new CardContainer(0, 0, appSettings.getWidth() - 300, 120);
-        card.setMaxSize(appSettings.getWidth() - 300, 120);
+    public TileContainer buildTheme() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
 
-        HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setMaxSize(1600, 120);
-
-        root.setAlignment(Pos.BASELINE_LEFT);
-        root.setSpacing(layoutSpacing);
-
-        TextFlowOverlay description = new TextFlowOverlay("Change the theme of the application.", 600, 200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setMaxWidth(600);
-        description.setMaxHeight(200);
-        description.setTextFillColor(Color.WHITE);
-        description.addStyle(appSettings.getGlobalTextSize());
-        root.addElement(description);
+        tileContainer.setTitle("Theme");
+        tileContainer.setDescription("Change the theme of the application.");
 
         List<String> items = new ArrayList<>();
         items.add("Primer Light");
@@ -255,10 +214,8 @@ public class SettingsView {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        //String current = (infoFile.hasKey("width") && infoFile.hasKey("height") ? infoFile.get("width") + "x" + infoFile.get("height") : "");
         AppSettings appSettings = App.getInstance().getAppSettings();
         selection.setDefaultItem(appSettings.getTheme());
-        root.addElement(selection);
         selection.onItemSelect(event -> {
             String item = event.getItem();
             appSettings.setTheme(item);
@@ -266,9 +223,9 @@ public class SettingsView {
 
             Application.setUserAgentStylesheet(appSettings.getStyleTheme(item).getUserAgentStylesheet());
         });
-        card.setBody(root);
+        tileContainer.setAction(selection);
 
-        return card;
+        return tileContainer;
     }
 
     private String getTextKey(String item) {
