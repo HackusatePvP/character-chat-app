@@ -1,6 +1,7 @@
 package me.piitex.app.backend;
 
 import me.piitex.app.App;
+import org.apache.hc.client5.http.HttpHostConnectException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -327,8 +328,7 @@ public class FileDownloadProcess {
                                 }
                             });
 
-                    Optional<String> fileName = getFileNameFromHeaders(response)
-                            .or(() -> getFileNameFromUrl(fileUrl));
+                    Optional<String> fileName = getFileNameFromHeaders(response).or(() -> getFileNameFromUrl(fileUrl));
 
                     if (response.getEntity() != null) {
                         EntityUtils.consume(response.getEntity());
@@ -344,7 +344,12 @@ public class FileDownloadProcess {
                 }
             }
         } catch (IOException e) {
-            App.logger.error("Error occurred while downloading model!", e);
+            if (e instanceof HttpHostConnectException) {
+                // If the client cannot connect to the internet or the host is down.
+                App.logger.warn("Could not not connect to host 'huggingface.co'.");
+            } else {
+                App.logger.error("Error occurred while downloading model!", e);
+            }
             return new DownloadResult(false, Optional.empty(), Optional.empty(),
                     Optional.of("Network or client error (HEAD): " + e.getMessage()), false);
         }
