@@ -22,12 +22,17 @@ import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import static me.piitex.app.views.Positions.*;
 
 public class SidebarView {
     private final VerticalLayout root;
     private final Renderer parent;
 
+    // Testing out consumer. Hopefully it's more efficient than interfaces.
+    private Consumer<Boolean> onCollapseStateChange;
     public SidebarView(Renderer parent, boolean collapse) {
         this.parent = parent;
         root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
@@ -40,7 +45,17 @@ public class SidebarView {
             expand.onClick(event -> {
                 if (parent instanceof Layout layout) {
                     layout.getPane().getChildren().removeFirst();
-                    layout.getPane().getChildren().addFirst(new SidebarView(parent, false).getRoot().render());
+
+                    // Re-assemble sidebar.
+                    root.getElements().clear();
+                    build();
+
+                    layout.getPane().getChildren().addFirst(root.render());
+
+                    //TODO Handle sidebar collapse event.
+                    if (onCollapseStateChange != null) {
+                        onCollapseStateChange.accept(false); // false indicates expanded
+                    }
                 }
             });
 
@@ -69,9 +84,21 @@ public class SidebarView {
             expand.addEventHandler(MouseEvent.MOUSE_CLICKED, event1 -> {
                 if (parent instanceof Layout layout) {
                     layout.getPane().getChildren().removeFirst();
-                    layout.getPane().getChildren().addFirst(new SidebarView(parent, false).getRoot().render());
+                    // Re-assemble sidebar.
+                    root.getElements().clear();
+                    build();
+
+                    layout.getPane().getChildren().addFirst(root.render());
+                    //TODO Handle sidebar collapse event
+                    if (onCollapseStateChange != null) {
+                        onCollapseStateChange.accept(false);
+                    }
                 }
             });
+
+            if (onCollapseStateChange != null) {
+                onCollapseStateChange.accept(true);
+            }
 
         });
 
@@ -130,6 +157,10 @@ public class SidebarView {
             }
             App.window.render();
         });
+    }
+
+    public void setOnCollapseStateChange(Consumer<Boolean> onCollapseStateChange) {
+        this.onCollapseStateChange = onCollapseStateChange;
     }
 
     private ButtonOverlay buildExpand() {
