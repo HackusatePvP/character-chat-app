@@ -34,7 +34,7 @@ public class UsersView {
         root.setSpacing(35);
         container.addElement(root);
 
-        root.addElement(new SidebarView(root).getRoot());
+        root.addElement(new SidebarView(root, false).getRoot());
 
         ButtonOverlay create = new ButtonOverlay("create", "Create User");
         create.addStyle(Styles.SUCCESS);

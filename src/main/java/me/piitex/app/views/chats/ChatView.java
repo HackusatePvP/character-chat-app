@@ -106,7 +106,7 @@ public class ChatView {
 
         HorizontalLayout main = new HorizontalLayout(appSettings.getWidth(), 0);
         main.setSpacing(5);
-        main.addElement(new SidebarView(main).getRoot());
+        main.addElement(new SidebarView(main, true).getRoot());
 
         container.addElement(main);
 

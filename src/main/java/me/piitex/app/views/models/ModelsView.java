@@ -22,7 +22,7 @@ public class ModelsView {
         container.addStyle(Styles.BG_INSET);
 
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        layout.addElement(new SidebarView(layout).getRoot());
+        layout.addElement(new SidebarView(layout, false).getRoot());
         container.addElement(layout);
 
         VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());

@@ -22,25 +22,36 @@ import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import static me.piitex.app.views.Positions.*;
+
 public class SidebarView {
     private final VerticalLayout root;
+    private final Renderer parent;
 
-    public SidebarView(Renderer parent) {
-        int width;
-        int height;
-        if (App.mobile) {
-            width = 100;
-            height = 1280;
-        } else {
-            width = 200;
-            height = 1000;
-        }
-
-        root = new VerticalLayout(width, height);
+    public SidebarView(Renderer parent, boolean collapse) {
+        this.parent = parent;
+        root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
         root.setAlignment(Pos.BASELINE_CENTER);
         root.addStyle(Styles.BORDER_DEFAULT);
         root.addStyle(Styles.BG_INSET);
-        double rootWidth = 150;
+        if (collapse) {
+            ButtonOverlay expand = buildExpand();
+            root.setWidth(SIDEBAR_WIDTH_COLLAPSE);
+            expand.onClick(event -> {
+                if (parent instanceof Layout layout) {
+                    layout.getPane().getChildren().removeFirst();
+                    layout.getPane().getChildren().addFirst(new SidebarView(parent, false).getRoot().render());
+                }
+            });
+
+            root.addElement(expand);
+        } else {
+            build();
+        }
+    }
+
+    public void build() {
+        double rootWidth = SIDEBAR_WIDTH - 20;
 
         TextOverlay close = new TextOverlay(new FontIcon(Material2AL.CLOSE));
         close.setX(root.getMaxWidth() - 5);
@@ -49,9 +60,7 @@ public class SidebarView {
             root.getPane().setMaxWidth(50);
             root.getPane().setMinWidth(50);
 
-            ButtonOverlay buttonOverlay = new ButtonOverlay("expand", new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT));
-            buttonOverlay.setWidth(32);
-            buttonOverlay.setHeight(32);
+            ButtonOverlay buttonOverlay = buildExpand();
 
             Node expand = buttonOverlay.render();
             root.getPane().getChildren().clear();
@@ -60,7 +69,7 @@ public class SidebarView {
             expand.addEventHandler(MouseEvent.MOUSE_CLICKED, event1 -> {
                 if (parent instanceof Layout layout) {
                     layout.getPane().getChildren().removeFirst();
-                    layout.getPane().getChildren().addFirst(new SidebarView(parent).getRoot().render());
+                    layout.getPane().getChildren().addFirst(new SidebarView(parent, false).getRoot().render());
                 }
             });
 
@@ -121,6 +130,13 @@ public class SidebarView {
             }
             App.window.render();
         });
+    }
+
+    private ButtonOverlay buildExpand() {
+        ButtonOverlay buttonOverlay = new ButtonOverlay("expand", new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT));
+        buttonOverlay.setWidth(32);
+        buttonOverlay.setHeight(32);
+        return buttonOverlay;
     }
 
     public VerticalLayout getRoot() {

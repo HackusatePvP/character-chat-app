@@ -143,7 +143,7 @@ public class CharacterEditMobileView {
         this.root = new EmptyContainer(0, 0, 192, 1080);
 
         HorizontalLayout layout = new HorizontalLayout(600, 1080);
-        layout.addElement(new SidebarView(layout).getRoot());
+        layout.addElement(new SidebarView(layout, false).getRoot());
         root.addElement(layout);
 
         VerticalLayout main = new VerticalLayout(600, 1000);

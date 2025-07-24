@@ -33,7 +33,7 @@ public class HomeView {
         }
         root.addStyle(Styles.BG_INSET);
 
-        root.addElement(new SidebarView(root).getRoot());
+        root.addElement(new SidebarView(root, false).getRoot());
 
         root.setSpacing(35);
         container.addElement(root);
