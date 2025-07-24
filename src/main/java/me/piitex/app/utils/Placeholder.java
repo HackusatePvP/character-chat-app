@@ -88,6 +88,7 @@ public class Placeholder {
 
 
     public static String formatPlaceholders(String content, @Nullable Character character, @Nullable User user) {
+        content = formatImproperTags(content);
         if (character != null) {
             content = content.replace("{{char}}", character.getDisplayName()).replace("{char}", character.getDisplayName()).replace("{{chara}}", character.getDisplayName()).replace("{chara}", character.getDisplayName()).replace("{{character}}", character.getDisplayName()).replace("{character}", character.getDisplayName());
         }
@@ -95,6 +96,16 @@ public class Placeholder {
         if (user != null) {
             content = content.replace("{user}", user.getDisplayName()).replace("{{user}}", user.getDisplayName()).replace("{usr}", user.getDisplayName()).replace("{{usr}}", user.getDisplayName());
         }
+
+        return content;
+    }
+
+    public static String formatImproperTags(String content) {
+        // Removes improper tags that are caused by misconfigured models/chat templates
+        content = content.replace("<im_end>", "");
+        content = content.replace("<|im_end|>", "");
+        content = content.replace("<|im_start|>user", "");
+        content = content.replace("<|im_start|>assistant", "");
 
         return content;
     }
