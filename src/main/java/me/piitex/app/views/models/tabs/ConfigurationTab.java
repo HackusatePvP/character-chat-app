@@ -431,7 +431,9 @@ public class ConfigurationTab extends Tab {
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setMaxHeight(50);
-        selection.setDefaultItem(settings.getBackend());
+        String item = settings.getBackend();
+        item = item.replace(item.substring(0, 1), item.substring(0, 1).toUpperCase());
+        selection.setDefaultItem(item);
 
         selection.onItemSelect(event -> {
             String newBackend = event.getItem();
