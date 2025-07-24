@@ -89,6 +89,7 @@ public class ConfigurationTab extends Tab {
             chooser.setInitialDirectory(new File(settings.getModelPath()));
             File file = chooser.showDialog(App.window.getStage());
             if (file == null) return;
+            App.logger.info("Updating model path to '{}'", file.getAbsolutePath());
             settings.setModelPath(file.getAbsolutePath());
 
             javafx.scene.control.Tab tab = tabsContainer.getTabPane().getTabs().stream().filter(tab1 -> tab1.getText().equalsIgnoreCase("list")).findAny().orElse(null);
