@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import me.piitex.app.App;
@@ -14,6 +15,7 @@ import me.piitex.app.backend.server.ServerLoadingListener;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -35,18 +37,20 @@ import java.util.List;
 import static me.piitex.app.views.Positions.*;
 
 public class ConfigurationTab extends Tab {
+    private final TabsContainer tabsContainer;
+    private final ModelsView modelsView;
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
     private VerticalLayout layout;
-    private final TabsContainer tabsContainer;
 
     private ButtonOverlay start, stop, reload;
 
     private final ServerSettings settings = App.getInstance().getSettings();
 
-    public ConfigurationTab(TabsContainer tabsContainer) {
+    public ConfigurationTab(ModelsView parent, TabsContainer tabsContainer) {
         super("Settings");
         this.tabsContainer = tabsContainer;
+        this.modelsView = parent;
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
@@ -94,9 +98,13 @@ public class ConfigurationTab extends Tab {
             App.logger.info("Updating model path to '{}'", file.getAbsolutePath());
             settings.setModelPath(file.getAbsolutePath());
 
-            javafx.scene.control.Tab tab = tabsContainer.getTabPane().getTabs().stream().filter(tab1 -> tab1.getText().equalsIgnoreCase("list")).findAny().orElse(null);
-            int index = tabsContainer.getTabPane().getTabs().indexOf(tab);
-            tabsContainer.getTabPane().getTabs().set(index, new ListTab().render());
+            // Will refresh the entire view.
+            modelsView.getContainer().getElements().clear();
+            modelsView.build();
+
+            Pane pane = (Pane) modelsView.getContainer().getView();
+            pane.getChildren().clear();
+            pane.getChildren().addAll(modelsView.getContainer().build().getValue());
 
         });
 

@@ -17,10 +17,15 @@ public class ModelsView {
     private final AppSettings appSettings = App.getInstance().getAppSettings();
     private final Container container;
 
+    private TabsContainer tabsContainer;
+
     public ModelsView() {
         container = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
         container.addStyle(Styles.BG_INSET);
+        build();
+    }
 
+    public void build() {
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         layout.addElement(new SidebarView(layout, false).getRoot());
         container.addElement(layout);
@@ -29,13 +34,16 @@ public class ModelsView {
         layout.addElement(main);
 
         // Add the views
-        TabsContainer tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
+        tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         main.addElement(tabsContainer);
 
-        tabsContainer.addTab(new ConfigurationTab(tabsContainer));
+        buildTabs();
+    }
+
+    public void buildTabs() {
+        tabsContainer.addTab(new ConfigurationTab(this, tabsContainer));
         tabsContainer.addTab(new ListTab());
         tabsContainer.addTab(new DownloadTab());
-
     }
 
     public Container getContainer() {
