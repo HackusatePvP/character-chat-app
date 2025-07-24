@@ -141,7 +141,7 @@ public class ServerProcess {
         }
 
         // Reasoning Template
-        if (!settings.getReasoningTemplate().equalsIgnoreCase("disabled")) {
+        if (!settings.getReasoningTemplate().equalsIgnoreCase("disabled") && !settings.getReasoningTemplate().equalsIgnoreCase("none")) {
             App.logger.debug("Enabling response format...");
             parameters.add("--reasoning-format");
             parameters.add(settings.getReasoningTemplate());
