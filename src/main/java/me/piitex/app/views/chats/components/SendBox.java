@@ -57,7 +57,7 @@ public class SendBox extends VerticalLayout {
         send.onSubmit(event -> {
             // Handle submit action. Send the input to the model and generate a response
             StyledTextArea textArea = (StyledTextArea) send.getNode();
-            parentView.handleSubmit(textArea.getText());
+            parentView.handleSubmit(textArea.getText().stripTrailing());
             textArea.replaceText("");
         });
 
