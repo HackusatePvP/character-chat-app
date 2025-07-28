@@ -189,7 +189,7 @@ public class CharactersView {
     private void editCharacter(Character character) {
         App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
-        App.getInstance().getThreadPoolManager().submitTask(() -> {
+        App.getThreadPoolManager().submitTask(() -> {
             Container container;
             if (App.mobile) {
                 container = new CharacterEditMobileView(character, false).getRoot();

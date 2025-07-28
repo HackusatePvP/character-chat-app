@@ -464,7 +464,7 @@ public class CharacterEditView {
         }
         loreItems.forEach((key, value) -> textToTokenize.append(key).append(": ").append(value).append("\n"));
 
-        App.getInstance().getThreadPoolManager().submitTask(() -> {
+        App.getThreadPoolManager().submitTask(() -> {
             try {
                 int tokenSize = Server.tokenize(textToTokenize.toString());
 

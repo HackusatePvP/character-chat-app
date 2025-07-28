@@ -99,7 +99,7 @@ public class DownloadTab extends Tab {
     }
 
     private void loadAndBuildDownloadList() {
-        App.getInstance().getThreadPoolManager().submitTask(() -> {
+        App.getThreadPoolManager().submitTask(() -> {
             App.logger.info("Initiated httpclient thread.");
             ConfigUtil configUtil;
             try {

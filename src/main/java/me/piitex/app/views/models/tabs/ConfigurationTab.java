@@ -345,7 +345,7 @@ public class ConfigurationTab extends Tab {
             renderProgress();
 
             Model finalModel = model;
-            App.getInstance().getThreadPoolManager().submitTask(() -> {
+            App.getThreadPoolManager().submitTask(() -> {
                 ServerProcess process = new ServerProcess(finalModel);
                 Platform.runLater(() -> {
                     if (process.isError()) {

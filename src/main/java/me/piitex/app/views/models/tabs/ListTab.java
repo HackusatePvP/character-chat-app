@@ -4,6 +4,7 @@ import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
@@ -135,9 +136,12 @@ public class ListTab extends Tab {
             settings.addStyle(Styles.ACCENT);
             settings.addStyle(Styles.LARGE);
             settings.onClick(event -> {
+                System.out.println("Handling...");
+                App.window.getScene().setCursor(Cursor.WAIT);
                 App.window.clearContainers();
                 App.window.addContainer(new ModelEditView(model.getSettings()).getContainer());
                 App.window.render();
+                App.window.getScene().setCursor(Cursor.DEFAULT);
             });
 
             TextOverlay delete = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));
@@ -163,7 +167,7 @@ public class ListTab extends Tab {
                     App.window.removeContainer(dialogueContainer);
 
                     // Delete the model
-                    App.getInstance().getThreadPoolManager().submitTask(() -> {
+                    App.getThreadPoolManager().submitTask(() -> {
                         if (model.getFile().delete()) {
                             App.logger.info("Deleted model '{}'", model.getFile().getAbsolutePath());
 

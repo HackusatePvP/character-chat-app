@@ -360,7 +360,7 @@ public class ChatView {
             response.setImage(image);
         }
 
-        Future<?> thread = App.getInstance().getThreadPoolManager().submitTask(() -> {
+        Future<?> thread = App.getThreadPoolManager().submitTask(() -> {
             // Generate response!
             response.setPrompt(chatMessage.getContent());
             String received;

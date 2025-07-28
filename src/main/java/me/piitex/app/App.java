@@ -24,7 +24,7 @@ public class App {
     private final Map<String, User> userTemplates = new TreeMap<>();
 
     private static App instance;
-    private ThreadPoolManager threadPoolManager;
+    public static ThreadPoolManager threadPoolManager;
 
     public static boolean dev = false;
 
@@ -120,7 +120,7 @@ public class App {
         return settings;
     }
 
-    public ThreadPoolManager getThreadPoolManager() {
+    public static ThreadPoolManager getThreadPoolManager() {
         return threadPoolManager;
     }
 
