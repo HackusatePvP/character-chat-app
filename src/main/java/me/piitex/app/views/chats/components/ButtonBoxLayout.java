@@ -1,5 +1,6 @@
 package me.piitex.app.views.chats.components;
 
+import atlantafx.base.controls.Card;
 import atlantafx.base.layout.ModalBox;
 import atlantafx.base.theme.Styles;
 import javafx.animation.KeyFrame;
@@ -13,9 +14,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.ChatView;
-import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
-import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ModalContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -27,7 +26,7 @@ import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
 public class ButtonBoxLayout extends HorizontalLayout {
-    private final Container container;
+    private final VerticalLayout messageBox;
     private final Character character;
     private final ChatMessage chatMessage;
     private final Chat chat;
@@ -35,9 +34,9 @@ public class ButtonBoxLayout extends HorizontalLayout {
     private final ChatView parentView;
 
 
-    public ButtonBoxLayout(Container container, Character character, ChatMessage chatMessage, Chat chat, int index, ChatView parentView, double width, double height) {
+    public ButtonBoxLayout(VerticalLayout messageBox, Character character, ChatMessage chatMessage, Chat chat, int index, ChatView parentView, double width, double height) {
         super(width, height);
-        this.container = container;
+        this.messageBox = messageBox;
         this.character = character;
         this.chatMessage = chatMessage;
         this.chat = chat;
@@ -108,11 +107,13 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
                 chat.replaceMessageContent(index, contentToStore);
 
-                parentView.getLayout().getPane().getChildren().remove(container.getView());
-
                 ChatMessage updatedChatMessage = chat.getMessage(index);
                 if (updatedChatMessage != null) {
-                    parentView.buildChatBox(updatedChatMessage, index, true);
+
+                    Card card = (Card) messageBox.getPane().getChildren().stream().filter(node -> node instanceof Card).findAny().orElse(null);
+                    if (card != null) {
+                        card.setBody(ChatView.buildTextFlow(updatedChatMessage, chat, index).build());
+                    }
                 }
 
                 App.window.removeContainer(modalContainer);
@@ -159,7 +160,8 @@ public class ButtonBoxLayout extends HorizontalLayout {
                 parentView.getLayout().getPane().getChildren().removeLast();
 
                 // Generate new box with
-                CardContainer responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size(), true); // Set content later
+                //CardContainer responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size(), true); // Set content later
+                VerticalLayout responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size(), true);
 
                 // Gen response
                 Response response = new Response(index, chat.getLastLine(index).getContent(), character, character.getUser(), chat);

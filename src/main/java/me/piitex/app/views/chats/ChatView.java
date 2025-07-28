@@ -12,6 +12,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.*;
@@ -54,8 +55,8 @@ public class ChatView {
 
     private File image = null;
 
-    // Not sure if this is smart but for better control map the container to the index.
-    private final Map<Integer, CardContainer> containerMap = new HashMap<>();
+    // Not sure if this is smart but for better control map the layout to the index.
+    private final Map<Integer, VerticalLayout> messageMap = new HashMap<>();
 
     private AppSettings appSettings = App.getInstance().getAppSettings();
 
@@ -106,7 +107,9 @@ public class ChatView {
 
         HorizontalLayout main = new HorizontalLayout(appSettings.getWidth(), 0);
         main.setSpacing(5);
-        main.addElement(new SidebarView(main, true).getRoot());
+
+        SidebarView sidebarView = new SidebarView(main, false);
+        main.addElement(sidebarView.getRoot());
 
         container.addElement(main);
 
@@ -154,6 +157,16 @@ public class ChatView {
             }
         });
 
+        sidebarView.setOnCollapseStateChange((aBoolean) -> {
+            System.out.println("Handling...");
+            if (aBoolean) {
+                System.out.println("Expanding scroll view...");
+                scrollContainer.getScrollPane().setPrefWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
+                scrollContainer.getScrollPane().setMaxWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
+                scrollContainer.getScrollPane().setMinWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
+            }
+        });
+
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -191,7 +204,11 @@ public class ChatView {
         }
     }
 
-    public CardContainer buildChatBox(ChatMessage chatMessage, int index, boolean render) {
+    public VerticalLayout buildChatBox(ChatMessage chatMessage, int index, boolean render) {
+        return new ChatMessageBox(character, chat, chatMessage, index, this, render, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
+    }
+
+    /*public CardContainer buildChatBox(ChatMessage chatMessage, int index, boolean render) {
         CardContainer cardContainer = new ChatBoxCard(character, chat, chatMessage, index, this, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
         containerMap.put(index, cardContainer);
         layout.addElement(cardContainer);
@@ -215,11 +232,10 @@ public class ChatView {
         }
 
         return cardContainer;
-    }
+    }*/
 
-    public HorizontalLayout buildButtonBox(CardContainer container, ChatMessage chatMessage, int index) {
-        HorizontalLayout buttonBox = new ButtonBoxLayout(container, character, chatMessage, chat, index, this, CHAT_BOX_BUTTON_BOX_WIDTH, CHAT_BOX_BUTTON_BOX_HEIGHT);
-        return buttonBox;
+    public HorizontalLayout buildButtonBox(VerticalLayout messageBox, ChatMessage chatMessage, int index) {
+        return new ButtonBoxLayout(messageBox, character, chatMessage, chat, index, this, CHAT_BOX_BUTTON_BOX_WIDTH, CHAT_BOX_BUTTON_BOX_HEIGHT);
     }
 
     public VerticalLayout buildSendBox() {
@@ -256,7 +272,7 @@ public class ChatView {
                     Model check = serverProcess.getModel();
                     if (!check.getFile().getName().equalsIgnoreCase(m.getFile().getName())) {
                         serverProcess.stop();
-                        App.getInstance().getThreadPoolManager().submitTask(() -> {
+                        App.getThreadPoolManager().submitTask(() -> {
                             new ServerProcess(m);
                         });
 
@@ -301,7 +317,6 @@ public class ChatView {
         }
     }
 
-
     private void renderProgress() {
         send.getNode().setDisable(true);
         submit.getNode().setDisable(true);
@@ -316,34 +331,49 @@ public class ChatView {
     }
 
     public void handleSubmit(String message) {
+        System.out.println("Handling.");
         if (message.isEmpty()) return;
+        System.out.println("Passed");
 
         // Disable buttons to prevent spamming
+        System.out.println("Disabling...");
         send.getNode().setDisable(true);
         submit.getNode().setDisable(true);
 
         // Remove regen from previous card
-        CardContainer previous = containerMap.get(chat.getMessages().size() - 1);
+        System.out.println("Previous: " + (chat.getMessages().size() - 1));
+        VerticalLayout previous = messageMap.get(chat.getMessages().size() - 1);
         if (!chat.getMessages().isEmpty()) {
+            System.out.println("Message is not empty...");
             Role previousSender = chat.getMessages().getLast().getSender();
             if (previous != null && previousSender == Role.ASSISTANT) {
-                Card card = (Card) previous.getView();
-                if (card != null) {
-                    HBox buttonLayout = (HBox) card.getFooter();
-                    buttonLayout.getChildren().removeLast();
+                System.out.println("Found assistant...");
+                Pane messageBox = previous.getPane();
+                if (messageBox != null) {
+                    System.out.println("Box was rendered...");
+                    // This is going to be a little more difficult. // Remove the 'regen' button from the last card
+                    // The card is nested within the layout.
+                    Card card = (Card) messageBox.getChildren().stream().filter(node -> node instanceof Card).findAny().orElse(null);
+                    if (card != null) {
+                        System.out.println("Found card...");
+                        HBox buttonLayout = (HBox) card.getFooter();
+                        buttonLayout.getChildren().removeLast();
+                    }
                 }
             }
         }
 
+        System.out.println("Adding user box...");
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
         ChatMessage chatMessage = new ChatMessage(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
 
         buildChatBox(chatMessage, chat.getMessages().size(), true);
         chat.addLine(chatMessage);
 
+        System.out.println("Adding assistant box...");
         int assistantIndex = chat.getMessages().size();
         ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", (image != null ? image.getAbsolutePath() : null));
-        CardContainer responseBox = buildChatBox(newMsg, assistantIndex, true); // Set content later
+        VerticalLayout responseBox = buildChatBox(newMsg, assistantIndex, true); // Set content later
 
         // Gen response
         Response response = new Response(chat.getMessages().size(), message, character, character.getUser(), chat);
@@ -353,8 +383,11 @@ public class ChatView {
         generateResponse(response, chatMessage, responseBox);
     }
 
-    public void generateResponse(Response response, ChatMessage chatMessage, CardContainer responseBox) {
-        Card card = (Card) responseBox.build().getKey();
+    public void generateResponse(Response response, ChatMessage chatMessage, VerticalLayout responseBox) {
+        //Card card = (Card) responseBox.build().getKey();
+
+        Pane pane = responseBox.render();
+        Card card = (Card) pane.getChildren().stream().filter(node -> node instanceof Card).findAny().orElse(null);
 
         if (image != null) {
             response.setImage(image);
@@ -444,8 +477,8 @@ public class ChatView {
         this.image = image;
     }
 
-    public Map<Integer, CardContainer> getContainerMap() {
-        return containerMap;
+    public Map<Integer, VerticalLayout> getMessageMap() {
+        return messageMap;
     }
 
     public static TextFlowOverlay buildTextFlow(ChatMessage chatMessage, Chat chat, int index) {

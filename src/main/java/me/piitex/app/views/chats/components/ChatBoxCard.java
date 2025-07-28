@@ -10,6 +10,7 @@ import me.piitex.app.backend.Role;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
+import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.ImageOverlay;
 import me.piitex.engine.overlays.TextOverlay;
@@ -19,14 +20,16 @@ import java.io.File;
 import static me.piitex.app.views.chats.ChatView.buildTextFlow;
 
 public class ChatBoxCard extends CardContainer {
+    private final VerticalLayout messageBox;
     private final Character character;
     private final Chat chat;
     private final ChatMessage chatMessage;
     private final int index;
     private final ChatView parentView;
 
-    public ChatBoxCard(Character character, Chat chat, ChatMessage chatMessage, int index, ChatView parentView, double width, double height) {
+    public ChatBoxCard(VerticalLayout messageBox, Character character, Chat chat, ChatMessage chatMessage, int index, ChatView parentView, double width, double height) {
         super(width, height);
+        this.messageBox = messageBox;
         this.character = character;
         this.chat = chat;
         this.chatMessage = chatMessage;
@@ -66,7 +69,7 @@ public class ChatBoxCard extends CardContainer {
         header.addElement(display);
 
         this.setBody(buildTextFlow(chatMessage, chat, index));
-        this.setFooter(parentView.buildButtonBox(this, chatMessage, index));
+        this.setFooter(parentView.buildButtonBox(messageBox, chatMessage, index));
     }
 
 }
