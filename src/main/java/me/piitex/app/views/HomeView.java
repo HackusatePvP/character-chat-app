@@ -60,7 +60,7 @@ public class HomeView {
 
         // Not thread efficient of safe. To be fair the entire application is not efficient or thread safe so why care now.
         if (App.getInstance().isLoading()) {
-            container.addRenderEvent(event -> App.getInstance().getThreadPoolManager().submitTask(() -> {
+            container.addRenderEvent(event -> App.getThreadPoolManager().submitTask(() -> {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
