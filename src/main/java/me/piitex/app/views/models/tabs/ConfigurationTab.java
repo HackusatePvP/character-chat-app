@@ -19,6 +19,7 @@ import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
+import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.containers.tabs.Tab;
@@ -235,11 +236,12 @@ public class ConfigurationTab extends Tab {
         card.setMaxSize(layout.getWidth(), 150);
 
         TextOverlay text = new TextOverlay("Danger Zone");
+        text.addStyle(Styles.TITLE_3);
         text.setTextFill(Color.RED);
         text.addStyle(Styles.DANGER);
         card.setHeader(text);
 
-        TextOverlay desc = new TextOverlay("Any changes made to model settings will require a reload. Please wait until a notification appears to ensure everything worked properly.");
+        TextFlowOverlay desc = new TextFlowOverlay("Any changes made to model settings will require a reload. Please wait until a notification appears to ensure everything worked properly.", (int) card.getWidth() - 50, 0);
         desc.addStyle(appSettings.getGlobalTextSize());
         card.setBody(desc);
 
@@ -273,7 +275,7 @@ public class ConfigurationTab extends Tab {
 
             renderProgress();
 
-            App.getInstance().getThreadPoolManager().submitTask(() -> {
+            App.getThreadPoolManager().submitTask(() -> {
                 Model model = settings.getGlobalModel();
                 if (model == null) {
                     model = App.getDefaultModel();
@@ -374,7 +376,7 @@ public class ConfigurationTab extends Tab {
 
             ServerProcess.getCurrentServer().stop();
 
-            App.getInstance().getThreadPoolManager().submitTask(() -> {
+            App.getThreadPoolManager().submitTask(() -> {
                 ServerProcess process = ServerProcess.getCurrentServer();
                 Platform.runLater(() -> {
                     if (process.isAlive()) {
@@ -516,7 +518,19 @@ public class ConfigurationTab extends Tab {
         progress.setMaxHeight(50);
         progress.setY(10);
         TextOverlay label = new TextOverlay("Starting backend...");
-        App.window.renderPopup(progress, PopupPosition.BOTTOM_CENTER, 200, 100, false, label);
+
+        EmptyContainer container = new EmptyContainer(150, 80);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(Styles.BG_DEFAULT);
+
+        VerticalLayout layout = new VerticalLayout(150, 100);
+        layout.setAlignment(Pos.CENTER);
+        container.addElement(layout);
+        layout.addElement(label);
+        layout.addElement(progress);
+
+        App.window.renderPopup(container, PopupPosition.BOTTOM_CENTER, 150, 100);
+        //App.window.renderPopup(progress, PopupPosition.BOTTOM_CENTER, 200, 100, false, label);
     }
 
 }
