@@ -50,7 +50,7 @@ public class Response {
     }
 
     public void createContext() throws JSONException {
-        App.logger.info("Creating current context tokens...");
+        App.logger.debug("Creating current context tokens...");
 
         messages = new JSONArray();
 
@@ -88,6 +88,11 @@ public class Response {
             tokens += Server.tokenize(character.getChatScenario());
         }
 
+        List<String> processedLores = new ArrayList<>();
+        List<String> loreItems = new ArrayList<>(character.getLorebook().keySet());
+        loreItems.addAll(user.getLorebook().keySet());
+
+
         LinkedList<ChatMessage> chatMessages = chat.getMessages(); // Now returns ChatMessage objects
         Collections.reverse(chatMessages);
 
@@ -96,26 +101,54 @@ public class Response {
         for (ChatMessage s : chatMessages) {
             tokens += Server.tokenize(s.getContent());
             if (tokens < maxTokens) {
+                // Process lore with each chat message
+                // Lore works with "keys" which are words.
+                // If the "word" is typed add the lore value if it's not already processed.
+                // This is poorly optimized as it has multiple nested loops.
+                // It does run async but not really a good fix.
+                for (String input : s.getContent().split(" ")) {
+                    input = input.trim();
+                    if (input.isEmpty()) continue;
+
+                    for (String loreEntry : loreItems) {
+                        String lore = character.getLorebook().get(loreEntry);
+                        if (lore == null || lore.isEmpty()) {
+                            lore = user.getLorebook().get(loreEntry);
+                        }
+                        lore = lore.trim();
+
+                        String[] loreKeys = loreEntry.split(",");
+
+                        boolean process = false;
+                        for (String key : loreKeys) {
+                            key = key.trim();
+                            if (input.toLowerCase().contains(key.toLowerCase())) {
+                                process = true;
+                                break;
+                            }
+                        }
+                        if (process) {
+                            if (!processedLores.contains(loreEntry)) {
+                                processedLores.add(loreEntry);
+                                JSONObject loreItem = new JSONObject();
+                                try {
+                                    loreItem.put("role", "system");
+                                    loreItem.put("content", format(lore, character, user));
+                                    messages.put(loreItem);
+                                    tokens += Server.tokenize(lore);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+                    }
+                }
                 chatContext.add(s);
             } else {
                 break;
             }
         }
 
-        character.getLorebook().forEach((s, s2) -> {
-            if (prompt.toLowerCase().contains(s.toLowerCase())) {
-                if (!messages.toString().contains(s2)) {
-                    JSONObject lore = new JSONObject();
-                    try {
-                        lore.put("role", "system");
-                        lore.put("content", format(s2, character, user));
-                        messages.put(lore);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
 
         Collections.reverse(chatContext);
 
