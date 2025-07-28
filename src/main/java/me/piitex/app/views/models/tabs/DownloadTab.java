@@ -256,7 +256,6 @@ public class DownloadTab extends Tab {
                     addDownloadedTag(tileLayout);
                     downloadIcon.getNode().setDisable(true);
                 }
-                fileInfoFetcher.shutdown();
 
                 // Write long
                 downloadCache.set(dlKey + ".name", fileName);
@@ -335,8 +334,6 @@ public class DownloadTab extends Tab {
             tileLayout.getPane().getChildren().remove(stopButton.render());
             tileLayout.getPane().getChildren().remove(downloadSpeed);
 
-            downloadProcess.shutdown();
-
             if (result.isSuccess()) {
                 addDownloadedTag(tileLayout);
             } else {
@@ -362,7 +359,6 @@ public class DownloadTab extends Tab {
                 tileLayout.getPane().getChildren().removeIf(node -> node instanceof RingProgressIndicator || (node instanceof Text && ((Text)node).getText().equals(new FontIcon(Material2MZ.STOP_CIRCLE).toString())));
                 downloadIcon.getNode().setDisable(false);
             });
-            downloadProcess.shutdown();
 
             fileInfoRef.get().setDownloaded(false);
         });

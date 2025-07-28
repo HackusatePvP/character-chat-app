@@ -20,18 +20,13 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileDownloadProcess {
 
     private static final Pattern FILENAME_PATTERN = Pattern.compile("filename\\*?=['\"]?(?:UTF-8''|)([^;\"\\s]+)");
-
-    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     private DownloadCompleteListener downloadCompleteListener;
     private DownloadProgressListener downloadProgressListener;
@@ -161,7 +156,7 @@ public class FileDownloadProcess {
         DownloadTask task = new DownloadTask(null);
         currentDownloadTasks.put(fileUrl, task);
 
-        Future<?> future = executorService.submit(() -> {
+        Future<?> future = App.getThreadPoolManager().submitTask(() -> {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 HttpGet httpGet = new HttpGet(fileUrl);
 
@@ -296,7 +291,7 @@ public class FileDownloadProcess {
     }
 
     public void getFileInfoByUrlAsync(String fileUrl) {
-        executorService.submit(() -> {
+        App.getThreadPoolManager().submitTask(() -> {
             DownloadResult result = getFileInfoByUrl(fileUrl);
             if (fileInfoCompleteListener != null) {
                 fileInfoCompleteListener.onFileInfoComplete(result);
@@ -391,18 +386,6 @@ public class FileDownloadProcess {
             App.logger.error("Error occurred while downloading model!", e);
         }
         return Optional.empty();
-    }
-
-    public void shutdown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 
     public static Map<String, FileDownloadProcess> getCurrentDownloads() {
