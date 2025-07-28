@@ -141,17 +141,16 @@ public class ServerProcess {
         }
 
         // Reasoning Template
-        if (!settings.getReasoningTemplate().equalsIgnoreCase("disabled") && !settings.getReasoningTemplate().equalsIgnoreCase("none")) {
+        if (!model.getSettings().getReasoningTemplate().equalsIgnoreCase("disabled") && !settings.getReasoningTemplate().equalsIgnoreCase("none")) {
             App.logger.debug("Enabling response format...");
             parameters.add("--reasoning-format");
-            parameters.add(settings.getReasoningTemplate());
+            parameters.add(model.getSettings().getReasoningTemplate());
         }
 
-        // Chat Template
-        if (!settings.getChatTemplate().equalsIgnoreCase("default")) {
+        if (!model.getSettings().getChatTemplate().equalsIgnoreCase("default")) {
             App.logger.debug("Setting chat template...");
             parameters.add("--chat-template");
-            parameters.add(settings.getChatTemplate());
+            parameters.add(model.getSettings().getChatTemplate());
         }
 
         // Jinja Chat Template
