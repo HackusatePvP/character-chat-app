@@ -1,11 +1,9 @@
 package me.piitex.app;
 
-import atlantafx.base.theme.PrimerDark;
 import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import javafx.application.Application;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.DeviceProcess;
@@ -18,7 +16,6 @@ import me.piitex.engine.RenConfiguration;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.loaders.ImageLoader;
-import me.piitex.engine.overlays.TextAreaOverlay;
 
 import java.awt.*;
 import java.io.File;
@@ -74,8 +71,8 @@ public class JavaFXLoad extends Application {
         // Disable image caching.
         // Useful for most apps but not this one
         // Causes issues when changing a user or character image as the path will remain the same.
+        // This is because the pathing for the image doesn't change but the gets replaced by the new image.
         ImageLoader.useCache = false;
-
 
         Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(false).setDimensions(setWidth, setHeight).build();
 
@@ -109,8 +106,6 @@ public class JavaFXLoad extends Application {
         icon.addExitItem("Exit", e -> App.shutdown());
         icon.setOnAction(event -> {
             App.logger.info("Handling tray action");
-
-            // Not working
             stage.show();
             stage.toFront();
             stage.setIconified(false);
