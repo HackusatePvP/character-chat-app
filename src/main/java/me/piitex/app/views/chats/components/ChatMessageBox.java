@@ -50,8 +50,6 @@ public class ChatMessageBox extends VerticalLayout {
                 parentView.getLayout().removeElement(imageCard);
             }
         }
-
-        System.out.println("Adding to root...");
         parentView.getLayout().addElement(this);
 
     }

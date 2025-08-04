@@ -62,8 +62,6 @@ public class ChatView extends EmptyContainer {
     public ChatView(Character character, @Nullable Chat chat) {
         super(800, 600);
 
-        System.out.println("Calling 1");
-
         this.character = character;
         if (chat == null) {
             if (character.getLastChat() != null) {
@@ -86,8 +84,6 @@ public class ChatView extends EmptyContainer {
 
     public ChatView(Character character, @Nullable Chat chat, boolean create) {
         super(800, 600);
-
-        System.out.println("Calling 2");
 
         this.character = character;
         if (create) {
@@ -166,9 +162,7 @@ public class ChatView extends EmptyContainer {
         });
 
         sidebarView.setOnCollapseStateChange((aBoolean) -> {
-            System.out.println("Handling...");
             if (aBoolean) {
-                System.out.println("Expanding scroll view...");
                 scrollContainer.getScrollPane().setPrefWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
                 scrollContainer.getScrollPane().setMaxWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
                 scrollContainer.getScrollPane().setMinWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
@@ -334,7 +328,6 @@ public class ChatView extends EmptyContainer {
                 if (previousSender == Role.ASSISTANT) {
                     CardContainer card = (CardContainer) previous.getElements().values().stream().filter(element -> element instanceof CardContainer).findAny().orElse(null);
                     if (card != null) {
-                        System.out.println("Card is not null... Removing regen button...");
                         HorizontalLayout buttonLayout = (HorizontalLayout) card.getFooterLayout();
                         buttonLayout.removeElement(buttonLayout.getElements().lastKey());
                     }
