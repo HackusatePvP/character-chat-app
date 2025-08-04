@@ -38,7 +38,6 @@ public class App {
 
     private volatile boolean loading = false;
 
-
     public App() {
         logger.info("Initializing application...");
         instance = this;
@@ -65,8 +64,8 @@ public class App {
         }
 
         threadPoolManager.submitTask(() -> {
-            loadUserTemplates();
             loading = true;
+            loadUserTemplates();
             loadCharacters();
             loading = false;
         });
@@ -83,7 +82,12 @@ public class App {
 
     public void loadCharacters() {
         logger.info("Loading characters...");
-        for (File file : getCharactersDirectory().listFiles()) {
+        File[] files = getCharactersDirectory().listFiles();
+        if (files == null) {
+            logger.error("Could not initialize characters directory. Program may lack permission to access file system.");
+            return;
+        }
+        for (File file : files) {
             if (file.isDirectory()) {
                 String id = file.getName();
                 // Check if info file exists
@@ -98,7 +102,12 @@ public class App {
 
     public void loadUserTemplates() {
         logger.info("Loading users...");
-        for (File file : getUsersDirectory().listFiles()) {
+        File[] files = getUsersDirectory().listFiles();
+        if (files == null) {
+            logger.error("Could not initialize users directory. Program may lack permission to access file system.");
+            return;
+        }
+        for (File file : files) {
             if (file.isDirectory()) {
                 String id = file.getName();
                 // Check if info file exists
@@ -213,7 +222,6 @@ public class App {
     public static List<Model> getModels() {
         return getModels(null); // Call the overloaded method with null to get all.
     }
-
 
     private static void findGGUFModelsRecursive(@NotNull File directory, List<Model> models, String filterType) {
         File[] files = directory.listFiles();
