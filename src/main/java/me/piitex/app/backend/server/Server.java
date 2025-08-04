@@ -1,17 +1,12 @@
 package me.piitex.app.backend.server;
 
-import atlantafx.base.controls.Card;
 import javafx.application.Platform;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.text.TextFlow;
 import me.piitex.app.App;
-import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
-import me.piitex.app.backend.Role;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
-import me.piitex.app.views.chats.ChatView;
-import me.piitex.engine.hanlders.events.OverlayClickEvent;
+import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.overlays.TextFlowOverlay;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -55,8 +50,8 @@ public class Server {
         return object.getString("status");
     }
 
-    public static String generateResponseOAIStream(ScrollPane scrollPane, Card card, Response response) throws JSONException, IOException, InterruptedException {
-        App.logger.info("Generating response from server...");
+    public static String generateResponseOAIStream(ScrollPane scrollPane, CardContainer card, Response response) throws JSONException, IOException, InterruptedException {
+        App.logger.info("Collecting response from server...");
         HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
         ModelSettings settings = response.getCharacter().getModelSettings();
         JSONObject toPost = new JSONObject();
@@ -137,22 +132,8 @@ public class Server {
                         // Apply coloring for roleplay. Yellow around quotes, blue around astrix
                         updated = Placeholder.applyDynamicBBCode(updated);
 
-                        TextFlowOverlay textFlow = ChatView.buildTextFlow(new ChatMessage(Role.ASSISTANT, updated, null), response.getChat(), response.getIndex());
-
-                        TextFlow fxFlow = (TextFlow) textFlow.render();
-                        textFlow.setNode(fxFlow);
-                        fxFlow.setOnMouseClicked(event -> {
-                            if (textFlow.getOnClick() != null) {
-                                textFlow.getOnClick().onClick(new OverlayClickEvent(textFlow, event, event.getSceneX(), event.getSceneY()));
-                            }
-                        });
-
-                        card.setBody(fxFlow);
-                        fxFlow.widthProperty().addListener(observable -> {
-                            if (scrollPane.getVvalue() >= 0.93) {
-                                scrollPane.setVvalue(1);
-                            }
-                        });
+                        TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBodyOverlay();
+                        textFlowOverlay.setText(updated);
 
                     });
                 }
