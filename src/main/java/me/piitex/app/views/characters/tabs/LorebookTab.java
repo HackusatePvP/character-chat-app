@@ -8,8 +8,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import me.piitex.app.App;
-import me.piitex.app.backend.Character;
-import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
@@ -18,15 +16,11 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.InputFieldOverlay;
-import me.piitex.engine.overlays.TextAreaOverlay;
-import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 public class LorebookTab extends Tab {
 
@@ -80,7 +74,7 @@ public class LorebookTab extends Tab {
         HorizontalLayout buttonBox = new HorizontalLayout(200, 50);
         buttonBox.setAlignment(Pos.CENTER);
 
-        ButtonOverlay add = new ButtonOverlay("add", "Add");
+        ButtonOverlay add = new ButtonBuilder("add").setText("Add").build();
         add.addStyle(Styles.SUCCESS);
         add.addStyle(Styles.BUTTON_OUTLINED);
         buttonBox.addElement(add);
@@ -152,7 +146,7 @@ public class LorebookTab extends Tab {
         });
         card.setBody(entryValue);
 
-        ButtonOverlay remove = new ButtonOverlay("remove", "Remove");
+        ButtonOverlay remove = new ButtonBuilder("remove").setText("Remove").build();
         remove.setX(170);
         remove.addStyle(Styles.DANGER);
         remove.addStyle(Styles.BUTTON_OUTLINED);

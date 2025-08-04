@@ -87,7 +87,7 @@ public class ConfigurationTab extends Tab {
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        ButtonOverlay button = new ButtonOverlay("location", "Select Location");
+        ButtonOverlay button = new ButtonBuilder("location").setText("Set Location").build();
         button.setTooltip(settings.getModelPath());
         container.setAction(button);
 
@@ -250,17 +250,17 @@ public class ConfigurationTab extends Tab {
         layout.setAlignment(Pos.CENTER);
         card.setFooter(layout);
 
-        start = new ButtonOverlay("start", "Start");
+        start = new ButtonBuilder("start").setText("Start").build();
         start.setEnabled(true);
         start.addStyle(Styles.SUCCESS);
         start.addStyle(Styles.BUTTON_OUTLINED);
 
-        reload = new ButtonOverlay("reload", "Reload");
+        reload = new ButtonBuilder("reload").setText("Reload").build();
         reload.setEnabled(true);
         reload.setTextFill(Color.YELLOW);
         reload.addStyle(Styles.BUTTON_OUTLINED);
 
-        stop = new ButtonOverlay("stop", "Stop");
+        stop = new ButtonBuilder("stop").setText("Stop").build();
         stop.setEnabled(true);
         stop.addStyle(Styles.DANGER);
         stop.addStyle(Styles.BUTTON_OUTLINED);

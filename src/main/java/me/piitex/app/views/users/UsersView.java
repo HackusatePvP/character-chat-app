@@ -14,10 +14,7 @@ import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.ImageOverlay;
-import me.piitex.engine.overlays.MessageOverlay;
-import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -36,7 +33,7 @@ public class UsersView {
 
         root.addElement(new SidebarView(root, false).getRoot());
 
-        ButtonOverlay create = new ButtonOverlay("create", "Create User");
+        ButtonOverlay create = new ButtonBuilder("create").setText("Create User").build();
         create.addStyle(Styles.SUCCESS);
         create.addStyle(Styles.BUTTON_OUTLINED);
         create.setX(900);
@@ -163,12 +160,12 @@ public class UsersView {
         delete.onClick(event -> {
             DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + user.getId() + "'?", 500, 500);
 
-            ButtonOverlay cancel = new ButtonOverlay("cancel", "Keep");
+            ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
             cancel.setWidth(150);
             cancel.addStyle(Styles.SUCCESS);
             cancel.onClick(event1 -> App.window.removeContainer(dialogueContainer));
 
-            ButtonOverlay confirm = new ButtonOverlay("confirm", "Delete");
+            ButtonOverlay confirm = new ButtonBuilder("confirm").setText("Delete").build();
             confirm.setWidth(150);
             confirm.addStyle(Styles.DANGER);
             confirm.onClick(event1 -> {

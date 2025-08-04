@@ -241,7 +241,7 @@ public class ChatView extends EmptyContainer {
     public VerticalLayout buildSendBox() {
         send = new RichTextAreaOverlay("", "Type your response.", CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         send.setMaxHeight(CHAT_SEND_BOX_HEIGHT);
-        submit = new ButtonOverlay("submit", "Send");
+        submit = new ButtonBuilder("submit").setText("Send").build();
 
         VerticalLayout sendBox = new SendBox(send, submit, this, CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         sendBox.setMaxSize(CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);

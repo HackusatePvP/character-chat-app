@@ -130,14 +130,14 @@ public class ModelTab extends Tab {
 
             DialogueContainer dialogueContainer = new DialogueContainer("To edit the model settings you must exit the page. Ensure you have saved any changes.", 500, 500);
 
-            ButtonOverlay stay = new ButtonOverlay("stay", "Save");
+            ButtonOverlay stay = new ButtonBuilder("stay").setText("Save").build();
             stay.setWidth(150);
             stay.addStyle(Styles.SUCCESS);
             stay.onClick(event1 -> {
                 App.window.removeContainer(dialogueContainer);
             });
 
-            ButtonOverlay leave = new ButtonOverlay("leave", "Configure Model Settings");
+            ButtonOverlay leave = new ButtonBuilder("leave").setText("Configure Model Settings").build();
             leave.setWidth(150);
             leave.addStyle(Styles.DANGER);
             leave.onClick(event1 -> {

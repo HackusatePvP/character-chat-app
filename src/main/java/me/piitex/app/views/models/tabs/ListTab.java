@@ -152,14 +152,14 @@ public class ListTab extends Tab {
 
                 DialogueContainer dialogueContainer = new DialogueContainer("Are you sure you want to delete this model?", 500, 500);
 
-                ButtonOverlay stay = new ButtonOverlay("cancel", "Cancel");
+                ButtonOverlay stay = new ButtonBuilder("cancel").setText("Cancel").build();
                 stay.setWidth(150);
                 stay.addStyle(Styles.SUCCESS);
                 stay.onClick(event1 -> {
                     App.window.removeContainer(dialogueContainer);
                 });
 
-                ButtonOverlay leave = new ButtonOverlay("delete", "Delete");
+                ButtonOverlay leave = new ButtonBuilder("delete").setText("Delete").build();
                 leave.setWidth(150);
                 leave.addStyle(Styles.DANGER);
                 leave.onClick(event1 -> {

@@ -163,7 +163,7 @@ public class CharacterTab extends Tab {
         });
         root.addElement(charDisplayName);
 
-        ButtonOverlay importCard = new ButtonOverlay("import", "Import Character Card");
+        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import Character Card").build();
         if (character != null) {
             importCard.setEnabled(false);
         }

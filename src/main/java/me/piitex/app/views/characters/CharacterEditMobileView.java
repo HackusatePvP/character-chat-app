@@ -203,7 +203,7 @@ public class CharacterEditMobileView {
         });
 
         // Make this a file chooser
-        ButtonOverlay importCard = new ButtonOverlay("import", "Import Character Card");
+        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import Character Card").build();
         if (character != null) {
             importCard.setEnabled(false);
         }
@@ -454,7 +454,7 @@ public class CharacterEditMobileView {
         HorizontalLayout buttonBox = new HorizontalLayout(200, 50);
         buttonBox.setAlignment(Pos.CENTER);
 
-        ButtonOverlay add = new ButtonOverlay("add", "Add");
+        ButtonOverlay add = new ButtonBuilder("add").setText("Add").build();
         add.addStyle(Styles.SUCCESS);
         add.addStyle(Styles.BUTTON_OUTLINED);
         buttonBox.addElement(add);
@@ -529,7 +529,7 @@ public class CharacterEditMobileView {
         TextAreaOverlay value = new TextAreaOverlay(loreItems.get(key), 0, 0, 200, 200);
         card.setBody(value);
 
-        ButtonOverlay remove = new ButtonOverlay("remove", "Remove");
+        ButtonOverlay remove = new ButtonBuilder("remove").setText("Remove").build();
         remove.setX(60);
         remove.addStyle(Styles.DANGER);
         remove.addStyle(Styles.BUTTON_OUTLINED);
@@ -653,12 +653,12 @@ public class CharacterEditMobileView {
         layout.setSpacing(20);
         layout.setAlignment(Pos.CENTER);
 
-        ButtonOverlay cancel = new ButtonOverlay("cancel", "Cancel");
+        ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Cancel").build();
         cancel.addStyle(Styles.DANGER);
         cancel.addStyle(Styles.BUTTON_OUTLINED);
         layout.addElement(cancel);
 
-        ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
+        ButtonOverlay submit = new ButtonBuilder("submit").setText("Submit").build();
         submit.addStyle(Styles.SUCCESS);
         submit.addStyle(Styles.BUTTON_OUTLINED);
         layout.addElements(submit);
@@ -667,7 +667,7 @@ public class CharacterEditMobileView {
             // Confirm the cancel before leaving!!!
             DialogueContainer dialogueContainer = new DialogueContainer("Do you want to exit?", 500, 500);
 
-            ButtonOverlay stay = new ButtonOverlay("cancel", "Stay");
+            ButtonOverlay stay = new ButtonBuilder("cancel").setText("Stay").build();
             stay.setWidth(150);
             stay.addStyle(Styles.SUCCESS);
             stay.onClick(event1 -> {
@@ -675,7 +675,7 @@ public class CharacterEditMobileView {
                 App.window.removeContainer(dialogueContainer);
             });
 
-            ButtonOverlay leave = new ButtonOverlay("cancel", "Leave");
+            ButtonOverlay leave = new ButtonBuilder("cancel").setText("Leave").build();
             leave.setWidth(150);
             leave.addStyle(Styles.DANGER);
             leave.onClick(event1 -> {

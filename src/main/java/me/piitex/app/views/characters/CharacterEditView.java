@@ -28,6 +28,7 @@ import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.app.backend.Character;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
 import org.fxmisc.richtext.StyledTextArea;
@@ -261,12 +262,12 @@ public class CharacterEditView {
         layout.setSpacing(20);
         layout.setAlignment(Pos.CENTER);
 
-        ButtonOverlay cancel = new ButtonOverlay("cancel", "Cancel");
+        ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Cancel").build();
         cancel.addStyle(Styles.DANGER);
         cancel.addStyle(Styles.BUTTON_OUTLINED);
         layout.addElement(cancel);
 
-        ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
+        ButtonOverlay submit = new ButtonBuilder("submit").setText("Submit").build();
         submit.addStyle(Styles.SUCCESS);
         submit.addStyle(Styles.BUTTON_OUTLINED);
         layout.addElements(submit);
@@ -274,14 +275,14 @@ public class CharacterEditView {
         cancel.onClick(event -> {
             DialogueContainer dialogueContainer = new DialogueContainer("Do you want to exit without saving?", 500, 500);
 
-            ButtonOverlay stay = new ButtonOverlay("stay", "Stay");
+            ButtonOverlay stay = new ButtonBuilder("stay").setText("Stay").build();
             stay.setWidth(150);
             stay.addStyle(Styles.SUCCESS);
             stay.onClick(event1 -> {
                 App.window.removeContainer(dialogueContainer);
             });
 
-            ButtonOverlay leave = new ButtonOverlay("leave", "Leave");
+            ButtonOverlay leave = new ButtonBuilder("leave").setText("Leave").build();
             leave.setWidth(150);
             leave.addStyle(Styles.DANGER);
             leave.onClick(event1 -> {

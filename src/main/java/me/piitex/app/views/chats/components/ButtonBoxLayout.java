@@ -18,6 +18,7 @@ import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.ModalContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.TextAreaOverlay;
 import me.piitex.engine.overlays.TextOverlay;
@@ -97,7 +98,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
             TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(contentForEdit), 0, 0, 400, 300);
             verticalLayout.addElement(area);
 
-            ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
+            ButtonOverlay submit = new ButtonBuilder("submit").setText("Submit").build();
             submit.addStyle(Styles.SUCCESS);
             verticalLayout.addElement(submit);
 
