@@ -232,8 +232,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public CardContainer buildDangerZone() {
-        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 150);
-        card.setMaxSize(layout.getWidth(), 150);
+        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 200);
+        card.setMaxSize(layout.getWidth(), 200);
 
         TextOverlay text = new TextOverlay("Danger Zone");
         text.addStyle(Styles.TITLE_3);
@@ -515,22 +515,22 @@ public class ConfigurationTab extends Tab {
     private void renderProgress() {
         // Display progress bar for backend loading
         ProgressBarOverlay progress = new ProgressBarOverlay();
-        progress.setWidth(120);
+        progress.setWidth(200);
         progress.setMaxHeight(50);
         progress.setY(10);
         TextOverlay label = new TextOverlay("Starting backend...");
 
-        EmptyContainer container = new EmptyContainer(150, 80);
+        EmptyContainer container = new EmptyContainer(300, 100);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(Styles.BG_DEFAULT);
 
-        VerticalLayout layout = new VerticalLayout(150, 100);
+        VerticalLayout layout = new VerticalLayout(300, 100);
         layout.setAlignment(Pos.CENTER);
         container.addElement(layout);
         layout.addElement(label);
         layout.addElement(progress);
 
-        App.window.renderPopup(container, PopupPosition.BOTTOM_CENTER, 150, 100);
+        App.window.renderPopup(container, PopupPosition.BOTTOM_CENTER, 300, 100);
         //App.window.renderPopup(progress, PopupPosition.BOTTOM_CENTER, 200, 100, false, label);
     }
 
