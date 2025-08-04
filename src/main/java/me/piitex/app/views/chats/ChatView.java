@@ -1,6 +1,5 @@
 package me.piitex.app.views.chats;
 
-import atlantafx.base.controls.Card;
 import atlantafx.base.theme.Styles;
 import com.drew.lang.annotations.Nullable;
 import javafx.application.Platform;
@@ -11,8 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.*;
@@ -24,8 +21,8 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.chats.components.*;
-import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
+import me.piitex.engine.Renderer;
 import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -163,12 +160,38 @@ public class ChatView extends EmptyContainer {
 
         sidebarView.setOnCollapseStateChange((aBoolean) -> {
             if (aBoolean) {
-                scrollContainer.getScrollPane().setPrefWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
-                scrollContainer.getScrollPane().setMaxWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
-                scrollContainer.getScrollPane().setMinWidth(CHAT_VIEW_SCROLL_WIDTH + 50);
+                updateNodeWidth(layout,150);
+                scrollContainer.setWidth(CHAT_VIEW_SCROLL_WIDTH + 300);
+            } else {
+                updateNodeWidth(layout,-150);
+                scrollContainer.setWidth(CHAT_VIEW_SCROLL_WIDTH - 300);
             }
         });
 
+    }
+
+    private void updateNodeWidth(Renderer renderer, double offset) {
+        renderer.setWidth(renderer.getWidth() + offset);
+        renderer.getElements().forEach((integer, element) -> {
+            if (element instanceof Region region) {
+                region.setWidth(region.getWidth() + offset);
+                region.setPrefWidth(region.getPrefWidth() + offset);
+                region.setMaxWidth(region.getMaxWidth() + offset);
+            }
+            if (element instanceof TextFlowOverlay textFlowOverlay) {
+                for (Overlay overlay : textFlowOverlay.getTexts()) {
+                    if (overlay instanceof Region region) {
+                        region.setWidth(region.getWidth() + offset);
+                        region.setPrefWidth(region.getPrefWidth() + offset);
+                        region.setMaxWidth(region.getMaxWidth() + offset);
+                    }
+                }
+            }
+            if (element instanceof Renderer region) {
+                region.setWidth(region.getWidth() + offset);
+                updateNodeWidth(region, offset);
+            }
+        });
     }
 
     public ChoiceBoxOverlay buildSelection() {

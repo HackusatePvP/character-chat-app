@@ -39,7 +39,7 @@ public class ChatBoxCard extends CardContainer {
     }
 
     public void buildCard() {
-        this.setMaxSize(getWidth(), getHeight());
+        this.setMaxSize(messageBox.getWidth(), getHeight());
         String iconPath = "";
         String displayName = "";
         Role role = chatMessage.getSender();
