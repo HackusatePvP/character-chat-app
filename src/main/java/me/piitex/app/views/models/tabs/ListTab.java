@@ -135,8 +135,9 @@ public class ListTab extends Tab {
             settings.addStyle(Styles.ACCENT);
             settings.addStyle(Styles.LARGE);
             settings.onClick(event -> {
-                App.window.clearContainers();
                 App.window.getScene().setCursor(Cursor.WAIT);
+
+                App.window.clearContainers();
                 App.window.addContainer(new ModelEditView(model.getSettings()).getContainer());
 
                 App.window.getScene().setCursor(Cursor.DEFAULT);
