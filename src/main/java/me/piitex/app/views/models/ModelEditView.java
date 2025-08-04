@@ -165,9 +165,9 @@ public class ModelEditView {
         info.setTooltip("Controls the creativity and randomness of the model's output. Higher values make the output more diverse and surprising, while lower values make it more focused, deterministic.");
         tileContainer.setGraphic(info);
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, temperature);
+        SpinnerNumberOverlay<Double> input = new SpinnerNumberOverlay<>(0, Double.MAX_VALUE, temperature);
         input.onValueChange(event -> {
-            this.temperature = event.getNewValue();
+            this.temperature = (double) event.getNewValue();
         });
         tileContainer.setAction(input);
 
@@ -186,9 +186,9 @@ public class ModelEditView {
         info.setTooltip("Min-P keeps only tokens whose probability is at least 'p' times the probability of the most likely token. A value of 0 disables this filtering.");
         tileContainer.setGraphic(info);
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, minP);
+        SpinnerNumberOverlay<Double> input = new SpinnerNumberOverlay<>(0, Double.MAX_VALUE, minP);
         input.onValueChange(event -> {
-            this.minP = event.getNewValue();
+            this.minP = (double) event.getNewValue();
         });
         tileContainer.setAction(input);
 
@@ -207,9 +207,9 @@ public class ModelEditView {
         info.setTooltip("Higher values (e.g, 1.1-1.5) aggressively discourage repetition, while a value of 1.0 applies no penalty. This helps in generating more varied and natural-sounding responses.");
         tileContainer.setGraphic(info);
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, repeatPenalty);
+        SpinnerNumberOverlay<Double> input = new SpinnerNumberOverlay<Double>(0, Double.MAX_VALUE, repeatPenalty);
         input.onValueChange(event -> {
-            this.repeatPenalty = event.getNewValue();
+            this.repeatPenalty = (double) event.getNewValue();
         });
         tileContainer.setAction(input);
 
@@ -228,7 +228,7 @@ public class ModelEditView {
         info.setTooltip("A larger value means the model will look further back in its generated text to avoid repeating phrases or patterns.");
         tileContainer.setGraphic(info);
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, repeatTokens);
+        SpinnerNumberOverlay<Integer> input = new SpinnerNumberOverlay<>(0, Integer.MAX_VALUE, repeatTokens);
         input.onValueChange(event -> {
             this.repeatTokens = (int) event.getNewValue();
         });
@@ -356,16 +356,15 @@ public class ModelEditView {
         layout.setSpacing(50);
         layout.setX((appSettings.getWidth() - 300) / 2);
 
-        ButtonOverlay discard = new ButtonOverlay("disc", "Discard");
+        ButtonOverlay discard = new ButtonBuilder("discard").setText("Discard").build();
         discard.addStyle(Styles.DANGER);
         discard.addStyle(Styles.BUTTON_OUTLINED);
         discard.onClick(event -> {
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView().getContainer());
-            App.window.render();
+            App.window.addContainer(new ModelsView());
         });
 
-        ButtonOverlay submit = new ButtonOverlay("submit", "Submit");
+        ButtonOverlay submit = new ButtonBuilder("submit").setText("Submit").build();
         submit.addStyle(Styles.SUCCESS);
         submit.addStyle(Styles.BUTTON_OUTLINED);
         submit.onClick(event -> {
@@ -381,8 +380,7 @@ public class ModelEditView {
             settings.setJinja(jinja);
 
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView().getContainer());
-            App.window.render();
+            App.window.addContainer(new ModelsView());
         });
 
         layout.addElements(discard, submit);

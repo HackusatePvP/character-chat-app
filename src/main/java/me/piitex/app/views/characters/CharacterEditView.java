@@ -286,8 +286,7 @@ public class CharacterEditView {
             leave.addStyle(Styles.DANGER);
             leave.onClick(event1 -> {
                 App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
+                App.window.addContainer(new HomeView());
             });
 
             dialogueContainer.setCancelButton(stay);
@@ -353,9 +352,7 @@ public class CharacterEditView {
                 }
 
                 App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
-
+                App.window.addContainer(new HomeView());
             } catch (IOException e) {
                 App.logger.error("Failed to save character: ", e);
             }

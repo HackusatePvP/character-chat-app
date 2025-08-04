@@ -11,7 +11,6 @@ import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
-import me.piitex.engine.Container;
 import me.piitex.engine.RenConfiguration;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
@@ -58,8 +57,8 @@ public class JavaFXLoad extends Application {
             App.logger.info("Forcefully resetting view to 1280x720.");
             setWidth = 1280;
             setHeight = 720;
-            App.getInstance().getAppSettings().setWidth(1280);
-            App.getInstance().getAppSettings().setHeight(720);
+            App.getInstance().getAppSettings().setWidth(setWidth);
+            App.getInstance().getAppSettings().setHeight(setHeight);
         }
 
         App.logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
@@ -71,11 +70,10 @@ public class JavaFXLoad extends Application {
         // Disable image caching.
         // Useful for most apps but not this one
         // Causes issues when changing a user or character image as the path will remain the same.
-        // This is because the pathing for the image doesn't change but the gets replaced by the new image.
+        // This is because the pathing for the image doesn't change but the image gets replaced by the new image.
         ImageLoader.useCache = false;
 
         Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(false).setDimensions(setWidth, setHeight).build();
-
         App.window = window;
 
         Stage stage = window.getStage();
@@ -86,8 +84,7 @@ public class JavaFXLoad extends Application {
             if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown()) {
                 App.logger.debug("Resetting view...");
                 App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
+                App.window.addContainer(new HomeView());
             }
             if (event.getCode() == KeyCode.C && event.isControlDown() && event.isShiftDown()) {
                 App.logger.debug("Resetting character data...");
@@ -99,8 +96,8 @@ public class JavaFXLoad extends Application {
 
         // Build home view
         App.logger.info("Navigating to home page.");
-        Container container = new HomeView().getContainer();
-        window.addContainer(container);
+        window.clearContainers();
+        window.addContainer(new HomeView());
 
         FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
         icon.addExitItem("Exit", e -> App.shutdown());
@@ -112,8 +109,6 @@ public class JavaFXLoad extends Application {
         });
 
         icon.show();
-
-        window.render();
 
         // Sub thread as not to block JavaFX from initializing.
         App.getThreadPoolManager().submitTask(() -> {

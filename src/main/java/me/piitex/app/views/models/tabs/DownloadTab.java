@@ -15,10 +15,11 @@ import me.piitex.app.backend.FileDownloadProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.ConfigUtil;
 import me.piitex.engine.containers.ScrollContainer;
-import me.piitex.engine.containers.TitledContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
+import me.piitex.engine.layouts.TitledLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -116,10 +117,10 @@ public class DownloadTab extends Tab {
 
                 DownloadModel downloadModel = new DownloadModel(key, name, rawLinks);
 
-                TitledContainer downloadContainer = createDownloadContainer(name, description, downloadModel);
+                TitledLayout downloadContainer = createDownloadContainer(name, description, downloadModel);
 
                 Platform.runLater(() -> {
-                    Node node = downloadContainer.build().getKey();
+                    Node node = downloadContainer.render();
                     // Check is needed for race condition. If a download is in progress the container may already be mapped to children.
                     if (!downloadListLayout.getPane().getChildren().contains(node)) {
                         downloadListLayout.getPane().getChildren().add(node);
@@ -129,8 +130,8 @@ public class DownloadTab extends Tab {
         });
     }
 
-    private TitledContainer createDownloadContainer(String title, String description, DownloadModel downloadModel) {
-        TitledContainer titledContainer = new TitledContainer(title, 0, 0);
+    private TitledLayout createDownloadContainer(String title, String description, DownloadModel downloadModel) {
+        TitledLayout titledContainer = new TitledLayout(title, 0, 0);
         titledContainer.addStyle(Styles.DENSE);
         titledContainer.addStyle(Tweaks.ALT_ICON);
         titledContainer.setSpacing(CONTAINER_SPACING);
@@ -149,14 +150,14 @@ public class DownloadTab extends Tab {
         return titledContainer;
     }
 
-    private HorizontalLayout createDownloadTile(TitledContainer titledContainer, String quantization, String url, String modelKey) {
+    private HorizontalLayout createDownloadTile(TitledLayout titledContainer, String quantization, String url, String modelKey) {
         HorizontalLayout tileLayout = new HorizontalLayout(TILE_LAYOUT_WIDTH, TILE_LAYOUT_HEIGHT);
         tileLayout.setAlignment(Pos.CENTER_LEFT);
         tileLayout.addStyle(Styles.BORDER_MUTED);
         tileLayout.addStyle(appSettings.getGlobalTextSize());
         tileLayout.setSpacing(50);
 
-        ButtonOverlay downloadIcon = new ButtonOverlay("download", new FontIcon(Material2MZ.SAVE_ALT));
+        ButtonOverlay downloadIcon = new ButtonBuilder("download").setIcon(new FontIcon(Material2MZ.SAVE_ALT)).build();
         downloadIcon.addStyle(Styles.ACCENT);
         downloadIcon.addStyle(Styles.BUTTON_CIRCLE);
         downloadIcon.addStyle(Styles.BUTTON_OUTLINED);
@@ -164,7 +165,6 @@ public class DownloadTab extends Tab {
         tileLayout.addElement(downloadIcon);
 
         TextOverlay quantizationText = new TextOverlay(quantization);
-        quantizationText.setWidth(QUANT_WIDTH);
         quantizationText.setUnderline(true);
         quantizationText.addStyle(Styles.TEXT_BOLD);
         quantizationText.setTooltip("The smaller the quantization the better performance. Comes at the cost of quality.");
@@ -366,7 +366,7 @@ public class DownloadTab extends Tab {
     }
 
     private void addDownloadedTag(HorizontalLayout tileLayout) {
-        ButtonOverlay tag = new ButtonOverlay("tag", "Downloaded");
+        ButtonOverlay tag = new ButtonBuilder("tag").setText("Downloaded").build();
         tag.setEnabled(false);
         tag.addStyle(Styles.BUTTON_OUTLINED);
         Platform.runLater(() -> tileLayout.getPane().getChildren().add(tag.render()));

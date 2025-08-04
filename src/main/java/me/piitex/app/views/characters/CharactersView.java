@@ -118,11 +118,9 @@ public class CharactersView {
 
                     // Load chat window...
                     App.window.clearContainers();
-                    Container container = new ChatView(character, character.getLastChat()).getContainer();
-                    App.window.addContainer(container);
+                    App.window.addContainer(new ChatView(character, character.getLastChat()));
 
                     Platform.runLater(() -> {
-                        App.window.render();
                         App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
                     });
                 }
@@ -200,8 +198,6 @@ public class CharactersView {
             Platform.runLater(() -> {
                 App.window.clearContainers();
                 App.window.addContainer(container);
-                App.window.render();
-
                 App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
             });
         });
@@ -225,20 +221,19 @@ public class CharactersView {
         CharacterEditView editView = new CharacterEditView(duplicated, true);
         App.window.clearContainers();
         App.window.addContainer(editView.getRoot());
-        App.window.render();
     }
 
     private void deleteCharacter(Character character) {
         DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + character.getId() + "'?", 500, 500);
 
-        ButtonOverlay cancel = new ButtonOverlay("cancel", "Keep");
+        ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
         cancel.setWidth(150);
         cancel.addStyle(Styles.SUCCESS);
         cancel.onClick(event1 -> {
             App.window.removeContainer(dialogueContainer);
         });
 
-        ButtonOverlay confirm = new ButtonOverlay("confirm", "Delete");
+        ButtonOverlay confirm = new ButtonBuilder("confirm").setText("Delete").build();
         confirm.setWidth(150);
         confirm.addStyle(Styles.DANGER);
         confirm.onClick(event1 -> {
@@ -250,8 +245,7 @@ public class CharactersView {
             }
 
             App.window.clearContainers();
-            App.window.addContainer(new HomeView().getContainer());
-            App.window.render();
+            App.window.addContainer(new HomeView());
         });
 
         dialogueContainer.setCancelButton(cancel);

@@ -13,10 +13,10 @@ import me.piitex.app.views.models.ModelsView;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.ScrollContainer;
-import me.piitex.engine.containers.TitledContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.Layout;
+import me.piitex.engine.layouts.TitledLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -72,7 +72,7 @@ public class ListTab extends Tab {
             DecimalFormat df = new DecimalFormat("#.##");
             String formattedFileSize = df.format(fileSizeInGB);
 
-            TitledContainer root = new TitledContainer(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, 0);
+            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, 0);
             root.addStyle(Styles.DENSE);
             root.setMaxSize(900, 250);
             root.setSpacing(30);
@@ -121,8 +121,7 @@ public class ListTab extends Tab {
                 model.getSettings().setDefault(event.getNewValue());
 
                 App.window.clearContainers();
-                App.window.addContainer(new ModelsView().getContainer());
-                App.window.render();
+                App.window.addContainer(new ModelsView());
             });
 
             HorizontalLayout subFooter = new HorizontalLayout(400, 50);
@@ -137,10 +136,10 @@ public class ListTab extends Tab {
             settings.addStyle(Styles.LARGE);
             settings.onClick(event -> {
                 System.out.println("Handling...");
-                App.window.getScene().setCursor(Cursor.WAIT);
                 App.window.clearContainers();
+                App.window.getScene().setCursor(Cursor.WAIT);
                 App.window.addContainer(new ModelEditView(model.getSettings()).getContainer());
-                App.window.render();
+
                 App.window.getScene().setCursor(Cursor.DEFAULT);
             });
 
@@ -175,7 +174,6 @@ public class ListTab extends Tab {
                             Platform.runLater(() -> {
                                 layout.removeAllElements();
                                 buildModelCards(layout);
-                                App.window.render();
                             });
 
                         } else {

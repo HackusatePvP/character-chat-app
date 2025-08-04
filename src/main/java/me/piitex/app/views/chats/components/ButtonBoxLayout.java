@@ -112,7 +112,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
                     Card card = (Card) messageBox.getPane().getChildren().stream().filter(node -> node instanceof Card).findAny().orElse(null);
                     if (card != null) {
-                        card.setBody(ChatView.buildTextFlow(updatedChatMessage, chat, index).build());
+                        card.setBody(ChatView.buildTextFlow(updatedChatMessage, chat, index).assemble());
                     }
                 }
 
@@ -134,9 +134,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
         delete.setTooltip("Delete the message.");
         addElement(delete);
         delete.onClick(event -> {
-            // Delete the message
-            //TODO: Add confirm for deleting
-            parentView.getLayout().getPane().getChildren().removeLast();
+            parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
             chat.removeMessage(index);
             chat.update();
         });
@@ -157,21 +155,15 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
                 // Remove the line which is the last line of the chat
                 chat.removeMessage(index);
-                parentView.getLayout().getPane().getChildren().removeLast();
+                parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
 
-                // Generate new box with
-                //CardContainer responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size(), true); // Set content later
-                VerticalLayout responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size(), true);
-
-                // Gen response
+                VerticalLayout responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size());
                 Response response = new Response(index, chat.getLastLine(index).getContent(), character, character.getUser(), chat);
                 chat.setResponse(response);
 
-                // Disable buttons to prevent spamming
-                parentView.getSend().getNode().setDisable(true);
-                parentView.getSubmit().getNode().setDisable(true);
+                parentView.getSend().setEnabled(false);
+                parentView.getSubmit().setEnabled(false);
                 parentView.generateResponse(response, chatMessage, responseBox);
-
             });
         }
     }

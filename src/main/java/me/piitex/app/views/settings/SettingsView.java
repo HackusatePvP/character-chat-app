@@ -94,7 +94,6 @@ public class SettingsView {
 
             App.window.clearContainers();
             App.window.addContainer(new SettingsView().getContainer());
-            App.window.render();
         });
 
         tileContainer.setAction(selection);

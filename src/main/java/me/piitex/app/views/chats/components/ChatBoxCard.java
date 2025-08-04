@@ -39,8 +39,6 @@ public class ChatBoxCard extends CardContainer {
     }
 
     public void buildCard() {
-        /*CardContainer cardContainer = new CardContainer(appSettings.getWidth() - 350, 0); // Width, height
-        cardContainer.setMaxSize(appSettings.getWidth() - 350, 0);*/
         this.setMaxSize(getWidth(), getHeight());
         String iconPath = "";
         String displayName = "";
@@ -55,8 +53,8 @@ public class ChatBoxCard extends CardContainer {
 
         ImageOverlay avatar = new ImageOverlay(new ImageLoader(new File(iconPath)));
         avatar.setPreserveRatio(false);
-        avatar.setWidth(128);
-        avatar.setHeight(128);
+        avatar.setFitWidth(128);
+        avatar.setFitHeight(128);
 
         HorizontalLayout header = new HorizontalLayout(900 ,0);
         header.setAlignment(Pos.CENTER_LEFT);

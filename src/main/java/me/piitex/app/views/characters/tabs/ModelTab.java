@@ -15,10 +15,7 @@ import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.ComboBoxOverlay;
-import me.piitex.engine.overlays.MessageOverlay;
-import me.piitex.engine.overlays.ToggleSwitchOverlay;
+import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -121,7 +118,7 @@ public class ModelTab extends Tab {
         container.setTitle("Model Settings");
         container.setDescription("Click on the gear icon to edit character specific model settings. This will override global model settings.");
 
-        ButtonOverlay buttonOverlay = new ButtonOverlay("", new FontIcon(Material2MZ.SETTINGS));
+        ButtonOverlay buttonOverlay = new ButtonBuilder("").setIcon(new FontIcon(Material2MZ.SETTINGS)).build();
         buttonOverlay.onClick(event -> {
             if (character == null) {
                 MessageOverlay messageOverlay = new MessageOverlay("Warning", "You must create the character before editing the model settings.");
@@ -146,7 +143,6 @@ public class ModelTab extends Tab {
             leave.onClick(event1 -> {
                 App.window.clearContainers();
                 App.window.addContainer(new ModelEditView(character.getModelSettings()).getContainer());
-                App.window.render();
             });
 
             dialogueContainer.setCancelButton(stay);

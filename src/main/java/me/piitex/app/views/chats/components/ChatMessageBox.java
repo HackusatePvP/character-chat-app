@@ -19,17 +19,15 @@ public class ChatMessageBox extends VerticalLayout {
     private final ChatMessage chatMessage;
     private final int index;
     private final ChatView parentView;
-    private final boolean render;
 
 
-    public ChatMessageBox(Character character, Chat chat, ChatMessage chatMessage, int index, ChatView parentView, boolean render, double width, double height) {
+    public ChatMessageBox(Character character, Chat chat, ChatMessage chatMessage, int index, ChatView parentView, double width, double height) {
         super(width, height);
         this.character = character;
         this.chat = chat;
         this.chatMessage = chatMessage;
         this.index = index;
         this.parentView = parentView;
-        this.render = render;
 
         initialize();
     }
@@ -49,22 +47,13 @@ public class ChatMessageBox extends VerticalLayout {
             if (file.exists()) {
                 ImageCard imageCard = new ImageCard(chatMessage, file.getName(), CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_IMAGE_HEIGHT);
                 addElement(imageCard);
-
-                if (render) {
-                    if (parentView.getLayout().getPane() != null) {
-                        parentView.getLayout().getPane().getChildren().add(imageCard.build().getKey());
-                    }
-                }
-
+                parentView.getLayout().removeElement(imageCard);
             }
         }
 
         System.out.println("Adding to root...");
         parentView.getLayout().addElement(this);
 
-        if (render) {
-            parentView.getLayout().getPane().getChildren().add(render());
-        }
     }
 
 }

@@ -4,12 +4,10 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharactersView;
 import me.piitex.app.views.server.ServerLayout;
-import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
@@ -17,26 +15,30 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 
-public class HomeView {
-    private final Container container;
+public class HomeView extends EmptyContainer {
+    private final HorizontalLayout root;
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public HomeView() {
-        HorizontalLayout root;
+        super(600, 1080);
         if (App.mobile) {
-            container = new EmptyContainer(600, 1080);
             root = new HorizontalLayout(600, 1080);
         } else {
-            container = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
+            setWidth(appSettings.getWidth());
+            setHeight(appSettings.getHeight());
             root = new HorizontalLayout(appSettings.getWidth(), appSettings.getHeight());
         }
+
+        addElement(root);
+
+        init();
+    }
+
+    public void init() {
         root.addStyle(Styles.BG_INSET);
-
         root.addElement(new SidebarView(root, false).getRoot());
-
         root.setSpacing(35);
-        container.addElement(root);
 
         if (App.getInstance().isLoading()) {
             VerticalLayout layout = new VerticalLayout(1920, 0);
@@ -49,28 +51,19 @@ public class HomeView {
 
             root.addElement(layout);
         } else {
-            if (!App.getInstance().getCharacters().isEmpty()) {
-                root.addElement(new CharactersView().getRoot());
-            } else {
-                root.addElement(buildInstructions());
-            }
+            buildBody(root);
         }
 
-        container.addElement(new ServerLayout(appSettings.getWidth(), 50));
-
-        // Not thread efficient of safe. To be fair the entire application is not efficient or thread safe so why care now.
+        addElement(new ServerLayout(appSettings.getWidth(), 50));
         if (App.getInstance().isLoading()) {
-            container.addRenderEvent(event -> App.getThreadPoolManager().submitTask(() -> {
+            addRenderEvent(event -> App.getThreadPoolManager().submitTask(() -> {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
                     if (!loading) break;
                 }
-
                 Platform.runLater(() -> {
-                    App.window.clearContainers();
-                    App.window.addContainer(new HomeView().getContainer());
-                    App.window.render();
+                    buildBody(root);
                 });
             }));
         }
@@ -82,8 +75,6 @@ public class HomeView {
             error.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
         }
-
-
     }
 
     public CardContainer buildInstructions() {
@@ -106,6 +97,8 @@ public class HomeView {
         VerticalLayout bodyLayout = new VerticalLayout(600, 500);
 
         TextFlowOverlay body = new TextFlowOverlay("", 600, 500);
+        bodyLayout.addElement(body);
+
         body.addStyle(Styles.TITLE_4);
         body.add(new TextOverlay("1. Navigate to settings.\n\n"));
         body.add(new TextOverlay("2. Set a compatible backend. If you do not want to download drivers select Vulkan.\n\n"));
@@ -118,7 +111,6 @@ public class HomeView {
         body.add(new TextOverlay("9. Go back to settings and start the server.\n\n"));
         body.add(new TextOverlay("10. (Optional) Create a User Template.\n\n"));
         body.add(new TextOverlay("11. Create a character.\n"));
-        bodyLayout.addElement(body);
 
         card.setBody(bodyLayout);
 
@@ -134,7 +126,11 @@ public class HomeView {
 
     }
 
-    public Container getContainer() {
-        return container;
+    public void buildBody(HorizontalLayout root) {
+        if (!App.getInstance().getCharacters().isEmpty()) {
+            root.addElement(new CharactersView().getRoot());
+        } else {
+            root.addElement(buildInstructions());
+        }
     }
 }

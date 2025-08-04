@@ -142,8 +142,8 @@ public class User {
         // They always seem to be too far to the right.
         overlay.setX(-10);
 
-        overlay.setWidth(width);
-        overlay.setHeight(height);
+        overlay.setFitWidth(width);
+        overlay.setFitHeight(height);
         return overlay;
     }
 

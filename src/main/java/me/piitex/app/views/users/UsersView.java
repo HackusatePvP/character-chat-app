@@ -45,7 +45,6 @@ public class UsersView {
         create.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new UserEditView(null).getRoot());
-            App.window.render();
         });
 
         root.addElement(build());
@@ -129,7 +128,6 @@ public class UsersView {
             UserEditView editView = new UserEditView(user);
             App.window.clearContainers();
             App.window.addContainer(editView.getRoot());
-            App.window.render();
         });
         root.addElement(edit);
 
@@ -154,7 +152,6 @@ public class UsersView {
             UserEditView editView = new UserEditView(duplicated, true);
             App.window.clearContainers();
             App.window.addContainer(editView.getRoot());
-            App.window.render();
         });
         root.addElement(duplicate);
 
@@ -183,8 +180,7 @@ public class UsersView {
                 }
 
                 App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
+                App.window.addContainer(new HomeView());
             });
 
             dialogueContainer.setCancelButton(cancel);

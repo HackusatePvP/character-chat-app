@@ -235,7 +235,6 @@ public class CharacterEditMobileView {
 
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, user, infoFile, characterTab).getRoot());
-                App.window.render();
 
             } catch (ImageProcessingException | IOException e) {
                 throw new RuntimeException(e);
@@ -266,8 +265,8 @@ public class CharacterEditMobileView {
         }
 
         ImageOverlay image = new ImageOverlay(new ImageLoader(characterIconPath));
-        image.setWidth(128);
-        image.setHeight(128);
+        image.setFitWidth(128);
+        image.setFitHeight(128);
         image.setPreserveRatio(false);
         layout.addElement(image, 2);
 
@@ -287,7 +286,6 @@ public class CharacterEditMobileView {
                 infoFile.set("icon-path", directory.getAbsolutePath());
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, user, infoFile, characterTab).getRoot());
-                App.window.render();
             }
         });
 
@@ -368,8 +366,8 @@ public class CharacterEditMobileView {
         }
 
         ImageOverlay image = new ImageOverlay(new ImageLoader(userIconPath));
-        image.setWidth(128);
-        image.setHeight(128);
+        image.setFitWidth(128);
+        image.setFitHeight(128);
         image.setPreserveRatio(false);
         layout.addElement(image, 2);
 
@@ -389,7 +387,6 @@ public class CharacterEditMobileView {
                 infoFile.set("icon-path", directory.getAbsolutePath());
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, user, infoFile, userTab).getRoot());
-                App.window.render();
             }
         });
 
@@ -429,7 +426,6 @@ public class CharacterEditMobileView {
             // Also want to render the user tab
             App.window.clearContainers();
             App.window.addContainer(new CharacterEditView(character, user, infoFile, userTab).getRoot());
-            App.window.render();
         });
 
         return root;
@@ -685,8 +681,7 @@ public class CharacterEditMobileView {
             leave.onClick(event1 -> {
                 // Close dialogue and return to home page
                 App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
+                App.window.addContainer(new HomeView());
             });
 
             dialogueContainer.setCancelButton(stay);
@@ -765,8 +760,7 @@ public class CharacterEditMobileView {
             App.getInstance().getCharacters().put(characterId, character);
 
             App.window.clearContainers();
-            App.window.addContainer(new HomeView().getContainer());
-            App.window.render();
+            App.window.addContainer(new HomeView());
 
         });
 

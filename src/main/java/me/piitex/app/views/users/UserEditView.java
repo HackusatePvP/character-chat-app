@@ -164,8 +164,8 @@ public class UserEditView {
         }
 
         ImageOverlay image = new ImageOverlay(new ImageLoader(iconPath));
-        image.setWidth(128);
-        image.setHeight(128);
+        image.setFitWidth(128);
+        image.setFitHeight(128);
         image.setPreserveRatio(false);
         layout.addElement(image, 2);
 
@@ -185,7 +185,6 @@ public class UserEditView {
                 infoFile.set("icon-path", directory.getAbsolutePath());
                 App.window.clearContainers();
                 App.window.addContainer(new UserEditView(user, infoFile).getRoot());
-                App.window.render();
             }
         });
 
@@ -397,8 +396,7 @@ public class UserEditView {
             leave.onClick(event1 -> {
                 // Close dialogue and return to home page
                 App.window.clearContainers();
-                App.window.addContainer(new HomeView().getContainer());
-                App.window.render();
+                App.window.addContainer(new HomeView());
             });
 
             dialogueContainer.setCancelButton(stay);
@@ -447,7 +445,6 @@ public class UserEditView {
 
             App.window.clearContainers();
             App.window.addContainer(new UsersView().getRoot());
-            App.window.render();
 
         });
 

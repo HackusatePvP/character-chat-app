@@ -13,10 +13,10 @@ import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.app.views.users.UsersView;
-import me.piitex.engine.Container;
 import me.piitex.engine.Renderer;
 import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -104,54 +104,47 @@ public class SidebarView {
 
         });
 
-        ButtonOverlay home = new ButtonOverlay("home", "Home");
+        ButtonOverlay home = new ButtonBuilder("home").setText("Home").build();
         home.addStyle(appSettings.getGlobalTextSize());
         home.setWidth(rootWidth);
         root.addElement(home);
         home.onClick(event -> {
             App.window.clearContainers();
-            App.window.addContainer(new HomeView().getContainer());
-            App.window.render();
+            App.window.addContainer(new HomeView());
         });
 
-        ButtonOverlay settings = new ButtonOverlay("home", "Settings");
+        ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").build();
         settings.addStyle(appSettings.getGlobalTextSize());
         settings.setWidth(rootWidth);
         root.addElement(settings);
         settings.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new SettingsView().getContainer());
-            App.window.render();
         });
 
-        ButtonOverlay models = new ButtonOverlay("models", "Models / Backend");
+        ButtonOverlay models = new ButtonBuilder("models").setText("Models / Backend").build();
         models.addStyle(appSettings.getGlobalTextSize());
         models.setWidth(rootWidth);
         root.addElement(models);
         models.onClick(event -> {
             App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
-            Container container = new ModelsView().getContainer();
             App.window.clearContainers();
-            App.window.addContainer(container);
+            App.window.addContainer(new ModelsView());
+            App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
 
-            Platform.runLater(() -> {
-                App.window.render();
-                App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
-            });
         });
 
-        ButtonOverlay users = new ButtonOverlay("users", "User Templates");
+        ButtonOverlay users = new ButtonBuilder("users").setText("User Template").build();
         users.addStyle(appSettings.getGlobalTextSize());
         users.setWidth(rootWidth);
         root.addElement(users);
         users.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new UsersView().getRoot());
-            App.window.render();
         });
 
-        ButtonOverlay characters = new ButtonOverlay("characters", "Create Character");
+        ButtonOverlay characters = new ButtonBuilder("characters").setText("Characters").build();
         characters.addStyle(appSettings.getGlobalTextSize());
         characters.setWidth(rootWidth);
         root.addElement(characters);
@@ -162,7 +155,6 @@ public class SidebarView {
             } else {
                 App.window.addContainer(new CharacterEditView(null).getRoot());
             }
-            App.window.render();
         });
     }
 
@@ -171,7 +163,7 @@ public class SidebarView {
     }
 
     private ButtonOverlay buildExpand() {
-        ButtonOverlay buttonOverlay = new ButtonOverlay("expand", new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT));
+        ButtonOverlay buttonOverlay = new ButtonBuilder("expand").setIcon(new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT)).build();
         buttonOverlay.setWidth(32);
         buttonOverlay.setHeight(32);
         return buttonOverlay;

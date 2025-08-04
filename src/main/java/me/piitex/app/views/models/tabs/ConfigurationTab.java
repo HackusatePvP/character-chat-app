@@ -100,12 +100,12 @@ public class ConfigurationTab extends Tab {
             settings.setModelPath(file.getAbsolutePath());
 
             // Will refresh the entire view.
-            modelsView.getContainer().getElements().clear();
+            modelsView.getElements().clear();
             modelsView.build();
 
-            Pane pane = (Pane) modelsView.getContainer().getView();
+            Pane pane = (Pane) modelsView.getView();
             pane.getChildren().clear();
-            pane.getChildren().addAll(modelsView.getContainer().build().getValue());
+            pane.getChildren().addAll(modelsView.build().getValue());
 
         });
 
@@ -251,14 +251,17 @@ public class ConfigurationTab extends Tab {
         card.setFooter(layout);
 
         start = new ButtonOverlay("start", "Start");
+        start.setEnabled(true);
         start.addStyle(Styles.SUCCESS);
         start.addStyle(Styles.BUTTON_OUTLINED);
 
         reload = new ButtonOverlay("reload", "Reload");
+        reload.setEnabled(true);
         reload.setTextFill(Color.YELLOW);
         reload.addStyle(Styles.BUTTON_OUTLINED);
 
         stop = new ButtonOverlay("stop", "Stop");
+        stop.setEnabled(true);
         stop.addStyle(Styles.DANGER);
         stop.addStyle(Styles.BUTTON_OUTLINED);
 
@@ -419,7 +422,6 @@ public class ConfigurationTab extends Tab {
                         Platform.runLater(() -> {
                             if (App.window.getCurrentPopup() != null) { // Check if popup still exists
                                 App.window.removeContainer(App.window.getCurrentPopup());
-                                App.window.render();
 
                                 start.getNode().setDisable(false);
                                 stop.getNode().setDisable(false);
@@ -481,7 +483,6 @@ public class ConfigurationTab extends Tab {
                 // Once done re-render
                 App.window.clearContainers();
                 App.window.addContainer(new SettingsView().getContainer());
-                App.window.render();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

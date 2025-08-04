@@ -95,8 +95,8 @@ public class UserTab extends Tab {
         }
 
         ImageOverlay image = new ImageOverlay(new ImageLoader(currentIconPath));
-        image.setWidth(128);
-        image.setHeight(128);
+        image.setFitWidth(128);
+        image.setFitHeight(128);
         image.setPreserveRatio(false);
         layout.addElement(image, 2);
 
@@ -120,7 +120,6 @@ public class UserTab extends Tab {
                 parentView.updateInfoData();
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, parentView.getUser(), infoFile, this).getRoot());
-                App.window.render();
             }
         });
 
@@ -165,7 +164,6 @@ public class UserTab extends Tab {
             parentView.updateInfoData();
             App.window.clearContainers();
             App.window.addContainer(new CharacterEditView(character, template, parentView.getInfoFile(), this).getRoot());
-            App.window.render();
         });
 
         return root;

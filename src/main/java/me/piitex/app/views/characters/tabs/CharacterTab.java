@@ -10,7 +10,6 @@ import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -29,7 +28,6 @@ public class CharacterTab extends Tab {
 
     private final AppSettings appSettings;
     private final CharacterEditView parentView;
-
 
     private RichTextAreaOverlay charDescription;
     private InputFieldOverlay charIdInput;
@@ -75,7 +73,20 @@ public class CharacterTab extends Tab {
         charDescription.setMaxWidth(800);
         charDescription.addStyle(appSettings.getChatTextSize());
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
-        rootLayout.addElement(charDescription);
+
+        CardContainer cardContainer = new CardContainer(850, 400 * scaleFactor);
+        cardContainer.addStyle(Styles.BG_INSET);
+        cardContainer.addStyle(Styles.BORDER_DEFAULT);
+
+        cardContainer.setMaxSize(800, 0);
+
+        TextOverlay header = new TextOverlay("Character Persona");
+        header.addStyle(Styles.TITLE_4);
+
+        cardContainer.setHeader(header);
+        cardContainer.setBody(charDescription);
+
+        rootLayout.addElement(cardContainer);
 
         this.addElement(parentView.buildSubmitBox());
     }
@@ -99,8 +110,8 @@ public class CharacterTab extends Tab {
         }
 
         ImageOverlay image = new ImageOverlay(new ImageLoader(currentIconPath));
-        image.setWidth(128);
-        image.setHeight(128);
+        image.setFitWidth(128);
+        image.setFitHeight(128);
         image.setPreserveRatio(false);
         layout.addElement(image, 2);
 
@@ -124,7 +135,6 @@ public class CharacterTab extends Tab {
                 parentView.updateInfoData();
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(character, user, parentView.getInfoFile(), this).getRoot());
-                App.window.render();
             }
         });
         return root;
@@ -180,7 +190,6 @@ public class CharacterTab extends Tab {
                 parentView.updateInfoData();
                 App.window.clearContainers();
                 App.window.addContainer(new CharacterEditView(parentView.getCharacter(), parentView.getUser(), parentView.getInfoFile(), this).getRoot());
-                App.window.render();
 
             } catch (ImageProcessingException | IOException e) {
                 App.logger.error("Error importing character card: ", e);

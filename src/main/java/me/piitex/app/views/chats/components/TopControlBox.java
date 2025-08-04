@@ -56,11 +56,11 @@ public class TopControlBox extends HorizontalLayout {
 
             Role role = lastLine.getSender();
             if (role == Role.ASSISTANT) {
-                parentView.getLayout().getPane().getChildren().removeLast();
-                parentView.getLayout().getPane().getChildren().removeLast();
+                parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
+                parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
 
                 if (lastLine.hasImage()) {
-                    parentView.getLayout().getPane().getChildren().removeLast();
+                    parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
                 }
 
                 // Remove assistant
@@ -68,20 +68,20 @@ public class TopControlBox extends HorizontalLayout {
 
                 // Copy user message and then remove it
                 ChatMessage content = chat.getMessage(index - 2);
-                ((StyledTextArea) send.getNode()).replaceText(content.getContent());
+                send.setCurrentText(content.getContent());
                 chat.removeMessage(index - 2);
 
                 chat.update();
             } else {
                 // The last message is user
                 // Just remove the message from the chat and put it back into the box.
-                parentView.getLayout().getPane().getChildren().removeLast();
+                parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
 
                 if (lastLine.hasImage()) {
-                    parentView.getLayout().getPane().getChildren().removeLast();
+                    parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
                 }
 
-                ((StyledTextArea) send.getNode()).replaceText(lastLine.getContent());
+                send.setCurrentText(lastLine.getContent());
                 chat.removeMessage(index - 1);
                 chat.update();
             }

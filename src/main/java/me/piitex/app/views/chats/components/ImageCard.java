@@ -1,13 +1,13 @@
 package me.piitex.app.views.chats.components;
 
 import me.piitex.app.backend.ChatMessage;
-import me.piitex.engine.containers.TitledContainer;
+import me.piitex.engine.layouts.TitledLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.ImageOverlay;
 
 import java.io.File;
 
-public class ImageCard extends TitledContainer {
+public class ImageCard extends TitledLayout {
     private final ChatMessage chatMessage;
 
     public ImageCard(ChatMessage chatMessage, String title, double width, double height) {
