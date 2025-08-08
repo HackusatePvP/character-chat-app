@@ -29,6 +29,7 @@ public class SendBox extends VerticalLayout {
 
     public void buildSendBox() {
         setAlignment(Pos.CENTER);
+        setSpacing(0);
 
 
         addElement(parentView.buildTopControls());
