@@ -205,18 +205,24 @@ public class ChatView extends EmptyContainer {
         selection.setMaxWidth(CHAT_VIEW_SELECTION_WIDTH);
         selection.setMaxHeight(CHAT_VIEW_SELECTION_HEIGHT);
 
-        selection.onClick(event -> {
-            selection.onItemSelect(event1 -> {
-                String item = event1.getItem();
-                Chat next = character.getChat(item);
-                if (next != null && !next.getFile().getName().equalsIgnoreCase(chat.getFile().getName())) {
-                    next.loadChat();
-                }
+        selection.onItemSelect(event1 -> {
+            System.out.println("Selected: " + event1.getItem());
+            String item = event1.getItem();
 
-                App.window.clearContainers();
-                App.window.addContainer(new ChatView(character, next, true));
+            if (item.equals(chat.getFile().getName())) {
+                return;
+            }
 
-            });
+            Chat next = character.getChat(item);
+            if (next != null && !next.getFile().getName().equalsIgnoreCase(chat.getFile().getName())) {
+                next.loadChat();
+            }
+
+            ChoiceBox<String> choiceBox = (ChoiceBox<String>) selection.getNode();
+            choiceBox.getSelectionModel().clearSelection();
+
+            App.window.clearContainers();
+            App.window.addContainer(new ChatView(character, next, true));
         });
 
         return selection;
