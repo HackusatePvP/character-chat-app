@@ -45,10 +45,15 @@ public class CharacterTab extends Tab {
         this.setWidth(appSettings.getWidth() - 300);
         this.setHeight(appSettings.getHeight());
 
-        VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
+        VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 315, 0);
         rootLayout.setSpacing(40);
         rootLayout.setAlignment(Pos.TOP_CENTER);
-        this.addElement(rootLayout);
+
+        //this.addElement(rootLayout);
+        ScrollContainer scrollContainer = new ScrollContainer(rootLayout, 0, 0, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setPannable(true);
+        this.addElement(scrollContainer);
 
         HorizontalLayout displayBox = new HorizontalLayout(500, 200);
         displayBox.setMaxSize(500, 200);
