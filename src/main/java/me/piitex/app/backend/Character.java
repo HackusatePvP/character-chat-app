@@ -30,6 +30,10 @@ public class Character {
 
     private Map<String, String> lorebook = new TreeMap<>();
 
+    // sender, dialogue
+    // Assistant: "How can I help you?" *I asked pointedly.*
+    private Map<String, String> exampleDialogue = new TreeMap<>();
+
     private final List<Chat> chats = new ArrayList<>();
 
     private boolean shownDisclaimer = false;
@@ -79,6 +83,9 @@ public class Character {
         }
         if (infoFile.hasKey("lore")) {
             this.lorebook = infoFile.getStringMap("lore");
+        }
+        if (infoFile.hasKey("dialogue")) {
+            this.exampleDialogue = infoFile.getStringMap("dialogue");
         }
         if (infoFile.hasKey("last-chat")) {
             String last = infoFile.get("last-chat");
@@ -258,6 +265,15 @@ public class Character {
     public void setLorebook(Map<String, String> lorebook) {
         this.lorebook = lorebook;
         infoFile.set("lore", lorebook);
+    }
+
+    public Map<String, String> getExampleDialogue() {
+        return exampleDialogue;
+    }
+
+    public void setExampleDialogue(Map<String, String> exampleDialogue) {
+        this.exampleDialogue = exampleDialogue;
+        infoFile.set("dialogue", exampleDialogue);
     }
 
     public File getCharacterDirectory() {

@@ -79,19 +79,11 @@ public class CharacterTab extends Tab {
         charDescription.addStyle(appSettings.getChatTextSize());
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
 
-        CardContainer cardContainer = new CardContainer(850, 400 * scaleFactor);
-        cardContainer.addStyle(Styles.BG_INSET);
-        cardContainer.addStyle(Styles.BORDER_DEFAULT);
+        rootLayout.addElement(charDescription);
 
-        cardContainer.setMaxSize(800, 0);
-
-        TextOverlay header = new TextOverlay("Character Persona");
-        header.addStyle(Styles.TITLE_4);
-
-        cardContainer.setHeader(header);
-        cardContainer.setBody(charDescription);
-
-        rootLayout.addElement(cardContainer);
+        VerticalLayout dialogueLayout = new VerticalLayout(0, 0);
+        InputFieldOverlay dialogue = new InputFieldOverlay("", "{character}: Dialogue prompt", 0, 0, 400, -1);
+        //rootLayout.addElement(dialogueLayout);
 
         this.addElement(parentView.buildSubmitBox());
     }
