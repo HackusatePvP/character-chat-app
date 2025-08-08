@@ -43,7 +43,7 @@ public class ConfigurationTab extends Tab {
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
     private VerticalLayout layout;
-
+    private InputFieldOverlay runningModel;
     private ButtonOverlay start, stop, reload;
 
     private final ServerSettings settings = App.getInstance().getSettings();
@@ -117,8 +117,8 @@ public class ConfigurationTab extends Tab {
     public TileContainer buildCurrentModel() {
         TileContainer container = new TileContainer(0, 0);
         container.setMaxSize(layout.getWidth(), 100);
-        container.setTitle("Current Model");
-        container.setDescription("Set the current model. This will override the default model.");
+        container.setTitle("Model Selection");
+        container.setDescription("Select a model to use. Will require a \"reload\".");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
@@ -223,10 +223,10 @@ public class ConfigurationTab extends Tab {
         }
         String input = (model != null ? model.getFile().getAbsolutePath() : "null");
 
-        InputFieldOverlay inputFieldOverlay = new InputFieldOverlay(input, 0, 0, 400, 50);
-        inputFieldOverlay.setEnabled(false);
+        runningModel = new InputFieldOverlay(input, 0, 0, 400, 50);
+        runningModel.setEnabled(false);
 
-        container.setAction(inputFieldOverlay);
+        container.setAction(runningModel);
 
         return container;
     }
@@ -303,6 +303,7 @@ public class ConfigurationTab extends Tab {
                         started.addStyle(Styles.SUCCESS);
                         started.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                        runningModel.setCurrentText(ServerProcess.getCurrentServer().getModel().getFile().getAbsolutePath());
                     }
                     startButton.setDisable(false);
                     reloadButton.setDisable(false);
@@ -363,6 +364,7 @@ public class ConfigurationTab extends Tab {
                         started.addStyle(Styles.SUCCESS);
                         started.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                        runningModel.setCurrentText(ServerProcess.getCurrentServer().getModel().getFile().getAbsolutePath());
                     }
                     startButton.setDisable(false);
                     reloadButton.setDisable(false);
@@ -392,6 +394,7 @@ public class ConfigurationTab extends Tab {
                         started.addStyle(Styles.SUCCESS);
                         started.addStyle(Styles.BG_DEFAULT);
                         App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                        runningModel.setCurrentText("null");
                     }
                 });
 
@@ -496,7 +499,7 @@ public class ConfigurationTab extends Tab {
     public TileContainer buildGpuDevice() {
         TileContainer container = new TileContainer(0, 0);
         container.setMaxSize(layout.getWidth(), 100);
-        container.setTitle("Backend Server");
+        container.setTitle("GPU Device");
         container.setDescription("Select the compatible GPU for your backend. Auto will automatically choose the GPU for you. Please verify that there is one more option than Auto.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
