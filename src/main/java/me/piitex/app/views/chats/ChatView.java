@@ -359,13 +359,13 @@ public class ChatView extends EmptyContainer {
         }
 
         message = Placeholder.formatPlaceholders(message, character, character.getUser());
-        ChatMessage chatMessage = new ChatMessage(Role.USER, message, (image != null ? image.getAbsolutePath() : null));
+        ChatMessage chatMessage = new ChatMessage(Role.USER, message, (image != null ? image.getAbsolutePath() : null), null);
 
         buildChatBox(chatMessage, chat.getMessages().size());
         chat.addLine(chatMessage);
 
         int assistantIndex = chat.getMessages().size();
-        ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", (image != null ? image.getAbsolutePath() : null));
+        ChatMessage newMsg = new ChatMessage(Role.ASSISTANT, "", (image != null ? image.getAbsolutePath() : null), null);
         VerticalLayout responseBox = buildChatBox(newMsg, assistantIndex); // Set content later
 
         // Gen response
@@ -388,7 +388,7 @@ public class ChatView extends EmptyContainer {
             response.setPrompt(chatMessage.getContent());
             String received;
             try {
-                received = Server.generateResponseOAIStream(scrollContainer.getScrollPane(), card, response);
+                received = Server.generateResponseOAIStream(responseBox, card, response);
             } catch (IOException e) {
                 Platform.runLater(() -> {
                     MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");
@@ -408,8 +408,9 @@ public class ChatView extends EmptyContainer {
                     }
                 });
             }
+            chatMessage.setReasoning(response.getReasoning());
 
-            chat.addLine(Role.ASSISTANT, received, (chatMessage.hasImage() ? chatMessage.getImageUrl() : null));
+            chat.addLine(Role.ASSISTANT, received, (chatMessage.hasImage() ? chatMessage.getImageUrl() : null), (chatMessage.getReasoning() != null ? chatMessage.getReasoning() : null));
             chat.getResponse().getResponses().put(chat.getResponse().getResponses().size(), received);
             chat.getResponse().update();
             send.getNode().setDisable(false);

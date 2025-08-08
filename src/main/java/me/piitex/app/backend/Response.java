@@ -27,6 +27,7 @@ public class Response {
     private File image;
 
     private String response;
+    private String reasoning;
 
     private boolean generating = false;
     private boolean halt = false;
@@ -49,7 +50,7 @@ public class Response {
         });
     }
 
-    public void createContext() throws JSONException {
+    public void createOAIContext(boolean oai) throws JSONException {
         App.logger.debug("Creating current context tokens...");
 
         messages = new JSONArray();
@@ -88,6 +89,11 @@ public class Response {
             tokens += Server.tokenize(character.getChatScenario());
         }
 
+        // FIXME: Testing out example dialogue. Some models have a tough time following instructions to the styling of their responses
+        JSONObject exampleDialogue = new JSONObject();
+        exampleDialogue.put("role", "system");
+        exampleDialogue.put("content", format("Follow the format shown in the example when responding.\nExample 1:\nassistant: \"How may I help you today?\" {character} asked with a gentle tone\nuser:\"Can you help me figure prompt engineering?\" {user} replied with a slight frustration in his voice.", character, character.getUser()));
+
         List<String> processedLores = new ArrayList<>();
         List<String> loreItems = new ArrayList<>(character.getLorebook().keySet());
         loreItems.addAll(user.getLorebook().keySet());
@@ -100,6 +106,9 @@ public class Response {
 
         for (ChatMessage s : chatMessages) {
             tokens += Server.tokenize(s.getContent());
+            if (s.getReasoning() != null) {
+                tokens += Server.tokenize(s.getReasoning());
+            }
             if (tokens < maxTokens) {
                 // Process lore with each chat message
                 // Lore works with "keys" which are words.
@@ -152,9 +161,6 @@ public class Response {
 
         Collections.reverse(chatContext);
 
-        //TODO: Add images to the chat data. That way each message can have an image as context.
-        // This would take up significant token size. I believe in the near future, per message image is possible.
-        // For now it will only use the last image uploaded.
         int index = 0;
         for (ChatMessage currentChatMessage : chatContext) {
             JSONObject chatMessageContext = new JSONObject();
@@ -163,8 +169,18 @@ public class Response {
 
             JSONObject textPart = new JSONObject();
             textPart.put("type", "text");
-            textPart.put("text", format(currentChatMessage.getContent(), character, user));
+            if (currentChatMessage.getReasoning() != null && !currentChatMessage.getReasoning() .isEmpty()) {
+                String reason = "<think> " + currentChatMessage.getReasoning()  + " </think> ";
+                textPart.put("text", format(reason + currentChatMessage.getContent(), character, user));
+            } else {
+                textPart.put("text", format(currentChatMessage.getContent(), character, user));
+            }
             contentArray.put(textPart);
+
+            //TODO: Add images to the chat data. That way each message can have an image as context.
+            // This would take up significant token size. I believe in the near future, per message image is possible.
+            // For now it will only use the last image uploaded.
+            // Only add images for open ai context.
 
             if (image != null && index == chat.getMessages().size() - 1) {
                 if (image.exists() && image.isFile()) {
@@ -174,9 +190,11 @@ public class Response {
                         String iData = Base64.getEncoder().encodeToString(fileContent);
                         JSONObject imgPart = new JSONObject();
 
-                        imgPart.put("type", "image_url");
-                        imgPart.put("image_url", new JSONObject().put("url", "data:image/" + getImageType() + ";base64," + iData));
-                        contentArray.put(imgPart);
+                        if (oai) {
+                            imgPart.put("type", "image_url");
+                            imgPart.put("image_url", new JSONObject().put("url", "data:image/" + getImageType() + ";base64," + iData));
+                            contentArray.put(imgPart);
+                        }
                     } catch (IOException e) {
                         App.logger.error("Error reading image file for base64 encoding: {}", image, e);
                     }
@@ -245,6 +263,14 @@ public class Response {
 
     public void setResponse(String response) {
         this.response = response;
+    }
+
+    public String getReasoning() {
+        return reasoning;
+    }
+
+    public void setReasoning(String reasoning) {
+        this.reasoning = reasoning;
     }
 
     public boolean isGenerating() {

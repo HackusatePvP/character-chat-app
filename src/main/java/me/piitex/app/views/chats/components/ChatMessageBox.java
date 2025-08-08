@@ -37,6 +37,9 @@ public class ChatMessageBox extends VerticalLayout {
         // 1. Thought tags if applicable
         // 2. Chat card
         // 3. Image card
+        if (chatMessage.getReasoning() != null && !chatMessage.getReasoning().isEmpty()) {
+            addElement(new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, -1));
+        }
 
         CardContainer cardContainer = new ChatBoxCard(this, character, chat, chatMessage, index, parentView, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
         addElement(cardContainer);
@@ -45,7 +48,7 @@ public class ChatMessageBox extends VerticalLayout {
         if (chatMessage.getSender() == Role.USER && chatMessage.hasImage()) {
             File file = new File(chatMessage.getImageUrl());
             if (file.exists()) {
-                ImageCard imageCard = new ImageCard(chatMessage, file.getName(), CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_IMAGE_HEIGHT);
+                ImageCard imageCard = new ImageCard(chatMessage, file.getName(), CHAT_BOX_IMAGE_WIDTH, -1);
                 addElement(imageCard);
                 parentView.getLayout().removeElement(imageCard);
             }

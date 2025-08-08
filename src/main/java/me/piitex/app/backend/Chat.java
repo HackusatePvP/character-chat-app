@@ -85,29 +85,43 @@ public class Chat {
             sender = Role.USER;
             contentPart = rawLine.substring("user:".length());
         } else {
-            // Unrecognized format, skip or log an error
             System.err.println("Warning: Unrecognized chat line format: " + rawLine);
-            return null; // Or throw an exception
+            return null;
         }
-        String content;
+
+        String content = null;
         String imageUrl = null;
+        String reasoning = null;
+
+        int reasoningDelimiterIndex = contentPart.indexOf("!!REASONING!!");
         int imgDelimiterIndex = contentPart.indexOf("!!IMG!!");
 
-        if (imgDelimiterIndex != -1) {
-            content = contentPart.substring(0, imgDelimiterIndex);
-            if (imgDelimiterIndex + "!!IMG!!".length() < contentPart.length()) {
-                imageUrl = contentPart.substring(imgDelimiterIndex + "!!IMG!!".length());
+        // Handle reasoning if present
+        if (reasoningDelimiterIndex != -1) {
+            reasoning = contentPart.substring(reasoningDelimiterIndex + "!!REASONING!!".length()).trim();
+            // Update contentPart to exclude the reasoning section
+            contentPart = contentPart.substring(0, reasoningDelimiterIndex);
+            if (reasoning.isBlank()) {
+                reasoning = null;
             }
-            if (imageUrl != null && imageUrl.isBlank()) {
+        }
+
+        // Handle image if present in the remaining contentPart
+        if (imgDelimiterIndex != -1 && imgDelimiterIndex < contentPart.length()) {
+            content = contentPart.substring(0, imgDelimiterIndex).trim();
+            imageUrl = contentPart.substring(imgDelimiterIndex + "!!IMG!!".length()).trim();
+            if (imageUrl.isBlank()) {
                 imageUrl = null;
             }
         } else {
-            content = contentPart;
+            // If no image, the entire contentPart is the content
+            content = contentPart.trim();
         }
 
         content = content.replace("!@!", "\n");
 
-        return new ChatMessage(sender, content, imageUrl);
+
+        return new ChatMessage(sender, content, imageUrl, reasoning);
     }
 
     private String chatMessageToRawLine(ChatMessage message) {
@@ -119,12 +133,15 @@ public class Chat {
         if (message.hasImage()) {
             rawLineBuilder.append("!!IMG!!").append(message.getImageUrl());
         }
+        if (message.getReasoning() != null && !message.getReasoning().isEmpty()) {
+            rawLineBuilder.append("!!REASONING!!").append(message.getReasoning().replace("\n", "!@!"));
+        }
         return rawLineBuilder.toString();
     }
 
 
-    public ChatMessage addLine(Role role, String content, String imageUrl) {
-        ChatMessage newMessage = new ChatMessage(role, content, imageUrl);
+    public ChatMessage addLine(Role role, String content, String imageUrl, String reasoning) {
+        ChatMessage newMessage = new ChatMessage(role, content, imageUrl, reasoning);
         messages.add(newMessage);
         update();
 
@@ -137,7 +154,7 @@ public class Chat {
     }
 
     public void addLine(Role role, String content) {
-        addLine(role, content, null);
+        addLine(role, content, null, null);
     }
 
     public LinkedList<ChatMessage> getMessages() {
@@ -174,7 +191,8 @@ public class Chat {
             ChatMessage updatedMessage = new ChatMessage(
                     existingMessage.getSender(),
                     newContent, // New content
-                    existingMessage.getImageUrl()
+                    existingMessage.getImageUrl(),
+                    existingMessage.getReasoning()
             );
             return replaceMessage(index, updatedMessage);
         }

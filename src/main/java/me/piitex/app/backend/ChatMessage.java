@@ -4,11 +4,13 @@ public class ChatMessage {
     private Role sender;
     private String content;
     private String imageUrl;
+    private String reasoning;
 
-    public ChatMessage(Role sender, String content, String imageUrl) {
+    public ChatMessage(Role sender, String content, String imageUrl, String reasoning) {
         this.sender = sender;
         this.content = content;
         this.imageUrl = imageUrl;
+        this.reasoning = reasoning;
     }
 
     public Role getSender() {
@@ -41,5 +43,14 @@ public class ChatMessage {
 
     public boolean hasImage() {
         return imageUrl != null && !imageUrl.isBlank();
+    }
+
+    public String getReasoning() {
+        if (reasoning == null) return null;
+        return reasoning.replace("!@!", "\n");
+    }
+
+    public void setReasoning(String reasoning) {
+        this.reasoning = reasoning;
     }
 }
