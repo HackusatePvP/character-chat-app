@@ -55,7 +55,7 @@ public class LorebookTab extends Tab {
         info.setY(10);
         rootLayout.addElement(info);
 
-        HorizontalLayout displayBox = new HorizontalLayout(0, 0);
+        HorizontalLayout displayBox = new HorizontalLayout(0, -1);
         displayBox.setSpacing(100);
         displayBox.setMaxSize(600, 0);
         rootLayout.addElement(displayBox);
@@ -116,9 +116,9 @@ public class LorebookTab extends Tab {
     }
 
     private ScrollContainer getLoreItems() {
-        VerticalLayout scrollLayout = new VerticalLayout(0, 0);
+        VerticalLayout scrollLayout = new VerticalLayout(0, -1);
 
-        ScrollContainer root = new ScrollContainer(scrollLayout, 0, 0, 450, 0);
+        ScrollContainer root = new ScrollContainer(scrollLayout, 0, 0, 450, appSettings.getHeight() - 300);
         root.setMaxSize(450, appSettings.getHeight() - 300);
         root.setVerticalScroll(true);
         root.setScrollWhenNeeded(false);

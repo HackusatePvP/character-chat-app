@@ -26,7 +26,7 @@ public class ChatTab extends Tab {
     private RichTextAreaOverlay chatScenarioInput;
     private SpinnerNumberOverlay chatContextSpinner;
 
-    private final double TEXT_AREA_HEIGHT = 150;
+    private final double TEXT_AREA_HEIGHT = -1;
 
     public ChatTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("Chat");
@@ -40,7 +40,7 @@ public class ChatTab extends Tab {
     private void buildChatTabContent(String chatFirstMessage, String chatScenario, int chatContextSize) {
         this.setWidth(appSettings.getWidth() - 300);
         this.setHeight(appSettings.getHeight());
-        int layoutSpacing = 200;
+        int layoutSpacing = 25;
 
         VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
         layout.setAlignment(Pos.TOP_CENTER);
@@ -55,7 +55,7 @@ public class ChatTab extends Tab {
         layout.addElement(firstCard);
 
         HorizontalLayout firstBox = new HorizontalLayout(0, TEXT_AREA_HEIGHT);
-        firstBox.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
+        firstBox.setMaxSize(firstBox.getWidth(), TEXT_AREA_HEIGHT);
         firstBox.setSpacing(layoutSpacing);
         firstCard.setBody(firstBox);
 

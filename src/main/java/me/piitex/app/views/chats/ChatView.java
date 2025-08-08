@@ -249,10 +249,10 @@ public class ChatView extends EmptyContainer {
     }
 
     public HorizontalLayout buildTopControls() {
-        topControls = new TopControlBox(chat, send, this,0, 0);
+        topControls = new TopControlBox(chat, send, this,0, -1);
         topControls.setX(50);
         topControls.setSpacing(20);
-        topControls.setMaxSize(1000, 50);
+        topControls.setMaxSize(1000, -1);
 
        return topControls;
     }
