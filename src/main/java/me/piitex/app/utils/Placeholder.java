@@ -79,6 +79,8 @@ public class Placeholder {
     public static String formatSymbols(String content) {
         // Replaces weird ai symbols that I find
         content = content.replace("“", "\"");
+        content = content.replace("”", "\"");
+
 
         if (!App.getInstance().getSettings().isAstrixEnabled()) {
             content = content.replace("*", "");
