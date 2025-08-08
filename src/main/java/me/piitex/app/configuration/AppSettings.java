@@ -9,7 +9,7 @@ import java.io.File;
 public class AppSettings {
     private int width = 1280, height = 720;
     private String chatTextSize = "default";
-    private String globalTextSize = "default";
+    private String globalTextSize = "title-4";
     private String imagesPath = "";
     private String theme = "Primer Dark";
 
