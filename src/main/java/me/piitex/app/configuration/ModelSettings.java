@@ -7,7 +7,9 @@ public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096; // 4096 is a good baseline. Most modern models can go way higher (32k)
     private double temperature = 0.8; // min 0
+    private double topP = 1; // min 0
     private double minP = 0.1; // min 0.05
+    private int topK = 40; // Min 0
     private int repeatTokens = 64; // min -1
     private double repeatPenalty = 1.1; // min 1.0
     private String mmProj = "None / Disabled";
@@ -40,10 +42,20 @@ public class ModelSettings {
         } else {
             infoFile.set("temperature", temperature);
         }
+        if (infoFile.hasKey("top-p")) {
+            this.topP = infoFile.getDouble("top-p");
+        } else {
+            infoFile.set("top-p", topP);
+        }
         if (infoFile.hasKey("min-p")) {
             this.minP = infoFile.getDouble("min-p");
         } else {
             infoFile.set("min-p", minP);
+        }
+        if (infoFile.hasKey("top-k")) {
+            this.topK = infoFile.getInteger("top-k");
+        } else {
+            infoFile.set("top-k", topK);
         }
         if (infoFile.hasKey("repeat-tokens")) {
             this.repeatTokens = infoFile.getInteger("repeat-tokens");
@@ -113,6 +125,17 @@ public class ModelSettings {
         }
     }
 
+    public double getTopP() {
+        return topP;
+    }
+
+    public void setTopP(double topP) {
+        this.topP = topP;
+        if (infoFile != null) {
+            infoFile.set("top-p", topP);
+        }
+    }
+
     public double getMinP() {
         return minP;
     }
@@ -121,6 +144,17 @@ public class ModelSettings {
         this.minP = minP;
         if (infoFile != null) {
             infoFile.set("min-p", minP);
+        }
+    }
+
+    public int getTopK() {
+        return topK;
+    }
+
+    public void setTopK(int topK) {
+        this.topK = topK;
+        if (infoFile != null) {
+            infoFile.set("top-k", topK);
         }
     }
 

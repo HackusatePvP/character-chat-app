@@ -30,7 +30,9 @@ public class ModelEditView {
     private int contextSize = 4096;
     private String multimodal = "None / Disabled";
     private double temperature = 0.8;
+    private double topP = 1;
     private double minP = 0.1;
+    private int topK = 40;
     private double repeatPenalty = 1.1;
     private int repeatTokens = 64;
     private String chatTemplate = "default";
@@ -60,7 +62,9 @@ public class ModelEditView {
         layout.addElement(buildContextSize());
         layout.addElement(buildModalFile());
         layout.addElement(buildTemperature());
+        layout.addElement(buildTopP());
         layout.addElement(buildMinP());
+        layout.addElement(buildTopK());
         layout.addElement(buildRepeatPenalty());
         layout.addElement(buildRepeatTokens());
         layout.addElement(buildChatTemplates());
@@ -74,7 +78,9 @@ public class ModelEditView {
         this.contextSize = settings.getContextSize();
         this.multimodal = settings.getMmProj();
         this.temperature = settings.getTemperature();
+        this.topP = settings.getTopP();
         this.minP = settings.getMinP();
+        this.topK = settings.getTopK();
         this.repeatPenalty = settings.getRepeatPenalty();
         this.repeatTokens = settings.getRepeatTokens();
         this.chatTemplate = settings.getChatTemplate();
@@ -174,6 +180,27 @@ public class ModelEditView {
         return tileContainer;
     }
 
+    private TileContainer buildTopP() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Top P");
+        tileContainer.setDescription("Set the top-p value for the model.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, topP);
+        input.onValueChange(event -> {
+            this.topP = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
     private TileContainer buildMinP() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
@@ -189,6 +216,27 @@ public class ModelEditView {
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, minP);
         input.onValueChange(event -> {
             this.minP = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildTopK() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Top K");
+        tileContainer.setDescription("Limit the next token selection to the K most probable tokens..");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Default is 40.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, topK);
+        input.onValueChange(event -> {
+            this.topK = event.getNewValue().intValue();
         });
         tileContainer.setAction(input);
 
@@ -372,7 +420,9 @@ public class ModelEditView {
             settings.setContextSize(contextSize);
             settings.setMmProj(multimodal);
             settings.setTemperature(temperature);
+            settings.setTopP(topP);
             settings.setMinP(minP);
+            settings.setTopK(topK);
             settings.setRepeatPenalty(repeatPenalty);
             settings.setRepeatTokens(repeatTokens);
             settings.setChatTemplate(chatTemplate);
