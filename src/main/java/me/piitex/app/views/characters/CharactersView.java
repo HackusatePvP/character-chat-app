@@ -118,11 +118,10 @@ public class CharactersView {
 
                     // Load chat window...
                     App.window.clearContainers();
-                    App.window.addContainer(new ChatView(character, character.getLastChat()));
 
-                    Platform.runLater(() -> {
-                        App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
-                    });
+                    App.window.addContainer(new ChatView(character, character.getLastChat()));
+                    App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+
                 }
 
             });
@@ -187,21 +186,18 @@ public class CharactersView {
     private void editCharacter(Character character) {
         App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
-        App.getThreadPoolManager().submitTask(() -> {
-            Container container;
-            if (App.mobile) {
-                container = new CharacterEditMobileView(character, false).getRoot();
-            } else {
-                container = new CharacterEditView(character, false).getRoot();
-            }
+        Container container;
+        if (App.mobile) {
+            container = new CharacterEditMobileView(character, false).getRoot();
+        } else {
+            container = new CharacterEditView(character, false).getRoot();
+        }
 
-            Platform.runLater(() -> {
-                App.window.clearContainers();
-                App.window.addContainer(container);
-                App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
-            });
+        Platform.runLater(() -> {
+            App.window.clearContainers();
+            App.window.addContainer(container);
+            App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
         });
-
     }
 
     private void duplicateCharacter(Character character) {
