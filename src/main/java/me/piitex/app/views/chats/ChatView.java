@@ -85,7 +85,6 @@ public class ChatView extends EmptyContainer {
         this.character = character;
         if (create) {
             if (chat == null) {
-
                 chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length));
                 character.getChats().add(chat);
                 // Add first message to chat if it exists.
@@ -206,7 +205,6 @@ public class ChatView extends EmptyContainer {
         selection.setMaxHeight(CHAT_VIEW_SELECTION_HEIGHT);
 
         selection.onItemSelect(event1 -> {
-            System.out.println("Selected: " + event1.getItem());
             String item = event1.getItem();
 
             if (item.equals(chat.getFile().getName())) {
