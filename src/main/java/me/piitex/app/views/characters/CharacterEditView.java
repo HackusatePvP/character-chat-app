@@ -42,6 +42,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.TreeMap;
 
+/*
+    TODO:  The engine has been improved and no longer needs useless casting. All castings need to be removed.
+ */
 public class CharacterEditView {
     private Container root;
 
@@ -317,7 +320,7 @@ public class CharacterEditView {
                 currentCharacterInstance.setLorebook(loreItems);
                 currentCharacterInstance.setFirstMessage(((StyledTextArea<?, ?>) chatTabInstance.getFirstMessageInput().getNode()).getText());
                 currentCharacterInstance.setChatScenario(((StyledTextArea<?, ?>) chatTabInstance.getChatScenarioInput().getNode()).getText());
-                currentCharacterInstance.setChatContext(((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).getValue().intValue());
+                currentCharacterInstance.setChatContext(chatTabInstance.getChatContextSpinner().getCurrentValue().intValue());
 
                 currentCharacterInstance.setOverride(((ToggleSwitch) modelTabInstance.getModelOverride().getNode()).isSelected());
                 currentCharacterInstance.setModel(((ComboBox) modelTabInstance.getModelSelection().getNode()).getSelectionModel().getSelectedItem().toString());
@@ -402,14 +405,14 @@ public class CharacterEditView {
         }
 
         try {
-            int contextSize = ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).getValue().intValue();
+            int contextSize = chatTabInstance.getChatContextSpinner().getCurrentValue().intValue();
             if (contextSize <= 0) {
                 tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
                 MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Context size must be a positive number.");
                 error.addStyle(Styles.DANGER);
                 error.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
-                ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).requestFocus();
+                chatTabInstance.getChatContextSpinner().getNode().requestFocus();
                 return false;
             }
         } catch (NumberFormatException e) {
@@ -418,7 +421,7 @@ public class CharacterEditView {
             error.addStyle(Styles.DANGER);
             error.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
-            ((Spinner<Double>) chatTabInstance.getChatContextSpinner().getNode()).requestFocus();
+            chatTabInstance.getChatContextSpinner().getNode().requestFocus();
             return false;
         }
 
