@@ -190,6 +190,10 @@ public class ServerProcess {
         // Build the process
         ProcessBuilder builder = new ProcessBuilder(parameters);
 
+        // Set env if needed
+        Map<String, String> environmentVariables = builder.environment();
+        environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
+
         // The server output will be errors even though it's not errors. This is how Java works
         builder.redirectError(new File(App.getAppDirectory(), "server.txt"));
 
