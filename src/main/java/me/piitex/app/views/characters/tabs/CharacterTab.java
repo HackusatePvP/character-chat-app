@@ -13,6 +13,7 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
+import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -110,12 +111,12 @@ public class CharacterTab extends Tab {
         image.setFitWidth(128);
         image.setFitHeight(128);
         image.setPreserveRatio(false);
-        layout.addElement(image, 2);
+        layout.addElement(image);
 
         TextOverlay upload = new TextOverlay("Click to upload image");
         upload.setTextFill(Color.WHITE);
         upload.setUnderline(true);
-        layout.addElement(upload, 5);
+        layout.addElement(upload);
 
         root.onClick(event -> {
             FileChooser chooser = new FileChooser();
