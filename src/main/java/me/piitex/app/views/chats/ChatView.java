@@ -392,7 +392,7 @@ public class ChatView extends EmptyContainer {
             response.setPrompt(chatMessage.getContent());
             String received;
             try {
-                received = Server.generateResponseOAIStream(responseBox, card, response);
+                received = Server.generateResponseOAIStream(chatMessage, responseBox, card, response);
             } catch (IOException e) {
                 Platform.runLater(() -> {
                     MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");

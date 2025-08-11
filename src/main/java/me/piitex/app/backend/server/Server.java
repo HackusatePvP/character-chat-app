@@ -1,10 +1,15 @@
 package me.piitex.app.backend.server;
 
+import atlantafx.base.util.BBCodeHandler;
+import atlantafx.base.util.BBCodeParser;
 import javafx.application.Platform;
+import javafx.scene.layout.Pane;
 import me.piitex.app.App;
+import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
+import me.piitex.app.views.chats.components.ReasoningLayout;
 import me.piitex.engine.Element;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.TitledLayout;
@@ -29,7 +34,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static me.piitex.app.views.Positions.CHAT_BOX_WIDTH;
+import static me.piitex.app.views.Positions.*;
 
 public class Server {
     private static final String baseUrl = "http://localhost:8187";
@@ -54,7 +59,7 @@ public class Server {
         return object.getString("status");
     }
 
-    public static String generateResponseOAIStream(VerticalLayout chatMessageBox, CardContainer card, Response response) throws JSONException, IOException, InterruptedException {
+    public static String generateResponseOAIStream(ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) throws JSONException, IOException, InterruptedException {
         App.logger.info("Collecting response from server...");
         HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
         ModelSettings settings = response.getCharacter().getModelSettings();
@@ -147,9 +152,7 @@ public class Server {
 
                             TitledLayout thinkCard;
                             if (element instanceof CardContainer cardContainer) {
-                                // Think card does not exist
-                                thinkCard = new TitledLayout("Reasoning", chatMessageBox.getWidth() - 50, -1);
-                                thinkCard.setMaxSize(chatMessageBox.getMaxWidth() - 50, -1);
+                                thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
                                 chatMessageBox.addElement(thinkCard, 0);
 
                                 // Set card body to 'thinking'
@@ -157,25 +160,25 @@ public class Server {
                                 textFlowOverlay.setText("Thinking...");
                             } else {
                                 thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
-                                thinkCard.setMaxSize(chatMessageBox.getMaxWidth() - 50, -1);
+                                thinkCard.setMaxSize(0, -1);
 
                                 CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1);
-
                                 TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBodyOverlay();
                                 textFlowOverlay.setText("Thinking...");
                             }
 
                             if (thinkCard.getElements().isEmpty()) {
-                                int width = CHAT_BOX_WIDTH;
-                                TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, width - 30, -1);
+                                TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, CHAT_BOX_IMAGE_WIDTH, -1);
                                 thinkCard.addElement(textFlowOverlay);
                             }
 
-                            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) thinkCard.getElementAt(0);
-                            if (textFlowOverlay.getText().isEmpty()) {
-                                thinkCard.setExpanded(true);
+                            if (thinkCard.getElementAt(0) instanceof TextFlowOverlay textFlowOverlay) {
+                                if (textFlowOverlay.getText() == null || textFlowOverlay.getText().isEmpty()) {
+                                    thinkCard.setExpanded(true);
+                                }
+                                textFlowOverlay.setText(updated);
                             }
-                            textFlowOverlay.setText(updated);
+
                         } else {
                             // Filter out think tags if possible
                             if (updated.contains("</think>") && updated.split("</think>").length > 1) {
@@ -191,8 +194,17 @@ public class Server {
                                 updated = updated.replace("</think>", "").replace("<think>", "");
                             }
 
-                            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBodyOverlay();
-                            textFlowOverlay.setText(updated);
+                            boolean caught = false;
+                            try {
+                                new BBCodeParser(updated, new BBCodeHandler.Default<>(new Pane()));
+                            } catch (IllegalStateException ignored) {
+                                caught = true;
+                            } finally {
+                                if (!caught) {
+                                    TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBodyOverlay();
+                                    textFlowOverlay.setText(updated);
+                                }
+                            }
                         }
 
                     });
