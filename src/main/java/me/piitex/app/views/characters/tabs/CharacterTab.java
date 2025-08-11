@@ -1,11 +1,13 @@
 package me.piitex.app.views.characters.tabs;
 
+import atlantafx.base.controls.Popover;
 import atlantafx.base.theme.Styles;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.annotations.Nullable;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
@@ -21,6 +23,8 @@ import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.app.backend.Character;
 import org.json.JSONObject;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.material2.Material2AL;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,9 +86,7 @@ public class CharacterTab extends Tab {
 
         rootLayout.addElement(charDescription);
 
-        VerticalLayout dialogueLayout = new VerticalLayout(0, 0);
-        InputFieldOverlay dialogue = new InputFieldOverlay("", "{character}: Dialogue prompt", 0, 0, 400, -1);
-        //rootLayout.addElement(dialogueLayout);
+        //rootLayout.addElement(buildExampleDialogue());
 
         this.addElement(parentView.buildSubmitBox());
     }
@@ -201,6 +203,80 @@ public class CharacterTab extends Tab {
         });
 
         return root;
+    }
+
+    public CardContainer buildExampleDialogue() {
+        CardContainer container = new CardContainer(800, -1);
+        container.setMaxSize(800, -1);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(Styles.BG_DEFAULT);
+
+        HorizontalLayout header = new HorizontalLayout(-1, 0);
+        header.setAlignment(Pos.TOP_CENTER);
+        container.setBody(header);
+
+        TextOverlay textHeader = new TextOverlay("Example Dialogue");
+        textHeader.addStyle(Styles.TITLE_4);
+        header.addElement(textHeader);
+
+        VerticalLayout body = new VerticalLayout(800, -1);
+
+        // Load current examples
+        parentView.getExampleDialogue().forEach((s, s2) -> {
+            body.addElement(addDialogueEntry(body, s2));
+        });
+
+        body.addElement(addDialogueEntry(body, null));
+        container.setBody(body);
+
+        return container;
+    }
+
+    public HorizontalLayout addDialogueEntry(VerticalLayout root, @Nullable String value) {
+        HorizontalLayout dialogueBox = new HorizontalLayout(800, -1);
+        dialogueBox.setSpacing(50);
+
+        InputFieldOverlay add = new InputFieldOverlay((value != null ? value : ""), "{character}: Example dialogue for {character}", 0, 0, 500, 50);
+        dialogueBox.addElement(add);
+
+        if (value != null) {
+            add.setEnabled(false);
+
+            ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new FontIcon(Material2AL.DELETE)).build();
+            delete.addStyle(Styles.DANGER);
+            delete.onClick(event1 -> {
+                root.removeElement(dialogueBox);
+            });
+            dialogueBox.addElement(delete);
+        } else {
+            ButtonOverlay insert = new ButtonBuilder("insert").setIcon(new FontIcon(Material2AL.ADD)).build();
+            dialogueBox.addElement(insert);
+
+            insert.onClick(event -> {
+                if (!add.getCurrentText().startsWith("{character}:") && !add.getCurrentText().startsWith("{user}:")) {
+                    Popover popover = new Popover(new Text("Dialogue must start with literal {character}: or {user}:"));
+                    popover.show(add.getNode());
+                    return;
+                }
+
+                add.setEnabled(false);
+                dialogueBox.removeElement(insert);
+
+                ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new FontIcon(Material2AL.DELETE)).build();
+                delete.addStyle(Styles.DANGER);
+                delete.onClick(event1 -> {
+                    root.removeElement(dialogueBox);
+                });
+                dialogueBox.addElement(delete);
+
+                root.addElement(addDialogueEntry(root, null));
+
+                parentView.getExampleDialogue().put(parentView.getExampleDialogue().size() + "", add.getCurrentText());
+            });
+        }
+
+
+        return dialogueBox;
     }
 
     public InputFieldOverlay getCharIdInput() {
