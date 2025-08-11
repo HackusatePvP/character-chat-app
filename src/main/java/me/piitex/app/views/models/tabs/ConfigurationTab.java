@@ -16,7 +16,7 @@ import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.models.ModelsView;
-import me.piitex.app.views.settings.SettingsView;
+import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
@@ -27,8 +27,6 @@ import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
 import java.io.IOException;
@@ -443,7 +441,7 @@ public class ConfigurationTab extends Tab {
         TileContainer container = new TileContainer(0, 0);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Backend Server");
-        container.setDescription("Select the compatible backend for your GPU device..");
+        container.setDescription("Select the compatible backend for your GPU device. Application may freeze while searching for devices.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
@@ -462,17 +460,6 @@ public class ConfigurationTab extends Tab {
         selection.onItemSelect(event -> {
             String newBackend = event.getItem();
             if (newBackend == null) return;
-            if (App.vulkanDisable) {
-                if (newBackend.equalsIgnoreCase("vulkan")) {
-                    ComboBox<String> comboBox = (ComboBox<String>) selection.getNode();
-                    comboBox.getSelectionModel().select(settings.getBackend());
-                    MessageOverlay warning = new MessageOverlay(0, 0, 600, 100, "Vulkan Support", "Due to BSOD issues with Vulkan the backend is disabled. We are currently waiting on a fix. Thank you for your understanding.", new TextOverlay(new FontIcon(Material2MZ.OUTLINED_FLAG)));
-                    warning.addStyle(Styles.WARNING);
-                    warning.addStyle(Styles.BG_DEFAULT);
-                    App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                    return;
-                }
-            }
 
             try {
                 // Thread blocks until done
@@ -483,9 +470,12 @@ public class ConfigurationTab extends Tab {
 
                 settings.setDevice("Auto");
 
-                // Once done re-render
-                App.window.clearContainers();
-                App.window.addContainer(new SettingsView().getContainer());
+                // Re-build devices
+                Element element = layout.getElementAt(2);
+                if (element != null) {
+                    layout.removeElement(2);
+                    layout.addElement(buildGpuDevice(), 2);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
