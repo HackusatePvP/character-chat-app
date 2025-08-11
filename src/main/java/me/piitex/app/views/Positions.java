@@ -37,6 +37,7 @@ public class Positions {
     public static int CHAT_BOX_BUTTON_BOX_HEIGHT;
     public static int CHAT_SEND_BOX_WIDTH;
     public static int CHAT_SEND_BOX_HEIGHT;
+    public static int CHAT_TEXTFLOW_WIDTH;
 
     /*
     ###########################
@@ -59,9 +60,11 @@ public class Positions {
     }
 
     private static void initializeDesktop() {
+        // -1 is computed size
+
         AppSettings appSettings = App.getInstance().getAppSettings();
         CHAT_VIEW_SCROLL_X = 0;
-        CHAT_VIEW_SCROLL_Y = 0;
+        CHAT_VIEW_SCROLL_Y = 10; // Small y offset
         CHAT_VIEW_SCROLL_WIDTH = appSettings.getWidth() - 50 - (appSettings.getWidth() / 6);
         CHAT_VIEW_SCROLL_HEIGHT = appSettings.getHeight() - 50 - (appSettings.getHeight() / 4);
         CHAT_VIEW_SELECTION_X = appSettings.getWidth() / 2;
@@ -73,12 +76,9 @@ public class Positions {
         CHAT_BOX_IMAGE_HEIGHT = -1;
         CHAT_BOX_BUTTON_BOX_WIDTH = 900;
         CHAT_BOX_BUTTON_BOX_HEIGHT = 50;
-        if (appSettings.getWidth() >= 1280 && appSettings.getWidth() < 1920) {
-            CHAT_SEND_BOX_WIDTH =  600;
-        } else {
-            CHAT_SEND_BOX_WIDTH =  800;
-        }
+        CHAT_SEND_BOX_WIDTH =  500;
         CHAT_SEND_BOX_HEIGHT = -1;
+        CHAT_TEXTFLOW_WIDTH = CHAT_BOX_WIDTH - 50;
 
         SIDEBAR_WIDTH = 200;
         SIDEBAR_WIDTH_COLLAPSE = 50;
@@ -106,6 +106,8 @@ public class Positions {
         CHAT_BOX_BUTTON_BOX_HEIGHT = 50;
         CHAT_SEND_BOX_WIDTH = 400;
         CHAT_SEND_BOX_HEIGHT = 200;
+        CHAT_BOX_IMAGE_WIDTH = 400;
+        CHAT_TEXTFLOW_WIDTH = CHAT_BOX_WIDTH - 50;
 
         SIDEBAR_WIDTH = 100;
         SIDEBAR_WIDTH_COLLAPSE = 50;
