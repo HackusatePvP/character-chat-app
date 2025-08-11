@@ -36,7 +36,7 @@ public class ListTab extends Tab {
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
-        VerticalLayout layout = new VerticalLayout(0, 0);
+        VerticalLayout layout = new VerticalLayout(0, -1);
         layout.setX(20);
         layout.setSpacing(10);
         layout.setPrefSize(appSettings.getWidth() - 500, 0);
