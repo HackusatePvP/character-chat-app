@@ -77,7 +77,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildModelPathTile() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Model Path");
         container.setDescription("Select the folder for your models.");
@@ -113,7 +113,7 @@ public class ConfigurationTab extends Tab {
 
 
     public TileContainer buildCurrentModel() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Model Selection");
         container.setDescription("Select a model to use. Will require a \"reload\".");
@@ -153,7 +153,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildGpuLayers() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("GPU Layers");
         container.setDescription("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.");
@@ -171,7 +171,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildMemoryLock() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Memory Lock");
         container.setDescription("Locks model in RAM. Can improve generation times. Disables model swapping.");
@@ -189,7 +189,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildFlashAttention() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Flash Attention");
         container.setDescription("Toggles flash attention. Designed to speed up training and inference while reducing memory usage. In some rare cases it can greatly reduce quality.");
@@ -207,7 +207,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildRunningModel() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Current Model");
         container.setDescription("The current running model that is loaded. Will be null if no model is active.");
@@ -438,7 +438,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildBackend() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("Backend Server");
         container.setDescription("Select the compatible backend for your GPU device. Application may freeze while searching for devices.");
@@ -487,7 +487,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildGpuDevice() {
-        TileContainer container = new TileContainer(0, 0);
+        TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("GPU Device");
         container.setDescription("Select the compatible GPU for your backend. Auto will automatically choose the GPU for you. Please verify that there is one more option than Auto.");
