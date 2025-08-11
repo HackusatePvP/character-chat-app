@@ -160,10 +160,17 @@ public class UserTab extends Tab {
             if (!item.equalsIgnoreCase("none")) {
                 template = App.getInstance().getUser(item); // Set user object in parentView
             }
-            // Re-render the CharacterEditView to reflect the selected user template
+
+            if (template != null) {
+                userDisplayNameInput.setCurrentText(template.getDisplayName());
+                userDescription.setCurrentText(template.getPersona());
+
+                if (template.getIconPath() != null && !template.getIconPath().isEmpty()) {
+                    parentView.setUserIconPath(new File(template.getIconPath()));
+                }
+            }
+
             parentView.updateInfoData();
-            App.window.clearContainers();
-            App.window.addContainer(new CharacterEditView(character, template, parentView.getInfoFile(), this).getRoot());
         });
 
         return root;
