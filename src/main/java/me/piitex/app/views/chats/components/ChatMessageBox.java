@@ -38,7 +38,7 @@ public class ChatMessageBox extends VerticalLayout {
         // 2. Chat card
         // 3. Image card
         if (chatMessage.getReasoning() != null && !chatMessage.getReasoning().isEmpty()) {
-            addElement(new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, -1));
+            addElement(new ReasoningLayout(chatMessage, 0, -1));
         }
 
         CardContainer cardContainer = new ChatBoxCard(this, character, chat, chatMessage, index, parentView, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
