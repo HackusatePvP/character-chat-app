@@ -84,11 +84,15 @@ public class ConfigurationTab extends Tab {
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
+        container.addElement(actionButton(container));
 
+        return container;
+    }
+
+    private ButtonOverlay actionButton(TileContainer container) {
         ButtonOverlay button = new ButtonBuilder("location").setText("Set Location").build();
         button.setTooltip(settings.getModelPath());
         container.setAction(button);
-
         button.onClick(event -> {
             DirectoryChooser chooser = new DirectoryChooser();
             chooser.setInitialDirectory(new File(settings.getModelPath()));
@@ -97,18 +101,12 @@ public class ConfigurationTab extends Tab {
             App.logger.info("Updating model path to '{}'", file.getAbsolutePath());
             settings.setModelPath(file.getAbsolutePath());
 
-            // Will refresh the entire view.
-            modelsView.getElements().clear();
-            modelsView.build();
-
-            Pane pane = (Pane) modelsView.getView();
-            pane.getChildren().clear();
-            pane.getChildren().addAll(modelsView.build().getValue());
+            // Updates button tooltip
+            container.setAction(actionButton(container));
 
         });
 
-
-        return container;
+        return button;
     }
 
 
