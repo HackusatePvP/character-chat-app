@@ -63,9 +63,10 @@ The views are extremely experimental and may not function properly.
 As of version 1.0.4 vision has been implemented into the chats. When sending an image it will now add the image to the chat window. You can close and expand the image when needed. The model can only process one image, it will prioritize the last sent message.
 
 ## Vulkan
-Vulkan has been re-enabled as of version 1.0.1. For Nvidia 50 series and 40 series it can still bluescreen when exiting the application. Please use Cuda if you encounter a crash.
+Vulkan works right out of the box. No installations needed apart from basic graphics drivers. As of version 1.0.5 vulkan is the default backend.
 
-Vulkan works right out of the box. No installations needed apart from basic graphics drivers.
+Q: What's the difference between the backends?
+A: Cuda and HIP typically provide better performance, but you will have to install necessary drivers. Vulkan works for most GPUs without the need of third party installations. Cuda requires an Nvidia card. HIP requires an AMD card.
 
 ## 🚀 Installation
 
