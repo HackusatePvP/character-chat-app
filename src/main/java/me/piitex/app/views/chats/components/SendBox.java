@@ -29,7 +29,7 @@ public class SendBox extends VerticalLayout {
 
     public void buildSendBox() {
         setAlignment(Pos.CENTER);
-        setSpacing(0);
+        setSpacing(10);
 
 
         addElement(parentView.buildTopControls());
@@ -71,6 +71,7 @@ public class SendBox extends VerticalLayout {
         // onRender will prevent race conditions regarding the ui.
         // It will ensure everything is converted to JavaFX when called.
         addRenderEvent(event -> {
+            System.out.println("Layout has been rendered...");
             Platform.runLater(parentView::checkServer);
         });
     }
