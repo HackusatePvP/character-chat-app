@@ -7,7 +7,6 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.util.Duration;
 import me.piitex.app.App;
@@ -39,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -69,6 +69,7 @@ public class CharacterEditView {
     private int chatContextSize = 4096;
 
     private final Map<String, String> loreItems = new TreeMap<>();
+    private final Map<String, String> exampleDialogue = new LinkedHashMap<>();
 
     private TabsContainer tabsContainer;
 
@@ -148,6 +149,8 @@ public class CharacterEditView {
         this.characterIconPath = new File(character.getIconPath());
         this.loreItems.clear();
         this.loreItems.putAll(character.getLorebook());
+        this.exampleDialogue.clear();
+        this.exampleDialogue.putAll(character.getExampleDialogue());
         this.user = character.getUser();
         this.chatFirstMessage = character.getFirstMessage();
         this.chatScenario = character.getChatScenario();
@@ -182,6 +185,10 @@ public class CharacterEditView {
         if (infoFile.hasKey("lore")) {
             loreItems.clear();
             loreItems.putAll(infoFile.getStringMap("lore"));
+        }
+        if (infoFile.hasKey("dialogue")) {
+            exampleDialogue.clear();
+            exampleDialogue.putAll(infoFile.getStringMap("dialogue"));
         }
         if (infoFile.hasKey("first-message")) {
             chatFirstMessage = infoFile.get("first-message");
@@ -219,6 +226,7 @@ public class CharacterEditView {
             infoFile.set("icon-path-user", userIconPath.getAbsolutePath());
         }
         infoFile.set("lore", loreItems);
+        infoFile.set("dialogue", exampleDialogue);
         infoFile.set("first-message", chatFirstMessage);
         infoFile.set("scenario", chatScenario);
         infoFile.set("chat-context-size", chatContextSize);
@@ -229,7 +237,7 @@ public class CharacterEditView {
         root.addStyle(Styles.BG_INSET);
 
         HorizontalLayout mainLayout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        mainLayout.addElement(new SidebarView(mainLayout, true).getRoot());
+        mainLayout.addElement(new SidebarView(mainLayout, false).getRoot());
         root.addElement(mainLayout);
 
         VerticalLayout contentLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
@@ -296,7 +304,7 @@ public class CharacterEditView {
             dialogueContainer.setCancelButton(stay);
             dialogueContainer.setConfirmButton(leave);
 
-            App.window.renderPopup(dialogueContainer, PopupPosition.CENTER, 500, 500);
+            App.window.renderPopup(dialogueContainer, event.getHandler().getSceneX(), event.getHandler().getSceneY() - 100, 500, 500);
         });
 
         submit.onClick(event -> {
@@ -318,6 +326,7 @@ public class CharacterEditView {
                 currentCharacterInstance.setDisplayName(((TextField) characterTabInstance.getCharDisplayName().getNode()).getText());
                 currentCharacterInstance.setPersona(((StyledTextArea<?, ?>) characterTabInstance.getCharDescription().getNode()).getText());
                 currentCharacterInstance.setLorebook(loreItems);
+                currentCharacterInstance.setExampleDialogue(exampleDialogue);
                 currentCharacterInstance.setFirstMessage(((StyledTextArea<?, ?>) chatTabInstance.getFirstMessageInput().getNode()).getText());
                 currentCharacterInstance.setChatScenario(((StyledTextArea<?, ?>) chatTabInstance.getChatScenarioInput().getNode()).getText());
                 currentCharacterInstance.setChatContext(chatTabInstance.getChatContextSpinner().getCurrentValue().intValue());
@@ -541,6 +550,10 @@ public class CharacterEditView {
 
     public Map<String, String> getLoreItems() {
         return loreItems;
+    }
+
+    public Map<String, String> getExampleDialogue() {
+        return exampleDialogue;
     }
 
     public Character getCharacter() {
