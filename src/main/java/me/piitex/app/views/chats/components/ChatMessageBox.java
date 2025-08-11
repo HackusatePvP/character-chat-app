@@ -37,7 +37,7 @@ public class ChatMessageBox extends VerticalLayout {
         // 1. Thought tags if applicable
         // 2. Chat card
         // 3. Image card
-        if (chatMessage.getReasoning() != null && !chatMessage.getReasoning().isEmpty()) {
+        if (chatMessage.getSender() == Role.ASSISTANT && chatMessage.getReasoning() != null && !chatMessage.getReasoning().isEmpty()) {
             addElement(new ReasoningLayout(chatMessage, 0, -1));
         }
 
