@@ -409,7 +409,7 @@ public class ModelEditView {
         discard.addStyle(Styles.BUTTON_OUTLINED);
         discard.onClick(event -> {
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView());
+            App.window.addContainer(new ModelsView("List"));
         });
 
         ButtonOverlay submit = new ButtonBuilder("submit").setText("Submit").build();
@@ -430,7 +430,7 @@ public class ModelEditView {
             settings.setJinja(jinja);
 
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView());
+            App.window.addContainer(new ModelsView("List"));
         });
 
         layout.addElements(discard, submit);

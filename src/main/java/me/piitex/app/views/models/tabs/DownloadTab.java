@@ -14,8 +14,10 @@ import me.piitex.app.backend.Model;
 import me.piitex.app.backend.FileDownloadProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.ConfigUtil;
+import me.piitex.app.views.models.ModelsView;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
+import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.TitledLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -33,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DownloadTab extends Tab {
-
+    private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
     private final VerticalLayout downloadListLayout;
@@ -49,8 +51,9 @@ public class DownloadTab extends Tab {
     private ConfigUtil downloadCache;
 
 
-    public DownloadTab() {
+    public DownloadTab(TabsContainer tabsContainer) {
         super("Download");
+        this.tabsContainer = tabsContainer;
         this.appSettings = App.getInstance().getAppSettings();
 
         File file = new File(App.getModelsDirectory(), "download-cache.dat");
@@ -339,6 +342,9 @@ public class DownloadTab extends Tab {
             } else {
                 downloadIcon.getNode().setDisable(false);
             }
+
+            tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
+
         }));
 
     }

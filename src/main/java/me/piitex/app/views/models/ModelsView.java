@@ -1,6 +1,7 @@
 package me.piitex.app.views.models;
 
 import atlantafx.base.theme.Styles;
+import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
@@ -17,15 +18,15 @@ public class ModelsView extends EmptyContainer {
 
     private TabsContainer tabsContainer;
 
-    public ModelsView() {
+    public ModelsView(@Nullable String tab) {
         super(800, 600);
         setWidth(appSettings.getWidth());
         setHeight(appSettings.getHeight());
         addStyle(Styles.BG_INSET);
-        init();
+        init(tab);
     }
 
-    public void init() {
+    public void init(@Nullable String tab) {
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         layout.addElement(new SidebarView(layout, false).getRoot());
         addElement(layout);
@@ -37,12 +38,16 @@ public class ModelsView extends EmptyContainer {
         tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         main.addElement(tabsContainer);
 
-        buildTabs();
+        buildTabs(tab);
     }
 
-    public void buildTabs() {
-        tabsContainer.addTab(new ConfigurationTab(this, tabsContainer));
-        tabsContainer.addTab(new ListTab());
-        tabsContainer.addTab(new DownloadTab());
+    public void buildTabs(@Nullable String tab) {
+        tabsContainer.addTab(new ConfigurationTab(tabsContainer));
+        tabsContainer.addTab(new ListTab(tabsContainer));
+        tabsContainer.addTab(new DownloadTab(tabsContainer));
+
+        if (tab != null && !tab.isEmpty()) {
+            tabsContainer.setSelectedTab(tab);
+        }
     }
 }

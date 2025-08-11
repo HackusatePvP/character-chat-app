@@ -130,7 +130,7 @@ public class SidebarView {
             App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
             App.window.clearContainers();
-            App.window.addContainer(new ModelsView());
+            App.window.addContainer(new ModelsView("Settings"));
             App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
 
         });

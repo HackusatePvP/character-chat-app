@@ -14,6 +14,7 @@ import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
+import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.TitledLayout;
@@ -28,11 +29,13 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 public class ListTab extends Tab {
+    private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
 
-    public ListTab() {
+    public ListTab(TabsContainer tabsContainer) {
         super("List");
+        this.tabsContainer = tabsContainer;
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
@@ -119,8 +122,8 @@ public class ListTab extends Tab {
                 }
                 model.getSettings().setDefault(event.getNewValue());
 
-                App.window.clearContainers();
-                App.window.addContainer(new ModelsView());
+                tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
+                tabsContainer.setSelectedTab("List");
             });
 
             HorizontalLayout subFooter = new HorizontalLayout(400, 50);

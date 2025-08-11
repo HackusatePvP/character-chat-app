@@ -37,7 +37,6 @@ import static me.piitex.app.views.Positions.*;
 
 public class ConfigurationTab extends Tab {
     private final TabsContainer tabsContainer;
-    private final ModelsView modelsView;
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
     private VerticalLayout layout;
@@ -46,10 +45,9 @@ public class ConfigurationTab extends Tab {
 
     private final ServerSettings settings = App.getInstance().getSettings();
 
-    public ConfigurationTab(ModelsView parent, TabsContainer tabsContainer) {
+    public ConfigurationTab(TabsContainer tabsContainer) {
         super("Settings");
         this.tabsContainer = tabsContainer;
-        this.modelsView = parent;
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
@@ -103,6 +101,7 @@ public class ConfigurationTab extends Tab {
 
             // Updates button tooltip
             container.setAction(actionButton(container));
+            tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
 
         });
 
@@ -263,7 +262,10 @@ public class ConfigurationTab extends Tab {
 
         start.onClick(event -> {
             ServerProcess process = ServerProcess.getCurrentServer();
-            if (process != null && process.isAlive()) return;
+            if (process != null && process.isAlive()) {
+                App.logger.info("Server is already running.");
+                return;
+            }
             Button startButton = (Button) start.getNode();
             Button reloadButton = (Button) reload.getNode();
             Button stopButton = (Button) stop.getNode();
