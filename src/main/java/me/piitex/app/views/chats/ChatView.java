@@ -102,7 +102,7 @@ public class ChatView extends EmptyContainer {
 
     public void init() {
         setWidth(appSettings.getWidth());
-        setHeight(0);
+        setHeight(appSettings.getHeight());
         addStyle(Styles.BG_INSET);
 
         HorizontalLayout main = new HorizontalLayout(appSettings.getWidth(), 0);
