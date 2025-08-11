@@ -49,7 +49,7 @@ public class JavaFXLoad extends Application {
             App.getInstance().getAppSettings().setWidth(width);
             App.getInstance().getAppSettings().setHeight(height);
             setWidth = 600;
-            setHeight = 1250;
+            setHeight = 1200;
 
         // When changing from mobile to desktop view the configuration must be reverted.
         // Application will default to 720p.
