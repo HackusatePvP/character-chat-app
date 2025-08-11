@@ -89,7 +89,7 @@ public class Chat {
             return null;
         }
 
-        String content = null;
+        String content;
         String imageUrl = null;
         String reasoning = null;
 
