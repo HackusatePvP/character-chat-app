@@ -68,9 +68,13 @@ public class HomeView extends EmptyContainer {
         }
     }
 
-    public CardContainer buildInstructions() {
-        CardContainer card = new CardContainer(20, 20,0, 0);
+    public VerticalLayout buildInstructions() {
+        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, -1);
+        layout.setAlignment(Pos.TOP_CENTER);
+
+        CardContainer card = new CardContainer(0, 0,0, 0);
         card.setMaxSize(600, appSettings.getHeight() - 100);
+        layout.addElement(card);
 
         VerticalLayout headerLayout = new VerticalLayout(600, 50);
         headerLayout.setAlignment(Pos.TOP_CENTER);
@@ -80,18 +84,18 @@ public class HomeView extends EmptyContainer {
         headerLayout.addElement(header);
 
         SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
+        separator.setX(-12);
         separator.addStyle(Styles.MEDIUM);
         headerLayout.addElement(separator);
 
         card.setHeader(headerLayout);
 
-        VerticalLayout bodyLayout = new VerticalLayout(600, 500);
+        VerticalLayout bodyLayout = new VerticalLayout(600, -1);
 
-        TextFlowOverlay body = new TextFlowOverlay("", 600, 500);
+        TextFlowOverlay body = new TextFlowOverlay("", 600, -1);
         bodyLayout.addElement(body);
 
-        body.addStyle(Styles.TITLE_4);
-        body.add(new TextOverlay("1. Navigate to settings.\n\n"));
+        body.add(new TextOverlay("1. Navigate to \"Models / Backend\".\n\n"));
         body.add(new TextOverlay("2. Set a compatible backend. If you do not want to download drivers select Vulkan.\n\n"));
         body.add(new TextOverlay("3. Set a GPU. Ensure there is another option besides auto.\n\n"));
         body.add(new TextOverlay("4. Navigate to Models.\n\n"));
@@ -113,7 +117,7 @@ public class HomeView extends EmptyContainer {
 
         card.setFooter(footerLayout);
 
-        return card;
+        return layout;
 
     }
 
