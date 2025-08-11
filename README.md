@@ -43,6 +43,7 @@ The chat offers basic functionality. There are controls to modify the individual
     * **No Data Collection:** Your data stays on your machine.
     * **Encrypted Data:** Sensitive information (chats, characters, users) is encrypted locally.
 * **Advanced Model Features:** Support for Qwen3 Think Mode and Jinja templating.
+* **Reasoning Support:** Think tags are separated into its own collapsable view.
 
 ## 💻 Compatibility
 Only works with Windows 10/11. Linux and Mac are being explored.
@@ -57,7 +58,6 @@ The views are extremely experimental and may not function properly.
 * [AtlantaFX](https://github.com/mkpaz/atlantafx) Modernized styling for JavaFX.
 * [RenEngine](https://github.com/HackusatePvP/RenEngine) Simplified framework for JavaFX.
 * [llama.cpp](https://github.com/ggml-org/llama.cpp) Backend server for the models.
-
 
 ## Multimodal / Vision
 As of version 1.0.4 vision has been implemented into the chats. When sending an image it will now add the image to the chat window. You can close and expand the image when needed. The model can only process one image, it will prioritize the last sent message.
