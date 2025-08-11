@@ -98,7 +98,7 @@ public class ServerProcess {
         if (!settings.getDevice().equalsIgnoreCase("auto")) {
             App.logger.debug("Setting device...");
             parameters.add("-dev");
-            parameters.add(settings.getFormattedDevice());
+            parameters.add(settings.getFormattedDevice().trim());
         }
 
         // Vision model file
