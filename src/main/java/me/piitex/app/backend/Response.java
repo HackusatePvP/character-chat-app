@@ -89,11 +89,6 @@ public class Response {
             tokens += Server.tokenize(character.getChatScenario());
         }
 
-        // FIXME: Testing out example dialogue. Some models have a tough time following instructions to the styling of their responses
-        JSONObject exampleDialogue = new JSONObject();
-        exampleDialogue.put("role", "system");
-        exampleDialogue.put("content", format("Follow the format shown in the example when responding.\nExample 1:\nassistant: \"How may I help you today?\" {character} asked with a gentle tone\nuser:\"Can you help me figure prompt engineering?\" {user} replied with a slight frustration in his voice.", character, character.getUser()));
-
         List<String> processedLores = new ArrayList<>();
         List<String> loreItems = new ArrayList<>(character.getLorebook().keySet());
         loreItems.addAll(user.getLorebook().keySet());
@@ -158,6 +153,23 @@ public class Response {
             }
         }
 
+        StringBuilder appender = new StringBuilder();
+        character.getExampleDialogue().forEach((s, s2) -> {
+            if (s2.startsWith("{character}:")) {
+                s2 = s2.replace("{character}:", "Assistant:");
+                s2 = format(s2, character, user);
+                appender.append(s2).append("\n");
+            }
+            if (s2.startsWith("{user}:")) {
+                s2 = s2.replace("{user}:", "User:");
+                s2 = format(s2, character, user);
+                appender.append(s2).append("\n");
+            }
+        });
+
+        JSONObject exampleDialogue = new JSONObject();
+        exampleDialogue.put("role", "system");
+        exampleDialogue.put("content", "Use the following format when responding.\n\n" + appender.toString().trim());
 
         Collections.reverse(chatContext);
 
