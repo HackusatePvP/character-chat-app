@@ -9,7 +9,7 @@ import java.util.LinkedList;
 
 public class ServerSettings {
     private final InfoFile infoFile;
-    private String backend = "Cuda";
+    private String backend = "Vulkan";
     private String device = "Auto";
     private int gpuLayers = 10;
     private boolean memoryLock = false;
