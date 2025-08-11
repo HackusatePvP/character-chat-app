@@ -8,7 +8,6 @@ import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharactersView;
 import me.piitex.app.views.server.ServerLayout;
-import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -66,14 +65,6 @@ public class HomeView extends EmptyContainer {
                     buildBody(root);
                 });
             }));
-        }
-
-        // Prompt warning with Vulkan
-        if (App.getInstance().getSettings().getBackend().equalsIgnoreCase("vulkan")) {
-            MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Warning", "Vulkan is known to cause BSOD (Blue screen). To minimize this issue, do not max out gpu layers. The issue is known and reported to LLamaCPP.");
-            error.addStyle(Styles.DANGER);
-            error.addStyle(Styles.BG_DEFAULT);
-            App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
         }
     }
 
