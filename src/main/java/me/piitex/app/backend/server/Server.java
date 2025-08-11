@@ -196,7 +196,7 @@ public class Server {
 
                             boolean caught = false;
                             try {
-                                new BBCodeParser(updated, new BBCodeHandler.Default<>(new Pane()));
+                                BBCodeParser.createFormattedText(updated);
                             } catch (IllegalStateException ignored) {
                                 caught = true;
                             } finally {
