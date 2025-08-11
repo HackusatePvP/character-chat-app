@@ -98,14 +98,13 @@ public class HomeView extends EmptyContainer {
         body.add(new TextOverlay("1. Navigate to \"Models / Backend\".\n\n"));
         body.add(new TextOverlay("2. Set a compatible backend. If you do not want to download drivers select Vulkan.\n\n"));
         body.add(new TextOverlay("3. Set a GPU. Ensure there is another option besides auto.\n\n"));
-        body.add(new TextOverlay("4. Navigate to Models.\n\n"));
-        body.add(new TextOverlay("5. Set the directory for your models.\n\n"));
-        body.add(new TextOverlay("6. Download a GGUF model from the \"Download\" tab.\n\n"));
-        body.add(new TextOverlay("7. Set the model as a default in the \"List\" tab. (REQUIRED).\n\n"));
-        body.add(new TextOverlay("8. (Optional) Configure the model settings by clicking the blue gear.\n\n"));
-        body.add(new TextOverlay("9. Go back to settings and start the server.\n\n"));
-        body.add(new TextOverlay("10. (Optional) Create a User Template.\n\n"));
-        body.add(new TextOverlay("11. Create a character.\n"));
+        body.add(new TextOverlay("4. Select the models directory (Recommended).\n\n"));
+        body.add(new TextOverlay("5. Download a GGUF model from the \"Download\" tab.\n\n"));
+        body.add(new TextOverlay("6. Set the model as a default in the \"List\" tab. (REQUIRED).\n\n"));
+        body.add(new TextOverlay("7. (Optional) Configure the model settings by clicking the blue gear.\n\n"));
+        body.add(new TextOverlay("8. Go back to settings and start the server.\n\n"));
+        body.add(new TextOverlay("9. (Optional) Create a User Template.\n\n"));
+        body.add(new TextOverlay("10. Create a character.\n"));
 
         card.setBody(bodyLayout);
 
