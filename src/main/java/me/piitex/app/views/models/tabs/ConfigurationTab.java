@@ -273,40 +273,12 @@ public class ConfigurationTab extends Tab {
             stopButton.setDisable(true);
 
             renderProgress();
+            Model model = settings.getGlobalModel();
+            if (model == null) {
+                model = App.getDefaultModel();
+            }
+            startServer(model);
 
-            App.getThreadPoolManager().submitTask(() -> {
-                Model model = settings.getGlobalModel();
-                if (model == null) {
-                    model = App.getDefaultModel();
-                }
-                ServerProcess newProcess = new ServerProcess(model);
-                Platform.runLater(() -> {
-                    if (newProcess.isError()) {
-                        if (settings.getGlobalModel() == null && App.getDefaultModel() == null) {
-                            MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "You do not have an active model. Set a model as default to start the server.");
-                            errorOverlay.addStyle(Styles.DANGER);
-                            errorOverlay.addStyle(Styles.BG_DEFAULT);
-                            App.window.renderPopup(errorOverlay, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-
-                        } else {
-                            MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
-                            error.addStyle(Styles.DANGER);
-                            error.addStyle(Styles.BG_DEFAULT);
-                            App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                        }
-                    } else {
-                        MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
-                        started.addStyle(Styles.SUCCESS);
-                        started.addStyle(Styles.BG_DEFAULT);
-                        App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                        runningModel.setCurrentText(ServerProcess.getCurrentServer().getModel().getFile().getAbsolutePath());
-                    }
-                    startButton.setDisable(false);
-                    reloadButton.setDisable(false);
-                    stopButton.setDisable(false);
-                });
-
-            });
         });
 
         reload.onClick(event -> {
@@ -336,38 +308,15 @@ public class ConfigurationTab extends Tab {
                 App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
             }
 
-            Button startButton = (Button) start.getNode();
-            Button reloadButton = (Button) reload.getNode();
-            Button stopButton = (Button) stop.getNode();
-
-            startButton.setDisable(true);
-            reloadButton.setDisable(true);
-            stopButton.setDisable(true);
+            start.setEnabled(false);
+            reload.setEnabled(false);
+            stop.setEnabled(false);
 
             renderProgress();
 
             Model finalModel = model;
-            App.getThreadPoolManager().submitTask(() -> {
-                ServerProcess process = new ServerProcess(finalModel);
-                Platform.runLater(() -> {
-                    if (process.isError()) {
-                        MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
-                        error.addStyle(Styles.DANGER);
-                        error.addStyle(Styles.BG_DEFAULT);
-                        App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                    } else {
-                        MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
-                        started.addStyle(Styles.SUCCESS);
-                        started.addStyle(Styles.BG_DEFAULT);
-                        App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                        runningModel.setCurrentText(ServerProcess.getCurrentServer().getModel().getFile().getAbsolutePath());
-                    }
-                    startButton.setDisable(false);
-                    reloadButton.setDisable(false);
-                    stopButton.setDisable(false);
-                });
+            startServer(finalModel);
 
-            });
         });
 
         stop.onClick(event -> {
@@ -433,6 +382,30 @@ public class ConfigurationTab extends Tab {
                 });
             }
         }
+    }
+
+    private void startServer(Model model) {
+        App.getThreadPoolManager().submitTask(() -> {
+            ServerProcess process = new ServerProcess(model);
+            Platform.runLater(() -> {
+                if (process.isError()) {
+                    MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred while starting the server. Please revert changes. If issue persists, restart the application.");
+                    error.addStyle(Styles.DANGER);
+                    error.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                } else {
+                    MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "The server has been reloaded.");
+                    started.addStyle(Styles.SUCCESS);
+                    started.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                    runningModel.setCurrentText(ServerProcess.getCurrentServer().getModel().getFile().getAbsolutePath());
+                }
+                start.setEnabled(true);
+                reload.setEnabled(true);
+                stop.setEnabled(true);
+            });
+
+        });
     }
 
     public TileContainer buildBackend() {
