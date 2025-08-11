@@ -2,11 +2,6 @@ package me.piitex.app.views.characters.tabs;
 
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
@@ -51,8 +46,6 @@ public class LorebookTab extends Tab {
 
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
         info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
-        info.setX(200);
-        info.setY(10);
         rootLayout.addElement(info);
 
         HorizontalLayout displayBox = new HorizontalLayout(0, -1);
@@ -95,16 +88,8 @@ public class LorebookTab extends Tab {
             CardContainer newLoreEntryCard = buildLoreEntry(keyText, scrollLayout);
             scrollLayout.addElement(newLoreEntryCard);
 
-            ScrollPane pane = scrollLoreContainer.getScrollPane();
-            if (pane != null) {
-                VBox vBox = (VBox) pane.getContent();
-                if (vBox != null) {
-                    vBox.getChildren().add(newLoreEntryCard.build().getKey());
-                }
-            }
-
-            ((TextField) addKeyInput.getNode()).setText("");
-            ((TextArea) addValueInput.getNode()).setText("");
+            addKeyInput.setCurrentText("");
+            addValueInput.setCurrentText("");
 
             parentView.warnTokens();
         });
@@ -154,19 +139,8 @@ public class LorebookTab extends Tab {
 
         remove.onClick(event -> {
             loreItems.remove(key);
+            scrollContainer.removeElement(card);
 
-            if (scrollContainer != null) {
-                ScrollPane pane = scrollLoreContainer.getScrollPane();
-                if (pane != null) {
-                    VBox vBox = (VBox) pane.getContent();
-                    if (vBox != null) {
-                        Node toRemove = scrollContainer.getNode(key);
-                        if (toRemove != null) {
-                            vBox.getChildren().remove(toRemove);
-                        }
-                    }
-                }
-            }
             parentView.warnTokens();
         });
 
