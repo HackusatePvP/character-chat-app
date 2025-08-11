@@ -72,16 +72,15 @@ public class ListTab extends Tab {
             DecimalFormat df = new DecimalFormat("#.##");
             String formattedFileSize = df.format(fileSizeInGB);
 
-            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, -1);
+            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 10, -1);
             root.addStyle(Styles.DENSE);
-            root.setMaxSize(900, 250);
             root.setSpacing(30);
             root.setAlignment(Pos.TOP_CENTER);
             root.addStyle(Tweaks.ALT_ICON);
             root.setExpanded(model.getSettings().isDefault());
             root.addStyle(appSettings.getGlobalTextSize());
 
-            HorizontalLayout body = new HorizontalLayout(800, 50);
+            HorizontalLayout body = new HorizontalLayout(0, 50);
             body.setSpacing(10);
             root.addElement(body);
 
