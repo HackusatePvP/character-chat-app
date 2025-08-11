@@ -77,10 +77,10 @@ public class DownloadTab extends Tab {
     }
 
     private VerticalLayout createMainLayout() {
-        VerticalLayout layout = new VerticalLayout(0, 0);
+        VerticalLayout layout = new VerticalLayout(0, -1);
         layout.setX(20);
         layout.setSpacing(0);
-        layout.setPrefSize(appSettings.getWidth() - 500, 0);
+        layout.setPrefSize(appSettings.getWidth() - 500, -1);
         return layout;
     }
 
@@ -131,7 +131,7 @@ public class DownloadTab extends Tab {
     }
 
     private TitledLayout createDownloadContainer(String title, String description, DownloadModel downloadModel) {
-        TitledLayout titledContainer = new TitledLayout(title, 0, 0);
+        TitledLayout titledContainer = new TitledLayout(title, 0, -1);
         titledContainer.addStyle(Styles.DENSE);
         titledContainer.addStyle(Tweaks.ALT_ICON);
         titledContainer.setSpacing(CONTAINER_SPACING);
@@ -195,7 +195,7 @@ public class DownloadTab extends Tab {
             // When they re-enter the page check to see if the url is still being downloaded.
             // If so re-apply the download indicators and controls.
             if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-                TitledPane titledPane = (TitledPane) titledContainer.getView();
+                TitledPane titledPane = titledContainer.getTitledPane();
                 titledPane.setExpanded(true);
 
                 FileInfo fileInfo = new FileInfo(0, "Unknown", modelKey);
