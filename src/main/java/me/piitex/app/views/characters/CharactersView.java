@@ -15,7 +15,6 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.Container;
-import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.ScrollContainer;
@@ -177,7 +176,7 @@ public class CharactersView {
         delete.addStyle(Styles.DANGER);
         delete.setTooltip("Delete the character.");
         delete.onClick(event -> {
-            deleteCharacter(character);
+            deleteCharacter(character, event.getHandler().getSceneX(), event.getHandler().getSceneY());
         });
         root.addElement(delete);
         return root;
@@ -219,7 +218,7 @@ public class CharactersView {
         App.window.addContainer(editView.getRoot());
     }
 
-    private void deleteCharacter(Character character) {
+    private void deleteCharacter(Character character, double x, double y) {
         DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + character.getId() + "'?", 500, 500);
 
         ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
@@ -248,7 +247,19 @@ public class CharactersView {
         dialogueContainer.setConfirmButton(confirm);
 
         // Render this on top
-        App.window.renderPopup(dialogueContainer, PopupPosition.CENTER, 500, 500);
+        App.window.renderPopup(dialogueContainer, x, y, 500, 500);
+    }
+
+    private void deleteCharacter(Character character) {
+        App.getInstance().getCharacters().remove(character.getId());
+        try {
+            FileUtils.deleteDirectory(character.getCharacterDirectory());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        App.window.clearContainers();
+        App.window.addContainer(new HomeView());
     }
 
     public ScrollContainer getRoot() {
