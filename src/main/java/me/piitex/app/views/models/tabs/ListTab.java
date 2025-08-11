@@ -72,7 +72,7 @@ public class ListTab extends Tab {
             DecimalFormat df = new DecimalFormat("#.##");
             String formattedFileSize = df.format(fileSizeInGB);
 
-            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, 0);
+            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", 0, -1);
             root.addStyle(Styles.DENSE);
             root.setMaxSize(900, 250);
             root.setSpacing(30);
