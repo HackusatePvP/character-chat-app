@@ -167,12 +167,12 @@ public class UserEditView {
         image.setFitWidth(128);
         image.setFitHeight(128);
         image.setPreserveRatio(false);
-        layout.addElement(image, 2);
+        layout.addElement(image);
 
         TextOverlay upload = new TextOverlay("Click to upload image");
         upload.setTextFill(Color.WHITE);
         upload.setUnderline(true);
-        layout.addElement(upload, 5);
+        layout.addElement(upload);
 
 
         root.onClick(event -> {
