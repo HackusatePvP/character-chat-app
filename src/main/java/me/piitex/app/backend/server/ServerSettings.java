@@ -30,7 +30,7 @@ public class ServerSettings {
         if (infoFile.hasKey("backend")) {
             backend = infoFile.get("backend");
         } else {
-            infoFile.set("backend", "cuda");
+            infoFile.set("backend", backend);
         }
         if (infoFile.hasKey("device")) {
             device = infoFile.get("device");
