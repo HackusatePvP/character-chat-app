@@ -66,12 +66,22 @@ public class Server {
         JSONObject toPost = new JSONObject();
         toPost.put("stream", true);
         toPost.put("temperature", settings.getTemperature());
-        toPost.put("min_p", settings.getMinP());
-        toPost.put("top_p", settings.getTopP());
+        toPost.put("dynatemp_range", settings.getDynamicTempRage());
+        toPost.put("dynatemp_exponent", settings.getDynamicExponent());
         toPost.put("top_k", settings.getTopK());
+        toPost.put("top_p", settings.getTopP());
+        toPost.put("min_p", settings.getMinP());
+        toPost.put("xtc_probability", settings.getXtcProbability());
+        toPost.put("xtc_threshold", settings.getXtxThreshold());
+        toPost.put("typical_p", settings.getTypicalP());
         toPost.put("repeat_last_n", settings.getRepeatTokens());
         toPost.put("repeat_penalty", settings.getRepeatPenalty());
-        //TODO: Add more sampling parameters!
+        toPost.put("presence_penalty", settings.getPresencePenalty());
+        toPost.put("frequency_penalty", settings.getFrequencyPenalty());
+        toPost.put("dry_multiplier", settings.getDryMultiplier());
+        toPost.put("dry_base", settings.getDryBase());
+        toPost.put("dry_allowed_length", settings.getDryAllowedLength());
+        toPost.put("dry_penalty_last_n", settings.getDryPenaltyTokens());
 
         response.createOAIContext(true);
         toPost.put("messages", response.getMessages());
@@ -140,7 +150,6 @@ public class Server {
                         // Apply coloring for roleplay. Yellow around quotes, blue around astrix
                         updated = Placeholder.applyDynamicBBCode(updated);
 
-                        // TODO: Check to see if the response is part of it's reasoning
                         // 1. Check to see if response starts with think tags. <think>
                         // 2. Make sure the think tags haven't ended. Does not contain </think>
                         if (updated.toLowerCase().startsWith("<think>") && !updated.toLowerCase().contains("</think>")) {
@@ -322,7 +331,6 @@ public class Server {
                         // Apply coloring for roleplay. Yellow around quotes, blue around astrix
                         updated = Placeholder.applyDynamicBBCode(updated);
 
-                        // TODO: Check to see if the response is part of it's reasoning
                         // 1. Check to see if response starts with think tags. <think>
                         // 2. Make sure the think tags haven't ended. Does not contain </think>
                         if (updated.toLowerCase().startsWith("<think>") && !updated.toLowerCase().contains("</think>")) {
