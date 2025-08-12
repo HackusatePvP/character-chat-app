@@ -66,6 +66,7 @@ public class App {
             loading = true;
             loadUserTemplates();
             loadCharacters();
+            App.logger.info("Loaded character data.");
             loading = false;
         });
 
