@@ -50,7 +50,7 @@ public class HomeView extends EmptyContainer {
 
             root.addElement(layout);
         } else {
-            buildBody(root);
+            buildBody();
         }
 
         addElement(new ServerLayout(appSettings.getWidth(), 50));
@@ -62,7 +62,8 @@ public class HomeView extends EmptyContainer {
                     if (!loading) break;
                 }
                 Platform.runLater(() -> {
-                    buildBody(root);
+                    root.removeElement(1);
+                    buildBody();
                 });
             }));
         }
@@ -120,7 +121,7 @@ public class HomeView extends EmptyContainer {
 
     }
 
-    public void buildBody(HorizontalLayout root) {
+    public void buildBody() {
         if (!App.getInstance().getCharacters().isEmpty()) {
             root.addElement(new CharactersView().getRoot());
         } else {
