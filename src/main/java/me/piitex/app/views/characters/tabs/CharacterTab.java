@@ -133,8 +133,8 @@ public class CharacterTab extends Tab {
                 appSettings.setImagesPath(selectedFile.getParent());
 
                 parentView.updateInfoData();
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(character, user, parentView.getInfoFile(), this).getRoot());
+
+                image.setImage(new ImageLoader(selectedFile));
             }
         });
         return root;
