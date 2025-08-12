@@ -9,7 +9,6 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.models.ModelEditView;
-import me.piitex.app.views.models.ModelsView;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.ScrollContainer;
@@ -40,19 +39,18 @@ public class ListTab extends Tab {
 
         // Build the list view for the models.
         VerticalLayout layout = new VerticalLayout(0, -1);
-        layout.setX(20);
+        layout.setMaxSize(0, -1);
         layout.setSpacing(10);
         layout.setPrefSize(appSettings.getWidth() - 500, 0);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer = new ScrollContainer(layout, 20, 20, appSettings.getWidth() - 320, appSettings.getHeight() - 200);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 320, appSettings.getHeight() - 200);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
         addElement(scrollContainer); // Adds the scroll container
 
         buildModelCards(layout); // Adds the models to the view
-
     }
 
     public void buildModelCards(Layout layout) {
@@ -76,6 +74,7 @@ public class ListTab extends Tab {
             String formattedFileSize = df.format(fileSizeInGB);
 
             TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 10, -1);
+            root.setMaxSize(scrollContainer.getWidth() - 10, -1);
             root.addStyle(Styles.DENSE);
             root.setSpacing(30);
             root.setAlignment(Pos.TOP_CENTER);
