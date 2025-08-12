@@ -12,6 +12,17 @@ public class ModelSettings {
     private int topK = 40; // Min 0
     private int repeatTokens = 64; // min -1
     private double repeatPenalty = 1.1; // min 1.0
+    private double dynamicTempRage = 0.0;
+    private double dynamicExponent = 1;
+    private double xtcProbability = 0;
+    private double xtxThreshold = 0.1;
+    private double typicalP = 1.0;
+    private double presencePenalty = 0;
+    private double frequencyPenalty = 0;
+    private double dryMultiplier = 0;
+    private double dryBase = 1.75;
+    private int dryAllowedLength = 2;
+    private int dryPenaltyTokens = -1;
     private String mmProj = "None / Disabled";
     private String chatTemplate = "default";
     private String reasoningTemplate = "disabled";
@@ -66,6 +77,61 @@ public class ModelSettings {
             this.repeatPenalty = infoFile.getDouble("repeat-penalty");
         } else {
             infoFile.set("repeat-penalty", repeatPenalty);
+        }
+        if (infoFile.hasKey("dynamic-temp-range")) {
+            this.dynamicTempRage = infoFile.getDouble("dynamic-temp-range");
+        } else {
+            infoFile.set("dynamic-temp-range", dynamicTempRage);
+        }
+        if (infoFile.hasKey("dynamic-exponent")) {
+            this.dynamicExponent = infoFile.getDouble("dynamic-exponent");
+        } else {
+            infoFile.set("dynamic-exponent", dynamicExponent);
+        }
+        if (infoFile.hasKey("xtc-probability")) {
+            this.xtcProbability = infoFile.getDouble("xtc-probability");
+        } else {
+            infoFile.set("xtc-probability", xtcProbability);
+        }
+        if (infoFile.hasKey("xtc-threshold")) {
+            this.xtxThreshold = infoFile.getDouble("xtc-threshold");
+        } else {
+            infoFile.set("xtc-threshold", xtxThreshold);
+        }
+        if (infoFile.hasKey("typical-p")) {
+            this.typicalP = infoFile.getDouble("typical-p");
+        } else {
+            infoFile.set("typical-p", typicalP);
+        }
+        if (infoFile.hasKey("presence-penalty")) {
+            this.presencePenalty = infoFile.getDouble("presence-penalty");
+        } else {
+            infoFile.set("presence-penalty", presencePenalty);
+        }
+        if (infoFile.hasKey("frequency-penalty")) {
+            this.frequencyPenalty = infoFile.getDouble("frequency-penalty");
+        } else {
+            infoFile.set("frequency-penalty", frequencyPenalty);
+        }
+        if (infoFile.hasKey("dry-multiplier")) {
+            this.dryMultiplier = infoFile.getDouble("dry-multiplier");
+        } else {
+            infoFile.set("dry-multiplier", dryMultiplier);
+        }
+        if (infoFile.hasKey("dry-base")) {
+            this.dryBase = infoFile.getDouble("dry-base");
+        } else {
+            infoFile.set("dry-base", dryBase);
+        }
+        if (infoFile.hasKey("dry-length")) {
+            this.dryAllowedLength = infoFile.getInteger("dry-length");
+        } else {
+            infoFile.set("dry-length", dryAllowedLength);
+        }
+        if (infoFile.hasKey("dry-penalty-tokens")) {
+            this.dryPenaltyTokens = infoFile.getInteger("dry-penalty-tokens");
+        } else {
+            infoFile.set("dry-penalty-tokens", dryPenaltyTokens);
         }
         if (infoFile.hasKey("chat-template")) {
             this.chatTemplate = infoFile.get("chat-template");
@@ -178,6 +244,105 @@ public class ModelSettings {
         if (infoFile != null) {
             infoFile.set("repeat-penalty", repeatPenalty);
         }
+    }
+
+    public double getDynamicTempRage() {
+        return dynamicTempRage;
+    }
+
+    public void setDynamicTempRage(double dynamicTempRage) {
+        this.dynamicTempRage = dynamicTempRage;
+        infoFile.set("dynamic-temp-range", dynamicTempRage);
+    }
+
+    public double getDynamicExponent() {
+        return dynamicExponent;
+    }
+
+    public void setDynamicExponent(double dynamicExponent) {
+        this.dynamicExponent = dynamicExponent;
+        infoFile.set("dynamic-exponent", dynamicExponent);
+    }
+
+    public double getXtcProbability() {
+        return xtcProbability;
+    }
+
+    public void setXtcProbability(double xtcProbability) {
+        this.xtcProbability = xtcProbability;
+        infoFile.set("xtc-probability", xtcProbability);
+    }
+
+    public double getXtxThreshold() {
+        return xtxThreshold;
+    }
+
+    public void setXtxThreshold(double xtxThreshold) {
+        this.xtxThreshold = xtxThreshold;
+        infoFile.set("xtc-threshold", xtxThreshold);
+    }
+
+    public double getTypicalP() {
+        return typicalP;
+    }
+
+    public void setTypicalP(double typicalP) {
+        this.typicalP = typicalP;
+        infoFile.set("typical-p", typicalP);
+    }
+
+    public double getPresencePenalty() {
+        return presencePenalty;
+    }
+
+    public void setPresencePenalty(double presencePenalty) {
+        this.presencePenalty = presencePenalty;
+        infoFile.set("presence-penalty", presencePenalty);
+    }
+
+    public double getFrequencyPenalty() {
+        return frequencyPenalty;
+    }
+
+    public void setFrequencyPenalty(double frequencyPenalty) {
+        this.frequencyPenalty = frequencyPenalty;
+        infoFile.set("frequency-penalty", frequencyPenalty);
+    }
+
+    public double getDryMultiplier() {
+        return dryMultiplier;
+    }
+
+    public void setDryMultiplier(double dryMultiplier) {
+        this.dryMultiplier = dryMultiplier;
+        infoFile.set("dry-multiplier", dryMultiplier);
+    }
+
+    public double getDryBase() {
+        return dryBase;
+    }
+
+    public void setDryBase(double dryBase) {
+        this.dryBase = dryBase;
+        infoFile.set("dry-base", dryBase);
+    }
+
+    public int getDryAllowedLength() {
+        return dryAllowedLength;
+    }
+
+    public void setDryAllowedLength(int dryAllowedLength) {
+        this.dryAllowedLength = dryAllowedLength;
+        infoFile.set("dry-length", dryAllowedLength);
+    }
+
+    public int getDryPenaltyTokens() {
+        return dryPenaltyTokens;
+    }
+
+    public void setDryPenaltyTokens(int dryPenaltyTokens) {
+        this.dryPenaltyTokens = dryPenaltyTokens;
+        infoFile.set("dry-penalty-tokens", dryPenaltyTokens);
     }
 
     public String getChatTemplate() {
