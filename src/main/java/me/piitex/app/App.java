@@ -32,7 +32,6 @@ public class App {
 
     // Doesn't support natively ran mobile, but can at least make it viewable with remote connection.
     public static boolean mobile = false;
-    public static boolean vulkanDisable = false;
 
     public static final Logger logger = LogManager.getLogger(App.class);
 
