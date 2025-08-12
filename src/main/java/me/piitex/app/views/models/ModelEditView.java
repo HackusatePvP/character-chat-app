@@ -117,10 +117,10 @@ public class ModelEditView {
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.setTitle("Context Size");
-        tileContainer.setDescription("The size of the prompts tokens.");
+        tileContainer.setDescription("Maximum size for context tokens. Recommended setting this between 4096 - 16834.");
 
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("Different models will support different sizes. Recommend setting this between 4096 - 16384");
+        info.setTooltip("The max amount of tokens to store for context. -1 will auto assign this value to the max. Higher values will consume large amounts of V-Ram.");
         tileContainer.setGraphic(info);
 
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, contextSize);
