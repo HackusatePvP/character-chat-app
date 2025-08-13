@@ -18,6 +18,7 @@ import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.ScrollContainer;
+import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
@@ -36,21 +37,21 @@ public class CharactersView {
     private final int spacing = 20;
 
     public CharactersView() {
-        VerticalLayout layout = new VerticalLayout(0, 0);
+        VerticalLayout layout = new VerticalLayout(0, -1);
         AppSettings appSettings = App.getInstance().getAppSettings();
         layout.setMaxSize(appSettings.getWidth() - 400, 0);
         layout.setSpacing(20);
 
         if (App.mobile) {
-            root = new ScrollContainer(layout, 20, 20, 400, 0);
+            root = new ScrollContainer(layout, 0, 0, 400, -1);
             root.setMaxSize(400, 1000);
             imageWidth = 128;
             imageHeight = 128;
-            cardWidth = 125;
+            cardWidth = 160;
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 300, 0);
+            root = new ScrollContainer(layout, 10, 10, appSettings.getWidth() - 310, -1);
             root.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
             imageWidth = 256;
             imageHeight = 256;
@@ -61,21 +62,14 @@ public class CharactersView {
         root.setHorizontalScroll(false);
         root.setVerticalScroll(true);
 
-        HorizontalLayout base = new HorizontalLayout(0, 0);
-        base.setSpacing(20);
-        layout.addElement(base);
 
-        int i = 0;
-        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        int max = (App.mobile ? 3 : (int) Math.round(6 * scaleFactor));
+        FlowLayout base = new FlowLayout(root.getWidth(), -1);
+        base.setVerticalSpacing(20);
+        base.setHorizontalSpacing(20);
+        base.addStyle(Styles.BORDER_DEFAULT);
+
+        layout.addElement(base);
         for (Character character : App.getInstance().getCharacters().values()) {
-            if (i == max) {
-                // Start a new horizontal row
-                base = new HorizontalLayout(0, 0);
-                base.setSpacing(20);
-                layout.addElement(base);
-                i = 0;
-            }
 
             CardContainer card = new CardContainer(0,0, cardWidth, cardHeight);
             card.setMaxSize(cardWidth, cardHeight);
@@ -137,8 +131,6 @@ public class CharactersView {
             card.setFooter(buildControlBox(character));
 
             base.addElement(card);
-
-            i++;
         }
     }
 
