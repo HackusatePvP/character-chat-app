@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -191,25 +192,27 @@ public class DownloadTab extends Tab {
         setupFileInfoFetch(tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
         setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
 
-        tileLayout.addRenderEvent(event -> {
-            // This has to be done AFTER the layout has rendered.
-            // If the user left the download page the download will continue.
-            // When they re-enter the page check to see if the url is still being downloaded.
-            // If so re-apply the download indicators and controls.
-            if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-                TitledPane titledPane = titledContainer.getTitledPane();
-                titledPane.setExpanded(true);
 
-                FileInfo fileInfo = new FileInfo(0, "Unknown", modelKey);
-                fileInfo.setDownloaded(false);
-                fileInfoRef.set(fileInfo);
-                createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+        // Needs to be on a delay in order to properly put the card at the top.
+        App.getThreadPoolManager().submitSchedule(() -> {
+            Platform.runLater(() -> {
+                // This has to be done AFTER the layout has rendered.
+                // If the user left the download page the download will continue.
+                // When they re-enter the page check to see if the url is still being downloaded.
+                // If so re-apply the download indicators and controls.
+                if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                    titledContainer.setExpanded(true);
+                    FileInfo fileInfo = new FileInfo(0, "Unknown", modelKey);
+                    fileInfo.setDownloaded(false);
+                    fileInfoRef.set(fileInfo);
+                    createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
 
-                // Add downloads to the top of the view.
-                downloadListLayout.getPane().getChildren().remove(titledPane);
-                downloadListLayout.getPane().getChildren().addFirst(titledPane);
-            }
-        });
+                    // Add downloads to the top of the view.
+                    downloadListLayout.getPane().getChildren().remove(titledContainer.getTitledPane());
+                    downloadListLayout.getPane().getChildren().addFirst(titledContainer.getTitledPane());
+                }
+            });
+        }, 500, TimeUnit.MILLISECONDS);
 
         return tileLayout;
     }
