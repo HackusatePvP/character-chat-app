@@ -142,7 +142,7 @@ public class ModelTab extends Tab {
             leave.addStyle(Styles.DANGER);
             leave.onClick(event1 -> {
                 App.window.clearContainers();
-                App.window.addContainer(new ModelEditView(character.getModelSettings()).getContainer());
+                App.window.addContainer(new ModelEditView(character.getModelSettings()));
             });
 
             dialogueContainer.setCancelButton(stay);

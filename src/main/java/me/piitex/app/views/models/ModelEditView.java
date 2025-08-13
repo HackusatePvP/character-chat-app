@@ -5,7 +5,6 @@ import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.views.SidebarView;
-import me.piitex.engine.Container;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
@@ -19,11 +18,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ModelEditView {
+public class ModelEditView extends EmptyContainer {
     private final ModelSettings settings;
     private int layoutSpacing = 150;
-    private final Container container;
-
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     private String instructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
@@ -40,14 +37,14 @@ public class ModelEditView {
     private boolean jinja = false;
 
     public ModelEditView(ModelSettings settings) {
+        super(App.getInstance().getAppSettings().getWidth(), App.getInstance().getAppSettings().getHeight() - 100);
         this.settings = settings;
         initializeSettings();
-        container = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight() - 100);
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
         main.setSpacing(35);
         main.addElement(new SidebarView(main, false).getRoot());
-        container.addElement(main);
+        addElement(main);
 
         VerticalLayout layout = new VerticalLayout(0, 0);
 
@@ -436,9 +433,5 @@ public class ModelEditView {
         layout.addElements(discard, submit);
 
         return layout;
-    }
-
-    public Container getContainer() {
-        return container;
     }
 }
