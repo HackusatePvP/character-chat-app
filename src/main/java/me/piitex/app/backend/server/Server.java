@@ -161,18 +161,18 @@ public class Server {
 
                             TitledLayout thinkCard;
                             if (element instanceof CardContainer cardContainer) {
-                                thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
+                                thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_HEIGHT);
                                 chatMessageBox.addElement(thinkCard, 0);
 
                                 // Set card body to 'thinking'
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBodyOverlay();
+                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
                                 textFlowOverlay.setText("Thinking...");
                             } else {
                                 thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
                                 thinkCard.setMaxSize(0, -1);
 
                                 CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1);
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBodyOverlay();
+                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
                                 textFlowOverlay.setText("Thinking...");
                             }
 
@@ -210,7 +210,7 @@ public class Server {
                                 caught = true;
                             } finally {
                                 if (!caught) {
-                                    TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBodyOverlay();
+                                    TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBody();
                                     textFlowOverlay.setText(updated);
                                 }
                             }
@@ -348,14 +348,14 @@ public class Server {
                                 chatMessageBox.addElement(thinkCard, 0);
 
                                 // Set card body to 'thinking'
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBodyOverlay();
+                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
                                 textFlowOverlay.setText("Thinking...");
                             } else {
                                 thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
 
                                 CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1);
 
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBodyOverlay();
+                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
                                 textFlowOverlay.setText("Thinking...");
                             }
 
@@ -385,7 +385,7 @@ public class Server {
                                 updated = updated.replace("</think>", "").replace("<think>", "");
                             }
 
-                            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBodyOverlay();
+                            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBody();
                             textFlowOverlay.setText(updated);
                         }
 
