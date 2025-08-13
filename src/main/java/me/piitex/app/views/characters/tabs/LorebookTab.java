@@ -50,7 +50,6 @@ public class LorebookTab extends Tab {
 
         HorizontalLayout displayBox = new HorizontalLayout(0, -1);
         displayBox.setSpacing(100);
-        displayBox.setMaxSize(600, 0);
         rootLayout.addElement(displayBox);
 
         CardContainer addContainer = new CardContainer(0, 0, 400, 400);
@@ -108,6 +107,7 @@ public class LorebookTab extends Tab {
         root.setVerticalScroll(true);
         root.setScrollWhenNeeded(false);
         root.setHorizontalScroll(false);
+        root.setPannable(true);
 
         App.logger.info("Building lore cache...");
         for (Map.Entry<String, String> entry : loreItems.entrySet()) {
