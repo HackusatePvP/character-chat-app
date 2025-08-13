@@ -310,8 +310,8 @@ public class ChatView extends EmptyContainer {
                         if (App.window.getCurrentPopup() != null) { // Check if popup still exists
                             App.window.removeContainer(App.window.getCurrentPopup());
 
-                            send.getNode().setDisable(false);
-                            submit.getNode().setDisable(false);
+                            send.setEnabled(true);
+                            submit.setEnabled(true);
                         }
                     });
                     // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
@@ -322,8 +322,8 @@ public class ChatView extends EmptyContainer {
     }
 
     private void renderProgress() {
-        send.getNode().setDisable(true);
-        submit.getNode().setDisable(true);
+        send.setEnabled(false);
+        submit.setEnabled(false);
 
         // Display progress bar for backend loading
         ProgressBarOverlay progress = new ProgressBarOverlay();
@@ -355,7 +355,7 @@ public class ChatView extends EmptyContainer {
                 if (previousSender == Role.ASSISTANT) {
                     CardContainer card = (CardContainer) previous.getElements().values().stream().filter(element -> element instanceof CardContainer).findAny().orElse(null);
                     if (card != null) {
-                        HorizontalLayout buttonLayout = (HorizontalLayout) card.getFooterLayout();
+                        HorizontalLayout buttonLayout = (HorizontalLayout) card.getFooter();
                         buttonLayout.removeElement(buttonLayout.getElements().lastKey());
                     }
                 }
