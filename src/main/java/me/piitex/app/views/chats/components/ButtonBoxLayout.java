@@ -77,8 +77,6 @@ public class ButtonBoxLayout extends HorizontalLayout {
         addElement(edit);
 
         edit.onClick(event -> {
-            if (ServerProcess.getCurrentServer().isLoading()) return;
-
             ChatMessage originalMessage = chat.getMessage(index);
 
             if (originalMessage == null) {
@@ -88,11 +86,12 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
             String contentForEdit = originalMessage.getContent();
 
+
+            ModalContainer modalContainer = new ModalContainer(400, 400);
+            modalContainer.addStyle(Styles.ELEVATED_1);
+
             VerticalLayout verticalLayout = new VerticalLayout(0, 0);
             verticalLayout.addStyle(Styles.BG_INSET);
-
-            ModalContainer modalContainer = new ModalContainer(verticalLayout, 400, 400);
-            modalContainer.addStyle(Styles.ELEVATED_1);
 
             verticalLayout.addElement(new TextOverlay("Edit Message"));
             TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(contentForEdit), 0, 0, 400, 300);
@@ -120,6 +119,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
                 App.window.removeContainer(modalContainer);
             });
 
+            modalContainer.setContent(verticalLayout);
             App.window.renderPopup(modalContainer, PopupPosition.CENTER, 400, 400);
 
             if (modalContainer.getView() != null) {
