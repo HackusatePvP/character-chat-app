@@ -323,16 +323,16 @@ public class CharacterEditView {
                     currentCharacterInstance = character;
                 }
 
-                currentCharacterInstance.setDisplayName(((TextField) characterTabInstance.getCharDisplayName().getNode()).getText());
-                currentCharacterInstance.setPersona(((StyledTextArea<?, ?>) characterTabInstance.getCharDescription().getNode()).getText());
+                currentCharacterInstance.setDisplayName(characterTabInstance.getCharDisplayName().getCurrentText());
+                currentCharacterInstance.setPersona(characterTabInstance.getCharDescription().getCurrentText());
                 currentCharacterInstance.setLorebook(loreItems);
                 currentCharacterInstance.setExampleDialogue(exampleDialogue);
-                currentCharacterInstance.setFirstMessage(((StyledTextArea<?, ?>) chatTabInstance.getFirstMessageInput().getNode()).getText());
-                currentCharacterInstance.setChatScenario(((StyledTextArea<?, ?>) chatTabInstance.getChatScenarioInput().getNode()).getText());
+                currentCharacterInstance.setFirstMessage(chatTabInstance.getFirstMessageInput().getCurrentText());
+                currentCharacterInstance.setChatScenario(chatTabInstance.getChatScenarioInput().getCurrentText());
                 currentCharacterInstance.setChatContext(chatTabInstance.getChatContextSpinner().getCurrentValue().intValue());
 
-                currentCharacterInstance.setOverride(((ToggleSwitch) modelTabInstance.getModelOverride().getNode()).isSelected());
-                currentCharacterInstance.setModel(((ComboBox) modelTabInstance.getModelSelection().getNode()).getSelectionModel().getSelectedItem().toString());
+                currentCharacterInstance.setOverride(modelTabInstance.getModelOverride().getCurrentValue());
+                currentCharacterInstance.setModel(modelTabInstance.getModelSelection().getSelected());
 
                 // Handle character icon file copy
                 if (characterIconPath != null && characterIconPath.exists()) {
@@ -358,9 +358,9 @@ public class CharacterEditView {
 
                     character.setUser(characterSpecificUser);
                 } else {
-                    user = new User(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText(), new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true));
-                    user.setDisplayName(((TextField) userTabInstance.getUserDisplayNameInput().getNode()).getText());
-                    user.setPersona(((StyledTextArea) userTabInstance.getUserDescription().getNode()).getText());
+                    user = new User(userTabInstance.getUserDisplayNameInput().getCurrentText(), new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true));
+                    user.setDisplayName(userTabInstance.getUserDisplayNameInput().getCurrentText());
+                    user.setPersona(userTabInstance.getUserDescription().getCurrentText());
                     character.setUser(user);
                 }
 
