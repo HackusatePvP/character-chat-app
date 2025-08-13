@@ -97,7 +97,8 @@ public class JavaFXLoad extends Application {
         // Build home view
         App.logger.info("Navigating to home page.");
         window.clearContainers();
-        window.addContainer(new HomeView());
+        HomeView homeView = new HomeView();
+        window.addContainer(homeView);
 
         FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
         icon.addExitItem("Exit", e -> App.shutdown());
