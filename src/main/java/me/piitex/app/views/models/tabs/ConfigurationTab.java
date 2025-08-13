@@ -266,13 +266,10 @@ public class ConfigurationTab extends Tab {
                 App.logger.info("Server is already running.");
                 return;
             }
-            Button startButton = (Button) start.getNode();
-            Button reloadButton = (Button) reload.getNode();
-            Button stopButton = (Button) stop.getNode();
 
-            startButton.setDisable(true);
-            reloadButton.setDisable(true);
-            stopButton.setDisable(true);
+            start.setEnabled(true);
+            reload.setEnabled(true);
+            stop.setEnabled(true);
 
             renderProgress();
             Model model = settings.getGlobalModel();
