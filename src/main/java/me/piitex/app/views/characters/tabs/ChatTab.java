@@ -50,12 +50,12 @@ public class ChatTab extends Tab {
         info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
         layout.addElement(info);
 
-        CardContainer firstCard = new CardContainer(0, 0, 0, 0);
-        firstCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
+        CardContainer firstCard = new CardContainer(0, 0, 0, -1);
+        firstCard.setMaxSize(layout.getWidth() - 200, -1);
         layout.addElement(firstCard);
 
-        HorizontalLayout firstBox = new HorizontalLayout(0, TEXT_AREA_HEIGHT);
-        firstBox.setMaxSize(firstBox.getWidth(), TEXT_AREA_HEIGHT);
+        HorizontalLayout firstBox = new HorizontalLayout(0, -1);
+        firstBox.setMaxSize(firstBox.getWidth(), -1);
         firstBox.setSpacing(layoutSpacing);
         firstCard.setBody(firstBox);
 
@@ -78,7 +78,7 @@ public class ChatTab extends Tab {
         firstMessageInput.addStyle(Styles.TEXT_ON_EMPHASIS);
         firstBox.addElement(firstMessageInput);
 
-        CardContainer scenarioCard = new CardContainer(0, 0, 0, 0);
+        CardContainer scenarioCard = new CardContainer(0, 0, 0, -1);
         scenarioCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         layout.addElement(scenarioCard);
 
@@ -105,11 +105,11 @@ public class ChatTab extends Tab {
         chatScenarioInput.addStyle(appSettings.getChatTextSize());
         chatScenarioInput.addStyle(Styles.TEXT_ON_EMPHASIS);
 
-        CardContainer contextCard = new CardContainer(0, 0, 0, 0);
+        CardContainer contextCard = new CardContainer(0, 0, 0, TEXT_AREA_HEIGHT);
         contextCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         layout.addElement(contextCard);
 
-        HorizontalLayout contextBox = new HorizontalLayout(0, 0);
+        HorizontalLayout contextBox = new HorizontalLayout(0, -1);
         contextBox.setAlignment(Pos.BASELINE_LEFT);
         contextBox.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
         contextBox.setSpacing(layoutSpacing);
