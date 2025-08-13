@@ -483,7 +483,7 @@ public class CharacterEditMobileView {
             CardContainer toAdd = buildLoreEntry(addKey.getCurrentText(), (VerticalLayout) scrollLore.getLayout());
             scrollLore.getLayout().addElement(toAdd);
 
-            Node node = toAdd.build().getKey();
+            Node node = toAdd.build();
             vBox.getChildren().add(node);
             // ALSO ADD TO RENDERED
             scrollLore.getLayout().getRenderedNodes().put(addKey.getCurrentText(), node);

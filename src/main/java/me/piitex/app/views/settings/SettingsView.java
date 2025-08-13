@@ -197,7 +197,7 @@ public class SettingsView {
             build();
             Pane pane = (Pane) container.getView();
             pane.getChildren().clear();
-            pane.getChildren().addAll(container.build().getValue());
+            pane.getChildren().addAll(container.build());
 
         });
 
