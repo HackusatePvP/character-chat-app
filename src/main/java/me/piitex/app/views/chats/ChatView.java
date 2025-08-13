@@ -437,19 +437,12 @@ public class ChatView extends EmptyContainer {
         stop.onClick(event -> {
             App.logger.info("Force stopping response...");
             stopNode.setDisable(true);
-
             thread.cancel(true); // Does not stop input stream
-            Platform.runLater(() -> {
-                ProgressBarOverlay progress = new ProgressBarOverlay();
-                progress.setWidth(120);
-                progress.setMaxHeight(50);
-                progress.setY(10);
-                TextOverlay label = new TextOverlay("Stopping Response...");
-                App.window.renderPopup(progress, 800, 885, 200, 100, false, label);
-            });
+
+            topControls.removeElement(stop);
         });
 
-        topControls.getPane().getChildren().add(stopNode);
+        topControls.addElement(stop);
     }
 
     public VerticalLayout getLayout() {
