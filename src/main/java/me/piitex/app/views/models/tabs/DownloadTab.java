@@ -82,7 +82,7 @@ public class DownloadTab extends Tab {
     private VerticalLayout createMainLayout() {
         VerticalLayout layout = new VerticalLayout(0, -1);
         layout.setX(20);
-        layout.setSpacing(0);
+        layout.setSpacing(10);
         layout.setPrefSize(appSettings.getWidth() - 500, -1);
         return layout;
     }
@@ -119,22 +119,18 @@ public class DownloadTab extends Tab {
                 String description = configUtil.getString(key + ".description");
 
                 DownloadModel downloadModel = new DownloadModel(key, name, rawLinks);
-
                 TitledLayout downloadContainer = createDownloadContainer(name, description, downloadModel);
-
                 Platform.runLater(() -> {
-                    Node node = downloadContainer.render();
-                    // Check is needed for race condition. If a download is in progress the container may already be mapped to children.
-                    if (!downloadListLayout.getPane().getChildren().contains(node)) {
-                        downloadListLayout.getPane().getChildren().add(node);
-                    }
+                    downloadListLayout.addElement(downloadContainer);
                 });
             }
+
+            App.logger.info("Finished thread...");
         });
     }
 
     private TitledLayout createDownloadContainer(String title, String description, DownloadModel downloadModel) {
-        TitledLayout titledContainer = new TitledLayout(title, 0, -1);
+        TitledLayout titledContainer = new TitledLayout(title, scrollContainer.getWidth() - 10, -1);
         titledContainer.addStyle(Styles.DENSE);
         titledContainer.addStyle(Tweaks.ALT_ICON);
         titledContainer.setSpacing(CONTAINER_SPACING);
@@ -147,7 +143,10 @@ public class DownloadTab extends Tab {
 
         downloadModel.getLinks().forEach((quantization, url) -> {
             HorizontalLayout tileLayout = createDownloadTile(titledContainer, quantization, url, downloadModel.getKey());
-            titledContainer.addElement(tileLayout);
+
+            Platform.runLater(() -> {
+                titledContainer.addElement(tileLayout);
+            });
         });
 
         return titledContainer;
@@ -227,7 +226,6 @@ public class DownloadTab extends Tab {
         long instant = System.currentTimeMillis();
         long difference = instant - lastCheck;
         long millisInDay = 1000L * 60 * 60 * 24;
-
         if (difference < millisInDay && !downloadCache.getString(dlKey + ".name").equals("Unknown")) {
             if (downloadCache.has(dlKey)) {
                 String name = downloadCache.getString(dlKey + ".name");
@@ -236,11 +234,13 @@ public class DownloadTab extends Tab {
                 fileInfoRef.set(fileInfo);
 
                 tileLayout.addRenderEvent(event -> {
-                    ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
+                    sizeText.setText(fileInfo.getDownloadSize());
 
                     if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-                        addDownloadedTag(tileLayout);
-                        downloadIcon.getNode().setDisable(true);
+                        Platform.runLater(() -> {
+                            addDownloadedTag(tileLayout);
+                            downloadIcon.setEnabled(false);
+                        });
                     }
                 });
             }
@@ -253,11 +253,11 @@ public class DownloadTab extends Tab {
                 FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
                 fileInfoRef.set(fileInfo);
 
-                ((Text) sizeText.getNode()).setText(fileInfo.getDownloadSize());
+                sizeText.setText(fileInfo.getDownloadSize());
 
                 if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
                     addDownloadedTag(tileLayout);
-                    downloadIcon.getNode().setDisable(true);
+                    downloadIcon.setEnabled(false);
                 }
 
                 // Write long
@@ -288,7 +288,7 @@ public class DownloadTab extends Tab {
     private void createDownloadInputs(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef) {
 
         Platform.runLater(() -> {
-            downloadIcon.getNode().setDisable(true);
+            downloadIcon.setEnabled(false);
         });
 
 
@@ -316,7 +316,7 @@ public class DownloadTab extends Tab {
         Platform.runLater(() -> {
             tileLayout.getPane().getChildren().add(progressIndicator);
             tileLayout.getPane().getChildren().add(downloadSpeed);
-            tileLayout.getPane().getChildren().add(stopButton.render());
+            tileLayout.getPane().getChildren().add(stopButton.assemble());
         });
 
         AtomicLong lastDownload = new AtomicLong(0L);
@@ -334,13 +334,13 @@ public class DownloadTab extends Tab {
         downloadProcess.setDownloadCompleteListener(result -> Platform.runLater(() -> {
             // Remove the download control buttons
             tileLayout.getPane().getChildren().remove(progressIndicator);
-            tileLayout.getPane().getChildren().remove(stopButton.render());
+            tileLayout.getPane().getChildren().remove(stopButton.assemble());
             tileLayout.getPane().getChildren().remove(downloadSpeed);
 
             if (result.isSuccess()) {
                 addDownloadedTag(tileLayout);
             } else {
-                downloadIcon.getNode().setDisable(false);
+                downloadIcon.setEnabled(true);
             }
 
             tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
@@ -363,7 +363,7 @@ public class DownloadTab extends Tab {
             // Remove UI elements and re-enable download button
             Platform.runLater(() -> {
                 tileLayout.getPane().getChildren().removeIf(node -> node instanceof RingProgressIndicator || (node instanceof Text && ((Text)node).getText().equals(new FontIcon(Material2MZ.STOP_CIRCLE).toString())));
-                downloadIcon.getNode().setDisable(false);
+                downloadIcon.setEnabled(true);
             });
 
             fileInfoRef.get().setDownloaded(false);
@@ -375,7 +375,12 @@ public class DownloadTab extends Tab {
         ButtonOverlay tag = new ButtonBuilder("tag").setText("Downloaded").build();
         tag.setEnabled(false);
         tag.addStyle(Styles.BUTTON_OUTLINED);
-        Platform.runLater(() -> tileLayout.getPane().getChildren().add(tag.render()));
+        Platform.runLater(() -> {
+            if (tileLayout.getElements().size() == 3) {
+                tileLayout.addElement(tag);
+            }
+        });
+
     }
 
 
