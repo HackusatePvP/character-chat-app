@@ -37,6 +37,7 @@ public class CharacterTab extends Tab {
     private RichTextAreaOverlay charDescription;
     private InputFieldOverlay charIdInput;
     private InputFieldOverlay charDisplayName;
+    private ImageOverlay image;
 
     public CharacterTab(AppSettings appSettings, @Nullable Character character, @Nullable User user, boolean duplicate, CharacterEditView parentView) {
         super("Character");
@@ -109,7 +110,7 @@ public class CharacterTab extends Tab {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
-        ImageOverlay image = new ImageOverlay(new ImageLoader(currentIconPath));
+        image = new ImageOverlay(new ImageLoader(currentIconPath));
         image.setFitWidth(128);
         image.setFitHeight(128);
         image.setPreserveRatio(false);
@@ -178,18 +179,22 @@ public class CharacterTab extends Tab {
             File file = event.getDirectory();
             try {
                 JSONObject metadata = CharacterCardImporter.getImageMetaData(file);
+                charIdInput.setCurrentText(CharacterCardImporter.getCharacterId(metadata));
+                charDisplayName.setCurrentText(CharacterCardImporter.getCharacterDisplayName(metadata));
+                charDescription.setCurrentText(CharacterCardImporter.getCharacterPersona(metadata));
 
-                parentView.setCharacterId(CharacterCardImporter.getCharacterId(metadata));
-                parentView.setCharacterDisplay(CharacterCardImporter.getCharacterDisplayName(metadata));
-                parentView.setCharacterPersona(CharacterCardImporter.getCharacterPersona(metadata));
-                parentView.setLoreItems(CharacterCardImporter.getLoreItems(metadata));
-                parentView.setChatFirstMessage(CharacterCardImporter.getFirstMessage(metadata));
-                parentView.setChatScenario(CharacterCardImporter.getChatScenario(metadata));
+                parentView.getLoreBookTabInstance().getItems().clear();
+                parentView.getLoreBookTabInstance().getItems().putAll(CharacterCardImporter.getLoreItems(metadata));
+                parentView.getLoreBookTabInstance().buildLorebookTabContent();
+
+                parentView.getChatTabInstance().getFirstMessageInput().setCurrentText(CharacterCardImporter.getFirstMessage(metadata));
+                parentView.getChatTabInstance().getChatScenarioInput().setCurrentText(CharacterCardImporter.getChatScenario(metadata));
+
                 parentView.setCharacterIconPath(file);
+                parentView.getInfoFile().set("icon-path", file.getAbsolutePath());
+                image.setImage(new ImageLoader(file));
 
                 parentView.updateInfoData();
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(parentView.getCharacter(), parentView.getUser(), parentView.getInfoFile(), this).getRoot());
 
             } catch (ImageProcessingException | IOException e) {
                 App.logger.error("Error importing character card: ", e);

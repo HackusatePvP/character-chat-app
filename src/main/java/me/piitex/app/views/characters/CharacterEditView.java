@@ -1,12 +1,10 @@
 package me.piitex.app.views.characters;
 
-import atlantafx.base.controls.ToggleSwitch;
 import atlantafx.base.theme.Styles;
 import com.drew.lang.annotations.Nullable;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.util.Duration;
 import me.piitex.app.App;
@@ -30,7 +28,6 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
-import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -77,6 +74,7 @@ public class CharacterEditView {
 
     private CharacterTab characterTabInstance;
     private UserTab userTabInstance;
+    private LorebookTab loreBookTabInstance;
     private ChatTab chatTabInstance;
     private ModelTab modelTabInstance;
 
@@ -252,7 +250,9 @@ public class CharacterEditView {
         userTabInstance = new UserTab(appSettings, infoFile, character, this);
         tabsContainer.addTab(userTabInstance);
 
-        tabsContainer.addTab(new LorebookTab(appSettings, infoFile, this));
+        loreBookTabInstance = new LorebookTab(appSettings, infoFile, this);
+        tabsContainer.addTab(loreBookTabInstance);
+
         chatTabInstance = new ChatTab(appSettings, infoFile,this);
         tabsContainer.addTab(chatTabInstance);
 
@@ -325,7 +325,7 @@ public class CharacterEditView {
 
                 currentCharacterInstance.setDisplayName(characterTabInstance.getCharDisplayName().getCurrentText());
                 currentCharacterInstance.setPersona(characterTabInstance.getCharDescription().getCurrentText());
-                currentCharacterInstance.setLorebook(loreItems);
+                currentCharacterInstance.setLorebook(loreBookTabInstance.getItems());
                 currentCharacterInstance.setExampleDialogue(exampleDialogue);
                 currentCharacterInstance.setFirstMessage(chatTabInstance.getFirstMessageInput().getCurrentText());
                 currentCharacterInstance.setChatScenario(chatTabInstance.getChatScenarioInput().getCurrentText());
@@ -612,5 +612,21 @@ public class CharacterEditView {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public UserTab getUserTabInstance() {
+        return userTabInstance;
+    }
+
+    public ModelTab getModelTabInstance() {
+        return modelTabInstance;
+    }
+
+    public ChatTab getChatTabInstance() {
+        return chatTabInstance;
+    }
+
+    public LorebookTab getLoreBookTabInstance() {
+        return loreBookTabInstance;
     }
 }
