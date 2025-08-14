@@ -115,7 +115,6 @@ public class ChatView extends EmptyContainer {
 
         VerticalLayout chatView = new VerticalLayout(0, 0);
         chatView.setAlignment(Pos.TOP_CENTER);
-        //chatView.setY(70);
         chatView.setSpacing(40);
         chatView.addStyle(Styles.BG_INSET);
         main.addElement(chatView);
@@ -159,38 +158,14 @@ public class ChatView extends EmptyContainer {
 
         sidebarView.setOnCollapseStateChange((aBoolean) -> {
             if (aBoolean) {
-                updateNodeWidth(layout,150);
                 scrollContainer.setWidth(CHAT_VIEW_SCROLL_WIDTH + 300);
+                scrollContainer.setMaxSize(CHAT_VIEW_SCROLL_WIDTH + 300, CHAT_VIEW_SCROLL_HEIGHT);
             } else {
-                updateNodeWidth(layout,-150);
-                scrollContainer.setWidth(CHAT_VIEW_SCROLL_WIDTH - 300);
+                scrollContainer.setWidth(CHAT_VIEW_SCROLL_WIDTH);
+                scrollContainer.setMaxSize(CHAT_VIEW_SCROLL_WIDTH, CHAT_VIEW_SCROLL_HEIGHT);
             }
         });
 
-    }
-
-    private void updateNodeWidth(Renderer renderer, double offset) {
-        renderer.setWidth(renderer.getWidth() + offset);
-        renderer.getElements().forEach((integer, element) -> {
-            if (element instanceof Region region) {
-                region.setWidth(region.getWidth() + offset);
-                region.setPrefWidth(region.getPrefWidth() + offset);
-                region.setMaxWidth(region.getMaxWidth() + offset);
-            }
-            if (element instanceof TextFlowOverlay textFlowOverlay) {
-                for (Overlay overlay : textFlowOverlay.getTexts()) {
-                    if (overlay instanceof Region region) {
-                        region.setWidth(region.getWidth() + offset);
-                        region.setPrefWidth(region.getPrefWidth() + offset);
-                        region.setMaxWidth(region.getMaxWidth() + offset);
-                    }
-                }
-            }
-            if (element instanceof Renderer region) {
-                region.setWidth(region.getWidth() + offset);
-                updateNodeWidth(region, offset);
-            }
-        });
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -438,8 +413,6 @@ public class ChatView extends EmptyContainer {
             App.logger.info("Force stopping response...");
             stopNode.setDisable(true);
             thread.cancel(true); // Does not stop input stream
-
-            topControls.removeElement(stop);
         });
 
         topControls.addElement(stop);
