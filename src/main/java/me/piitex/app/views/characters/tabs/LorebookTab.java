@@ -38,7 +38,9 @@ public class LorebookTab extends Tab {
         buildLorebookTabContent();
     }
 
-    private void buildLorebookTabContent() {
+    public void buildLorebookTabContent() {
+        removeAllElements();
+
         VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
         rootLayout.setSpacing(50);
         rootLayout.setAlignment(Pos.TOP_CENTER);
@@ -146,4 +148,9 @@ public class LorebookTab extends Tab {
 
         return card;
     }
+
+    public Map<String, String> getItems() {
+        return loreItems;
+    }
+
 }
