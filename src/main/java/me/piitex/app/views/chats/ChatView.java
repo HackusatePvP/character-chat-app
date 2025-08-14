@@ -331,7 +331,9 @@ public class ChatView extends EmptyContainer {
                     CardContainer card = (CardContainer) previous.getElements().values().stream().filter(element -> element instanceof CardContainer).findAny().orElse(null);
                     if (card != null) {
                         HorizontalLayout buttonLayout = (HorizontalLayout) card.getFooter();
-                        buttonLayout.removeElement(buttonLayout.getElements().lastKey());
+                        if (buttonLayout.getElements().size() > 3) {
+                            buttonLayout.removeElement(buttonLayout.getElements().lastKey());
+                        }
                     }
                 }
             }
