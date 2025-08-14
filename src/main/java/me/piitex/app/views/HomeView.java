@@ -36,7 +36,7 @@ public class HomeView extends EmptyContainer {
 
     public void init() {
         root.addStyle(Styles.BG_INSET);
-        root.addElement(new SidebarView(root, false).getRoot());
+        root.addElement(new SidebarView(root, false));
         root.setSpacing(35);
 
         if (App.getInstance().isLoading()) {

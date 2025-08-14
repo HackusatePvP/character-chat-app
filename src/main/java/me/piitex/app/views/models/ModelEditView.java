@@ -43,7 +43,7 @@ public class ModelEditView extends EmptyContainer {
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
         main.setSpacing(35);
-        main.addElement(new SidebarView(main, false).getRoot());
+        main.addElement(new SidebarView(main, false));
         addElement(main);
 
         VerticalLayout layout = new VerticalLayout(0, 0);

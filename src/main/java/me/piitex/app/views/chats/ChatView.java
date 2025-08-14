@@ -109,7 +109,7 @@ public class ChatView extends EmptyContainer {
         main.setSpacing(5);
 
         SidebarView sidebarView = new SidebarView(main, false);
-        main.addElement(sidebarView.getRoot());
+        main.addElement(sidebarView);
 
         addElement(main);
 

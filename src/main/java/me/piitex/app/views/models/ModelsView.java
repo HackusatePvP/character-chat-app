@@ -28,7 +28,7 @@ public class ModelsView extends EmptyContainer {
 
     public void init(@Nullable String tab) {
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        layout.addElement(new SidebarView(layout, false).getRoot());
+        layout.addElement(new SidebarView(layout, false));
         addElement(layout);
 
         VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());

@@ -1,11 +1,8 @@
 package me.piitex.app.views;
 
 import atlantafx.base.theme.Styles;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharacterEditMobileView;
@@ -14,7 +11,6 @@ import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.app.views.users.UsersView;
 import me.piitex.engine.Renderer;
-import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
@@ -26,8 +22,7 @@ import java.util.function.Consumer;
 
 import static me.piitex.app.views.Positions.*;
 
-public class SidebarView {
-    private final VerticalLayout root;
+public class SidebarView extends VerticalLayout {
     private final Renderer parent;
 
     // Testing out consumer. Hopefully it's more efficient than interfaces.
@@ -36,78 +31,42 @@ public class SidebarView {
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public SidebarView(Renderer parent, boolean collapse) {
+        super(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
         this.parent = parent;
-        root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
-        root.setAlignment(Pos.BASELINE_CENTER);
-        root.addStyle(Styles.BORDER_DEFAULT);
-        root.addStyle(Styles.BG_INSET);
+        setAlignment(Pos.BASELINE_CENTER);
+        addStyle(Styles.BORDER_DEFAULT);
+        addStyle(Styles.BG_INSET);
         if (collapse) {
             ButtonOverlay expand = buildExpand();
-            root.setWidth(SIDEBAR_WIDTH_COLLAPSE);
-            expand.onClick(event -> {
-                if (parent instanceof Layout layout) {
-                    layout.getPane().getChildren().removeFirst();
-
-                    // Re-assemble sidebar.
-                    root.getElements().clear();
-                    build();
-
-                    layout.getPane().getChildren().addFirst(root.render());
-
-                    //TODO Handle sidebar collapse event.
-                    if (onCollapseStateChange != null) {
-                        onCollapseStateChange.accept(false); // false indicates expanded
-                    }
-                }
-            });
-
-            root.addElement(expand);
+            setWidth(SIDEBAR_WIDTH_COLLAPSE);
+            addElement(expand);
         } else {
             build();
         }
     }
 
     public void build() {
+        System.out.println("Building...");
         double rootWidth = SIDEBAR_WIDTH - 20;
 
         TextOverlay close = new TextOverlay(new FontIcon(Material2AL.CLOSE));
-        close.setX(root.getMaxWidth() - 5);
-        root.addElement(close);
+        close.setX(getMaxWidth() - 5);
+        addElement(close);
         close.onClick(event -> {
-            root.getPane().setMaxWidth(50);
-            root.getPane().setMinWidth(50);
-
+            System.out.println("Closing view...");
+            setMaxSize(50, SIDEBAR_HEIGHT);
+            setWidth(50);
+            setHeight(SIDEBAR_HEIGHT);
             ButtonOverlay buttonOverlay = buildExpand();
 
-            Node expand = buttonOverlay.render();
-            root.getPane().getChildren().clear();
-            root.getPane().getChildren().addFirst(expand);
-
-            expand.addEventHandler(MouseEvent.MOUSE_CLICKED, event1 -> {
-                if (parent instanceof Layout layout) {
-                    layout.getPane().getChildren().removeFirst();
-                    // Re-assemble sidebar.
-                    root.getElements().clear();
-                    build();
-
-                    layout.getPane().getChildren().addFirst(root.render());
-                    //TODO Handle sidebar collapse event
-                    if (onCollapseStateChange != null) {
-                        onCollapseStateChange.accept(false);
-                    }
-                }
-            });
-
-            if (onCollapseStateChange != null) {
-                onCollapseStateChange.accept(true);
-            }
-
+            removeAllElements();
+            addElement(buttonOverlay);
         });
 
         ButtonOverlay home = new ButtonBuilder("home").setText("Home").build();
         home.addStyle(appSettings.getGlobalTextSize());
         home.setWidth(rootWidth);
-        root.addElement(home);
+        addElement(home);
         home.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new HomeView());
@@ -116,7 +75,7 @@ public class SidebarView {
         ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").build();
         settings.addStyle(appSettings.getGlobalTextSize());
         settings.setWidth(rootWidth);
-        root.addElement(settings);
+        addElement(settings);
         settings.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new SettingsView().getContainer());
@@ -125,7 +84,7 @@ public class SidebarView {
         ButtonOverlay models = new ButtonBuilder("models").setText("Models / Backend").build();
         models.addStyle(appSettings.getGlobalTextSize());
         models.setWidth(rootWidth);
-        root.addElement(models);
+        addElement(models);
         models.onClick(event -> {
             App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
@@ -138,7 +97,7 @@ public class SidebarView {
         ButtonOverlay users = new ButtonBuilder("users").setText("User Template").build();
         users.addStyle(appSettings.getGlobalTextSize());
         users.setWidth(rootWidth);
-        root.addElement(users);
+        addElement(users);
         users.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new UsersView().getRoot());
@@ -147,7 +106,7 @@ public class SidebarView {
         ButtonOverlay characters = new ButtonBuilder("characters").setText("Characters").build();
         characters.addStyle(appSettings.getGlobalTextSize());
         characters.setWidth(rootWidth);
-        root.addElement(characters);
+        addElement(characters);
         characters.onClick(event -> {
             App.window.clearContainers();
             if (App.mobile) {
@@ -166,10 +125,26 @@ public class SidebarView {
         ButtonOverlay buttonOverlay = new ButtonBuilder("expand").setIcon(new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT)).build();
         buttonOverlay.setWidth(32);
         buttonOverlay.setHeight(32);
-        return buttonOverlay;
-    }
 
-    public VerticalLayout getRoot() {
-        return root;
+        buttonOverlay.onClick(event1 -> {
+            System.out.println("Expanding view...");
+            // Re-assemble sidebar.
+            removeAllElements();
+            setWidth(SIDEBAR_WIDTH);
+            setHeight(SIDEBAR_HEIGHT);
+            setMaxSize(50, SIDEBAR_HEIGHT);
+            build();
+
+            if (onCollapseStateChange != null) {
+                onCollapseStateChange.accept(false);
+            }
+        });
+
+        if (onCollapseStateChange != null) {
+            onCollapseStateChange.accept(true);
+        }
+
+
+        return buttonOverlay;
     }
 }
