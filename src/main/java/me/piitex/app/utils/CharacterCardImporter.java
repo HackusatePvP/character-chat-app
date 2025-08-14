@@ -162,6 +162,8 @@ public class CharacterCardImporter {
                 persona += data.getString("personality");
             }
         }
+
+        persona = persona.replace("!@!", "\n");
         return persona;
     }
 
