@@ -46,14 +46,12 @@ public class SidebarView extends VerticalLayout {
     }
 
     public void build() {
-        System.out.println("Building...");
         double rootWidth = SIDEBAR_WIDTH - 20;
 
         TextOverlay close = new TextOverlay(new FontIcon(Material2AL.CLOSE));
         close.setX(getMaxWidth() - 5);
         addElement(close);
         close.onClick(event -> {
-            System.out.println("Closing view...");
             setMaxSize(50, SIDEBAR_HEIGHT);
             setWidth(50);
             setHeight(SIDEBAR_HEIGHT);
@@ -127,7 +125,6 @@ public class SidebarView extends VerticalLayout {
         buttonOverlay.setHeight(32);
 
         buttonOverlay.onClick(event1 -> {
-            System.out.println("Expanding view...");
             // Re-assemble sidebar.
             removeAllElements();
             setWidth(SIDEBAR_WIDTH);
