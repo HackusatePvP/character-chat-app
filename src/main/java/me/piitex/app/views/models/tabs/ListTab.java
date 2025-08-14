@@ -57,7 +57,7 @@ public class ListTab extends Tab {
 
         boolean def = false;
 
-        for (Model model : App.getModels("exclude")) {
+        for (Model model : App.getModels("exclude").values()) {
             if (model.getSettings().isDefault()) {
                 if (!def) {
                     def = true;
@@ -113,7 +113,7 @@ public class ListTab extends Tab {
                 // Also, re-render the view
 
                 // Reloop models and disable any defaults
-                for (Model m : App.getModels("exclude")) {
+                for (Model m : App.getModels("exclude").values()) {
                     if (m == model) continue;
                     if (m.getSettings().isDefault()) {
                         m.getSettings().setDefault(false);

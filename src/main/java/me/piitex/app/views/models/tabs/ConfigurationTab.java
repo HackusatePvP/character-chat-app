@@ -297,7 +297,7 @@ public class ConfigurationTab extends Tab {
             Model model = (settings.getGlobalModel() != null ? settings.getGlobalModel() : ServerProcess.getCurrentServer().getModel());
             if (model == null) {
                 // Lastly, look for the default model.
-                model = App.getModels("exlude").stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
+                model = App.getModels("exlude").values().stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
             }
 
             if (model == null) {

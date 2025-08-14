@@ -187,7 +187,7 @@ public class App {
     }
 
     public static Model getDefaultModel() {
-        for (Model model : getModels("exclude")) {
+        for (Model model : getModels("exclude").values()) {
             if (model.getSettings().isDefault()) {
                 return model;
             }
@@ -195,8 +195,8 @@ public class App {
         return null;
     }
 
-    public static List<Model> getModels(String filterType) {
-        List<Model> models = new ArrayList<>();
+    public static TreeMap<String, Model> getModels(String filterType) {
+        TreeMap<String, Model> models = new TreeMap<>();
 
         if (App.getInstance().getSettings().getModelPath().isEmpty()) {
             return models;
@@ -219,11 +219,11 @@ public class App {
         return models;
     }
 
-    public static List<Model> getModels() {
+    public static TreeMap<String, Model> getModels() {
         return getModels(null); // Call the overloaded method with null to get all.
     }
 
-    private static void findGGUFModelsRecursive(@NotNull File directory, List<Model> models, String filterType) {
+    private static void findGGUFModelsRecursive(@NotNull File directory, TreeMap<String, Model> models, String filterType) {
         File[] files = directory.listFiles();
         if (files == null) return;
         String actualFilterType = (filterType == null || filterType.isEmpty()) ? "all" : filterType.toLowerCase();
@@ -236,17 +236,17 @@ public class App {
                 switch (actualFilterType) {
                     case "mmproj":
                         if (isMMProj) {
-                            models.add(new Model(file));
+                            models.put(fileName, new Model(file));
                         }
                         break;
                     case "exclude":
                         if (!isMMProj) {
-                            models.add(new Model(file));
+                            models.put(fileName, new Model(file));
                         }
                         break;
                     case "all":
                     default:
-                        models.add(new Model(file));
+                        models.put(fileName, new Model(file));
                         break;
                 }
             }
@@ -255,14 +255,14 @@ public class App {
 
     public static Set<String> getModelNames(String filter) {
         Set<String> toReturn = new TreeSet<>();
-        for (Model model : getModels(filter)) {
+        for (Model model : getModels(filter).values()) {
             toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
         }
         return toReturn;
     }
 
     public static Model getModelByName(String directory, String name) {
-        return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name) && new File(model.getFile().getParent()).getName().equalsIgnoreCase(directory)).findAny().orElse(null);
+        return getModels("all").values().stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name) && new File(model.getFile().getParent()).getName().equalsIgnoreCase(directory)).findAny().orElse(null);
     }
 
     public static void shutdown() {

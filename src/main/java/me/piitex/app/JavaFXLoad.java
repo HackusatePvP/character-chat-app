@@ -123,7 +123,7 @@ public class JavaFXLoad extends Application {
             if (App.getInstance().getSettings().getGlobalModel() != null) {
                 new ServerProcess(App.getInstance().getSettings().getGlobalModel());
             } else {
-                for (Model model : App.getModels("exclude")) {
+                for (Model model : App.getModels("exclude").values()) {
                     if (model.getSettings().isDefault()) {
                         new ServerProcess(model);
                         break;

@@ -450,7 +450,7 @@ public class DownloadTab extends Tab {
         }
 
         private void checkIfDownloaded() {
-            for (Model model : App.getModels("all")) { // Assuming App.getModels exists
+            for (Model model : App.getModels("all").values()) { // Assuming App.getModels exists
                 if (model.getFile() != null && model.getFile().getName().equalsIgnoreCase(fileName) && model.getFile().getParent().contains(key)) {
                     this.downloaded = true;
                     break;
