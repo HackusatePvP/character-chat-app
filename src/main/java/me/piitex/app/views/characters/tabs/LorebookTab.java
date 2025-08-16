@@ -51,6 +51,7 @@ public class LorebookTab extends Tab {
         rootLayout.addElement(info);
 
         HorizontalLayout displayBox = new HorizontalLayout(0, -1);
+        displayBox.setAlignment(Pos.TOP_CENTER);
         displayBox.setSpacing(100);
         rootLayout.addElement(displayBox);
 
