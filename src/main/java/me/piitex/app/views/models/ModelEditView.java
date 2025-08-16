@@ -42,6 +42,7 @@ public class ModelEditView extends EmptyContainer {
         initializeSettings();
 
         HorizontalLayout main = new HorizontalLayout(0, 0);
+        main.addStyle(Styles.BG_INSET);
         main.setSpacing(35);
         main.addElement(new SidebarView(main, false));
         addElement(main);
@@ -87,6 +88,7 @@ public class ModelEditView extends EmptyContainer {
 
     public TileContainer buildInstructions() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 0);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setTitle("Model Instructions");
@@ -111,6 +113,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildContextSize() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.setTitle("Context Size");
@@ -132,6 +135,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildModalFile() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
         tileContainer.setTitle("Multimodal Support");
@@ -159,6 +163,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildTemperature() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Temperature");
@@ -180,6 +185,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildTopP() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Top P");
@@ -201,6 +207,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildMinP() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Min-P");
@@ -222,6 +229,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildTopK() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Top K");
@@ -243,6 +251,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildRepeatPenalty() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Repeat Penalty");
@@ -264,6 +273,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildRepeatTokens() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Repeat Tokens");
@@ -285,6 +295,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildChatTemplates() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Chat Template");
@@ -349,6 +360,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildReasoningTemplate() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Reasoning Template");
@@ -376,6 +388,7 @@ public class ModelEditView extends EmptyContainer {
     private TileContainer buildJinjaTemplate() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
         tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
         tileContainer.setTitle("Jinja Template");

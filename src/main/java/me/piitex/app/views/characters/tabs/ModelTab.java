@@ -62,6 +62,7 @@ public class ModelTab extends Tab {
     public TileContainer buildOverrideSwitch() {
         TileContainer container = new TileContainer(layout.getWidth() / 2, 200);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(Styles.BG_DEFAULT);
         container.setMaxSize(layout.getWidth() / 2, 200);
         container.setTitle("Model Override");
         container.setDescription("When toggled the server will switch the configured model on this page.");
@@ -78,6 +79,7 @@ public class ModelTab extends Tab {
     public TileContainer buildModelOverride() {
         TileContainer container = new TileContainer(layout.getWidth() / 2, 100);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(Styles.BG_DEFAULT);
         container.setMaxSize(layout.getWidth() / 2, 100);
         container.setTitle("Model Selection");
         container.setDescription("This will override all other model configurations.");
@@ -114,6 +116,7 @@ public class ModelTab extends Tab {
     public TileContainer buildModelEdit() {
         TileContainer container = new TileContainer(layout.getWidth() / 2, 200);
         container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(Styles.BG_DEFAULT);
         container.setMaxSize(layout.getWidth() / 2, 200);
         container.setTitle("Model Settings");
         container.setDescription("Click on the gear icon to edit character specific model settings. This will override global model settings.");
@@ -130,7 +133,7 @@ public class ModelTab extends Tab {
 
             DialogueContainer dialogueContainer = new DialogueContainer("To edit the model settings you must exit the page. Ensure you have saved any changes.", 500, 500);
 
-            ButtonOverlay stay = new ButtonBuilder("stay").setText("Save").build();
+            ButtonOverlay stay = new ButtonBuilder("stay").setText("Stay").build();
             stay.setWidth(150);
             stay.addStyle(Styles.SUCCESS);
             stay.onClick(event1 -> {
