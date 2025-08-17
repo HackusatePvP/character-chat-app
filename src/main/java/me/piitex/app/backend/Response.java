@@ -51,8 +51,6 @@ public class Response {
     }
 
     public void createOAIContext(boolean oai) throws JSONException {
-        App.logger.debug("Creating current context tokens...");
-
         messages = new JSONArray();
 
         int tokens = 0;
@@ -216,6 +214,8 @@ public class Response {
             messages.put(chatMessageContext);
             index++;
         }
+
+        App.logger.info("Gathered {} tokens of context", tokens);
     }
 
     public int getIndex() {
