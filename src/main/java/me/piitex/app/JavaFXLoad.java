@@ -144,7 +144,7 @@ public class JavaFXLoad extends Application {
             }
 
             if (event.getCode() == KeyCode.S && event.isControlDown() && event.isShiftDown()) {
-                App.logger.info("Resetting stage...");
+                App.logger.debug("Resetting stage...");
                 stage.setOnCloseRequest(null); // Prevent the application from exiting
                 stage.close();
                 stage.getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
