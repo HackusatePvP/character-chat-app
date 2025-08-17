@@ -81,27 +81,7 @@ public class JavaFXLoad extends Application {
         stage.setOnCloseRequest(windowEvent -> App.shutdown());
 
         // Debug hot keys.
-        stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown()) {
-                App.logger.debug("Resetting view...");
-                App.window.clearContainers();
-                App.window.addContainer(new HomeView());
-            }
-            if (event.getCode() == KeyCode.C && event.isControlDown() && event.isShiftDown()) {
-                App.logger.debug("Resetting character data...");
-                App.getInstance().getCharacters().clear();
-                App.getInstance().getUserTemplates().clear();
-                App.getInstance().loadCharacters();
-            }
-
-            if (event.getCode() == KeyCode.S && event.isControlDown() && event.isShiftDown()) {
-                App.logger.info("Resetting stage...");
-                window.getStage().setOnCloseRequest(null); // Prevent the application from exiting
-                window.getStage().close();
-                window.getStage().getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
-                window.buildAndRender();
-            }
-        });
+        setStageInput(window);
 
         // Build home view
         App.logger.info("Navigating to home page.");
@@ -146,5 +126,31 @@ public class JavaFXLoad extends Application {
         // Load App then render gui
         new App();
         launch();
+    }
+
+    private void setStageInput(Window window) {
+        Stage stage = window.getStage();
+        stage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.R && event.isControlDown() && event.isShiftDown()) {
+                App.logger.debug("Resetting view...");
+                App.window.clearContainers();
+                App.window.addContainer(new HomeView());
+            }
+            if (event.getCode() == KeyCode.C && event.isControlDown() && event.isShiftDown()) {
+                App.logger.debug("Resetting character data...");
+                App.getInstance().getCharacters().clear();
+                App.getInstance().getUserTemplates().clear();
+                App.getInstance().loadCharacters();
+            }
+
+            if (event.getCode() == KeyCode.S && event.isControlDown() && event.isShiftDown()) {
+                App.logger.info("Resetting stage...");
+                stage.setOnCloseRequest(null); // Prevent the application from exiting
+                stage.close();
+                stage.getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
+                window.buildAndRender();
+                setStageInput(window);
+            }
+        });
     }
 }
