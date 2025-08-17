@@ -143,9 +143,8 @@ public class DownloadTab extends Tab {
         titledContainer.addElement(descriptionOverlay);
 
         downloadModel.getLinks().forEach((quantization, url) -> {
-            HorizontalLayout tileLayout = createDownloadTile(titledContainer, quantization, url, downloadModel.getKey());
-
             Platform.runLater(() -> {
+                HorizontalLayout tileLayout = createDownloadTile(titledContainer, quantization, url, downloadModel.getKey());
                 titledContainer.addElement(tileLayout);
             });
         });
