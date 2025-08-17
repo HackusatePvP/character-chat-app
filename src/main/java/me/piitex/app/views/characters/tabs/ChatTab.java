@@ -42,7 +42,7 @@ public class ChatTab extends Tab {
         this.setHeight(appSettings.getHeight());
         int layoutSpacing = 25;
 
-        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
+        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, -1);
         layout.setAlignment(Pos.TOP_CENTER);
         this.addElement(layout);
 
