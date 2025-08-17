@@ -159,6 +159,9 @@ public class UserTab extends Tab {
             User template = null;
             if (!item.equalsIgnoreCase("none")) {
                 template = App.getInstance().getUser(item); // Set user object in parentView
+            } else {
+                userDescription.setCurrentText("");
+                userDisplayNameInput.setCurrentText("");
             }
 
             if (template != null) {
@@ -176,7 +179,6 @@ public class UserTab extends Tab {
         return root;
     }
 
-    // Getters for validation in CharacterEditView
     public InputFieldOverlay getUserDisplayNameInput() {
         return userDisplayNameInput;
     }
