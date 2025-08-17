@@ -3,19 +3,13 @@ package me.piitex.app.views.models.tabs;
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
-import me.piitex.app.backend.server.DeviceProcess;
-import me.piitex.app.backend.server.ServerLoadingListener;
-import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.views.models.ModelsView;
 import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -32,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static me.piitex.app.views.Positions.*;
 
@@ -62,16 +57,17 @@ public class ConfigurationTab extends Tab {
         scrollContainer.setHorizontalScroll(false);
         addElement(scrollContainer); // Adds the scroll container
 
-        layout.addElement(buildDangerZone());
+        layout.addElement(buildServerZone());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
+        layout.addElement(buildRunningModel());
         layout.addElement(buildModelPathTile());
         layout.addElement(buildCurrentModel());
         layout.addElement(buildGpuLayers());
         layout.addElement(buildMemoryLock());
         layout.addElement(buildFlashAttention());
-        layout.addElement(buildRunningModel());
 
+        Platform.runLater(this::handleServerLoad);
     }
 
     public TileContainer buildModelPathTile() {
@@ -226,11 +222,11 @@ public class ConfigurationTab extends Tab {
         return container;
     }
 
-    public CardContainer buildDangerZone() {
+    public CardContainer buildServerZone() {
         CardContainer card = new CardContainer(0, 0, layout.getWidth(), 200);
         card.setMaxSize(layout.getWidth(), 200);
 
-        TextOverlay text = new TextOverlay("Danger Zone");
+        TextOverlay text = new TextOverlay("Server Zone");
         text.addStyle(Styles.TITLE_3);
         text.setTextFill(Color.RED);
         text.addStyle(Styles.DANGER);
@@ -352,35 +348,50 @@ public class ConfigurationTab extends Tab {
     }
 
     private void handleServerLoad() {
-        if (ServerProcess.getCurrentServer() != null) {
+        boolean loading = false;
+        if (ServerProcess.getCurrentServer() == null) {
+            loading = true;
+        } else if (ServerProcess.getCurrentServer().isLoading()) {
+            loading = true;
+        }
+
+
+        if (loading) {
+            start.setEnabled(false);
+            stop.setEnabled(false);
+            reload.setEnabled(false);
+            renderProgress();
+
             ServerProcess serverProcess = ServerProcess.getCurrentServer();
-            // Show progress bar only if still loading
-            if (serverProcess.isLoading()) {
-                start.setEnabled(false);
-                stop.setEnabled(false);
-                reload.setEnabled(false);
-                renderProgress(); // Call renderProgress() to show your popup
 
-                // Add a listener to be notified when loading is complete
-                serverProcess.addServerLoadingListener(new ServerLoadingListener() {
-                    @Override
-                    public void onServerLoadingComplete(boolean success) {
-                        // Ensure UI updates are on the JavaFX Application Thread
-                        Platform.runLater(() -> {
-                            if (App.window.getCurrentPopup() != null) { // Check if popup still exists
-                                App.window.removeContainer(App.window.getCurrentPopup());
-
-                                start.getNode().setDisable(false);
-                                stop.getNode().setDisable(false);
-                                reload.getNode().setDisable(false);
-                            }
-                        });
-                        // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
-                        serverProcess.removeServerLoadingListener(this);
-                    }
-                });
+            if (serverProcess == null) {
+                App.getThreadPoolManager().submitSchedule(() -> {
+                    handleServerEvent(ServerProcess.getCurrentServer());
+                }, 500, TimeUnit.MILLISECONDS);
+            } else {
+                handleServerEvent(serverProcess);
             }
         }
+    }
+
+    private void handleServerEvent(ServerProcess serverProcess) {
+        serverProcess.addServerLoadingListener(new ServerLoadingListener() {
+            @Override
+            public void onServerLoadingComplete(boolean success) {
+                // Ensure UI updates are on the JavaFX Application Thread
+                Platform.runLater(() -> {
+                    if (App.window.getCurrentPopup() != null) { // Check if popup still exists
+                        App.window.removeContainer(App.window.getCurrentPopup());
+
+                        start.getNode().setDisable(false);
+                        stop.getNode().setDisable(false);
+                        reload.getNode().setDisable(false);
+                    }
+                });
+                // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
+                serverProcess.removeServerLoadingListener(this);
+            }
+        });
     }
 
     private void startServer(Model model) {
