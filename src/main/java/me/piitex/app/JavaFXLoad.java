@@ -4,6 +4,7 @@ import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import javafx.application.Application;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.DeviceProcess;
@@ -91,6 +92,14 @@ public class JavaFXLoad extends Application {
                 App.getInstance().getCharacters().clear();
                 App.getInstance().getUserTemplates().clear();
                 App.getInstance().loadCharacters();
+            }
+
+            if (event.getCode() == KeyCode.S && event.isControlDown() && event.isShiftDown()) {
+                App.logger.info("Resetting stage...");
+                window.getStage().setOnCloseRequest(null); // Prevent the application from exiting
+                window.getStage().close();
+                window.getStage().getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
+                window.buildAndRender();
             }
         });
 
