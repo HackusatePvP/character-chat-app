@@ -47,7 +47,7 @@ public class ModelTab extends Tab {
         this.setWidth(appSettings.getWidth() - 300);
         this.setHeight(appSettings.getHeight());
 
-        layout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
+        layout = new VerticalLayout(appSettings.getWidth() - 300, -1);
         layout.setAlignment(Pos.TOP_CENTER);
         this.addElement(layout);
 
@@ -60,10 +60,10 @@ public class ModelTab extends Tab {
     }
 
     public TileContainer buildOverrideSwitch() {
-        TileContainer container = new TileContainer(layout.getWidth() / 2, 200);
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth() - 200, -1);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(Styles.BG_DEFAULT);
-        container.setMaxSize(layout.getWidth() / 2, 200);
         container.setTitle("Model Override");
         container.setDescription("When toggled the server will switch the configured model on this page.");
 
@@ -77,10 +77,10 @@ public class ModelTab extends Tab {
     }
 
     public TileContainer buildModelOverride() {
-        TileContainer container = new TileContainer(layout.getWidth() / 2, 100);
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth() - 200, -1);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(Styles.BG_DEFAULT);
-        container.setMaxSize(layout.getWidth() / 2, 100);
         container.setTitle("Model Selection");
         container.setDescription("This will override all other model configurations.");
 
@@ -114,10 +114,10 @@ public class ModelTab extends Tab {
     }
 
     public TileContainer buildModelEdit() {
-        TileContainer container = new TileContainer(layout.getWidth() / 2, 200);
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth() - 200, -1);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(Styles.BG_DEFAULT);
-        container.setMaxSize(layout.getWidth() / 2, 200);
         container.setTitle("Model Settings");
         container.setDescription("Click on the gear icon to edit character specific model settings. This will override global model settings.");
 
