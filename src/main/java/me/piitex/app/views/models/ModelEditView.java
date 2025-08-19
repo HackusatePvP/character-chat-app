@@ -280,10 +280,10 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setDescription("Specifies the number of recent tokens (from the model's output history) to consider when applying the repetition penalty.");
 
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("A larger value means the model will look further back in its generated text to avoid repeating phrases or patterns.");
+        info.setTooltip("A larger value means the model will look further back in its generated text to avoid repeating phrases or patterns. -1 will use context size.");
         tileContainer.setGraphic(info);
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Integer.MAX_VALUE, repeatTokens);
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, Integer.MAX_VALUE, repeatTokens);
         input.onValueChange(event -> {
             this.repeatTokens = event.getNewValue().intValue();
         });
