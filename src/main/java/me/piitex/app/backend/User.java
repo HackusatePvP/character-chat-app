@@ -1,5 +1,6 @@
 package me.piitex.app.backend;
 
+import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.engine.loaders.ImageLoader;
@@ -28,10 +29,14 @@ public class User {
         infoFile.set("id", id);
     }
 
-    public User(String id, InfoFile infoFile) {
+    public User(String id, @Nullable InfoFile infoFile) {
         this.id = id;
-        infoFile.set("id", id);
+        if (infoFile == null) {
+            infoFile = new InfoFile();
+        }
         this.infoFile = infoFile;
+
+        infoFile.set("id", id);
         if (infoFile.hasKey("display-name")) {
             this.displayName = infoFile.get("display-name");
         }
