@@ -75,12 +75,11 @@ public class CharactersView {
             card.setMaxSize(cardWidth, cardHeight);
 
             VerticalLayout displayBox = new VerticalLayout(0, 0);
-            displayBox.setAlignment(Pos.TOP_CENTER);
+            displayBox.setAlignment(Pos.BASELINE_CENTER);
 
             TextOverlay helper = new TextOverlay("Click to chat");
             helper.setUnderline(true);
             displayBox.addElement(helper);
-            displayBox.setAlignment(Pos.BASELINE_CENTER);
 
             ContextMenu contextMenu = new ContextMenu();
 
