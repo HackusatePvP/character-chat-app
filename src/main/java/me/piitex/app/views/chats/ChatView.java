@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static me.piitex.app.views.Positions.*;
 
@@ -166,6 +167,8 @@ public class ChatView extends EmptyContainer {
             }
         });
 
+       // Check to make sure server has been started.
+       Platform.runLater(this::checkServer);
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -253,6 +256,7 @@ public class ChatView extends EmptyContainer {
                         serverProcess.stop();
                         App.getThreadPoolManager().submitTask(() -> {
                             new ServerProcess(m);
+                            handleServerLoad();
                         });
 
                         try {
@@ -260,7 +264,6 @@ public class ChatView extends EmptyContainer {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        handleServerLoad();
                         return;
                     }
                 }
@@ -271,25 +274,33 @@ public class ChatView extends EmptyContainer {
     }
 
     private void handleServerLoad() {
+
         // Show progress bar only if still loading
         ServerProcess serverProcess = ServerProcess.getCurrentServer();
-        if (serverProcess != null && serverProcess.isLoading()) {
+        if (serverProcess == null || serverProcess.isLoading()) {
             renderProgress(); // Call renderProgress() to show your popup
 
             // Add a listener to be notified when loading is complete
+            while (serverProcess == null) {
+                serverProcess = ServerProcess.getCurrentServer();
+                if (serverProcess != null) {
+                    break;
+                }
+            }
+
+            System.out.println("Passing...");
             serverProcess.addServerLoadingListener(new ServerLoadingListener() {
                 @Override
                 public void onServerLoadingComplete(boolean success) {
                     // Ensure UI updates are on the JavaFX Application Thread
                     Platform.runLater(() -> {
-                        if (App.window.getCurrentPopup() != null) { // Check if popup still exists
-                            App.window.removeContainer(App.window.getCurrentPopup());
-
-                            send.setEnabled(true);
-                            submit.setEnabled(true);
+                        if (topControls.getElements().size() > 3) {
+                            topControls.removeElement(topControls.getElements().lastKey());
                         }
+                        send.setEnabled(true);
+                        submit.setEnabled(true);
+
                     });
-                    // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
                     ServerProcess.getCurrentServer().removeServerLoadingListener(this);
                 }
             });
@@ -301,12 +312,26 @@ public class ChatView extends EmptyContainer {
         submit.setEnabled(false);
 
         // Display progress bar for backend loading
+        VerticalLayout verticalLayout = new VerticalLayout(120, -1);
+        verticalLayout.setSpacing(0);
+
         ProgressBarOverlay progress = new ProgressBarOverlay();
         progress.setWidth(120);
-        progress.setMaxHeight(50);
+        progress.setMaxHeight(20);
         progress.setY(10);
+
         TextOverlay label = new TextOverlay("Starting backend...");
-        App.window.renderPopup(progress, 800, 885, 200, 100, false, label);
+        verticalLayout.addElement(label);
+        verticalLayout.addElement(progress);
+
+        // Add to top controls
+        topControls.addElement(verticalLayout);
+
+        topControls.getElements().forEach((integer, element) -> {
+            if (element instanceof VerticalLayout) {
+                System.out.println("Index: " + integer);
+            }
+        });
     }
 
     public void handleSubmit(String message) {
