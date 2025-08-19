@@ -67,11 +67,5 @@ public class SendBox extends VerticalLayout {
             parentView.handleSubmit(textArea.getText());
             textArea.replaceText("");
         });
-
-        // onRender will prevent race conditions regarding the ui.
-        // It will ensure everything is converted to JavaFX when called.
-        addRenderEvent(event -> {
-            Platform.runLater(parentView::checkServer);
-        });
     }
 }
