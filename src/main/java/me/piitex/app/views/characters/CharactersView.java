@@ -55,7 +55,7 @@ public class CharactersView {
             root.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
             imageWidth = 256;
             imageHeight = 256;
-            cardWidth = 250;
+            cardWidth = 280;
             cardHeight = 380;
         }
         root.setScrollWhenNeeded(false);
@@ -75,6 +75,7 @@ public class CharactersView {
             card.setMaxSize(cardWidth, cardHeight);
 
             VerticalLayout displayBox = new VerticalLayout(0, 0);
+            displayBox.setAlignment(Pos.TOP_CENTER);
 
             TextOverlay helper = new TextOverlay("Click to chat");
             helper.setUnderline(true);
@@ -121,6 +122,7 @@ public class CharactersView {
 
             ImageOverlay icon = User.getUserAvatar(character.getIconPath(), imageWidth, imageHeight);
             if (icon != null && icon.getImage() != null) {
+                icon.setPreserveRatio(false);
                 displayBox.addElement(icon);
             }
             TextOverlay name = new TextOverlay(character.getId());

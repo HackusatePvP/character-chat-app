@@ -141,14 +141,13 @@ public class User {
         }
 
         ImageLoader loader = new ImageLoader(file);
+        loader.setWidth(width);
+        loader.setHeight(height);
+
         ImageOverlay overlay = new ImageOverlay(loader);
-
-        // General off set for images.
-        // They always seem to be too far to the right.
-        overlay.setX(-10);
-
         overlay.setFitWidth(width);
         overlay.setFitHeight(height);
+
         return overlay;
     }
 
