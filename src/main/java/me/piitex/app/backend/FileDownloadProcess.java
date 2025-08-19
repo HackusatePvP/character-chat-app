@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
@@ -339,9 +340,9 @@ public class FileDownloadProcess {
                 }
             }
         } catch (IOException e) {
-            if (e instanceof HttpHostConnectException) {
+            if (e instanceof HttpHostConnectException || e instanceof UnknownHostException) {
                 // If the client cannot connect to the internet or the host is down.
-                App.logger.warn("Could not not connect to host 'huggingface.co'.");
+                return new DownloadResult(false, Optional.empty(), Optional.empty(), Optional.of("Could not connect to host."), false);
             } else {
                 App.logger.error("Error occurred while downloading model!", e);
             }
