@@ -97,11 +97,12 @@ public class CharacterTab extends Tab {
         root.setMaxSize(200, 200);
 
         VerticalLayout layout = new VerticalLayout(200, 200);
+        layout.setAlignment(Pos.CENTER);
         layout.setMaxSize(200, 200);
-
         layout.setX(-10);
         layout.setY(-10);
         root.setBody(layout);
+
         layout.setAlignment(Pos.BASELINE_CENTER);
         layout.setSpacing(25);
 
@@ -123,7 +124,7 @@ public class CharacterTab extends Tab {
 
         root.onClick(event -> {
             FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg"));
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg", "*.gif"));
             if (appSettings.getImagesPath() != null && !appSettings.getImagesPath().isEmpty()) {
                 chooser.setInitialDirectory(new File(appSettings.getImagesPath()));
             }
