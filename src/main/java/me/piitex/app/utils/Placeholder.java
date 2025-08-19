@@ -81,10 +81,6 @@ public class Placeholder {
         content = content.replace("“", "\"");
         content = content.replace("”", "\"");
 
-
-        if (!App.getInstance().getSettings().isAstrixEnabled()) {
-            content = content.replace("*", "");
-        }
         return content;
     }
 
