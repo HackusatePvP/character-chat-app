@@ -61,13 +61,13 @@ public class CharacterTab extends Tab {
         scrollContainer.setPannable(true);
         this.addElement(scrollContainer);
 
-        HorizontalLayout displayBox = new HorizontalLayout(500, 200);
-        displayBox.setMaxSize(500, 200);
+        HorizontalLayout displayBox = new HorizontalLayout(600, 320);
+        displayBox.setMaxSize(600, 320);
         displayBox.addStyle(Styles.BORDER_SUBTLE);
         displayBox.setSpacing(20);
         rootLayout.addElement(displayBox);
 
-        CardContainer displayCard = buildCharacterDisplay(character, user);
+        CardContainer displayCard = buildCharacterDisplay();
         displayBox.addElement(displayCard);
         displayBox.addElement(buildCharacterInput(character, duplicate));
 
@@ -92,29 +92,27 @@ public class CharacterTab extends Tab {
         this.addElement(parentView.buildSubmitBox());
     }
 
-    private CardContainer buildCharacterDisplay(@Nullable Character character, @Nullable User user) {
-        CardContainer root = new CardContainer(0, 0, 200, 200);
-        root.setMaxSize(200, 200);
+    private CardContainer buildCharacterDisplay() {
+        CardContainer root = new CardContainer(0, 0, 300, 320);
 
-        VerticalLayout layout = new VerticalLayout(200, 200);
-        layout.setAlignment(Pos.CENTER);
-        layout.setMaxSize(200, 200);
-        layout.setX(-10);
-        layout.setY(-10);
-        root.setBody(layout);
-
+        VerticalLayout layout = new VerticalLayout(300, 320);
         layout.setAlignment(Pos.BASELINE_CENTER);
-        layout.setSpacing(25);
+        root.setBody(layout);
 
         File currentIconPath = parentView.getCharacterIconPath();
         if (currentIconPath == null || !currentIconPath.exists()) {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
-        image = new ImageOverlay(new ImageLoader(currentIconPath));
-        image.setFitWidth(128);
-        image.setFitHeight(128);
+        ImageLoader loader = new ImageLoader(currentIconPath);
+        loader.setWidth(256);
+        loader.setHeight(256);
+
+        image = new ImageOverlay(loader);
+        image.setFitWidth(256);
+        image.setFitHeight(256);
         image.setPreserveRatio(false);
+
         layout.addElement(image);
 
         TextOverlay upload = new TextOverlay("Click to upload image");
@@ -151,6 +149,7 @@ public class CharacterTab extends Tab {
         charIdInput = new InputFieldOverlay(parentView.getCharacterId(), 0, 0, 200, 50);
         if (character != null && !duplicate) {
             charIdInput.setEnabled(false);
+            charIdInput.setEditable(false);
         }
         charIdInput.setHintText("Character ID (Must be unique)");
         charIdInput.onInputSetEvent(event -> {
