@@ -94,7 +94,7 @@ public class CharactersView {
             });
             MenuItem delete = new MenuItem("Delete");
             delete.setOnAction(event -> {
-                deleteCharacter(character);
+                deleteCharacter(character, base, card);
             });
 
             contextMenu.getItems().add(edit);
@@ -256,16 +256,19 @@ public class CharactersView {
         App.window.renderPopup(dialogueContainer, x, y, 500, 500);
     }
 
-    private void deleteCharacter(Character character) {
+    private void deleteCharacter(Character character, FlowLayout base, CardContainer card) {
         App.getInstance().getCharacters().remove(character.getId());
-        try {
-            FileUtils.deleteDirectory(character.getCharacterDirectory());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        App.window.clearContainers();
-        App.window.addContainer(new HomeView());
+        App.getThreadPoolManager().submitSchedule(() -> {
+            try {
+                App.logger.info("Deleting: {}", character.getId());
+                FileUtils.deleteDirectory(character.getCharacterDirectory());
+            } catch (IOException e) {
+                App.logger.error("Could not delete directory!", e);
+            }
+        }, 1, TimeUnit.SECONDS);
+
+        base.removeElement(card);
     }
 
     public ScrollContainer getRoot() {
