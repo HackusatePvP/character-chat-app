@@ -375,11 +375,11 @@ public class DownloadTab extends Tab {
 
     private void addDownloadedTag(HorizontalLayout tileLayout) {
         ButtonOverlay tag = new ButtonBuilder("tag").setText("Downloaded").build();
-        tag.setEnabled(false);
         tag.addStyle(Styles.BUTTON_OUTLINED);
         Platform.runLater(() -> {
             if (tileLayout.getElements().size() == 3) {
                 tileLayout.addElement(tag);
+                tag.setEnabled(false);
             }
         });
 
