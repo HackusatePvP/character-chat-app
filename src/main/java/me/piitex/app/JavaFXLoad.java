@@ -148,8 +148,8 @@ public class JavaFXLoad extends Application {
                 stage.setOnCloseRequest(null); // Prevent the application from exiting
                 stage.close();
                 stage.getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
-                window.buildAndRender();
-                setStageInput(window);
+
+                start(new Stage());
             }
         });
     }
