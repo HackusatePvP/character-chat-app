@@ -56,7 +56,7 @@ public class CharacterTab extends Tab {
         rootLayout.setAlignment(Pos.TOP_CENTER);
 
         //this.addElement(rootLayout);
-        ScrollContainer scrollContainer = new ScrollContainer(rootLayout, 0, 0, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        ScrollContainer scrollContainer = new ScrollContainer(rootLayout, 0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setPannable(true);
         this.addElement(scrollContainer);
@@ -96,7 +96,8 @@ public class CharacterTab extends Tab {
         CardContainer root = new CardContainer(0, 0, 300, 320);
 
         VerticalLayout layout = new VerticalLayout(300, 320);
-        layout.setAlignment(Pos.BASELINE_CENTER);
+        layout.setSpacing(25);
+        layout.setAlignment(Pos.TOP_CENTER);
         root.setBody(layout);
 
         File currentIconPath = parentView.getCharacterIconPath();
@@ -134,7 +135,11 @@ public class CharacterTab extends Tab {
 
                 parentView.updateInfoData();
 
-                image.setImage(new ImageLoader(selectedFile));
+                ImageLoader imageLoader = new ImageLoader(selectedFile);
+                imageLoader.setWidth(256);
+                imageLoader.setHeight(256);
+
+                image.setImage(imageLoader);
             }
         });
         return root;
