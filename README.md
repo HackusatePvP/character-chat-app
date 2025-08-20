@@ -66,6 +66,7 @@ As of version 1.0.4 vision has been implemented into the chats. When sending an 
 Vulkan works right out of the box. No installations needed apart from basic graphics drivers. As of version 1.0.5 vulkan is the default backend.
 
 Q: What's the difference between the backends?
+
 A: Cuda and HIP typically provide better performance, but you will have to install necessary drivers. Vulkan works for most GPUs without the need of third party installations. Cuda requires an Nvidia card. HIP requires an AMD card.
 
 ## 🚀 Installation
