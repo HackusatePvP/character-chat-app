@@ -61,12 +61,11 @@ public class Positions {
 
     private static void initializeDesktop() {
         // -1 is computed size
-
         AppSettings appSettings = App.getInstance().getAppSettings();
         CHAT_VIEW_SCROLL_X = 0;
         CHAT_VIEW_SCROLL_Y = 10; // Small y offset
-        CHAT_VIEW_SCROLL_WIDTH = appSettings.getWidth() - 50 - (appSettings.getWidth() / 6);
-        CHAT_VIEW_SCROLL_HEIGHT = appSettings.getHeight() - 50 - (appSettings.getHeight() / 4);
+        CHAT_VIEW_SCROLL_WIDTH = appSettings.getWidth() - 250;
+        CHAT_VIEW_SCROLL_HEIGHT = appSettings.getHeight() - 250;
         CHAT_VIEW_SELECTION_X = appSettings.getWidth() / 2;
         CHAT_VIEW_SELECTION_WIDTH = 100;
         CHAT_VIEW_SELECTION_HEIGHT = 50;
