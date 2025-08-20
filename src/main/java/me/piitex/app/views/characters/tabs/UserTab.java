@@ -29,33 +29,35 @@ public class UserTab extends Tab {
     private InputFieldOverlay userDisplayNameInput;
     private RichTextAreaOverlay userDescription;
 
+    private ImageOverlay image;
+
     public UserTab(AppSettings appSettings, InfoFile infoFile, Character character, CharacterEditView parentView) {
         super("User");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
         this.parentView = parentView;
 
-        buildUserTabContent(character);
+        buildUserTabContent();
     }
 
-    private void buildUserTabContent(Character character) {
+    private void buildUserTabContent() {
         this.setWidth(appSettings.getWidth() - 300);
         this.setHeight(appSettings.getHeight());
 
-        VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
-        rootLayout.setSpacing(50);
+        VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 315, 0);
+        rootLayout.setSpacing(40);
         rootLayout.setAlignment(Pos.TOP_CENTER);
         this.addElement(rootLayout);
 
-        HorizontalLayout displayBox = new HorizontalLayout(500, 200);
-        displayBox.setMaxSize(500, 200);
+        HorizontalLayout displayBox = new HorizontalLayout(600, 320);
+        displayBox.setMaxSize(600, 320);
         displayBox.addStyle(Styles.BORDER_SUBTLE);
         displayBox.setSpacing(20);
         rootLayout.addElement(displayBox);
 
-        CardContainer displayCard = buildUserDisplay(character);
+        CardContainer displayCard = buildUserDisplay();
         displayBox.addElement(displayCard);
-        displayBox.addElement(buildUserInput(character));
+        displayBox.addElement(buildUserInput());
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
         userDescription = new RichTextAreaOverlay(parentView.getUserPersona(), 600, 400 * scaleFactor);
@@ -77,15 +79,12 @@ public class UserTab extends Tab {
         this.addElement(parentView.buildSubmitBox());
     }
 
-    private CardContainer buildUserDisplay(Character character) {
-        CardContainer root = new CardContainer(0, 0, 200, 200);
-        root.setMaxSize(200, 200);
+    private CardContainer buildUserDisplay() {
+        CardContainer root = new CardContainer(0, 0, 300, 320);
 
-        VerticalLayout layout = new VerticalLayout(200, 200);
-        layout.setX(-10);
-        layout.setY(-10);
+        VerticalLayout layout = new VerticalLayout(300, 320);
         root.setBody(layout);
-        layout.setAlignment(Pos.BASELINE_CENTER);
+        layout.setAlignment(Pos.TOP_CENTER);
         layout.setSpacing(25);
 
         // Use parentView's userIconPath
@@ -94,10 +93,15 @@ public class UserTab extends Tab {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
-        ImageOverlay image = new ImageOverlay(new ImageLoader(currentIconPath));
-        image.setFitWidth(128);
-        image.setFitHeight(128);
+        ImageLoader loader = new ImageLoader(currentIconPath);
+        loader.setWidth(256);
+        loader.setHeight(256);
+
+        image = new ImageOverlay(loader);
+        image.setFitWidth(256);
+        image.setFitHeight(256);
         image.setPreserveRatio(false);
+
         layout.addElement(image);
 
         TextOverlay upload = new TextOverlay("Click to upload image");
@@ -118,15 +122,19 @@ public class UserTab extends Tab {
                 infoFile.set("icon-path-user", selectedFile.getAbsolutePath());
 
                 parentView.updateInfoData();
-                App.window.clearContainers();
-                App.window.addContainer(new CharacterEditView(character, parentView.getUser(), infoFile, this).getRoot());
+
+                ImageLoader imageLoader = new ImageLoader(selectedFile);
+                imageLoader.setWidth(256);
+                imageLoader.setHeight(256);
+
+                image.setImage(imageLoader);
             }
         });
 
         return root;
     }
 
-    private VerticalLayout buildUserInput(Character character) {
+    private VerticalLayout buildUserInput() {
         VerticalLayout root = new VerticalLayout(250, 150);
         root.setAlignment(Pos.BASELINE_CENTER);
         root.setMaxSize(250, 200);
