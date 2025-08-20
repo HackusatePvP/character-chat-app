@@ -12,7 +12,7 @@ public class ServerLayout extends HorizontalLayout {
 
     public ServerLayout(double width, double height) {
         super(width, height);
-        setSpacing(100);
+        setSpacing(200);
         setY(app.getAppSettings().getHeight() - 90);
         build();
     }
