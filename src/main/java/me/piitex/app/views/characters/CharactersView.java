@@ -27,6 +27,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class CharactersView {
     private final ScrollContainer root;
@@ -129,13 +130,13 @@ public class CharactersView {
 
             card.setBody(displayBox);
 
-            card.setFooter(buildControlBox(character));
+            card.setFooter(buildControlBox(base, card, character));
 
             base.addElement(card);
         }
     }
 
-    public HorizontalLayout buildControlBox(Character character) {
+    public HorizontalLayout buildControlBox(FlowLayout base, CardContainer card, Character character) {
         HorizontalLayout root = new HorizontalLayout(200, 25);
         root.setIndex(10);
         root.setSpacing(spacing);
@@ -169,7 +170,7 @@ public class CharactersView {
         delete.addStyle(Styles.DANGER);
         delete.setTooltip("Delete the character.");
         delete.onClick(event -> {
-            deleteCharacter(character, event.getHandler().getSceneX(), event.getHandler().getSceneY());
+            deleteCharacter(base, card, character, event.getHandler().getSceneX(), event.getHandler().getSceneY());
         });
         root.addElement(delete);
         return root;
@@ -211,7 +212,7 @@ public class CharactersView {
         App.window.addContainer(editView.getRoot());
     }
 
-    private void deleteCharacter(Character character, double x, double y) {
+    private void deleteCharacter(FlowLayout base, CardContainer card, Character character, double x, double y) {
         DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + character.getId() + "'?", 500, 500);
 
         ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
@@ -226,14 +227,26 @@ public class CharactersView {
         confirm.addStyle(Styles.DANGER);
         confirm.onClick(event1 -> {
             App.getInstance().getCharacters().remove(character.getId());
-            try {
-                FileUtils.deleteDirectory(character.getCharacterDirectory());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            App.window.removeContainer(dialogueContainer);
 
-            App.window.clearContainers();
-            App.window.addContainer(new HomeView());
+            // Cleanup image usage
+            VerticalLayout verticalLayout = (VerticalLayout) card.getBody();
+            ImageOverlay imageOverlay = (ImageOverlay) verticalLayout.getElementAt(1);
+
+            // When setting to null the engine will dispose of the image and the JVM will call gc.
+            imageOverlay.setImage(null);
+
+            base.removeElement(card);
+
+            // Add a buffer to ensure image resources are disposed.
+            App.getThreadPoolManager().submitSchedule(() -> {
+                try {
+                    App.logger.info("Deleting: {}", character.getId());
+                    FileUtils.deleteDirectory(character.getCharacterDirectory());
+                } catch (IOException e) {
+                    App.logger.error("Could not delete directory!", e);
+                }
+            }, 1, TimeUnit.SECONDS);
         });
 
         dialogueContainer.setCancelButton(cancel);
