@@ -9,11 +9,12 @@ import me.piitex.app.views.characters.CharacterEditMobileView;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
-import me.piitex.app.views.users.UsersView;
+import me.piitex.engine.PopupPosition;
 import me.piitex.engine.Renderer;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
+import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -97,8 +98,9 @@ public class SidebarView extends VerticalLayout {
         users.setWidth(rootWidth);
         addElement(users);
         users.onClick(event -> {
-            App.window.clearContainers();
-            App.window.addContainer(new UsersView().getRoot());
+            MessageOverlay warning = new MessageOverlay("Development", "User templates are still in development.");
+            warning.addStyle(Styles.WARNING);
+            App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 400, 100, true);
         });
 
         ButtonOverlay characters = new ButtonBuilder("characters").setText("Characters").build();
