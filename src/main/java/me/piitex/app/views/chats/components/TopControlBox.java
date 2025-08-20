@@ -12,8 +12,11 @@ import me.piitex.app.backend.Role;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.chats.ChatView;
+import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
+import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
+import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.engine.overlays.RichTextAreaOverlay;
 import me.piitex.engine.overlays.TextOverlay;
@@ -70,6 +73,19 @@ public class TopControlBox extends HorizontalLayout {
                 ChatMessage content = chat.getMessage(index - 2);
                 send.setCurrentText(content.getContent());
                 chat.removeMessage(index - 2);
+
+                ChatMessage last = chat.getMessages().getLast();
+                if (last.getSender() == Role.ASSISTANT) {
+                    Element element = parentView.getLayout().getElements().lastEntry().getValue();
+                    if (element instanceof VerticalLayout messageBox) {
+                        for (Element e : messageBox.getElements().values()) {
+                            if (e instanceof CardContainer cardContainer) {
+                                cardContainer.setFooter(parentView.buildButtonBox(messageBox, last, chat.getMessages().lastIndexOf(chat.getMessages().getLast())));
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 chat.update();
             } else {
