@@ -74,14 +74,16 @@ public class TopControlBox extends HorizontalLayout {
                 send.setCurrentText(content.getContent());
                 chat.removeMessage(index - 2);
 
-                ChatMessage last = chat.getMessages().getLast();
-                if (last.getSender() == Role.ASSISTANT) {
-                    Element element = parentView.getLayout().getElements().lastEntry().getValue();
-                    if (element instanceof VerticalLayout messageBox) {
-                        for (Element e : messageBox.getElements().values()) {
-                            if (e instanceof CardContainer cardContainer) {
-                                cardContainer.setFooter(parentView.buildButtonBox(messageBox, last, chat.getMessages().lastIndexOf(chat.getMessages().getLast())));
-                                break;
+                if (chat.getMessages().isEmpty()) {
+                    ChatMessage last = chat.getMessages().getLast();
+                    if (last.getSender() == Role.ASSISTANT) {
+                        Element element = parentView.getLayout().getElements().lastEntry().getValue();
+                        if (element instanceof VerticalLayout messageBox) {
+                            for (Element e : messageBox.getElements().values()) {
+                                if (e instanceof CardContainer cardContainer) {
+                                    cardContainer.setFooter(parentView.buildButtonBox(messageBox, last, chat.getMessages().lastIndexOf(chat.getMessages().getLast())));
+                                    break;
+                                }
                             }
                         }
                     }
