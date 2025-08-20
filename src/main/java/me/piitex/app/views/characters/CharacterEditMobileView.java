@@ -59,7 +59,7 @@ public class CharacterEditMobileView {
     private final InfoFile infoFile;
 
     @Nullable
-    private me.piitex.app.backend.Character character;
+    private Character character;
     @Nullable private User user;
 
     private boolean duplicate = false;
@@ -95,7 +95,7 @@ public class CharacterEditMobileView {
 
     private TabsContainer container;
 
-    public CharacterEditMobileView(@Nullable me.piitex.app.backend.Character character) {
+    public CharacterEditMobileView(@Nullable Character character) {
         this.infoFile = new InfoFile();
         this.character = character;
         build(null);
@@ -104,7 +104,7 @@ public class CharacterEditMobileView {
         }
     }
 
-    public CharacterEditMobileView(@Nullable me.piitex.app.backend.Character character, boolean duplicate) {
+    public CharacterEditMobileView(@Nullable Character character, boolean duplicate) {
         this.infoFile = new InfoFile();
         this.character = character;
         this.duplicate = duplicate;
@@ -115,7 +115,7 @@ public class CharacterEditMobileView {
 
     }
 
-    public CharacterEditMobileView(@Nullable me.piitex.app.backend.Character character, @Nullable User user, @Nullable InfoFile infoFile, @Nullable Tab tab) {
+    public CharacterEditMobileView(@Nullable Character character, @Nullable User user, @Nullable InfoFile infoFile, @Nullable Tab tab) {
         this.character = character;
         this.infoFile = infoFile;
         this.user = user;
@@ -697,7 +697,7 @@ public class CharacterEditMobileView {
 
             // Write the files
             if (character == null) {
-                character = new me.piitex.app.backend.Character(characterId);
+                character = new Character(characterId);
             }
             if (duplicate) {
                 // Duplicating is a little weird.
@@ -707,7 +707,7 @@ public class CharacterEditMobileView {
 
                 // Create a new character that acts as the final duplication
                 // This allows us to set the chara id since it's a final.
-                me.piitex.app.backend.Character dupe = new Character(characterId);
+                Character dupe = new Character(characterId);
 
                 // Copy the duplicated character info into the new character with the configured id
                 dupe.copy(character);
