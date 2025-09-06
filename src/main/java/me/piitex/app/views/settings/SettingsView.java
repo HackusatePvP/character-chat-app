@@ -81,7 +81,7 @@ public class SettingsView {
         String current = appSettings.getWidth() + "x" + appSettings.getHeight();
         selection.setDefaultItem(current);
         selection.onItemSelect(event -> {
-            String item = event.getItem();
+            String item = event.getNewValue();
             int width = Integer.parseInt(item.split("x")[0]);
             int height = Integer.parseInt(item.split("x")[1]);
             appSettings.setWidth(width);
@@ -125,7 +125,7 @@ public class SettingsView {
         selection.setMaxHeight(50);
         selection.setDefaultItem(getTextKey(appSettings.getChatTextSize()));
         selection.onItemSelect(event -> {
-            String item = event.getItem();
+            String item = event.getNewValue();
             if (item.equalsIgnoreCase("small")) {
                 item = Styles.TEXT_SMALL;
             } else if (item.equalsIgnoreCase("Default")) {
@@ -173,7 +173,7 @@ public class SettingsView {
         selection.setMaxHeight(50);
         selection.setDefaultItem(getTextKey(appSettings.getGlobalTextSize()));
         selection.onItemSelect(event -> {
-            String item = event.getItem();
+            String item = event.getNewValue();
             if (item.equalsIgnoreCase("small")) {
                 item = Styles.TEXT_SMALL;
             } else if (item.equalsIgnoreCase("Default")) {
@@ -230,7 +230,7 @@ public class SettingsView {
         AppSettings appSettings = App.getInstance().getAppSettings();
         selection.setDefaultItem(appSettings.getTheme());
         selection.onItemSelect(event -> {
-            String item = event.getItem();
+            String item = event.getNewValue();
             appSettings.setTheme(item);
             App.logger.info("Switching theme to " + item);
 

@@ -415,7 +415,7 @@ public class CharacterEditMobileView {
         root.addElement(userDisplayName);
 
         templates.onItemSelect(event -> {
-            String item = event.getItem();
+            String item = event.getNewValue();
             if (item.isEmpty()) return;
             if (item.equalsIgnoreCase("none")) {
                 user = null;

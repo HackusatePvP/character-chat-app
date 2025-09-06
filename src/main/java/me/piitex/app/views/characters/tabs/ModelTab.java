@@ -95,17 +95,17 @@ public class ModelTab extends Tab {
         container.setAction(modelSelection);
 
         modelSelection.onItemSelect(event -> {
-            if (event.getItem().startsWith("Default /")) {
+            if (event.getNewValue().startsWith("Default /")) {
                 infoFile.set("model", "");
                 return;
             }
-            String dir = event.getItem().split("/")[0];
-            String file = event.getItem().split("/")[1];
+            String dir = event.getNewValue().split("/")[0];
+            String file = event.getNewValue().split("/")[1];
             Model m = App.getModelByName(dir, file);
             if (m != null) {
                 infoFile.set("model", m.getFile().getName());
             } else {
-                App.logger.error("Could not find model '{}'", event.getItem());
+                App.logger.error("Could not find model '{}'", event.getNewValue());
             }
         });
         container.setAction(modelSelection);

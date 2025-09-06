@@ -152,7 +152,7 @@ public class ModelEditView extends EmptyContainer {
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 250, 50);
         selection.setDefaultItem(multimodal);
         selection.onItemSelect(event -> {
-            this.multimodal = event.getItem();
+            this.multimodal = event.getNewValue();
         });
 
         tileContainer.setAction(selection);
@@ -349,7 +349,7 @@ public class ModelEditView extends EmptyContainer {
         ComboBoxOverlay selection = new ComboBoxOverlay(templates, 250, 50);
         selection.setDefaultItem(chatTemplate);
         selection.onItemSelect(event -> {
-            this.chatTemplate = event.getItem();
+            this.chatTemplate = event.getNewValue();
         });
 
         tileContainer.setAction(selection);
@@ -378,7 +378,7 @@ public class ModelEditView extends EmptyContainer {
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setDefaultItem(reasoningTemplate);
         selection.onItemSelect(event -> {
-            this.reasoningTemplate = event.getItem();
+            this.reasoningTemplate = event.getNewValue();
         });
         tileContainer.setAction(selection);
 

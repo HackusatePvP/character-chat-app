@@ -183,7 +183,7 @@ public class ChatView extends EmptyContainer {
         selection.setMaxHeight(CHAT_VIEW_SELECTION_HEIGHT);
 
         selection.onItemSelect(event1 -> {
-            String item = event1.getItem();
+            String item = event1.getNewValue();
 
             if (item.equals(chat.getFile().getName())) {
                 return;

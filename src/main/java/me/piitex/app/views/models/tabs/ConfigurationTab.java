@@ -130,15 +130,15 @@ public class ConfigurationTab extends Tab {
         container.setAction(selection);
 
         selection.onItemSelect(event -> {
-            if (event.getItem().startsWith("Default /")) {
+            if (event.getNewValue().startsWith("Default /")) {
                 Model model = App.getDefaultModel();
                 if (model != null) {
                     settings.setGlobalModel(model.getFile().getAbsolutePath());
                 }
                 return;
             }
-            String dir = event.getItem().split("/")[0];
-            String file = event.getItem().split("/")[1];
+            String dir = event.getNewValue().split("/")[0];
+            String file = event.getNewValue().split("/")[1];
             settings.setGlobalModel(App.getModelByName(dir, file).getFile().getAbsolutePath());
         });
 
@@ -439,7 +439,7 @@ public class ConfigurationTab extends Tab {
         selection.setDefaultItem(item);
 
         selection.onItemSelect(event -> {
-            String newBackend = event.getItem();
+            String newBackend = event.getNewValue();
             if (newBackend == null) return;
 
             try {
@@ -479,7 +479,7 @@ public class ConfigurationTab extends Tab {
         ComboBoxOverlay selection = new ComboBoxOverlay(settings.getDevices(), 400, 50);
         selection.setDefaultItem(settings.getDevice());
         selection.onItemSelect(event -> {
-            settings.setDevice(event.getItem());
+            settings.setDevice(event.getNewValue());
         });
         container.setAction(selection);
 

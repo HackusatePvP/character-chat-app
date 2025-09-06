@@ -162,7 +162,7 @@ public class UserTab extends Tab {
         }
 
         templates.onItemSelect(event -> {
-            String item = event.getItem();
+            String item = event.getNewValue();
             if (item.isEmpty()) return;
             User template = null;
             if (!item.equalsIgnoreCase("none")) {
