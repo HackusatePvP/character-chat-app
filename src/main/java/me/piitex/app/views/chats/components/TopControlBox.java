@@ -74,7 +74,7 @@ public class TopControlBox extends HorizontalLayout {
                 send.setCurrentText(content.getContent());
                 chat.removeMessage(index - 2);
 
-                if (chat.getMessages().isEmpty()) {
+                if (!chat.getMessages().isEmpty()) {
                     ChatMessage last = chat.getMessages().getLast();
                     if (last.getSender() == Role.ASSISTANT) {
                         Element element = parentView.getLayout().getElements().lastEntry().getValue();
