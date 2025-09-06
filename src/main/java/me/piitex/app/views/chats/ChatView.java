@@ -249,27 +249,26 @@ public class ChatView extends EmptyContainer {
             String dir = model.split("/")[0];
             String file = model.split("/")[1];
             Model m = App.getModelByName(dir, file);
-            if (m != null) {
-                if (serverProcess != null) {
-                    Model check = serverProcess.getModel();
-                    if (!check.getFile().getName().equalsIgnoreCase(m.getFile().getName())) {
-                        serverProcess.stop();
-                        App.getThreadPoolManager().submitTask(() -> {
-                            new ServerProcess(m);
-                            handleServerLoad();
-                        });
+            if (m != null && serverProcess != null) {
+                Model check = serverProcess.getModel();
+                if (!check.getFile().getName().equalsIgnoreCase(m.getFile().getName())) {
+                    serverProcess.stop();
+                    App.getThreadPoolManager().submitTask(() -> {
+                        new ServerProcess(m);
+                        handleServerLoad();
+                    });
 
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        return;
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
+                    return;
                 }
-
             }
+
         }
+
         handleServerLoad();
     }
 
