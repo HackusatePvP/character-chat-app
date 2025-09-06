@@ -47,20 +47,29 @@ public class JavaFXLoad extends Application {
             App.mobile = true;
             RenConfiguration.setWidth(width);
             RenConfiguration.setHeight(height);
-            App.getInstance().getAppSettings().setWidth(width);
-            App.getInstance().getAppSettings().setHeight(height);
+            appSettings.setWidth(width);
+            appSettings.setHeight(height);
             setWidth = 600;
             setHeight = 1200;
 
         // When changing from mobile to desktop view the configuration must be reverted.
         // Application will default to 720p.
-        } else if (App.getInstance().getAppSettings().getWidth() <= 720) {
+        } else if (App.getInstance().getAppSettings().getWidth() <= 1000) {
             App.logger.info("Forcefully resetting view to 1280x720.");
             setWidth = 1280;
             setHeight = 720;
             App.getInstance().getAppSettings().setWidth(setWidth);
             App.getInstance().getAppSettings().setHeight(setHeight);
+        } else if (width < appSettings.getWidth()) {
+            App.logger.warn("Monitor size does not fit configured dimensions.");
+            appSettings.setWidth(1280);
+            appSettings.setHeight(720);
+            width = 1280;
+            height = 720;
+            setWidth = width;
+            setHeight = height;
         }
+
 
         App.logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
         App.logger.info("Screen Size ({},{})", dimension.width, dimension.height);
