@@ -4,6 +4,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
+import me.piitex.app.utils.Placeholder;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -294,6 +295,7 @@ public class Response {
     }
 
     private String format(String line, Character character, User user) {
+        line = Placeholder.retrieveOriginalText(line);
         return line.replace("{char}", character.getDisplayName()).replace("{character}", character.getDisplayName())
                 .replace("{{char}}", character.getDisplayName()).replace("{{character}}", character.getDisplayName())
                 .replace("{user}", user.getDisplayName()).replace("{{user}}", user.getDisplayName());
