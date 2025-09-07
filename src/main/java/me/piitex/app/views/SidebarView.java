@@ -103,7 +103,7 @@ public class SidebarView extends VerticalLayout {
             App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 400, 100, true);
         });
 
-        ButtonOverlay characters = new ButtonBuilder("characters").setText("Characters").build();
+        ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").build();
         characters.addStyle(appSettings.getGlobalTextSize());
         characters.setWidth(rootWidth);
         addElement(characters);
