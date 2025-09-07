@@ -56,7 +56,8 @@ public class CharacterTab extends Tab {
         rootLayout.setAlignment(Pos.TOP_CENTER);
 
         //this.addElement(rootLayout);
-        ScrollContainer scrollContainer = new ScrollContainer(rootLayout, 0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
+        ScrollContainer scrollContainer = new ScrollContainer(rootLayout, 0, 0, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer.setMaxSize(scrollContainer.getWidth(), scrollContainer.getHeight());
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setPannable(true);
         this.addElement(scrollContainer);
@@ -71,9 +72,7 @@ public class CharacterTab extends Tab {
         displayBox.addElement(displayCard);
         displayBox.addElement(buildCharacterInput(character, duplicate));
 
-        double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-
-        charDescription = new RichTextAreaOverlay(parentView.getCharacterPersona(), 800, 400 * scaleFactor);
+        charDescription = new RichTextAreaOverlay(parentView.getCharacterPersona(), 800, 400);
         charDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         charDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         charDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));

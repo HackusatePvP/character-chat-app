@@ -268,8 +268,8 @@ public class CharacterEditView {
     }
 
     public HorizontalLayout buildSubmitBox() {
-        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 300, 200);
-        layout.setY(appSettings.getHeight() - 250);
+        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 300, 50);
+        layout.setY(appSettings.getHeight() - 150);
         layout.setSpacing(20);
         layout.setAlignment(Pos.CENTER);
 
