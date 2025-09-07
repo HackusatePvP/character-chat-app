@@ -287,7 +287,6 @@ public class ChatView extends EmptyContainer {
                 }
             }
 
-            System.out.println("Passing...");
             serverProcess.addServerLoadingListener(new ServerLoadingListener() {
                 @Override
                 public void onServerLoadingComplete(boolean success) {
@@ -325,12 +324,6 @@ public class ChatView extends EmptyContainer {
 
         // Add to top controls
         topControls.addElement(verticalLayout);
-
-        topControls.getElements().forEach((integer, element) -> {
-            if (element instanceof VerticalLayout) {
-                System.out.println("Index: " + integer);
-            }
-        });
     }
 
     public void handleSubmit(String message) {
