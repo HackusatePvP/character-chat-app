@@ -89,7 +89,10 @@ public class ConfigurationTab extends Tab {
         container.setAction(button);
         button.onClick(event -> {
             DirectoryChooser chooser = new DirectoryChooser();
-            chooser.setInitialDirectory(new File(settings.getModelPath()));
+            File currentPath = new File(settings.getModelPath());
+            if (currentPath.exists() && currentPath.isDirectory()) {
+                chooser.setInitialDirectory(currentPath);
+            }
             File file = chooser.showDialog(App.window.getStage());
             if (file == null) return;
             App.logger.info("Updating model path to '{}'", file.getAbsolutePath());
