@@ -178,11 +178,7 @@ public class ServerProcess {
         parameters.add("8187");
         parameters.add("--no-webui");
 
-        App.logger.debug("Server Parameters: " + parameters.toString());
-
-        if (App.dev) {
-            App.logger.debug("Server Parameters: " + parameters);
-        }
+        App.logger.debug("Server Parameters: {}", parameters);
 
         // Build the process
         ProcessBuilder builder = new ProcessBuilder(parameters);
