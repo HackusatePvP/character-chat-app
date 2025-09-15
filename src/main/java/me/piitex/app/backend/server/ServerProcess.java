@@ -281,6 +281,8 @@ public class ServerProcess {
     }
 
     public boolean stop() {
+        listeners.clear();
+
         if (process == null) {
             return true;
         }
@@ -289,24 +291,23 @@ public class ServerProcess {
         }
 
         App.logger.info("Attempting to gracefully shutdown llama-server.");
-        process.destroy(); // Send a termination signal
+        process.destroy();
 
         try {
             // Wait for the process to exit, with a timeout
             boolean exited = process.waitFor(10, TimeUnit.SECONDS); // Give it up to 10 seconds
             if (exited) {
                 App.logger.info("llama-server exited.");
-                return true; // Process successfully exited
+                return true;
             } else {
                 App.logger.info("Forcefully terminating llama-server...");
-                process.destroyForcibly(); // Force kill if it didn't respond
-                // Wait again for forcible destruction (might not be necessary but safer)
+                process.destroyForcibly();
                 process.waitFor(5, TimeUnit.SECONDS);
-                return !process.isAlive(); // Return true if it's dead
+                return !process.isAlive();
             }
         } catch (InterruptedException e) {
             App.logger.info("Waiting to destroy process...");
-            Thread.currentThread().interrupt(); // Restore interrupted status
+            Thread.currentThread().interrupt();
             process.destroyForcibly();
             return !process.isAlive();
         }
