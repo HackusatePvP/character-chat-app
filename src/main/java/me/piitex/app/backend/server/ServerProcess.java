@@ -142,6 +142,7 @@ public class ServerProcess {
         // Flash attention
         if (settings.isFlashAttention()) {
             parameters.add("-fa");
+            parameters.add("auto");
         }
 
         // Reasoning Template
@@ -161,13 +162,6 @@ public class ServerProcess {
         if (settings.isJinja()) {
             App.logger.debug("Using jinja...");
             parameters.add("--jinja");
-        }
-
-        // Qwen3 think mode
-        if (!settings.isThinkMode()) {
-            App.logger.debug("Disabling think mode...");
-            parameters.add("--reasoning-budget");
-            parameters.add("0");
         }
 
         parameters.add("-c");
