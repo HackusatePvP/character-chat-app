@@ -5,7 +5,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.views.characters.CharacterEditMobileView;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
@@ -109,11 +108,7 @@ public class SidebarView extends VerticalLayout {
         addElement(characters);
         characters.onClick(event -> {
             App.window.clearContainers();
-            if (App.mobile) {
-                App.window.addContainer(new CharacterEditMobileView(null).getRoot());
-            } else {
-                App.window.addContainer(new CharacterEditView(null).getRoot());
-            }
+            App.window.addContainer(new CharacterEditView(null).getRoot());
         });
     }
 

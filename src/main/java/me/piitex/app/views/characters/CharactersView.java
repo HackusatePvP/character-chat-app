@@ -179,12 +179,7 @@ public class CharactersView {
     private void editCharacter(Character character) {
         App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
-        Container container;
-        if (App.mobile) {
-            container = new CharacterEditMobileView(character, false).getRoot();
-        } else {
-            container = new CharacterEditView(character, false).getRoot();
-        }
+        Container container = new CharacterEditView(character, false).getRoot();
 
         Platform.runLater(() -> {
             App.window.clearContainers();
