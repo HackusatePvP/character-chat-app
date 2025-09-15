@@ -102,6 +102,8 @@ public class ConfigurationTab extends Tab {
             container.setAction(actionButton(container));
             tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
 
+            layout.replaceElement(5, buildCurrentModel());
+
         });
 
         return button;
