@@ -358,7 +358,6 @@ public class ConfigurationTab extends Tab {
             loading = true;
         }
 
-
         if (loading) {
             start.setEnabled(false);
             stop.setEnabled(false);
@@ -369,10 +368,22 @@ public class ConfigurationTab extends Tab {
 
             if (serverProcess == null) {
                 App.getThreadPoolManager().submitSchedule(() -> {
-                    handleServerEvent(ServerProcess.getCurrentServer());
+                    if (ServerProcess.getCurrentServer() != null) { // Check again to see if it is null
+                        handleServerEvent(ServerProcess.getCurrentServer());
+                    } else {
+                        Platform.runLater(() -> {
+                            App.window.removeContainer(App.window.getCurrentPopup());
+
+                            start.getNode().setDisable(false);
+                            stop.getNode().setDisable(false);
+                            reload.getNode().setDisable(false);
+                        });
+                    }
                 }, 500, TimeUnit.MILLISECONDS);
             } else {
-                handleServerEvent(serverProcess);
+                if (serverProcess.isLoading()) {
+                    handleServerEvent(serverProcess);
+                }
             }
         }
     }
