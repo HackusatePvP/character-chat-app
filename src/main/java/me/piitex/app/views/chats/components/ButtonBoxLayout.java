@@ -122,12 +122,11 @@ public class ButtonBoxLayout extends HorizontalLayout {
             modalContainer.setContent(verticalLayout);
             App.window.renderPopup(modalContainer, PopupPosition.CENTER, 400, 400);
 
-            if (modalContainer.getView() != null) {
-                ModalBox modalBox = (ModalBox) modalContainer.getView();
-                modalBox.setOnClose(event1 -> {
-                    App.window.removeContainer(modalContainer);
-                });
-            }
+            ModalBox modalBox = modalContainer.getModalBox();
+            modalBox.setOnClose(event1 -> {
+                App.window.removeContainer(modalContainer);
+            });
+
         });
 
         TextOverlay delete = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));

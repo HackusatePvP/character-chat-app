@@ -148,6 +148,7 @@ public class UserTab extends Tab {
         root.addElement(templates);
 
         userDisplayNameInput = new InputFieldOverlay(parentView.getUserDisplay(), 0, 0, 200, 50);
+        userDisplayNameInput.setEnabled(true);
         userDisplayNameInput.setHintText("Display Name");
         userDisplayNameInput.onInputSetEvent(event -> {
             parentView.setUserDisplay(event.getInput());

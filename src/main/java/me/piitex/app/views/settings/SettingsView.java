@@ -195,7 +195,7 @@ public class SettingsView {
             // Refresh view to reflect changes.
             container.getElements().clear();
             build();
-            Pane pane = (Pane) container.getView();
+            Pane pane = (Pane) container.getNode();
             pane.getChildren().clear();
             pane.getChildren().addAll(container.build());
 
