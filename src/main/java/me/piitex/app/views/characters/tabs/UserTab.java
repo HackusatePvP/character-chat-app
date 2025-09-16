@@ -10,6 +10,7 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
+import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -47,7 +48,13 @@ public class UserTab extends Tab {
         VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 315, 0);
         rootLayout.setSpacing(40);
         rootLayout.setAlignment(Pos.TOP_CENTER);
-        this.addElement(rootLayout);
+
+        //this.addElement(rootLayout);
+        ScrollContainer scrollContainer = new ScrollContainer(rootLayout, 0, 0, appSettings.getWidth() - 300, appSettings.getHeight() - 200);
+        scrollContainer.setMaxSize(scrollContainer.getWidth(), scrollContainer.getHeight());
+        scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setPannable(true);
+        this.addElement(scrollContainer);
 
         HorizontalLayout displayBox = new HorizontalLayout(600, 320);
         displayBox.setMaxSize(600, 320);
