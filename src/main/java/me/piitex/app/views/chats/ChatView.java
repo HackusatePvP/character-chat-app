@@ -141,21 +141,23 @@ public class ChatView extends EmptyContainer {
         // Layout is the chat window.
         loadMessages();
 
-        Platform.runLater(() -> {
-            if (!character.isShownDisclaimer()) {
-                AlertOverlay alert = new AlertOverlay("DISCLAIMER", Alert.AlertType.WARNING);
-                alert.setWidth(600);
-                alert.setHeight(250);
-                alert.setContent("Everything the character says is made up. Do not use AI for mental or medical health assistance.");
-                alert.addButton(new ButtonType("I Understand", ButtonBar.ButtonData.YES));
+        AlertOverlay alert;
+        if (!character.isShownDisclaimer()) {
+            alert = new AlertOverlay("DISCLAIMER", Alert.AlertType.WARNING);
+            alert.setWidth(600);
+            alert.setHeight(250);
+            alert.setContent("Everything the character says is made up. Do not use AI for mental or medical health assistance.");
+            alert.addButton(new ButtonType("I Understand", ButtonBar.ButtonData.YES));
 
-                alert.onConfirm(event -> {
-                    character.setShownDisclaimer(true);
-                });
+            alert.onConfirm(event -> {
+                character.setShownDisclaimer(true);
+            });
 
-                App.window.renderAlert(alert);
-            }
-        });
+            Platform.runLater(() -> {
+            });
+        } else {
+            alert = null;
+        }
 
         sidebarView.setOnCollapseStateChange((aBoolean) -> {
             if (aBoolean) {
@@ -167,8 +169,13 @@ public class ChatView extends EmptyContainer {
             }
         });
 
-       // Check to make sure server has been started.
-       Platform.runLater(this::checkServer);
+        // Check to make sure server has been started.
+        Platform.runLater(() -> {
+            checkServer();
+            if (alert != null) {
+                App.window.renderAlert(alert);
+            }
+        });
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -269,12 +276,18 @@ public class ChatView extends EmptyContainer {
 
         }
 
-        handleServerLoad();
+        if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isError()) {
+            MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not initiate the server!");
+            error.addStyle(Styles.DANGER);
+            error.addStyle(Styles.BG_DEFAULT);
+            App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, true);
+        } else {
+            handleServerLoad();
+        }
     }
 
     private void handleServerLoad() {
 
-        // Show progress bar only if still loading
         ServerProcess serverProcess = ServerProcess.getCurrentServer();
         if (serverProcess == null || serverProcess.isLoading()) {
             renderProgress(); // Call renderProgress() to show your popup
