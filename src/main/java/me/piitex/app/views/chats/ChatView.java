@@ -393,6 +393,7 @@ public class ChatView extends EmptyContainer {
         if (image != null) {
             response.setImage(image);
         }
+        topControls.addElement(buildResponseProgress());
 
         Future<?> thread = App.getThreadPoolManager().submitTask(() -> {
             // Generate response!
@@ -429,6 +430,7 @@ public class ChatView extends EmptyContainer {
 
             Platform.runLater(() -> {
                 topControls.getPane().getChildren().removeLast();
+                topControls.getPane().getChildren().removeLast();
             });
         });
 
@@ -448,6 +450,20 @@ public class ChatView extends EmptyContainer {
         });
 
         topControls.addElement(stop);
+    }
+
+    public VerticalLayout buildResponseProgress() {
+        VerticalLayout root = new VerticalLayout(150, 50);
+        root.setMaxSize(150, 50);
+        root.setAlignment(Pos.TOP_CENTER);
+
+        TextOverlay text = new TextOverlay("Generating Response...");
+        root.addElement(text);
+
+        ProgressBarOverlay progressBarOverlay = new ProgressBarOverlay();
+        root.addElement(progressBarOverlay);
+
+        return root;
     }
 
     public VerticalLayout getLayout() {
