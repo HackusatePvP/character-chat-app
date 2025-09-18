@@ -277,7 +277,7 @@ public class ChatView extends EmptyContainer {
         }
 
         if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isError()) {
-            MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not initiate the server!");
+            MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Server Error", "Could not initiate the server!");
             error.addStyle(Styles.DANGER);
             error.addStyle(Styles.BG_DEFAULT);
             App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, true);
