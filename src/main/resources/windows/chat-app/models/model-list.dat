@@ -1,15 +1,35 @@
-cydonia-3:
+cydonia-24b-v4:
   description: Best roleplay model at 20B parameters.
-  name: Cydonia 24B v3.1
+  name: Cydonia 24B v4
   parameters: 24B
   map:
-    Q2_K: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q2_K.gguf?download=true
-    Q3_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q3_K_M.gguf?download=true
-    Q4_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q4_K_M.gguf?download=true
-    Q5_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q5_K_M.gguf?download=true
-    Q6_K: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q6_K.gguf?download=true
-    Q8_0: https://huggingface.co/TheDrummer/Cydonia-24B-v3.1-GGUF/resolve/main/Cydonia-24B-v3j-Q8_0.gguf?download=true
-  tags: [mistral, no-vision, 20B, recommended]
+    IQ1_M: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ1_M.gguf?download=true
+    IQ2_S: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ2_S.gguf?download=true
+    IQ2_XS: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ2_XS.gguf?download=true
+    IQ3_M: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ3_M.gguf?download=true
+    IQ3_XS: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ3_XS.gguf?download=true
+    IQ3_XXS: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ3_XXS.gguf?download=true
+    IQ4_NL: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ4_NL.gguf?download=true
+    IQ4_XS: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-IQ4_XS.gguf?download=true
+    Q2_K: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q2_K.gguf?download=true
+    Q2_K_L: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q2_K_L.gguf?download=true
+    Q3_K_L: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q3_K_L.gguf?download=true
+    Q3_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q3_K_M.gguf?download=true
+    Q3_K_S: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q3_K_S.gguf?download=true
+    Q3_K_XL: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q3_K_XL.gguf?download=true
+    Q4_0: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q4_0.gguf?download=true
+    Q4_1: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q4_1.gguf?download=true
+    Q4_K_L: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q4_K_L.gguf?download=true
+    Q4_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q4_K_M.gguf?download=true
+    Q4_K_S: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q4_K_S.gguf?download=true
+    Q5_K_L: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q5_K_L.gguf?download=true
+    Q5_K_M: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q5_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q5_K_S.gguf?download=true
+    Q6_K: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q6_K.gguf?download=true
+    Q6_K_L: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q6_K_L.gguf?download=true
+    Q8_0: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-Q8_0.gguf?download=true
+    bf16: https://huggingface.co/TheDrummer/Cydonia-24B-v4-GGUF/resolve/main/TheDrummer_Cydonia-24B-v4-bf16.gguf?download=true
+  tags: [cydonia, no-vision, 20B, recommended]
 mistral-small-22B-arliAI-rpmax-v1-1:
   name: Mistral-Small 22B ArliAI-RPMax v1.1
   description: Trained exclusively for roleplay. Does not support vision.
