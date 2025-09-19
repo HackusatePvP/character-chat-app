@@ -18,7 +18,6 @@ public class Character {
 
     private String firstMessage = "";
     private String chatScenario = "";
-    private int chatContext = 4096;
 
     private Chat lastChat;
 
@@ -77,9 +76,6 @@ public class Character {
         }
         if (infoFile.hasKey("chat-scenario")) {
             this.chatScenario = infoFile.get("chat-scenario");
-        }
-        if (infoFile.hasKey("chat-context")) {
-            this.chatContext = infoFile.getInteger("chat-context");
         }
         if (infoFile.hasKey("lore")) {
             this.lorebook = infoFile.getStringMap("lore");
@@ -214,15 +210,6 @@ public class Character {
         infoFile.set("chat-scenario", chatScenario);
     }
 
-    public int getChatContext() {
-        return chatContext;
-    }
-
-    public void setChatContext(int chatContext) {
-        this.chatContext = chatContext;
-        infoFile.set("chat-context", chatContext);
-    }
-
     public Chat getLastChat() {
         return lastChat;
     }
@@ -300,7 +287,6 @@ public class Character {
         setLorebook(character.getLorebook());
         setFirstMessage(character.getFirstMessage());
         setChatScenario(character.getChatScenario());
-        setChatContext(character.getChatContext());
         // Note: Chats are not copied.
     }
 }

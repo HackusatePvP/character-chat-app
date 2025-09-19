@@ -63,7 +63,6 @@ public class CharacterEditView {
     private String userPersona = "";
     private String chatFirstMessage = "";
     private String chatScenario = "";
-    private int chatContextSize = 4096;
 
     private final Map<String, String> loreItems = new TreeMap<>();
     private final Map<String, String> exampleDialogue = new LinkedHashMap<>();
@@ -136,7 +135,6 @@ public class CharacterEditView {
 
         chatFirstMessage = "";
         chatScenario = "";
-        chatContextSize = 4096;
         loreItems.clear();
     }
 
@@ -152,7 +150,6 @@ public class CharacterEditView {
         this.user = character.getUser();
         this.chatFirstMessage = character.getFirstMessage();
         this.chatScenario = character.getChatScenario();
-        this.chatContextSize = character.getChatContext();
     }
 
     private void updateFieldsFromInfoFile() {
@@ -194,9 +191,6 @@ public class CharacterEditView {
         if (infoFile.hasKey("scenario")) {
             chatScenario = infoFile.get("scenario");
         }
-        if (infoFile.hasKey("chat-context-size")) {
-            chatContextSize = infoFile.getInteger("chat-context-size");
-        }
         if (infoFile.hasKey("duplicate")) {
             duplicate = infoFile.getBoolean("duplicate");
         }
@@ -227,7 +221,6 @@ public class CharacterEditView {
         infoFile.set("dialogue", exampleDialogue);
         infoFile.set("first-message", chatFirstMessage);
         infoFile.set("scenario", chatScenario);
-        infoFile.set("chat-context-size", chatContextSize);
     }
 
     public void build(@Nullable Tab tabToSelect) {
@@ -329,7 +322,6 @@ public class CharacterEditView {
                 currentCharacterInstance.setExampleDialogue(exampleDialogue);
                 currentCharacterInstance.setFirstMessage(chatTabInstance.getFirstMessageInput().getCurrentText());
                 currentCharacterInstance.setChatScenario(chatTabInstance.getChatScenarioInput().getCurrentText());
-                currentCharacterInstance.setChatContext(chatTabInstance.getChatContextSpinner().getCurrentValue().intValue());
 
                 currentCharacterInstance.setOverride(modelTabInstance.getModelOverride().getCurrentValue());
                 currentCharacterInstance.setModel(modelTabInstance.getModelSelection().getSelected());
@@ -474,10 +466,19 @@ public class CharacterEditView {
         }
         loreItems.forEach((key, value) -> textToTokenize.append(key).append(": ").append(value).append("\n"));
 
+        int chatContextSize;
+        if (ServerProcess.getCurrentServer() != null && ServerProcess.getCurrentServer().getModel() != null) {
+            chatContextSize = ServerProcess.getCurrentServer().getModel().getSettings().getContextSize();
+        } else if (App.getInstance().getSettings().getGlobalModel() != null) {
+            chatContextSize = App.getInstance().getSettings().getGlobalModel().getSettings().getContextSize();
+        } else {
+            chatContextSize = 4096;
+        }
+
         App.getThreadPoolManager().submitTask(() -> {
             try {
                 int tokenSize = Server.tokenize(textToTokenize.toString());
-
+                App.logger.warn("Character context size too big. ({}/{})", tokenSize, chatContextSize);
                 Platform.runLater(() -> {
                     if (tokenSize > (chatContextSize / 2)) {
                         MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + "). You should aim to use at most half the available context.");
@@ -544,10 +545,6 @@ public class CharacterEditView {
         return chatScenario;
     }
 
-    public int getChatContextSize() {
-        return chatContextSize;
-    }
-
     public Map<String, String> getLoreItems() {
         return loreItems;
     }
@@ -595,10 +592,6 @@ public class CharacterEditView {
 
     public void setChatScenario(String chatScenario) {
         this.chatScenario = chatScenario;
-    }
-
-    public void setChatContextSize(int chatContextSize) {
-        this.chatContextSize = chatContextSize;
     }
 
     public InfoFile getInfoFile() {

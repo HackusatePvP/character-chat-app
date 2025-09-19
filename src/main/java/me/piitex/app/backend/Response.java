@@ -2,6 +2,7 @@ package me.piitex.app.backend;
 
 import me.piitex.app.App;
 import me.piitex.app.backend.server.Server;
+import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
@@ -55,7 +56,14 @@ public class Response {
         messages = new JSONArray();
 
         int tokens = 0;
-        int maxTokens = character.getChatContext();
+        int maxTokens;
+        if (ServerProcess.getCurrentServer() != null && ServerProcess.getCurrentServer().getModel() != null) {
+            maxTokens = ServerProcess.getCurrentServer().getModel().getSettings().getContextSize();
+        } else if (App.getInstance().getSettings().getGlobalModel() != null) {
+            maxTokens = App.getInstance().getSettings().getGlobalModel().getSettings().getContextSize();
+        } else {
+            maxTokens = 4096; // Default to standard 4k
+        }
 
         ModelSettings settings = character.getModelSettings();
         JSONObject modelInstructions = new JSONObject();

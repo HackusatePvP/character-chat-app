@@ -34,10 +34,10 @@ public class ChatTab extends Tab {
         this.infoFile = infoFile;
         this.parentView = parentView;
 
-        buildChatTabContent(parentView.getChatFirstMessage(), parentView.getChatScenario(), parentView.getChatContextSize());
+        buildChatTabContent(parentView.getChatFirstMessage(), parentView.getChatScenario());
     }
 
-    private void buildChatTabContent(String chatFirstMessage, String chatScenario, int chatContextSize) {
+    private void buildChatTabContent(String chatFirstMessage, String chatScenario) {
         this.setWidth(appSettings.getWidth() - 300);
         this.setHeight(appSettings.getHeight());
         int layoutSpacing = 25;
@@ -104,29 +104,6 @@ public class ChatTab extends Tab {
         chatScenarioInput.addStyle(Styles.BG_DEFAULT);
         chatScenarioInput.addStyle(appSettings.getChatTextSize());
         chatScenarioInput.addStyle(Styles.TEXT_ON_EMPHASIS);
-
-        CardContainer contextCard = new CardContainer(0, 0, 0, TEXT_AREA_HEIGHT);
-        contextCard.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
-        layout.addElement(contextCard);
-
-        HorizontalLayout contextBox = new HorizontalLayout(0, -1);
-        contextBox.setAlignment(Pos.BASELINE_LEFT);
-        contextBox.setMaxSize(layout.getWidth() - 200, TEXT_AREA_HEIGHT);
-        contextBox.setSpacing(layoutSpacing);
-        contextCard.setBody(contextBox);
-
-        TextFlowOverlay contextDesc = new TextFlowOverlay("Set the chat context size.", (int) contextCard.getMaxWidth() / 2- 20, 50);
-        contextDesc.setTextFillColor(Color.WHITE);
-        contextBox.addElement(contextDesc);
-
-        chatContextSpinner = new SpinnerNumberOverlay(1024, Integer.MAX_VALUE, chatContextSize);
-        contextBox.addElement(chatContextSpinner);
-        chatContextSpinner.onValueChange(event -> {
-            int newContextSize = (int) event.getNewValue();
-            parentView.setChatContextSize(newContextSize);
-            infoFile.set("chat-context", newContextSize);
-            parentView.warnTokens();
-        });
 
         this.addElement(parentView.buildSubmitBox());
     }
