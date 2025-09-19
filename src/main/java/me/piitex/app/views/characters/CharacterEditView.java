@@ -480,7 +480,7 @@ public class CharacterEditView {
 
                 Platform.runLater(() -> {
                     if (tokenSize > (chatContextSize / 2)) {
-                        MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + ")");
+                        MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + "). You should aim to use at most half the available context.");
                         tokenWarning.addStyle(Styles.WARNING);
                         tokenWarning.addStyle(Styles.BG_DEFAULT);
                         tokenWarning.setIcon(new FontIcon(Material2MZ.OUTLINED_FLAG));
