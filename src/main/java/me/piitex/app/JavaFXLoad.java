@@ -12,7 +12,6 @@ import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
-import me.piitex.engine.RenConfiguration;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.loaders.ImageLoader;
@@ -45,8 +44,6 @@ public class JavaFXLoad extends Application {
             App.logger.info("Using mobile layouts...");
             // Set mobile view
             App.mobile = true;
-            RenConfiguration.setWidth(width);
-            RenConfiguration.setHeight(height);
             appSettings.setWidth(width);
             appSettings.setHeight(height);
             setWidth = 600;
