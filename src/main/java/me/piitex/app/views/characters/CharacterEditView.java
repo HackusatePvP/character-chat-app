@@ -481,21 +481,25 @@ public class CharacterEditView {
                 App.logger.warn("Character context size too big. ({}/{})", tokenSize, chatContextSize);
                 Platform.runLater(() -> {
                     if (tokenSize > (chatContextSize / 2)) {
-                        MessageOverlay tokenWarning = new MessageOverlay(0, 0, 500, 50, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + "). You should aim to use at most half the available context.");
+                        MessageOverlay tokenWarning = new MessageOverlay(0, 0, 400, 100, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + "). You should aim to use at most half the available context.");
+                        tokenWarning.setMaxWidth(tokenWarning.getWidth());
                         tokenWarning.addStyle(Styles.WARNING);
                         tokenWarning.addStyle(Styles.BG_DEFAULT);
                         tokenWarning.setIcon(new FontIcon(Material2MZ.OUTLINED_FLAG));
-                        App.window.renderPopup(tokenWarning, 650, 870, 500, 50, false, null);
+                        App.window.renderPopup(tokenWarning, appSettings.getWidth() / 3,  100, tokenWarning.getWidth(), tokenWarning.getHeight(), false, null);
+
                     }
                 });
 
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     App.logger.error("Error during tokenization: ", e);
-                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Tokenization Failed", "Could not calculate token size: " + e.getMessage() + ". Please check server status.");
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 400, 50, "Tokenization Failed", "Could not calculate token size: " + e.getMessage() + ". Please check server status.");
+                    errorOverlay.setMaxWidth(errorOverlay.getWidth());
                     errorOverlay.addStyle(Styles.DANGER);
                     errorOverlay.addStyle(Styles.BG_DEFAULT);
-                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                    errorOverlay.setIcon(new FontIcon(Material2MZ.OUTLINED_FLAG));
+                    App.window.renderPopup(errorOverlay, appSettings.getWidth() / 3,  100, errorOverlay.getWidth(), errorOverlay.getHeight(), false, null);
                 });
             }
         });
