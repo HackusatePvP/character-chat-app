@@ -59,11 +59,9 @@ public class LorebookTab extends Tab {
         addContainer.setMaxSize(400, 400);
 
         addKeyInput = new InputFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
-        addKeyInput.setId("key");
         addContainer.setHeader(addKeyInput);
 
         addValueInput = new TextAreaOverlay("", "Enter the lore info", 0, 0, 400, 200);
-        addValueInput.setId("value");
         addContainer.setBody(addValueInput);
 
         HorizontalLayout buttonBox = new HorizontalLayout(200, 50);
@@ -121,7 +119,6 @@ public class LorebookTab extends Tab {
 
     private CardContainer buildLoreEntry(String key, VerticalLayout scrollContainer) {
         CardContainer card = new CardContainer(0, 0, 400, 300);
-        card.setId(key);
 
         InputFieldOverlay entryKey = new InputFieldOverlay(key, 0, 0, 400, 50);
         entryKey.setEnabled(false); // Make key read-only
