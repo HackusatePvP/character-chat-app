@@ -170,7 +170,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setDescription("Set the temperature for the model.");
 
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("Controls the creativity and randomness of the model's output. Higher values make the output more diverse and surprising, while lower values make it more focused, deterministic.");
+        info.setTooltip("Controls the randomness of the generated text by affecting the probability distribution of the output tokens. Higher = more random, lower = more focused.");
         tileContainer.setGraphic(info);
 
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, temperature);
@@ -192,7 +192,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setDescription("Set the top-p value for the model.");
 
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P.");
+        info.setTooltip("Limits tokens to those that together have a cumulative probability of at least p");
         tileContainer.setGraphic(info);
 
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, topP);
@@ -214,7 +214,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setDescription("Filters out less likely tokens during generation.");
 
         TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
-        info.setTooltip("Min-P keeps only tokens whose probability is at least 'p' times the probability of the most likely token. A value of 0 disables this filtering.");
+        info.setTooltip("Limits tokens based on the minimum probability for a token to be considered, relative to the probability of the most likely token.");
         tileContainer.setGraphic(info);
 
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, minP);
