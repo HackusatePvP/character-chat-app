@@ -71,8 +71,6 @@ public class JavaFXLoad extends Application {
         App.logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
         App.logger.info("Screen Size ({},{})", dimension.width, dimension.height);
 
-        // Initialize global positions. Needed for the rendering process.
-        Positions.initialize();
 
         // Disable image caching.
         // Useful for most apps but not this one
@@ -82,6 +80,9 @@ public class JavaFXLoad extends Application {
 
         Window window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(false).setDimensions(setWidth, setHeight).build();
         App.window = window;
+
+        // Initialize global positions. Needed for the rendering process.
+        Positions.initialize();
 
         Stage stage = window.getStage();
         stage.setOnCloseRequest(windowEvent -> App.shutdown());
