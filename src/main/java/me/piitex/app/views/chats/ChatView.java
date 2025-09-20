@@ -491,7 +491,7 @@ public class ChatView extends EmptyContainer {
         AppSettings appSettings = App.getInstance().getAppSettings();
 
         TextFlowOverlay chatBox;
-        int width = CHAT_BOX_WIDTH;
+        double width = CHAT_BOX_WIDTH;
         // Set a little less than chatLayout
         chatBox = new TextFlowOverlay(content, width - 30, 0);
         chatBox.setMaxWidth(width - 30);

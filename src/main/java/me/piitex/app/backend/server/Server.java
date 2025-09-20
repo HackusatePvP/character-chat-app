@@ -360,7 +360,7 @@ public class Server {
                             }
 
                             if (thinkCard.getElements().isEmpty()) {
-                                int width = CHAT_BOX_WIDTH;
+                                double width = CHAT_BOX_WIDTH;
                                 TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, width - 30, 0);
                                 thinkCard.addElement(textFlowOverlay);
                             }
