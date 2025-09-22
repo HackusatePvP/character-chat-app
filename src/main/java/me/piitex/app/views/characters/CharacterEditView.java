@@ -404,28 +404,6 @@ public class CharacterEditView {
             userTabInstance.getUserDisplayNameInput().getNode().requestFocus();
             return false;
         }
-
-        try {
-            int contextSize = chatTabInstance.getChatContextSpinner().getCurrentValue().intValue();
-            if (contextSize <= 0) {
-                tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
-                MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Context size must be a positive number.");
-                error.addStyle(Styles.DANGER);
-                error.addStyle(Styles.BG_DEFAULT);
-                App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
-                chatTabInstance.getChatContextSpinner().getNode().requestFocus();
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            tabsContainer.getTabPane().getSelectionModel().select(chatTabInstance.getJfxTab());
-            MessageOverlay error = new MessageOverlay(0, 0, 500, 50, "Invalid Input", "Please enter a valid number for context size.");
-            error.addStyle(Styles.DANGER);
-            error.addStyle(Styles.BG_DEFAULT);
-            App.window.renderPopup(error, PopupPosition.CENTER, 500, 50, false, null);
-            chatTabInstance.getChatContextSpinner().getNode().requestFocus();
-            return false;
-        }
-
         return true;
     }
 

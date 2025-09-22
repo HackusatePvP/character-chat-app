@@ -24,7 +24,6 @@ public class ChatTab extends Tab {
     // UI elements
     private RichTextAreaOverlay firstMessageInput;
     private RichTextAreaOverlay chatScenarioInput;
-    private SpinnerNumberOverlay chatContextSpinner;
 
     private final double TEXT_AREA_HEIGHT = -1;
 
@@ -114,9 +113,5 @@ public class ChatTab extends Tab {
 
     public RichTextAreaOverlay getChatScenarioInput() {
         return chatScenarioInput;
-    }
-
-    public SpinnerNumberOverlay getChatContextSpinner() {
-        return chatContextSpinner;
     }
 }
