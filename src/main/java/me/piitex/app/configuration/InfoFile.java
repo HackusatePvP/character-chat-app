@@ -263,8 +263,7 @@ public class InfoFile {
      * @param value the double value to set.
      */
     public void set(String key, double value) {
-        entryMap.put(key, value + "");
-        update();
+        set(key, value + "");
     }
 
     /**
@@ -274,8 +273,7 @@ public class InfoFile {
      * @param value the integer value to set.
      */
     public void set(String key, int value) {
-        entryMap.put(key, value + "");
-        update();
+        set(key, value + "");
     }
 
     /**
@@ -285,8 +283,7 @@ public class InfoFile {
      * @param value the boolean value to set.
      */
     public void set(String key, boolean value) {
-        entryMap.put(key, value + "");
-        update();
+        set(key, value + "");
     }
 
     /**
@@ -296,8 +293,7 @@ public class InfoFile {
      * @param value the long value to set.
      */
     public void set(String key, long value) {
-        entryMap.put(key, value + "");
-        update();
+        set(key, value + "");
     }
 
     /**
@@ -313,8 +309,7 @@ public class InfoFile {
         for (String s : values) {
             appender.append("!@!").append(s);
         }
-        entryMap.put(key, appender.toString());
-        update();
+        set(key, appender.toString());
     }
 
     /**
@@ -330,8 +325,7 @@ public class InfoFile {
         map.forEach((s, s2) -> {
             appender.append("!&'!").append(s).append("@!@").append(s2);
         });
-        entryMap.put(key, appender.toString());
-        update();
+        set(key, appender.toString());
     }
 
     /**
