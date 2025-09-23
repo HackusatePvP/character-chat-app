@@ -5,33 +5,7 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
 
 **Important:** You'll need a mid-range gaming GPU with 8GB VRAM or more!
 
-## Showcase
-
-### Home
-The homepage is where you can select which characters to chat with. You can also modify copy and delete characters.
-
 <img alt="Home" height="700" src="images/Home.png" width="1200"/>
-
-### Settings
-Settings page is where you can configure your device and backend. You can also modify general app settings.
-
-<img alt="Settings" height="700" src="images/Settings.png" width="1200"/>
-
-### Models
-Models is where you configure any model related setting. You can even download recommended models.
-
-<img alt="Models" height="700" src="images/Models.png" width="1200"/>
-
-### Creator
-The creator is where you can create and modify both characters and users.
-
-<img alt="Creator" height="700" src="images/Character%20Creator.png" width="1200"/>
-
-### Chat
-The chat offers basic functionality. There are controls to modify the individual messages. You can attach an image if the model supports vision.
-
-<img alt="Settings" height="700" src="images/Chat.png" width="1200"/>
-
 
 ## ✨ Features
 * **Role-Play Focused:** Optimized for engaging and immersive character interactions.
@@ -110,4 +84,4 @@ There will be two jar files.
 1. character-chat-app.jar : This is the executable file.
 2. character-chat-app-1.0-SNAPSHOT.jar : Compiled classes only.
 
-Place executable jar into `%APPDATA%/chat-app/`.
+Download the latest releases. This is needed for necessary backend and sdk files. Replace the jarfile with your compiled executable jar file.
