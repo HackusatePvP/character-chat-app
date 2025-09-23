@@ -163,11 +163,24 @@ public class App {
     }
 
     public static File getAppDirectory() {
+        // If Main.run passes this is being executed by the jar file.
+        // When Main.run does not pass, it being executed by the IDE.
+        // For testing within the IDE, use JavaFXLoad.main() as your entry point
+        // For standard installation, run will pass.
+        if (Main.run) {
+            return new File(System.getProperty("user.dir"));
+        } else {
+            return new File(System.getenv("APPDATA") + "/chat-app/");
+        }
+    }
+
+    public static File getDataDirectory() {
         return new File(System.getenv("APPDATA") + "/chat-app/");
     }
 
+
     public static File getBackendDirectory() {
-        return new File(getAppDirectory(), "backend/");
+        return new File(getAppDirectory(), "/backend/");
     }
 
     public static File getModelsDirectory() {
@@ -175,15 +188,15 @@ public class App {
     }
 
     public static File getCharactersDirectory() {
-        return new File(getAppDirectory(), "characters/");
+        return new File(getDataDirectory(), "characters/");
     }
 
     public static File getUsersDirectory() {
-        return new File(getAppDirectory(), "users/");
+        return new File(getDataDirectory(), "users/");
     }
 
     public static File getImagesDirectory() {
-        return new File(getAppDirectory(), "images/");
+        return new File(getDataDirectory(), "images/");
     }
 
     public static Model getDefaultModel() {
