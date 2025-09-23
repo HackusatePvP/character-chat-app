@@ -3,7 +3,7 @@ package me.piitex.app.backend;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.Server;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.engine.configurations.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
 import org.apache.commons.io.FileUtils;

@@ -4,7 +4,7 @@ import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.engine.configurations.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.tabs.Tab;

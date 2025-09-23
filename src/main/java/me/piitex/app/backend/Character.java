@@ -2,8 +2,8 @@ package me.piitex.app.backend;
 
 import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
-import me.piitex.app.configuration.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
+import me.piitex.engine.configurations.InfoFile;
 
 import java.io.File;
 import java.util.*;

@@ -6,7 +6,7 @@ import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.engine.configurations.InfoFile;
 import me.piitex.engine.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

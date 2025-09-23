@@ -6,7 +6,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.engine.configurations.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelEditView;
 import me.piitex.engine.PopupPosition;

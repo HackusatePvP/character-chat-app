@@ -2,7 +2,7 @@ package me.piitex.app.backend.server;
 
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.engine.configurations.InfoFile;
 
 import java.io.File;
 import java.util.LinkedList;

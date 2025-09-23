@@ -7,7 +7,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.configuration.InfoFile;
+import me.piitex.engine.configurations.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ScrollContainer;

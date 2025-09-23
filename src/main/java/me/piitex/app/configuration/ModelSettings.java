@@ -2,6 +2,7 @@ package me.piitex.app.configuration;
 
 
 import com.drew.lang.annotations.Nullable;
+import me.piitex.engine.configurations.InfoFile;
 
 public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
