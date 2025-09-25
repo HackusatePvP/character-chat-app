@@ -22,7 +22,6 @@ import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.chats.components.*;
 import me.piitex.engine.PopupPosition;
-import me.piitex.engine.Renderer;
 import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -34,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static me.piitex.app.views.Positions.*;
 
