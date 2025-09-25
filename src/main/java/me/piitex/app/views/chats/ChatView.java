@@ -393,16 +393,19 @@ public class ChatView extends EmptyContainer {
         if (image != null) {
             response.setImage(image);
         }
+        // Notify the user a generation is pending...
         topControls.addElement(buildResponseProgress());
 
         Future<?> thread = App.getThreadPoolManager().submitTask(() -> {
-            // Generate response!
+            // Response object holds all data regarding the response (message, context, image, ect)
             response.setPrompt(chatMessage.getContent());
             String received;
             try {
+                // This will connect to the local backend using httpclient to generate a response.
                 received = Server.generateResponseOAIStream(chatMessage, responseBox, card, response);
             } catch (IOException e) {
                 Platform.runLater(() -> {
+                    // If an exception is thrown for whatever reason, notify the user an error occured.
                     MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");
                     error.addStyle(Styles.DANGER);
                     error.addStyle(Styles.BG_DEFAULT);
@@ -412,7 +415,7 @@ public class ChatView extends EmptyContainer {
                 });
                 return;
             } catch (InterruptedException e) {
-                // Get the current response
+                // When the response is interrupted delete current popup. (Generating response...)
                 received = response.getResponse();
                 Platform.runLater(() -> {
                     if (App.window.getCurrentPopup() != null) {
@@ -420,6 +423,8 @@ public class ChatView extends EmptyContainer {
                     }
                 });
             }
+
+            // The response has finished, collect all data and save it to the chat file.
             chatMessage.setReasoning(response.getReasoning());
 
             chat.addLine(Role.ASSISTANT, received, (chatMessage.hasImage() ? chatMessage.getImageUrl() : null), (chatMessage.getReasoning() != null ? chatMessage.getReasoning() : null));
@@ -434,7 +439,6 @@ public class ChatView extends EmptyContainer {
             });
         });
 
-        // Since this is being manually added to JavaFX pane, RenEngine API is useless.
         TextOverlay stop = new TextOverlay(new FontIcon(Material2MZ.STOP_CIRCLE));
         stop.addStyle(Styles.DANGER);
 
