@@ -39,9 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-/*
-    TODO:  The engine has been improved and no longer needs useless casting. All castings need to be removed.
- */
 public class CharacterEditView {
     private Container root;
 
@@ -442,7 +439,7 @@ public class CharacterEditView {
         if (chatScenario != null && !chatScenario.isEmpty()) {
             textToTokenize.append(chatScenario).append("\n");
         }
-        loreItems.forEach((key, value) -> textToTokenize.append(key).append(": ").append(value).append("\n"));
+        loreItems.forEach((key, string) -> textToTokenize.append(key).append(": ").append(string).append("\n"));
 
         int chatContextSize;
         if (ServerProcess.getCurrentServer() != null && ServerProcess.getCurrentServer().getModel() != null) {
