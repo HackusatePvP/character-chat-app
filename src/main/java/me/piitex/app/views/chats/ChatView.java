@@ -50,9 +50,6 @@ public class ChatView extends EmptyContainer {
 
     private File image = null;
 
-    // Not sure if this is smart but for better control map the layout to the index.
-    private final Map<Integer, VerticalLayout> messageMap = new HashMap<>();
-
     private AppSettings appSettings = App.getInstance().getAppSettings();
 
     public ChatView(Character character, @Nullable Chat chat) {
@@ -455,8 +452,8 @@ public class ChatView extends EmptyContainer {
     }
 
     public VerticalLayout buildResponseProgress() {
-        VerticalLayout root = new VerticalLayout(150, 50);
-        root.setMaxSize(150, 50);
+        VerticalLayout root = new VerticalLayout(150, 30);
+        root.setMaxSize(root.getWidth(), root.getHeight());
         root.setAlignment(Pos.TOP_CENTER);
 
         TextOverlay text = new TextOverlay("Generating Response...");
@@ -482,10 +479,6 @@ public class ChatView extends EmptyContainer {
 
     public void setImage(File image) {
         this.image = image;
-    }
-
-    public Map<Integer, VerticalLayout> getMessageMap() {
-        return messageMap;
     }
 
     public static TextFlowOverlay buildTextFlow(ChatMessage chatMessage, Chat chat, int index) {
