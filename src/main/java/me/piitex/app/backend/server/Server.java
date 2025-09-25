@@ -1,9 +1,7 @@
 package me.piitex.app.backend.server;
 
-import atlantafx.base.util.BBCodeHandler;
 import atlantafx.base.util.BBCodeParser;
 import javafx.application.Platform;
-import javafx.scene.layout.Pane;
 import me.piitex.app.App;
 import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
@@ -60,10 +58,49 @@ public class Server {
     }
 
     public static String generateResponseOAIStream(ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) throws JSONException, IOException, InterruptedException {
+
         App.logger.info("Collecting response from server...");
+
+        // Prepare request
+        HttpPost post = prepareOAIStreamRequest(response);
+
+        StringBuilder responseAppender = new StringBuilder();
+
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            response.setGenerating(true);
+            // Execute and process stream
+            executeAndProcessStream(client, post, chatMessage, chatMessageBox, card, response, responseAppender);
+        } finally {
+            // Set the response status to generating
+            response.setGenerating(false);
+        }
+
+        // Cleanup processes
+        return postProcessResponse(responseAppender.toString(), response);
+    }
+
+    /**
+     * Prepares the HttpPost object with all necessary OAI settings and messages.
+     */
+    private static HttpPost prepareOAIStreamRequest(Response response) throws JSONException {
         HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
         ModelSettings settings = response.getCharacter().getModelSettings();
         JSONObject toPost = new JSONObject();
+
+        // Method to add all settings to the JSON object
+        addModelSettingsToJSON(toPost, settings);
+
+        response.createOAIContext(true);
+        toPost.put("messages", response.getMessages());
+
+        post.setEntity(new StringEntity(toPost.toString(), ContentType.APPLICATION_JSON));
+        return post;
+    }
+
+    /**
+     * Helper to consolidate all model settings into the {@link JSONObject}.
+     */
+    private static void addModelSettingsToJSON(JSONObject toPost, ModelSettings settings) throws JSONException {
         toPost.put("stream", true);
         toPost.put("temperature", settings.getTemperature());
         toPost.put("dynatemp_range", settings.getDynamicTempRage());
@@ -82,345 +119,261 @@ public class Server {
         toPost.put("dry_base", settings.getDryBase());
         toPost.put("dry_allowed_length", settings.getDryAllowedLength());
         toPost.put("dry_penalty_last_n", settings.getDryPenaltyTokens());
+    }
 
-        response.createOAIContext(true);
-        toPost.put("messages", response.getMessages());
+    /**
+     * Executes the HTTP request and processes the incoming streaming response line by line.
+     */
+    private static void executeAndProcessStream(CloseableHttpClient client, HttpPost post, ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response,
+            StringBuilder appender) throws IOException, InterruptedException, JSONException {
 
-        post.setEntity(new StringEntity(toPost.toString(), ContentType.APPLICATION_JSON));
+        try (CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext());
+             Scanner scanner = new Scanner(httpResponse.getEntity().getContent())) {
 
-        StringBuilder appender = new StringBuilder();
-
-        try (CloseableHttpClient client = HttpClients.createDefault(); CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext())) {
-            Scanner scanner = new Scanner(httpResponse.getEntity().getContent());
-            boolean stop = false;
-            response.setGenerating(true);
+            boolean stopGenerating = false;
             while (scanner.hasNextLine()) {
                 response.setResponse(appender.toString());
-                // Check for interruption.
-                if (Thread.currentThread().isInterrupted()) {
-                    App.logger.info("Response interrupted. Stopping...");
-                    Thread.currentThread().interrupt();
-                    response.setGenerating(false);
-                    response.setHalt(true);
-                    client.close();
+
+                // Check for interruption and halts early
+                if (handleInterruption(response)) {
                     throw new InterruptedException("Response generation was interrupted by user.");
                 }
+                if (response.isHalt()) {
+                    App.logger.info("Halting response generation...");
+                    break;
+                }
 
-                String content = scanner.nextLine();
-                content = content.replaceFirst("data: ", "");
+                String content = scanner.nextLine().replaceFirst("data: ", "");
 
                 if (content.startsWith("error")) {
                     App.logger.error("Error occurred: {}", content);
                     break;
                 }
 
-                if (response.isHalt()) {
-                    App.logger.info("Halting response generation...");
-                    break;
-                }
-
                 if (content.isEmpty()) continue;
-                JSONObject receive = new JSONObject(content);
-                if (!receive.has("choices")) {
-                    App.logger.error("Error has occurred: {}", receive.toString(1));
-                    break;
-                }
-                JSONArray choices = receive.getJSONArray("choices");
-                for (int i = 0; i < choices.length(); i++) {
-                    JSONObject arrayObject = choices.getJSONObject(i);
-                    if (!arrayObject.has("finish_reason")) continue;
-                    String finish = arrayObject.optString("finish_reason", "");
-                    if (finish.equalsIgnoreCase("stop")) {
-                        response.setGenerating(false);
-                        stop = true;
-                        break;
-                    }
-                    JSONObject delta = arrayObject.getJSONObject("delta");
-                    String line = delta.optString("content", "");
-                    if (line.equalsIgnoreCase("null")) continue;
-                    appender.append(line);
 
-                    Platform.runLater(() -> {
-                        String updated = appender.toString();
+                // Process the JSON chunk
+                stopGenerating = processStreamChunk(content, appender, chatMessage, chatMessageBox, card, response);
 
-                        // Process any placeholders into the actual value. Example {character} -> character.getDisplayName()
-                        updated = Placeholder.formatSymbols(updated);
-                        updated = Placeholder.formatPlaceholders(updated, response.getCharacter(), response.getCharacter().getUser());
-
-                        // Apply coloring for roleplay. Yellow around quotes, blue around astrix
-                        updated = Placeholder.applyDynamicBBCode(updated);
-
-                        // 1. Check to see if response starts with think tags. <think>
-                        // 2. Make sure the think tags haven't ended. Does not contain </think>
-                        if (updated.toLowerCase().startsWith("<think>") && !updated.toLowerCase().contains("</think>")) {
-                            // This is a think response
-                            updated = updated.replace("<think>", "").replace("</think", "").trim();
-
-                            // Check to see if the think view already exists.
-                            Element element = chatMessageBox.getElementAt(0);
-
-                            TitledLayout thinkCard;
-                            if (element instanceof CardContainer cardContainer) {
-                                thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_HEIGHT);
-                                chatMessageBox.addElement(thinkCard, 0);
-
-                                // Set card body to 'thinking'
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
-                                textFlowOverlay.setText("Thinking...");
-                            } else {
-                                thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
-                                thinkCard.setMaxSize(0, -1);
-
-                                CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1);
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
-                                textFlowOverlay.setText("Thinking...");
-                            }
-
-                            if (thinkCard.getElements().isEmpty()) {
-                                TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, CHAT_BOX_IMAGE_WIDTH, -1);
-                                thinkCard.addElement(textFlowOverlay);
-                            }
-
-                            if (thinkCard.getElementAt(0) instanceof TextFlowOverlay textFlowOverlay) {
-                                if (textFlowOverlay.getText() == null || textFlowOverlay.getText().isEmpty()) {
-                                    thinkCard.setExpanded(true);
-                                }
-                                textFlowOverlay.setText(updated);
-                            }
-
-                        } else {
-                            // Filter out think tags if possible
-                            if (updated.contains("</think>") && updated.split("</think>").length > 1) {
-
-                                if (response.getReasoning() == null) {
-                                    TitledLayout thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
-                                    thinkCard.setExpanded(false);
-                                    response.setReasoning(updated.replace("\n", "!@!").replace("<think>", "").replace("</think>", ""));
-                                }
-
-                                updated = updated.split("</think>")[1];
-
-                                updated = updated.replace("</think>", "").replace("<think>", "");
-                            }
-
-                            boolean caught = false;
-                            try {
-                                BBCodeParser.createFormattedText(updated);
-                            } catch (IllegalStateException ignored) {
-                                caught = true;
-                            } finally {
-                                if (!caught) {
-                                    TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBody();
-                                    textFlowOverlay.setText(updated);
-                                }
-                            }
-                        }
-
-                    });
-                }
-
-                if (stop) {
+                if (stopGenerating) {
                     break;
                 }
             }
-        } finally {
+        }
+    }
+
+    /**
+     * Handles checking for thread interruption and sets state.
+     * @return true if the thread was interrupted.
+     */
+    private static boolean handleInterruption(Response response) {
+        if (Thread.currentThread().isInterrupted()) {
+            App.logger.info("Response interrupted. Stopping...");
+            Thread.currentThread().interrupt();
             response.setGenerating(false);
+            response.setHalt(true);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Parses a single stream chunk and updates the response and UI.
+     * @return true if a 'stop' reason was received.
+     */
+    private static boolean processStreamChunk(String content, StringBuilder appender, ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) throws JSONException {
+
+        JSONObject receive = new JSONObject(content);
+        if (!receive.has("choices")) {
+            App.logger.error("Error has occurred: {}", receive.toString(1));
+            return true; // Stop on unexpected format
         }
 
-        String s = appender.toString();
-        s = Placeholder.formatPlaceholders(s, response.getCharacter(), response.getCharacter().getUser());
+        JSONArray choices = receive.getJSONArray("choices");
+        for (int i = 0; i < choices.length(); i++) {
+            JSONObject arrayObject = choices.getJSONObject(i);
+            String finish = arrayObject.optString("finish_reason", "");
+            if (finish.equalsIgnoreCase("stop")) {
+                response.setGenerating(false);
+                return true; // Stop generation
+            }
+
+            JSONObject delta = arrayObject.getJSONObject("delta");
+            String line = delta.optString("content", "");
+            if (line.equalsIgnoreCase("null")) continue;
+
+            appender.append(line);
+
+            // Perform UI actions to notify the user of response progress
+            updateUIOnStream(appender.toString(), chatMessage, chatMessageBox, card, response);
+        }
+        return false; // Continue generation
+    }
+
+    /**
+     * Executes UI updates on the JavaFX Platform thread.
+     */
+    private static void updateUIOnStream(String currentResponse, ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) {
+
+        Platform.runLater(() -> {
+            String updated = currentResponse;
+
+            // Format placeholders and BBCode
+            updated = formatResponseText(updated, response);
+
+            // Handle 'Think' tags for the reasoning layout
+            if (updated.toLowerCase().startsWith("<think>") && !updated.toLowerCase().contains("</think>")) {
+                handleThinkTagStart(updated, chatMessage, chatMessageBox, response);
+            } else {
+                // Handle 'Think' tag cleanup and final display
+                handleThinkTagCleanupAndDisplay(updated, chatMessageBox, card, response);
+            }
+        });
+    }
+
+    /**
+     * Formats placeholders and applies dynamic BBCode coloring to the response text.
+     */
+    private static String formatResponseText(String updated, Response response) {
+        // Process any placeholders into the actual value. Example {character} -> character.getDisplayName()
+        updated = Placeholder.formatSymbols(updated);
+        updated = Placeholder.formatPlaceholders(updated, response.getCharacter(), response.getCharacter().getUser());
+
+        // Apply coloring for roleplay. Yellow around quotes, blue around astrix
+        updated = Placeholder.applyDynamicBBCode(updated);
+        return updated;
+    }
+
+    /**
+     * Handles the logic for displaying the 'thinking' message and updating the reasoning card
+     * when the response is inside the <think> block.
+     */
+    private static void handleThinkTagStart(String updated, ChatMessage chatMessage, VerticalLayout chatMessageBox, Response response) {
+
+        // This is a think response
+        updated = updated.replace("<think>", "").replace("</think", "").trim();
+
+        // Check to see if the think view already exists.
+        Element element = chatMessageBox.getElementAt(0);
+
+        TitledLayout thinkCard;
+        if (element instanceof CardContainer cardContainer) {
+            // If the first element is the main chat card, insert the think card above it.
+            thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_HEIGHT);
+            chatMessageBox.addElement(thinkCard, 0);
+
+            // Set card body to 'thinking' (This targets the main response card, not the think card)
+            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
+            textFlowOverlay.setText("Thinking...");
+        } else {
+            // Assume the first element is the existing TitledLayout (think card)
+            thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
+            thinkCard.setMaxSize(0, -1);
+
+            CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1); // Main response card is now at index 1
+            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
+            textFlowOverlay.setText("Thinking...");
+        }
+
+        // Update the content of the think card
+        if (thinkCard.getElements().isEmpty()) {
+            TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, CHAT_BOX_IMAGE_WIDTH, -1);
+            thinkCard.addElement(textFlowOverlay);
+        }
+
+        if (thinkCard.getElementAt(0) instanceof TextFlowOverlay textFlowOverlay) {
+            if (textFlowOverlay.getText() == null || textFlowOverlay.getText().isEmpty()) {
+                thinkCard.setExpanded(true); // Auto-expand if content starts
+            }
+            textFlowOverlay.setText(updated);
+        }
+    }
+
+    /**
+     * Handles the logic for exiting the <think> block, collapsing the reasoning card,
+     * and updating the final response card body.
+     */
+    private static void handleThinkTagCleanupAndDisplay(
+            String updated, VerticalLayout chatMessageBox, CardContainer card, Response response) {
+
+        // Check if the </think> closing tag has appeared and there is content after it
+        if (updated.contains("</think>") && updated.split("</think>").length > 1) {
+
+            // Save the reasoning content before stripping the tags
+            if (response.getReasoning() == null) {
+                TitledLayout thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
+                thinkCard.setExpanded(false); // Collapse the reasoning card
+
+                // Save the content for post-processing/storage
+                String reasoningContent = updated.replace("\n", "!@!").replace("<think>", "").replace("</think>", "");
+                response.setReasoning(reasoningContent);
+            }
+
+            // Get the actual response part (after </think>)
+            updated = updated.split("</think>")[1];
+
+            // Ensure any stray or malformed tags are gone from the final response part
+            updated = updated.replace("</think>", "").replace("<think>", "");
+        }
+
+        // Final display of the response in the main chat card
+        boolean caught = false;
+        try {
+            // Check if the current BBCode is valid before attempting to render
+            BBCodeParser.createFormattedText(updated);
+        } catch (IllegalStateException ignored) {
+            caught = true; // BBCode error (e.g., unclosed tag)
+        } finally {
+            if (!caught) {
+                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBody();
+                textFlowOverlay.setText(updated); // Update the main response card
+            }
+        }
+    }
+
+    /**
+     * Cleans up and finalizes the complete response string.
+     */
+    private static String postProcessResponse(String rawResponse, Response response) {
+        String finalResponse = Placeholder.formatPlaceholders(rawResponse, response.getCharacter(), response.getCharacter().getUser());
+
+        // Remove <think> tags if ThinkMode is off
         if (!App.getInstance().getSettings().isThinkMode()) {
-            Pattern pattern = Pattern.compile("<think>(.*?)</think>", Pattern.DOTALL);
-            Matcher matcher = pattern.matcher(appender.toString());
-            if (matcher.find()) {
-                // Group 1 (.*?) captures the content between the tags.
-                s = s.replace(matcher.group(1), "");
-                s = s.replace("<think></think>", "");
-            }
-            if (s.startsWith("null")) {
-                s = s.replaceFirst("null", "");
-            }
-            while (s.startsWith("\n")) {
-                s = s.replaceFirst("\n", "");
-            }
+            finalResponse = removeThinkTags(finalResponse);
         }
 
-        s = Placeholder.formatSymbols(s);
-        response.setResponse(s);
+        // Clean up leading newlines and "null" prefixes
+        finalResponse = cleanUpResponsePrefix(finalResponse);
 
+        finalResponse = Placeholder.formatSymbols(finalResponse);
+        response.setResponse(finalResponse);
+
+        return finalResponse;
+    }
+
+    /**
+     * Utility to remove <think> tags and their content.
+     */
+    private static String removeThinkTags(String s) {
+        Pattern pattern = Pattern.compile("<think>(.*?)</think>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            s = s.replace(matcher.group(1), "");
+            s = s.replace("<think></think>", "");
+        }
         return s;
     }
 
-    public static String generateResponseStream(VerticalLayout chatMessageBox, CardContainer card, Response response) throws InterruptedException, IOException {
-        App.logger.info("Collecting response from server...");
-        HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
-        ModelSettings settings = response.getCharacter().getModelSettings();
-        JSONObject toPost = new JSONObject();
-        toPost.put("stream", true);
-        toPost.put("temperature", settings.getTemperature());
-        toPost.put("min_p", settings.getMinP());
-        toPost.put("top_p", settings.getTopP());
-        toPost.put("top_k", settings.getTopK());
-        toPost.put("repeat_last_n", settings.getRepeatTokens());
-        toPost.put("repeat_penalty", settings.getRepeatPenalty());
-
-        response.createOAIContext(false);
-        toPost.put("messages", response.getMessages());
-
-        StringBuilder appender = new StringBuilder();
-
-        try (CloseableHttpClient client = HttpClients.createDefault(); CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext())) {
-            Scanner scanner = new Scanner(httpResponse.getEntity().getContent());
-            boolean stop = false;
-            response.setGenerating(true);
-
-            while (scanner.hasNext()) {
-                response.setResponse(appender.toString());
-                if (Thread.currentThread().isInterrupted()) {
-                    App.logger.info("Response interrupted. Stopping...");
-                    Thread.currentThread().interrupt();
-                    response.setGenerating(false);
-                    response.setHalt(true);
-                    client.close();
-                    throw new InterruptedException("Response generation was interrupted by user.");
-                }
-
-                String content = scanner.nextLine();
-                content = content.replaceFirst("data: ", "");
-
-                if (content.startsWith("error")) {
-                    App.logger.error("Error occurred: {}", content);
-                    break;
-                }
-
-                if (response.isHalt()) {
-                    App.logger.info("Halting response generation...");
-                    break;
-                }
-
-                if (content.isEmpty()) continue;
-                JSONObject receive = new JSONObject(content);
-                if (!receive.has("choices")) {
-                    App.logger.error("Error has occurred: {}", receive.toString(1));
-                    break;
-                }
-
-
-                JSONArray choices = receive.getJSONArray("choices");
-                for (int i = 0; i < choices.length(); i++) {
-                    JSONObject arrayObject = choices.getJSONObject(i);
-                    if (!arrayObject.has("finish_reason")) continue;
-                    String finish = arrayObject.optString("finish_reason", "");
-                    if (finish.equalsIgnoreCase("stop")) {
-                        response.setGenerating(false);
-                        stop = true;
-                        break;
-                    }
-                    JSONObject delta = arrayObject.getJSONObject("delta");
-                    String line = delta.optString("content", "");
-                    if (line.equalsIgnoreCase("null")) continue;
-                    appender.append(line);
-
-                    Platform.runLater(() -> {
-                        String updated = appender.toString();
-
-                        // Process any placeholders into the actual value. Example {character} -> character.getDisplayName()
-                        updated = Placeholder.formatSymbols(updated);
-                        updated = Placeholder.formatPlaceholders(updated, response.getCharacter(), response.getCharacter().getUser());
-
-                        // Apply coloring for roleplay. Yellow around quotes, blue around astrix
-                        updated = Placeholder.applyDynamicBBCode(updated);
-
-                        // 1. Check to see if response starts with think tags. <think>
-                        // 2. Make sure the think tags haven't ended. Does not contain </think>
-                        if (updated.toLowerCase().startsWith("<think>") && !updated.toLowerCase().contains("</think>")) {
-                            // This is a think response
-                            updated = updated.replace("<think>", "").replace("</think", "").trim();
-
-                            // Check to see if the think view already exists.
-                            Element element = chatMessageBox.getElementAt(0);
-
-                            TitledLayout thinkCard;
-                            if (element instanceof CardContainer cardContainer) {
-                                // Think card does not exist
-                                thinkCard = new TitledLayout("Reasoning", chatMessageBox.getWidth() - 50, 0);
-                                thinkCard.setMaxSize(chatMessageBox.getMaxWidth() - 50, 0);
-                                chatMessageBox.addElement(thinkCard, 0);
-
-                                // Set card body to 'thinking'
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
-                                textFlowOverlay.setText("Thinking...");
-                            } else {
-                                thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
-
-                                CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1);
-
-                                TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
-                                textFlowOverlay.setText("Thinking...");
-                            }
-
-                            if (thinkCard.getElements().isEmpty()) {
-                                double width = CHAT_BOX_WIDTH;
-                                TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, width - 30, 0);
-                                thinkCard.addElement(textFlowOverlay);
-                            }
-
-                            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) thinkCard.getElementAt(0);
-                            if (textFlowOverlay.getText().isEmpty()) {
-                                thinkCard.setExpanded(true);
-                            }
-                            textFlowOverlay.setText(updated);
-                        } else {
-                            // Filter out think tags if possible
-                            if (updated.contains("</think>") && updated.split("</think>").length > 1) {
-
-                                if (response.getReasoning() == null) {
-                                    TitledLayout thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
-                                    thinkCard.setExpanded(false);
-                                    response.setReasoning(updated.replace("\n", "!@!").replace("<think>", "").replace("</think>", ""));
-                                }
-
-                                updated = updated.split("</think>")[1];
-
-                                updated = updated.replace("</think>", "").replace("<think>", "");
-                            }
-
-                            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) card.getBody();
-                            textFlowOverlay.setText(updated);
-                        }
-
-                    });
-                }
-
-                if (stop) {
-                    break;
-                }
-            }
-        } finally {
-            response.setGenerating(false);
+    /**
+     * Utility to remove "null" prefix and leading newlines.
+     */
+    private static String cleanUpResponsePrefix(String s) {
+        if (s.startsWith("null")) {
+            s = s.replaceFirst("null", "");
         }
-
-        String s = appender.toString();
-        s = Placeholder.formatPlaceholders(s, response.getCharacter(), response.getCharacter().getUser());
-        if (!App.getInstance().getSettings().isThinkMode()) {
-            Pattern pattern = Pattern.compile("<think>(.*?)</think>", Pattern.DOTALL);
-            Matcher matcher = pattern.matcher(appender.toString());
-            if (matcher.find()) {
-                // Group 1 (.*?) captures the content between the tags.
-                s = s.replace(matcher.group(1), "");
-                s = s.replace("<think></think>", "");
-            }
-            if (s.startsWith("null")) {
-                s = s.replaceFirst("null", "");
-            }
-            while (s.startsWith("\n")) {
-                s = s.replaceFirst("\n", "");
-            }
+        while (s.startsWith("\n")) {
+            s = s.replaceFirst("\n", "");
         }
-
-        s = Placeholder.formatSymbols(s);
-        response.setResponse(s);
-
         return s;
     }
 
