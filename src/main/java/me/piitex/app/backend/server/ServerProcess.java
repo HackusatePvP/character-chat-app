@@ -124,9 +124,6 @@ public class ServerProcess {
         // GPU layers
         parameters.add("-ngl");
 
-        //FIXME: Vulkan will BSOD on application close if the getGpuLayers > model layers
-        // Add a correct fix when using vulkan to set a hard limit on the amount of layers
-        // Still causes BSOD after applying fix. More testing is required.
         if (settings.getBackend().equalsIgnoreCase("vulkan")) {
             if (model.getGpuLayers() > 0 && settings.getGpuLayers() > model.getGpuLayers()) {
                 settings.setGpuLayers(model.getGpuLayers());
