@@ -124,6 +124,7 @@ public class ModelEditView extends EmptyContainer {
 
     public TileContainer buildInstructions() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 0);
+        tileContainer.setMaxSize(tileContainer.getWidth(), -1);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
