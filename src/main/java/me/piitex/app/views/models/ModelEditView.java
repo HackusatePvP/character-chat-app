@@ -25,13 +25,24 @@ public class ModelEditView extends EmptyContainer {
 
     private String instructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096;
-    private String multimodal = "None / Disabled";
-    private double temperature = 0.8;
-    private double topP = 1;
-    private double minP = 0.1;
-    private int topK = 40;
-    private double repeatPenalty = 1.1;
-    private int repeatTokens = 64;
+    private double temperature = 0.8; // min 0
+    private double topP = 1; // min 0
+    private double minP = 0.1; // min 0.05
+    private int topK = 40; // Min 0
+    private int repeatTokens = 64; // min -1
+    private double repeatPenalty = 1.1; // min 1.0
+    private double dynamicTempRage = 0.0;
+    private double dynamicExponent = 1;
+    private double xtcProbability = 0;
+    private double xtcThreshold = 0.1;
+    private double typicalP = 1.0;
+    private double presencePenalty = 0;
+    private double frequencyPenalty = 0;
+    private double dryMultiplier = 0;
+    private double dryBase = 1.75;
+    private int dryAllowedLength = 2;
+    private int dryPenaltyTokens = -1;
+    private String mmProj = "None / Disabled";
     private String chatTemplate = "default";
     private String reasoningTemplate = "disabled";
     private boolean jinja = false;
@@ -60,11 +71,22 @@ public class ModelEditView extends EmptyContainer {
         layout.addElement(buildContextSize());
         layout.addElement(buildModalFile());
         layout.addElement(buildTemperature());
+        layout.addElement(buildDynamicTempRange());
+        layout.addElement(buildDynamicTempExponent());
         layout.addElement(buildTopP());
         layout.addElement(buildMinP());
         layout.addElement(buildTopK());
         layout.addElement(buildRepeatPenalty());
         layout.addElement(buildRepeatTokens());
+        layout.addElement(buildPresencePenalty());
+        layout.addElement(buildFrequencyPenalty());
+        layout.addElement(buildXtcProbability());
+        layout.addElement(buildXtcThreshold());
+        layout.addElement(buildTypicalP());
+        layout.addElement(buildDryMultiplier());
+        layout.addElement(buildDryBase());
+        layout.addElement(buildDryAllowedLength());
+        layout.addElement(buildDryPenaltyToken());
         layout.addElement(buildChatTemplates());
         layout.addElement(buildReasoningTemplate());
         layout.addElement(buildJinjaTemplate());
@@ -74,13 +96,23 @@ public class ModelEditView extends EmptyContainer {
     private void initializeSettings() {
         this.instructions = settings.getModelInstructions();
         this.contextSize = settings.getContextSize();
-        this.multimodal = settings.getMmProj();
+        this.mmProj = settings.getMmProj();
         this.temperature = settings.getTemperature();
+        this.dynamicTempRage = settings.getDynamicTempRage();
+        this.dynamicExponent = settings.getDynamicExponent();
         this.topP = settings.getTopP();
         this.minP = settings.getMinP();
         this.topK = settings.getTopK();
         this.repeatPenalty = settings.getRepeatPenalty();
         this.repeatTokens = settings.getRepeatTokens();
+        this.xtcProbability = settings.getXtcProbability();
+        this.xtcThreshold = settings.getXtcThreshold();
+        this.presencePenalty = settings.getPresencePenalty();
+        this.frequencyPenalty = settings.getFrequencyPenalty();
+        this.dryMultiplier = settings.getDryMultiplier();
+        this.dryBase = settings.getDryBase();
+        this.dryAllowedLength = settings.getDryAllowedLength();
+        this.dryPenaltyTokens = settings.getDryPenaltyTokens();
         this.chatTemplate = settings.getChatTemplate();
         this.reasoningTemplate = settings.getReasoningTemplate();
         this.jinja = settings.isJinja();
@@ -150,9 +182,9 @@ public class ModelEditView extends EmptyContainer {
         items.addAll(App.getModelNames("mmproj"));
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 250, 50);
-        selection.setDefaultItem(multimodal);
+        selection.setDefaultItem(mmProj);
         selection.onItemSelect(event -> {
-            this.multimodal = event.getNewValue();
+            this.mmProj = event.getNewValue();
         });
 
         tileContainer.setAction(selection);
@@ -176,6 +208,50 @@ public class ModelEditView extends EmptyContainer {
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, temperature);
         input.onValueChange(event -> {
             this.temperature = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildDynamicTempRange() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Dynamic Temperature Range");
+        tileContainer.setDescription("Addon for the temperature sampler.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("The added value to the range of dynamic temperature, which adjusts probabilities by entropy of tokens.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, dynamicTempRage);
+        input.onValueChange(event -> {
+            this.dynamicTempRage = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildDynamicTempExponent() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Dynamic Temperature Exponent");
+        tileContainer.setDescription("Addon for the temperature sampler.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Smoothes out the probability redistribution based on the most probable token.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, dynamicTempRage);
+        input.onValueChange(event -> {
+            this.dynamicExponent = event.getNewValue().doubleValue();
         });
         tileContainer.setAction(input);
 
@@ -286,6 +362,204 @@ public class ModelEditView extends EmptyContainer {
         SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, Integer.MAX_VALUE, repeatTokens);
         input.onValueChange(event -> {
             this.repeatTokens = event.getNewValue().intValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildPresencePenalty() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Presence Penalty");
+        tileContainer.setDescription("Limits tokens based on whether they appear in the output or not.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Repeat alpha presence penalty. Default: 0.0, which is disabled.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, presencePenalty);
+        input.onValueChange(event -> {
+            this.presencePenalty = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildFrequencyPenalty() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Frequency Penalty");
+        tileContainer.setDescription("Limits tokens based on how often they appear in the output.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Repeat alpha frequency penalty. Default: 0.0, which is disabled.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, frequencyPenalty);
+        input.onValueChange(event -> {
+            this.frequencyPenalty = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildXtcProbability() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("XTC Probability");
+        tileContainer.setDescription("Set the chance for token removal via XTC sampler.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Controls the chance of cutting tokens at all. 0 disables XTC.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, xtcProbability);
+        input.onValueChange(event -> {
+            this.xtcProbability = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildXtcThreshold() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("XTC Threshold");
+        tileContainer.setDescription("Set a minimum probability threshold for tokens to be removed");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Controls the token probability that is required to cut that token.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, xtcThreshold);
+        input.onValueChange(event -> {
+            this.xtcThreshold = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildTypicalP() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Typical P");
+        tileContainer.setDescription("Sorts and limits tokens based on the difference between log-probability and entropy.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Enable locally typical sampling with parameter p. Default: 1.0, which is disabled.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, typicalP);
+        input.onValueChange(event -> {
+            this.typicalP = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildDryMultiplier() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Dry Multiplier");
+        tileContainer.setDescription("Set the DRY (Don't Repeat Yourself) repetition penalty multiplier.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Default: 0.0, which is disabled.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, dryMultiplier);
+        input.onValueChange(event -> {
+            this.dryMultiplier = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildDryBase() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Dry Base");
+        tileContainer.setDescription("Set the DRY repetition penalty base value.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Default: 1.75");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, dryBase);
+        input.onValueChange(event -> {
+            this.dryBase = event.getNewValue().doubleValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildDryAllowedLength() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Dry Length");
+        tileContainer.setDescription("Tokens that extend repetition beyond this receive exponentially increasing penalty.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("multiplier * base ^ (length of repeating sequence before token - allowed length). Default: 2");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, dryAllowedLength);
+        input.onValueChange(event -> {
+            this.dryAllowedLength = event.getNewValue().intValue();
+        });
+        tileContainer.setAction(input);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildDryPenaltyToken() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Dry Penalty Last Token");
+        tileContainer.setDescription("How many tokens to scan for repetitions.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("Default: -1, where 0 is disabled and -1 is context size.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(0, Double.MAX_VALUE, dryPenaltyTokens);
+        input.onValueChange(event -> {
+            this.dryPenaltyTokens = event.getNewValue().intValue();
         });
         tileContainer.setAction(input);
 
@@ -428,13 +702,24 @@ public class ModelEditView extends EmptyContainer {
         submit.onClick(event -> {
             settings.setModelInstructions(instructions);
             settings.setContextSize(contextSize);
-            settings.setMmProj(multimodal);
             settings.setTemperature(temperature);
             settings.setTopP(topP);
             settings.setMinP(minP);
             settings.setTopK(topK);
             settings.setRepeatPenalty(repeatPenalty);
             settings.setRepeatTokens(repeatTokens);
+            settings.setDynamicTempRage(dynamicTempRage);
+            settings.setDynamicExponent(dynamicExponent);
+            settings.setXtcProbability(settings.getXtcProbability());
+            settings.setXtcThreshold(settings.getXtcThreshold());
+            settings.setTypicalP(settings.getTypicalP());
+            settings.setPresencePenalty(settings.getPresencePenalty());
+            settings.setFrequencyPenalty(settings.getFrequencyPenalty());
+            settings.setDryMultiplier(settings.getDryMultiplier());
+            settings.setDryBase(settings.getDryBase());
+            settings.setDryAllowedLength(settings.getDryAllowedLength());
+            settings.setDryPenaltyTokens(settings.getDryPenaltyTokens());
+            settings.setMmProj(mmProj);
             settings.setChatTemplate(chatTemplate);
             settings.setReasoningTemplate(reasoningTemplate);
             settings.setJinja(jinja);
