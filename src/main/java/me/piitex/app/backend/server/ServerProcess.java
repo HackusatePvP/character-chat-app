@@ -36,7 +36,64 @@ public class ServerProcess {
         }
 
         App.logger.info("Verifying server PID...");
-        // See if the server didn't properly shutdown
+
+        // Checks current state of PID. If the pid is active properly shut it down.
+        checkProcessID();
+
+        currentServer = this;
+
+        if (model == null) {
+            App.logger.error("Model was undefined. Unable to start server.");
+            error = true;
+            return;
+        }
+        App.logger.info("Loading {}", model.getFile().getAbsolutePath());
+
+        loading = true;
+
+        // Fetch server/model settings.
+        ServerSettings settings = App.getInstance().getSettings();
+
+        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
+        File server = new File(backendDirectory, "llama-server.exe");
+        List<String> parameters = getParameters(server, settings);
+        App.logger.debug("Server Parameters: {}", parameters);
+
+        // Build the process
+        ProcessBuilder builder = new ProcessBuilder(parameters);
+
+        // Set env if needed
+        Map<String, String> environmentVariables = builder.environment();
+        environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
+
+        // The server output will be errors even though it's not errors. This is how Java works
+        builder.redirectError(new File(App.getAppDirectory(), "server.txt"));
+
+        process = null;
+        try {
+            // When the server starts it will not be automatically shutdown.
+            // The process will remain open until this application is properly closed.
+            process = builder.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (process != null) {
+                // Save PID to terminate the process later.
+                ProcessHandle handle = process.toHandle();
+                App.getInstance().getSettings().getInfoFile().set("pid", handle.pid());
+            }
+        }
+
+        // Creates a thread-blocking scanner to ensure the server has started properly.
+        // It also checks for errors and logs them.
+        waitForServer();
+
+        if (!error) {
+            App.logger.info("Started llama-server successfully.");
+        }
+    }
+
+    private void checkProcessID() {
         if (App.getInstance().getSettings().getInfoFile().hasKey("pid")) {
             long pid = App.getInstance().getSettings().getInfoFile().getLong("pid");
             App.logger.info("Previous PID: {}", pid);
@@ -68,27 +125,9 @@ public class ServerProcess {
                 App.logger.info("{} is already destroyed.", pid);
             }
         }
+    }
 
-        currentServer = this;
-
-        if (model == null) {
-            App.logger.error("Model was undefined. Unable to start server.");
-            error = true;
-            return;
-        }
-        App.logger.info("Loading {}", model.getFile().getAbsolutePath());
-
-        loading = true;
-
-        // Fetch server/model settings.
-        ServerSettings settings = App.getInstance().getSettings();
-
-        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
-        // Set the backend
-        File server = new File(backendDirectory, "llama-server.exe");
-
-        // Create the model/llama server parameters.
-        // -m is a hard requirement
+    private LinkedList<String> getParameters(File server, ServerSettings settings) {
         LinkedList<String> parameters = new LinkedList<>();
         parameters.add(server.getAbsolutePath());
 
@@ -169,40 +208,7 @@ public class ServerProcess {
         parameters.add("8187");
         parameters.add("--no-webui");
 
-        App.logger.debug("Server Parameters: {}", parameters);
-
-        // Build the process
-        ProcessBuilder builder = new ProcessBuilder(parameters);
-
-        // Set env if needed
-        Map<String, String> environmentVariables = builder.environment();
-        environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
-
-        // The server output will be errors even though it's not errors. This is how Java works
-        builder.redirectError(new File(App.getAppDirectory(), "server.txt"));
-
-        process = null;
-        try {
-            // When the server starts it will not be automatically shutdown.
-            // The process will remain open until this application is properly closed.
-            process = builder.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (process != null) {
-                // Save PID to terminate the process later.
-                ProcessHandle handle = process.toHandle();
-                App.getInstance().getSettings().getInfoFile().set("pid", handle.pid());
-            }
-        }
-
-        // Creates a thread-blocking scanner to ensure the server has started properly.
-        // It also checks for errors and logs them.
-        waitForServer();
-
-        if (!error) {
-            App.logger.info("Started llama-server successfully.");
-        }
+        return parameters;
     }
 
     protected void waitForServer() {
