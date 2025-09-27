@@ -16,7 +16,7 @@ public class ModelSettings {
     private double dynamicTempRage = 0.0;
     private double dynamicExponent = 1;
     private double xtcProbability = 0;
-    private double xtxThreshold = 0.1;
+    private double xtcThreshold = 0.1;
     private double typicalP = 1.0;
     private double presencePenalty = 0;
     private double frequencyPenalty = 0;
@@ -95,9 +95,9 @@ public class ModelSettings {
             infoFile.set("xtc-probability", xtcProbability);
         }
         if (infoFile.hasKey("xtc-threshold")) {
-            this.xtxThreshold = infoFile.getDouble("xtc-threshold");
+            this.xtcThreshold = infoFile.getDouble("xtc-threshold");
         } else {
-            infoFile.set("xtc-threshold", xtxThreshold);
+            infoFile.set("xtc-threshold", xtcThreshold);
         }
         if (infoFile.hasKey("typical-p")) {
             this.typicalP = infoFile.getDouble("typical-p");
@@ -274,12 +274,12 @@ public class ModelSettings {
         infoFile.set("xtc-probability", xtcProbability);
     }
 
-    public double getXtxThreshold() {
-        return xtxThreshold;
+    public double getXtcThreshold() {
+        return xtcThreshold;
     }
 
-    public void setXtxThreshold(double xtxThreshold) {
-        this.xtxThreshold = xtxThreshold;
+    public void setXtcThreshold(double xtxThreshold) {
+        this.xtcThreshold = xtxThreshold;
         infoFile.set("xtc-threshold", xtxThreshold);
     }
 
