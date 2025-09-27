@@ -58,14 +58,17 @@ public class ModelEditView extends EmptyContainer {
         main.addElement(new SidebarView(main, false));
         addElement(main);
 
+        VerticalLayout page = new VerticalLayout(0, 0);
+        main.addElement(page);
+
         VerticalLayout layout = new VerticalLayout(0, 0);
 
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 250, appSettings.getHeight() - 100);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 250, appSettings.getHeight() - 125);
+        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 150);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
-        main.addElement(scrollContainer);
+        page.addElement(scrollContainer);
 
         layout.addElement(buildInstructions());
         layout.addElement(buildContextSize());
@@ -90,7 +93,8 @@ public class ModelEditView extends EmptyContainer {
         layout.addElement(buildChatTemplates());
         layout.addElement(buildReasoningTemplate());
         layout.addElement(buildJinjaTemplate());
-        layout.addElement(buildSubmitBox());
+
+        page.addElement(buildSubmitBox());
     }
 
     private void initializeSettings() {
