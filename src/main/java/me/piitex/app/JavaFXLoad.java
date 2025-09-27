@@ -130,6 +130,13 @@ public class JavaFXLoad extends Application {
     }
 
     public static void main(String[] args) {
+        // Use this function when testing and modifying the source.
+
+        // When called explicitly by the IDE it will launch the application through %APPDATA%.
+        // Ensure you have the latest release installed to %APPDATA%.
+        // Folder Location: %APPDATA%/chat-app/
+        // Backend Location: %APPDATA%/chat-app/backend/
+
         // Load App then render gui
         new App();
         launch();
