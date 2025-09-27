@@ -109,7 +109,7 @@ public class Server {
         toPost.put("top_p", settings.getTopP());
         toPost.put("min_p", settings.getMinP());
         toPost.put("xtc_probability", settings.getXtcProbability());
-        toPost.put("xtc_threshold", settings.getXtxThreshold());
+        toPost.put("xtc_threshold", settings.getXtcThreshold());
         toPost.put("typical_p", settings.getTypicalP());
         toPost.put("repeat_last_n", settings.getRepeatTokens());
         toPost.put("repeat_penalty", settings.getRepeatPenalty());
