@@ -73,15 +73,50 @@ If you place a model inside the directory you will have to refresh the page. (Cl
 
 Make sure you have a model set as a default. This is a hard requirement.
 
-## Compile Source
-You will have to have RenEngine compiled.
+## Modifying/Compiling Source
+Below is the instructions on how to test and compile source changes. The instructions will be for Intellij, but may work with other IDE's.
+
+### Install
+You need to ensure you have the latest release downloaded and extracted into %appdata%. When extracting the zip it will create a parent folder called `chat-app`.
+
+
+### Modifying
+Navigate to `JavaFXLoad.java`. Inside Intellij there will be a green arrow on the class line, and main() function. Click the green arrow on either of these.
+
+A configuration dialogue may open, if so set the JDK to 25. The app should start.
+
+Make changes to the source and test them by running the JavaFXLoad entry point.
+
+`TIP: Run configurations will be pinned to the right. Just press the green arrow on the top right. (Shift+F10)`
+
+### Compiling
+Ensure you have [RenEngine](https://github.com/HackusatePvP/RenEngine) compiled following its instructions.
 
 In the project directory run the follow.
 ```bash
 mvnw clean install
 ```
+
 There will be two jar files.
 1. character-chat-app.jar : This is the executable file.
 2. character-chat-app-1.0-SNAPSHOT.jar : Compiled classes only.
 
 Download the latest releases. This is needed for necessary backend and sdk files. Replace the jarfile with your compiled executable jar file.
+
+### Errors
+If the app does not launch check the following:
+1. Ensure C++ Redistruables are installed. This is required for both llamacpp and RenEngine.
+2. Ensure your java compiler is set to JDK 25. Sometimes your Windows Java and IDE Java are two different things.
+3. Ensure you installed the latest release.
+4. Invalidate caches and restart.
+
+Your application paths should be the following. Anything with `*` is required.
+* %appdata%/chat-app/*
+* %appdata%/chat-app/backend/*
+* %appdata%/chat-app/characters/
+* %appdata%/chat-app/icons/*
+* %appdata%/chat-app/jdk/*
+* %appdata%/chat-app/jdk/windows/*
+* %appdata%/chat-app/logs/
+* %appdata%/chat-app/models/*
+* %appdata%/chat-app/users/
