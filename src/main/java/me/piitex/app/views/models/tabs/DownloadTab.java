@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
-import me.piitex.app.backend.FileDownloadProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.engine.configurations.ConfigUtil;
 import me.piitex.engine.containers.ScrollContainer;
@@ -21,6 +20,9 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.utils.DownloadInfo;
+import me.piitex.engine.utils.DownloadListener;
+import me.piitex.engine.utils.FileDownloader;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -38,6 +40,9 @@ public class DownloadTab extends Tab {
     private final ScrollContainer scrollContainer;
     private final VerticalLayout downloadListLayout;
 
+    // NEW: The centralized FileDownloader instance
+    private final FileDownloader downloader;
+
     private static final int TILE_LAYOUT_WIDTH = 400;
     private static final int TILE_LAYOUT_HEIGHT = 75;
     private static final int ICON_X_OFFSET = 20;
@@ -53,6 +58,7 @@ public class DownloadTab extends Tab {
         super("Download");
         this.tabsContainer = tabsContainer;
         this.appSettings = App.getInstance().getAppSettings();
+        this.downloader = new FileDownloader();
 
         File file = new File(App.getModelsDirectory(), "download-cache.dat");
 
@@ -186,22 +192,22 @@ public class DownloadTab extends Tab {
         }
 
         setupFileInfoFetch(tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
-        setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+        setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef, titledContainer); // Pass titledContainer for relocation
 
 
         // Needs to be on a delay in order to properly put the card at the top.
         App.getThreadPoolManager().submitSchedule(() -> {
             Platform.runLater(() -> {
-                // This has to be done AFTER the layout has rendered.
-                // If the user left the download page the download will continue.
-                // When they re-enter the page check to see if the url is still being downloaded.
-                // If so re-apply the download indicators and controls.
-                if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                // Check to see if the url is still being downloaded.
+                DownloadInfo info = downloader.getDownloadInfo(url);
+                if (info != null && !info.isComplete()) {
                     titledContainer.setExpanded(true);
-                    FileInfo fileInfo = new FileInfo(0, "Unknown", modelKey);
+
+                    // Re-apply the download indicators and controls based on the active DownloadInfo
+                    FileInfo fileInfo = new FileInfo(info.getTotalFileSize(), info.getFileName(), modelKey);
                     fileInfo.setDownloaded(false);
                     fileInfoRef.set(fileInfo);
-                    createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+                    createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef, downloader);
 
                     // Add downloads to the top of the view.
                     downloadListLayout.getPane().getChildren().remove(titledContainer.getTitledPane());
@@ -219,12 +225,13 @@ public class DownloadTab extends Tab {
         if (downloadCache.has(dlKey)) {
             lastCheck = downloadCache.getLong(dlKey + ".fetch");
         } else {
-            lastCheck = 0; // Or System.currentTimeMillis() if you want the first check to be instant
+            lastCheck = 0;
         }
 
         long instant = System.currentTimeMillis();
         long difference = instant - lastCheck;
         long millisInDay = 1000L * 60 * 60 * 24;
+
         if (difference < millisInDay && !downloadCache.getString(dlKey + ".name").equals("Unknown")) {
             if (downloadCache.has(dlKey)) {
                 String name = downloadCache.getString(dlKey + ".name");
@@ -235,7 +242,8 @@ public class DownloadTab extends Tab {
                 tileLayout.addRenderEvent(event -> {
                     sizeText.setText(fileInfo.getDownloadSize());
 
-                    if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+                    // Check to see if the model is already downloaded
+                    if (fileInfo.isDownloaded() && downloader.getDownloadInfo(url) == null) {
                         Platform.runLater(() -> {
                             addDownloadedTag(tileLayout);
                             downloadIcon.setEnabled(false);
@@ -244,67 +252,85 @@ public class DownloadTab extends Tab {
                 });
             }
         } else {
-            FileDownloadProcess fileInfoFetcher = new FileDownloadProcess();
-            fileInfoFetcher.getFileInfoByUrlAsync(url);
-            fileInfoFetcher.setFileInfoCompleteListener(result -> Platform.runLater(() -> {
-                String fileName = result.getFileName().orElse("Unknown");
-                long fileSize = result.getFileSizeInBytes().orElse(0L);
-                FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
-                fileInfoRef.set(fileInfo);
+            App.getThreadPoolManager().submitTask(() -> {
+                long fileSize = downloader.getRemoteFileSize(url);
+                String fileName = url.substring(url.lastIndexOf('/') + 1);
 
-                sizeText.setText(fileInfo.getDownloadSize());
+                Platform.runLater(() -> {
+                    FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
+                    fileInfoRef.set(fileInfo);
 
-                if (fileInfo.isDownloaded() && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-                    addDownloadedTag(tileLayout);
-                    downloadIcon.setEnabled(false);
-                }
+                    sizeText.setText(fileInfo.getDownloadSize());
 
-                // Write long
-                downloadCache.set(dlKey + ".name", fileName);
-                downloadCache.set(dlKey + ".size", fileSize);
-                downloadCache.set(dlKey + ".fetch", System.currentTimeMillis());
+                    if (fileInfo.isDownloaded() && downloader.getDownloadInfo(url) == null) {
+                        addDownloadedTag(tileLayout);
+                        downloadIcon.setEnabled(false);
+                    }
 
-                try {
-                    downloadCache.save();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }));
+                    // Write to cache
+                    downloadCache.set(dlKey + ".name", fileName);
+                    downloadCache.set(dlKey + ".size", fileSize);
+                    downloadCache.set(dlKey + ".fetch", System.currentTimeMillis());
+
+                    try {
+                        downloadCache.save();
+                    } catch (IOException e) {
+                        App.logger.error("Error saving download cache", e);
+                    }
+                });
+            });
         }
     }
 
-    private void setupDownloadAction(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef) {
+    private void setupDownloadAction(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef, TitledLayout titledContainer) {
         downloadIcon.onClick(event -> {
             FileInfo fileInfo = fileInfoRef.get();
-            if ((fileInfo == null || fileInfo.isDownloaded()) && !FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
+            // Check if download is already active
+            if ((fileInfo == null || fileInfo.isDownloaded()) && downloader.getDownloadInfo(url) != null) {
                 return;
             }
 
-            createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef);
+            // Move card to top on download start
+            downloadListLayout.getPane().getChildren().remove(titledContainer.getTitledPane());
+            downloadListLayout.getPane().getChildren().addFirst(titledContainer.getTitledPane());
+            titledContainer.setExpanded(true);
+
+            createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef, downloader);
         });
     }
 
-    private void createDownloadInputs(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef) {
+    private void createDownloadInputs(HorizontalLayout tileLayout, ButtonOverlay downloadIcon, String url, String modelKey, AtomicReference<FileInfo> fileInfoRef, FileDownloader downloader) {
 
         Platform.runLater(() -> {
+            // Remove existing indicators if present (for re-entry)
+            tileLayout.getPane().getChildren().removeIf(node -> node instanceof RingProgressIndicator || node instanceof TextField || (node instanceof Text && node.toString().contains("STOP_CIRCLE")));
             downloadIcon.setEnabled(false);
         });
 
+        File modelDirectory = new File(App.getInstance().getSettings().getModelPath(), modelKey);
 
-        FileDownloadProcess downloadProcess;
-        FileDownloadProcess.DownloadTask currentTask;
-        File destinationFile = new File(App.getInstance().getSettings().getModelPath(), modelKey);
-        if (FileDownloadProcess.getCurrentDownloads().containsKey(url)) {
-            downloadProcess = FileDownloadProcess.getCurrentDownloads().get(url);
-            currentTask = FileDownloadProcess.getCurrentDownloadTasks().get(url);
-        } else {
-            downloadProcess = new FileDownloadProcess();
-            currentTask = downloadProcess.downloadFileAsync(url, destinationFile.toPath());
+        // Ensure the model's directory exists
+        if (!modelDirectory.exists()) {
+            modelDirectory.mkdirs();
+            App.logger.info("Created model directory: {}", modelDirectory.getAbsolutePath());
         }
 
+        // The FileInfo object, which was populated during setupFileInfoFetch, holds the correct file name.
+        FileInfo fileInfo = fileInfoRef.get();
+        if (fileInfo == null || fileInfo.getFileName() == null || fileInfo.getFileName().equals("Unknown")) {
+            // Fallback: Extract file name from URL (less reliable but necessary if fetch failed)
+            String fallbackName = url.substring(url.lastIndexOf('/') + 1);
+            fileInfo = new FileInfo(0, fallbackName, modelKey); // Use fallback data
+        }
+
+        // The final destination file
+        File destinationFile = new File(modelDirectory, fileInfo.getFileName());
+
+        // Check for existing download info (for re-entry)
+        DownloadInfo existingInfo = downloader.getDownloadInfo(url);
         RingProgressIndicator progressIndicator = new RingProgressIndicator(0, false);
 
-        TextOverlay stopButton = createStopButton(currentTask, destinationFile, downloadIcon, tileLayout, downloadProcess, fileInfoRef);
+        TextOverlay stopButton = createStopButton(url, destinationFile, downloadIcon, tileLayout, fileInfoRef);
         stopButton.addStyle(Styles.LARGE);
 
         TextField downloadSpeed = new TextField("");
@@ -318,52 +344,102 @@ public class DownloadTab extends Tab {
             tileLayout.getPane().getChildren().add(stopButton.assemble());
         });
 
-        AtomicLong lastDownload = new AtomicLong(0L);
-        AtomicLong lastChecked = new AtomicLong(0L);
+        AtomicReference<Double> smoothedSpeedRef = new AtomicReference<>(0.0);
 
-        downloadProcess.setDownloadProgressListener((totalBytesRead, totalFileSize, percent) -> {
-            Platform.runLater(() -> {
-                progressIndicator.progressProperty().set((double) totalBytesRead / totalFileSize);
-                double speed = calculateDownloadSpeed(totalBytesRead, lastDownload, lastChecked);
-                double mb = speed / (1024 * 1024);
-                downloadSpeed.setText(String.format("%.2f", mb) + " MB/s");
-            });
-        });
+        AtomicLong lastDownload = new AtomicLong(existingInfo != null ? existingInfo.getDownloadedBytes() : 0L);
+        AtomicLong lastChecked = new AtomicLong(System.currentTimeMillis());
 
-        downloadProcess.setDownloadCompleteListener(result -> Platform.runLater(() -> {
-            // Remove the download control buttons
-            tileLayout.getPane().getChildren().remove(progressIndicator);
-            tileLayout.getPane().getChildren().remove(stopButton.assemble());
-            tileLayout.getPane().getChildren().remove(downloadSpeed);
+        // Handle all events with the download.
+        DownloadListener downloadListener = new DownloadListener() {
 
-            if (result.isSuccess()) {
-                addDownloadedTag(tileLayout);
-            } else {
-                downloadIcon.setEnabled(true);
+            private void cleanupAndRemove(DownloadInfo info, boolean success) {
+                // Remove the listener first
+                downloader.removeDownloadListener(this);
+
+                App.logger.info("Download task finished/cancelled. Status: {}", success ? "SUCCESS" : "FAILED/CANCELED");
+
+                // Perform all UI cleanup on the JavaFX thread
+                Platform.runLater(() -> {
+                    // Ensure the captured Nodes are removed using the exact references
+                    tileLayout.getPane().getChildren().remove(progressIndicator);
+                    tileLayout.getPane().getChildren().remove(stopButton.getNode());
+                    tileLayout.getPane().getChildren().remove(downloadSpeed);
+
+                    if (success) {
+                        addDownloadedTag(tileLayout);
+                        downloadIcon.setEnabled(false);
+                        // Refresh model list on success
+                        tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
+                    } else {
+                        // Re-enable download button on failure/cancellation
+                        downloadIcon.setEnabled(true);
+                    }
+                });
             }
 
-            tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
+            @Override
+            public void onDownloadStart(DownloadInfo info) {
+                // Initial progress update for the UI on start
+                Platform.runLater(() -> {
+                    progressIndicator.progressProperty().set(0.0);
+                });
+            }
 
-        }));
+            @Override
+            public void onDownloadProgress(DownloadInfo info) {
+                // if the passed info is null, either the download was cancelled or failed.
+                if (info == null) {
+                    downloader.removeDownloadListener(this);
+                    return;
+                }
 
+                Platform.runLater(() -> {
+                    double speed = calculateDownloadSpeed(info.getDownloadedBytes(), lastDownload, lastChecked, smoothedSpeedRef);
+                    double mb = speed / (1024 * 1024);
+
+                    // Update UI
+                    downloadSpeed.setText(String.format("%.2f", mb) + " MB/s");
+                    progressIndicator.progressProperty().set(info.getDownloadProgress());
+                });
+            }
+
+            @Override
+            public void onDownloadComplete(DownloadInfo info, File outputFile) {
+                cleanupAndRemove(info, true);
+            }
+
+            @Override
+            public void onDownloadError(DownloadInfo info, Exception e) {
+                cleanupAndRemove(info, false);
+            }
+
+            @Override
+            public void onDownloadCancel(DownloadInfo info) {
+                cleanupAndRemove(info, false);
+            }
+        };
+
+        downloader.addDownloadListener(downloadListener);
+        if (existingInfo == null) {
+            downloader.startDownload(url, destinationFile);
+        }
     }
 
-    private TextOverlay createStopButton(FileDownloadProcess.DownloadTask downloadTask, File fileToDelete, ButtonOverlay downloadIcon, HorizontalLayout tileLayout, FileDownloadProcess downloadProcess, AtomicReference<FileInfo> fileInfoRef) {
+    private TextOverlay createStopButton(String url, File fileToDelete, ButtonOverlay downloadIcon, HorizontalLayout tileLayout, AtomicReference<FileInfo> fileInfoRef) {
         TextOverlay stop = new TextOverlay(new FontIcon(Material2MZ.STOP_CIRCLE));
         stop.addStyle(Styles.DANGER);
         stop.addStyle(Styles.TITLE_4);
         stop.onClick(event -> {
-            App.logger.info("Attempting to stop current download...");
+            App.logger.info("Attempting to stop current download: {}", url);
 
-            downloadTask.cancel();
+            // Calls the thread to be cancelled and clears mappings.
+            downloader.cancelDownload(url);
+
+            // Synchronous File Deletion (must be here as a final cleanup)
             if (fileToDelete.exists()) {
                 fileToDelete.delete();
+                App.logger.info("Deleted partial file: {}", fileToDelete.getName());
             }
-            // Remove UI elements and re-enable download button
-            Platform.runLater(() -> {
-                tileLayout.getPane().getChildren().removeIf(node -> node instanceof RingProgressIndicator || (node instanceof Text && ((Text)node).getText().equals(new FontIcon(Material2MZ.STOP_CIRCLE).toString())));
-                downloadIcon.setEnabled(true);
-            });
 
             fileInfoRef.get().setDownloaded(false);
         });
@@ -383,30 +459,35 @@ public class DownloadTab extends Tab {
     }
 
 
-    private double calculateDownloadSpeed(long totalBytesRead, AtomicLong lastDownloadBytes, AtomicLong lastDownloadTime) {
+    private double calculateDownloadSpeed(long totalBytesRead, AtomicLong lastDownloadBytes, AtomicLong lastDownloadTime, AtomicReference<Double> smoothedSpeedRef) {
         long currentTime = System.currentTimeMillis();
 
-        // Calculate bytes downloaded since the last update
         long bytesDownloadedSinceLastUpdate = totalBytesRead - lastDownloadBytes.get();
-
-        // Calculate time elapsed since the last update
         long timeElapsedSinceLastUpdate = currentTime - lastDownloadTime.get();
 
-        double bytesPerSecond = 0.0;
-
-        // Ensure both time has passed and bytes have been downloaded to avoid division by zero
-        // and to get a meaningful speed.
+        double instantaneousBytesPerSecond = 0.0;
         if (timeElapsedSinceLastUpdate > 0 && bytesDownloadedSinceLastUpdate > 0) {
-            // Convert milliseconds to seconds (timeElapsedSinceLastUpdate / 1000.0)
-            bytesPerSecond = (double) bytesDownloadedSinceLastUpdate / (timeElapsedSinceLastUpdate / 1000.0);
+            instantaneousBytesPerSecond = (double) bytesDownloadedSinceLastUpdate / (timeElapsedSinceLastUpdate / 1000.0);
         }
 
-        // IMPORTANT: Update the 'last' values for the next calculation
+        final double SMOOTHING_FACTOR = 0.15; // 0.15 is responsive but stable
+
+        double previousSmoothedSpeed = smoothedSpeedRef.get();
+
+        // Apply the EMA formula
+        double newSmoothedSpeed = (instantaneousBytesPerSecond * SMOOTHING_FACTOR) +
+                (previousSmoothedSpeed * (1.0 - SMOOTHING_FACTOR));
+
+        // Update the reference for the next calculation
+        smoothedSpeedRef.set(newSmoothedSpeed);
+
+        // Update the 'last' values for the next calculation
         lastDownloadBytes.set(totalBytesRead);
         lastDownloadTime.set(currentTime);
 
-        return bytesPerSecond;
+        return newSmoothedSpeed; // Return the stable, smoothed value
     }
+
     protected static class DownloadModel {
         private final String key;
         private final String name;
