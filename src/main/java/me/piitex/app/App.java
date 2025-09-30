@@ -65,7 +65,9 @@ public class App {
 
         threadPoolManager.submitTask(() -> {
             loading = true;
-            performUpdates();
+            if (Main.run) {
+                performUpdates();
+            }
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Loaded character data.");
