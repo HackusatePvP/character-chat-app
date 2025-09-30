@@ -8,6 +8,7 @@ import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.engine.configurations.InfoFile;
 import me.piitex.engine.Window;
+import me.piitex.engine.utils.FileDownloader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -64,12 +65,12 @@ public class App {
 
         threadPoolManager.submitTask(() -> {
             loading = true;
+            performUpdates();
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Loaded character data.");
             loading = false;
         });
-
 
         appSettings = new AppSettings();
         settings = new ServerSettings();
@@ -119,6 +120,28 @@ public class App {
                 }
             }
         }
+    }
+
+    public void performUpdates() {
+        logger.info("Checking for updates...");
+        // Automatically update model cache
+        String dataFileUrl = "https://raw.githubusercontent.com/HackusatePvP/character-chat-app/refs/heads/master/src/main/resources/windows/chat-app/models/model-list.dat";
+        FileDownloader downloader = new FileDownloader();
+        File currentData = new File(getModelsDirectory(), "model-list.dat");
+        if (!currentData.exists()) {
+            logger.warn("Model list data was missing...");
+        }
+
+        long currentSize = currentData.length();
+        long downloadSize = downloader.getRemoteFileSize(dataFileUrl);
+        if (currentSize != downloadSize) {
+            logger.info("Updating model list...");
+            downloader.startDownload(dataFileUrl, currentData);
+        }
+
+        logger.info("Model list updated...");
+        downloader.shutdown();
+
     }
 
     public AppSettings getAppSettings() {
