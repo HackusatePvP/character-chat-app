@@ -20,9 +20,9 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.TextOverlay;
-import me.piitex.engine.utils.DownloadInfo;
-import me.piitex.engine.utils.DownloadListener;
-import me.piitex.engine.utils.FileDownloader;
+import me.piitex.os.DownloadInfo;
+import me.piitex.os.DownloadListener;
+import me.piitex.os.FileDownloader;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -92,13 +92,7 @@ public class DownloadTab extends Tab {
     }
 
     private ScrollContainer createScrollContainer(VerticalLayout contentLayout) {
-        ScrollContainer container = new ScrollContainer(
-                contentLayout,
-                0,
-                20,
-                appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET,
-                appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET
-        );
+        ScrollContainer container = new ScrollContainer(contentLayout, 0, 20, appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET, appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET);
         container.setMaxSize(appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET, appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET);
         container.setVerticalScroll(true);
         container.setScrollWhenNeeded(true);
