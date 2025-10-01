@@ -1,6 +1,7 @@
 package me.piitex.app.utils;
 
 import com.drew.lang.annotations.Nullable;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
@@ -45,8 +46,8 @@ public class Placeholder {
         }
 
         AppSettings appSettings = App.getInstance().getAppSettings();
-        String astrixColor = appSettings.getAstrixColor(appSettings.getTheme());
-        String quoteColor = appSettings.getQuotationColor(appSettings.getTheme());
+        Color astrixColor = Color.web(appSettings.getAstrixColor());
+        Color quoteColor = Color.web(appSettings.getQuoteColor());
 
         String result = plainText;
 
@@ -57,7 +58,7 @@ public class Placeholder {
         StringBuilder sbQuote = new StringBuilder();
         while (quoteMatcher.find()) {
             String matchedQuote = quoteMatcher.group(1).trim(); // e.g., "Hello, player."
-            String replacement = "[color=" + quoteColor + "]" + matchedQuote.trim() + "[/color]";
+            String replacement = "[color=rgb(" + quoteColor.getRed()  * 100 + "," + quoteColor.getGreen() * 100 + ","  + quoteColor.getBlue() * 100 + ")]" + matchedQuote.trim() + "[/color]";
             quoteMatcher.appendReplacement(sbQuote, Matcher.quoteReplacement(replacement));
         }
         quoteMatcher.appendTail(sbQuote);
@@ -67,7 +68,7 @@ public class Placeholder {
         StringBuilder sbAsterisk = new StringBuilder();
         while (asteriskMatcher.find()) {
             String matchedAsterisk = asteriskMatcher.group(1).trim(); // e.g., *Waves*
-            String replacement = "[color=" + astrixColor + "]" + matchedAsterisk.trim() + "[/color]";
+            String replacement = "[color=rgb(" + astrixColor.getRed()  * 100 + "," + astrixColor.getGreen() * 100 + ","  + astrixColor.getBlue() * 100 + ")]" + matchedAsterisk.trim() + "[/color]";
             asteriskMatcher.appendReplacement(sbAsterisk, Matcher.quoteReplacement(replacement));
         }
         asteriskMatcher.appendTail(sbAsterisk);

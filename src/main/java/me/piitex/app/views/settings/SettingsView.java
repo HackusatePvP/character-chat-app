@@ -3,6 +3,7 @@ package me.piitex.app.views.settings;
 import atlantafx.base.theme.*;
 import javafx.application.Application;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
@@ -58,6 +59,8 @@ public class SettingsView {
         layout.addElement(buildGlobalChatSize());
         layout.addElement(buildChatSize());
         layout.addElement(buildTheme());
+        layout.addElement(buildQuotesColor());
+        layout.addElement(buildAstrixColor());
     }
 
     public TileContainer buildResolution() {
@@ -237,6 +240,56 @@ public class SettingsView {
             Application.setUserAgentStylesheet(appSettings.getStyleTheme(item).getUserAgentStylesheet());
         });
         tileContainer.setAction(selection);
+
+        return tileContainer;
+    }
+
+    public TileContainer buildQuotesColor() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+
+        Color currentColor = Color.web(appSettings.getQuoteColor());
+        ColorPickerOverlay colorPickerOverlay = new ColorPickerOverlay();
+        colorPickerOverlay.setValue(currentColor);
+
+        tileContainer.setTitle("Quote Tag Color");
+        tileContainer.setDescription("Change the color of text surrounded by quotations. ([color=rgb(" + currentColor.getRed()  * 100 + "," + currentColor.getGreen() * 100 + "," + currentColor.getBlue() * 100 + ")]\"This is quoted text.\"[/color]).");
+        System.out.println("[color=rgb(" + currentColor.getRed()  * 100+ "," + currentColor.getGreen() * 100 + "," + currentColor.getBlue() * 100 + ")");
+        colorPickerOverlay.onColorSelect(event -> {
+            Color color = event.getColorPickerOverlay().getValue();
+            appSettings.setQuoteColor(colorPickerOverlay.getValue().toString());
+            tileContainer.setDescription("Change the theme of text surrounded by quotations. ([color=rgb(" + color.getRed()  * 100 + "," + color.getGreen() * 100 + "," + color.getBlue() * 100 + ")]\"This is quoted text.\"[/color]).");
+        });
+
+        tileContainer.setAction(colorPickerOverlay);
+
+        return tileContainer;
+    }
+
+    public TileContainer buildAstrixColor() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+
+        Color currentColor = Color.web(appSettings.getAstrixColor());
+        ColorPickerOverlay colorPickerOverlay = new ColorPickerOverlay();
+        colorPickerOverlay.setValue(currentColor);
+
+        tileContainer.setTitle("Astrix Tag Color");
+        tileContainer.setDescription("Change the color of text surrounded by astrix. ([color=rgb(" + currentColor.getRed()  * 100 + "," + currentColor.getGreen() * 100 + "," + currentColor.getBlue() * 100 + ")]\\*This is quoted text.\\*[/color]).");
+        System.out.println("[color=rgb(" + currentColor.getRed()  * 100+ "," + currentColor.getGreen() * 100 + "," + currentColor.getBlue() * 100 + ")");
+        colorPickerOverlay.onColorSelect(event -> {
+            Color color = event.getColorPickerOverlay().getValue();
+            appSettings.setQuoteColor(colorPickerOverlay.getValue().toString());
+            tileContainer.setDescription("Change the color of text surrounded by astrix. ([color=rgb(" + color.getRed()  * 100 + "," + color.getGreen() * 100 + "," + color.getBlue() * 100 + ")]\\*This is quoted text.\\*[/color]).");
+        });
+
+        tileContainer.setAction(colorPickerOverlay);
 
         return tileContainer;
     }

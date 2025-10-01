@@ -13,6 +13,8 @@ public class AppSettings {
     private String globalTextSize = "title-4";
     private String imagesPath = "";
     private String theme = "Primer Dark";
+    private String quoteColor;
+    private String astrixColor;
 
     private final InfoFile infoFile;
 
@@ -36,6 +38,16 @@ public class AppSettings {
         }
         if (infoFile.hasKey("images-path")) {
             this.imagesPath = infoFile.get("images-path");
+        }
+        if (infoFile.hasKey("quote-color")) {
+            this.quoteColor = infoFile.get("quote-color");
+        } else {
+            this.quoteColor = Color.LIGHTYELLOW.toString();
+        }
+        if (infoFile.hasKey("astrix-color")) {
+            this.astrixColor = infoFile.get("astrix-color");
+        } else {
+            this.astrixColor = Color.DODGERBLUE.toString();
         }
     }
 
@@ -98,21 +110,39 @@ public class AppSettings {
         Needed for RichTextFX components and BBCode
      */
 
-    public String getQuotationColor(String theme) {
-        if (theme.toLowerCase().contains("light")) {
-            return "gold";
-        } else {
-            return "lightyellow";
-        }
+    public String getQuoteColor() {
+        return quoteColor;
     }
 
-    public String getAstrixColor(String theme) {
-        if (theme.toLowerCase().contains("light")) {
-            return "darkblue";
-        } else {
-            return "dodgerblue";
-        }
+    public void setQuoteColor(String quoteColor) {
+        this.quoteColor = quoteColor;
+        infoFile.set("quote-color", quoteColor);
     }
+
+    public String getAstrixColor() {
+        return astrixColor;
+    }
+
+    public void setAstrixColor(String astrixColor) {
+        this.astrixColor = astrixColor;
+        infoFile.set("astrix-color", astrixColor);
+    }
+
+    //    public String getQuotationColor(String theme) {
+//        if (theme.toLowerCase().contains("light")) {
+//            return "gold";
+//        } else {
+//            return "lightyellow";
+//        }
+//    }
+//
+//    public String getAstrixColor(String theme) {
+//        if (theme.toLowerCase().contains("light")) {
+//            return "darkblue";
+//        } else {
+//            return "";
+//        }
+//    }
 
     public Theme getStyleTheme(String name) {
         if (name.equalsIgnoreCase("primer light")) {
