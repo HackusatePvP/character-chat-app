@@ -413,7 +413,9 @@ public class DownloadTab extends Tab {
 
         downloader.addDownloadListener(downloadListener);
         if (existingInfo == null) {
-            downloader.startDownload(url, destinationFile);
+            App.getThreadPoolManager().submitTask(() -> {
+                downloader.startDownload(url, destinationFile);
+            });
         }
     }
 
