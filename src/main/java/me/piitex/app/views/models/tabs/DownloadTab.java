@@ -312,13 +312,11 @@ public class DownloadTab extends Tab {
         // The FileInfo object, which was populated during setupFileInfoFetch, holds the correct file name.
         FileInfo fileInfo = fileInfoRef.get();
         if (fileInfo == null || fileInfo.getFileName() == null || fileInfo.getFileName().equals("Unknown")) {
-            // Fallback: Extract file name from URL (less reliable but necessary if fetch failed)
-            String fallbackName = url.substring(url.lastIndexOf('/') + 1);
-            fileInfo = new FileInfo(0, fallbackName, modelKey); // Use fallback data
+            return;
         }
 
         // The final destination file
-        File destinationFile = new File(modelDirectory, fileInfo.getFileName());
+        File destinationFile = new File(modelDirectory, fileInfo.getFileName().replace("?download=true", ""));
 
         // Check for existing download info (for re-entry)
         DownloadInfo existingInfo = downloader.getDownloadInfo(url);
