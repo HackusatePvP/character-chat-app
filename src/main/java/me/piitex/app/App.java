@@ -8,7 +8,7 @@ import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.engine.configurations.InfoFile;
 import me.piitex.engine.Window;
-import me.piitex.engine.utils.FileDownloader;
+import me.piitex.os.FileDownloader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
