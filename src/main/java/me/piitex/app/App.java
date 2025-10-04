@@ -23,6 +23,7 @@ public class App {
     // Character ID, Character object
     private final Map<String, Character> characters = new TreeMap<>();
     private final Map<String, User> userTemplates = new TreeMap<>();
+    private static final FileDownloader fileDownloader = new FileDownloader();
 
     private static App instance;
     public static ThreadPoolManager threadPoolManager;
@@ -73,7 +74,6 @@ public class App {
             App.logger.info("Loaded character data.");
             loading = false;
         });
-
         appSettings = new AppSettings();
         settings = new ServerSettings();
         settings.getInfoFile().set("main-pid", ProcessHandle.current().pid());
@@ -199,10 +199,13 @@ public class App {
         }
     }
 
+    public static FileDownloader getFileDownloader() {
+        return fileDownloader;
+    }
+
     public static File getDataDirectory() {
         return new File(System.getenv("APPDATA") + "/chat-app/");
     }
-
 
     public static File getBackendDirectory() {
         return new File(getAppDirectory(), "/backend/");
@@ -317,7 +320,6 @@ public class App {
                 }
             }
         }
-        // When exiting, can cause BSOD with Vulkan.
         Platform.exit();
         System.exit(0);
     }

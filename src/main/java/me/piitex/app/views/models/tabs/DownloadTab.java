@@ -39,10 +39,6 @@ public class DownloadTab extends Tab {
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
     private final VerticalLayout downloadListLayout;
-
-    // NEW: The centralized FileDownloader instance
-    private final FileDownloader downloader;
-
     private static final int TILE_LAYOUT_WIDTH = 400;
     private static final int TILE_LAYOUT_HEIGHT = 75;
     private static final int ICON_X_OFFSET = 20;
@@ -51,14 +47,15 @@ public class DownloadTab extends Tab {
     private static final int SCROLL_MAX_WIDTH_OFFSET = 300;
     private static final int SCROLL_MAX_HEIGHT_OFFSET = 200;
 
-    private ConfigUtil downloadCache;
+    private final ConfigUtil downloadCache;
+
+    private final FileDownloader downloader = App.getFileDownloader();
 
 
     public DownloadTab(TabsContainer tabsContainer) {
         super("Download");
         this.tabsContainer = tabsContainer;
         this.appSettings = App.getInstance().getAppSettings();
-        this.downloader = new FileDownloader();
 
         File file = new File(App.getModelsDirectory(), "download-cache.dat");
 
