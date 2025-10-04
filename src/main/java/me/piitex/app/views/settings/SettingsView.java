@@ -295,7 +295,7 @@ public class SettingsView {
                 (int)(currentColor.getRed() * 255) + "," +
                 (int)(currentColor.getGreen() * 255) + "," +
                 (int)(currentColor.getBlue() * 255) +
-                ")]\"This is quoted text.\"[/color]).");
+                ")]*This is astrix text.*[/color]).");
 
 
         colorPickerOverlay.onColorSelect(event -> {
@@ -305,7 +305,7 @@ public class SettingsView {
                     (int)(color.getRed() * 255) + "," +
                     (int)(color.getGreen() * 255) + "," +
                     (int)(color.getBlue() * 255) +
-                    ")]\"This is quoted text.\"[/color]).");
+                    ")]*This is astrix text.*[/color]).");
         });
         tileContainer.setAction(colorPickerOverlay);
 
