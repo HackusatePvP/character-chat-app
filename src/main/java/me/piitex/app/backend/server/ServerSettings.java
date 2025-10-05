@@ -25,7 +25,7 @@ public class ServerSettings {
     private boolean flashAttention = false;
 
     public ServerSettings() {
-        infoFile = new InfoFile(new File(App.getAppDirectory(), "settings.info"), false);
+        infoFile = new InfoFile(new File(App.getDataDirectory(), "settings.info"), false);
 
         if (infoFile.hasKey("backend")) {
             backend = infoFile.get("backend");
