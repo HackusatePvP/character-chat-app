@@ -19,7 +19,7 @@ public class AppSettings {
     private final InfoFile infoFile;
 
     public AppSettings() {
-        this.infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
+        this.infoFile = new InfoFile(new File(App.getDataDirectory(), "app.info"), false);
 
         if (infoFile.hasKey("width")) {
             this.width = infoFile.getInteger("width");
