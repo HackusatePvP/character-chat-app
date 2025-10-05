@@ -29,6 +29,7 @@ snowpiercer-15b-v3:
     Q6_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q6_K_L.gguf?download=true
     Q8_0: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q8_0.gguf?download=true
     bf16: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-bf16.gguf?download=true
+    imatrix: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-imatrix.gguf?download=true
 cydonia-24b-v4:
   description: Best roleplay model at 20B parameters.
   name: Cydonia 24B v4
