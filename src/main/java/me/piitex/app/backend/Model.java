@@ -13,7 +13,7 @@ public class Model {
 
     public Model(File file) {
         this.file = file;
-        this.settings = new ModelSettings(new InfoFile(new File(App.getAppDirectory(), "models/" + file.getName().split("\\.")[0] + ".info"), false));
+        this.settings = new ModelSettings(new InfoFile(new File(App.getDataDirectory(), "models/" + file.getName().split("\\.")[0] + ".info"), false));
     }
 
     public ModelSettings getSettings() {
