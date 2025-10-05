@@ -1,32 +1,34 @@
-snowpiercer-15b-v2:
+# DO NOT MODIFY!
+
+snowpiercer-15b-v3:
   description: Excellent roleplay model for its size.
-  name: Snowpiercer 15B v2
+  name: Snowpiercer 15B v3
   map:
-    IQ2_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ2_M.gguf?download=true
-    IQ2_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ2_S.gguf?download=true
-    IQ3_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ3_M.gguf?download=true
-    IQ3_XS: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ3_XS.gguf?download=true
-    IQ3_XXS: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ3_XXS.gguf?download=true
-    IQ4_NL: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ4_NL.gguf?download=true
-    IQ4_XS: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-IQ4_XS.gguf?download=true
-    Q2_K: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q2_K.gguf?download=true
-    Q2_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q2_K_L.gguf?download=true
-    Q3_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q3_K_L.gguf?download=true
-    Q3_K_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q3_K_M.gguf?download=true
-    Q3_K_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q3_K_S.gguf?download=true
-    Q3_K_XL: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q3_K_XL.gguf?download=true
-    Q4_0: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q4_0.gguf?download=true
-    Q4_1: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q4_1.gguf?download=true
-    Q4_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q4_K_L.gguf?download=true
-    Q4_K_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q4_K_M.gguf?download=true
-    Q4_K_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q4_K_S.gguf?download=true
-    Q5_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q5_K_L.gguf?download=true
-    Q5_K_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q5_K_M.gguf?download=true
-    Q5_K_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q5_K_S.gguf?download=true
-    Q6_K: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q6_K.gguf?download=true
-    Q6_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q6_K_L.gguf?download=true
-    Q8_0: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-Q8_0.gguf?download=true
-    bf16: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v2-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v2-bf16.gguf?download=true
+    IQ2_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ2_M.gguf?download=true
+    IQ2_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ2_S.gguf?download=true
+    IQ3_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ3_M.gguf?download=true
+    IQ3_XS: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ3_XS.gguf?download=true
+    IQ3_XXS: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ3_XXS.gguf?download=true
+    IQ4_NL: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ4_NL.gguf?download=true
+    IQ4_XS: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-IQ4_XS.gguf?download=true
+    Q2_K: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q2_K.gguf?download=true
+    Q2_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q2_K_L.gguf?download=true
+    Q3_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q3_K_L.gguf?download=true
+    Q3_K_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q3_K_M.gguf?download=true
+    Q3_K_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q3_K_S.gguf?download=true
+    Q3_K_XL: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q3_K_XL.gguf?download=true
+    Q4_0: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q4_0.gguf?download=true
+    Q4_1: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q4_1.gguf?download=true
+    Q4_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q4_K_L.gguf?download=true
+    Q4_K_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q4_K_M.gguf?download=true
+    Q4_K_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q4_K_S.gguf?download=true
+    Q5_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q5_K_L.gguf?download=true
+    Q5_K_M: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q5_K_M.gguf?download=true
+    Q5_K_S: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q5_K_S.gguf?download=true
+    Q6_K: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q6_K.gguf?download=true
+    Q6_K_L: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q6_K_L.gguf?download=true
+    Q8_0: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-Q8_0.gguf?download=true
+    bf16: https://huggingface.co/bartowski/TheDrummer_Snowpiercer-15B-v3-GGUF/resolve/main/TheDrummer_Snowpiercer-15B-v3-bf16.gguf?download=true
 cydonia-24b-v4:
   description: Best roleplay model at 20B parameters.
   name: Cydonia 24B v4
