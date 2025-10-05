@@ -17,6 +17,7 @@ module me.piitex.app {
     requires org.apache.logging.log4j;
     requires annotations;
     requires org.fxmisc.richtext;
+    requires javafx.graphics;
 
     opens me.piitex.app to javafx.fxml;
     exports me.piitex.app;
