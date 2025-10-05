@@ -53,6 +53,12 @@ public class App extends FXLoad {
 
     private volatile boolean loading = true;
 
+    // Used for testing with the IDE!
+    static void main() {
+        new App();
+        Application.launch(App.class);
+    }
+
     @Override
     public void preInitialization() {
         logger.info("Initializing application...");
@@ -407,7 +413,7 @@ public class App extends FXLoad {
     }
 
     public static TreeMap<String, Model> getModels() {
-        return getModels(null); // Call the overloaded method with null to get all.
+        return getModels(null);
     }
 
     private static void findGGUFModelsRecursive(@NotNull File directory, TreeMap<String, Model> models, String filterType) {
