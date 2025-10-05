@@ -7,6 +7,6 @@ public class Main {
         // Sets a flag which indicates the program was launched through the jar file.
         // When testing with the IDEA launch the application with JavaFXLoad.main()
         run = true;
-        JavaFXLoad.main(args);
+        new App();
     }
 }
