@@ -445,7 +445,7 @@ public class ChatView extends EmptyContainer {
         stop.onClick(event -> {
             App.logger.info("Force stopping response...");
             stopNode.setDisable(true);
-            thread.cancel(true); // Does not stop input stream
+            thread.cancel(true);
         });
 
         topControls.addElement(stop);
@@ -481,7 +481,7 @@ public class ChatView extends EmptyContainer {
         this.image = image;
     }
 
-    public static TextFlowOverlay buildTextFlow(ChatMessage chatMessage, Chat chat, int index) {
+    public static TextFlowOverlay buildTextFlow(ChatMessage chatMessage) {
         String content = Placeholder.applyDynamicBBCode(chatMessage.getContent());
         AppSettings appSettings = App.getInstance().getAppSettings();
 

@@ -112,7 +112,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
                     Card card = (Card) messageBox.getPane().getChildren().stream().filter(node -> node instanceof Card).findAny().orElse(null);
                     if (card != null) {
-                        card.setBody(ChatView.buildTextFlow(updatedChatMessage, chat, index).assemble());
+                        card.setBody(ChatView.buildTextFlow(updatedChatMessage).assemble());
                     }
                 }
 
