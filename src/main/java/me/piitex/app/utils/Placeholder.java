@@ -46,8 +46,11 @@ public class Placeholder {
         }
 
         AppSettings appSettings = App.getInstance().getAppSettings();
+        Color textColor = Color.web(appSettings.getTextColor());
         Color astrixColor = Color.web(appSettings.getAstrixColor());
         Color quoteColor = Color.web(appSettings.getQuoteColor());
+
+        plainText = "[color=rgb(" + textColor.getRed()  * 255 + "," + textColor.getGreen() * 255 + ","  + textColor.getBlue() * 255 + ")]" + plainText + "[/color]";
 
         String result = plainText;
 

@@ -59,6 +59,7 @@ public class SettingsView {
         layout.addElement(buildGlobalChatSize());
         layout.addElement(buildChatSize());
         layout.addElement(buildTheme());
+        layout.addElement(buildGeneralText());
         layout.addElement(buildQuotesColor());
         layout.addElement(buildAstrixColor());
     }
@@ -243,6 +244,42 @@ public class SettingsView {
 
         return tileContainer;
     }
+
+    public TileContainer buildGeneralText() {
+        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle("color-fg-default");
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+
+        Color currentColor = Color.web(appSettings.getTextColor());
+        ColorPickerOverlay colorPickerOverlay = new ColorPickerOverlay();
+        colorPickerOverlay.setValue(currentColor);
+
+        tileContainer.setTitle("Chat Text Color");
+        tileContainer.setDescription("Change the color of regular chat text. ([color=rgb(" +
+                (int)(currentColor.getRed() * 255) + "," +
+                (int)(currentColor.getGreen() * 255) + "," +
+                (int)(currentColor.getBlue() * 255) +
+                ")]This is regular text[/color]).");
+
+
+        colorPickerOverlay.onColorSelect(event -> {
+            Color color = event.getColorPickerOverlay().getValue();
+            appSettings.setTextColor(colorPickerOverlay.getValue().toString());
+            tileContainer.setDescription("Change the color of regular chat text. ([color=rgb(" +
+                    (int)(color.getRed() * 255) + "," +
+                    (int)(color.getGreen() * 255) + "," +
+                    (int)(color.getBlue() * 255) +
+                    ")]This is regular text[/color]).");
+        });
+
+        tileContainer.setAction(colorPickerOverlay);
+
+        return tileContainer;
+    }
+
 
     public TileContainer buildQuotesColor() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
