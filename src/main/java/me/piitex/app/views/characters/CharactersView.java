@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
@@ -13,10 +14,12 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
+import me.piitex.app.views.LoadingView;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.DialogueContainer;
+import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -108,13 +111,23 @@ public class CharactersView {
                 }
 
                 if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
-                    App.window.getStage().getScene().setCursor(Cursor.WAIT);
-
-                    // Load chat window...
+                    // Display progress
                     App.window.clearContainers();
 
-                    App.window.addContainer(new ChatView(character, character.getLastChat()));
-                    App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+                    EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
+                    progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
+                    App.window.addContainer(progressContainer);
+
+                    App.getThreadPoolManager().submitTask(() -> {
+                        ChatView chatView = new ChatView(character, character.getLastChat());
+
+                        Platform.runLater(() -> {
+                            Node assemble = chatView.assemble();
+                            App.window.clearContainers();
+                            App.window.addContainer(chatView, assemble);
+                        });
+
+                    });
 
                 }
 

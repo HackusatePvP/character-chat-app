@@ -20,13 +20,15 @@ public class HomeView extends EmptyContainer {
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public HomeView() {
-        super(600, 1080);
+        int height = App.getInstance().getAppSettings().getHeight() - 50;
+
+        super(600, height);
         if (App.mobile) {
-            root = new HorizontalLayout(600, 1080);
+            root = new HorizontalLayout(600, height);
         } else {
             setWidth(appSettings.getWidth());
-            setHeight(appSettings.getHeight());
-            root = new HorizontalLayout(appSettings.getWidth(), appSettings.getHeight());
+            setHeight(height);
+            root = new HorizontalLayout(appSettings.getWidth() - 200, height);
         }
 
         addElement(root);
@@ -40,15 +42,7 @@ public class HomeView extends EmptyContainer {
         root.setSpacing(35);
 
         if (App.getInstance().isLoading()) {
-            VerticalLayout layout = new VerticalLayout(1920, 0);
-
-            TextOverlay text = new TextOverlay("Loading data...");
-            layout.addElement(text);
-
-            ProgressBarOverlay load = new ProgressBarOverlay();
-            layout.addElement(load);
-
-            root.addElement(layout);
+            root.addElement(new LoadingView("Loading data...", root.getWidth(), 650));
         } else {
             buildBody();
         }
