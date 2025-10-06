@@ -136,24 +136,6 @@ public class ChatView extends EmptyContainer {
         // Layout is the chat window.
         loadMessages();
 
-        AlertOverlay alert;
-        if (!character.isShownDisclaimer()) {
-            alert = new AlertOverlay("DISCLAIMER", Alert.AlertType.WARNING);
-            alert.setWidth(600);
-            alert.setHeight(250);
-            alert.setContent("Everything the character says is made up. Do not use AI for mental or medical health assistance.");
-            alert.addButton(new ButtonType("I Understand", ButtonBar.ButtonData.YES));
-
-            alert.onConfirm(event -> {
-                character.setShownDisclaimer(true);
-            });
-
-            Platform.runLater(() -> {
-            });
-        } else {
-            alert = null;
-        }
-
         sidebarView.setOnCollapseStateChange((aBoolean) -> {
             if (aBoolean) {
                 scrollContainer.setWidth(CHAT_VIEW_SCROLL_WIDTH + 300);
@@ -164,11 +146,19 @@ public class ChatView extends EmptyContainer {
             }
         });
 
+
         // Check to make sure server has been started.
         Platform.runLater(() -> {
             checkServer();
-            if (alert != null) {
-                App.window.renderAlert(alert);
+            if (!character.isShownDisclaimer()) {
+                AlertOverlay alert = new AlertOverlay("DISCLAIMER", Alert.AlertType.WARNING);
+                alert.setWidth(600);
+                alert.setHeight(250);
+                alert.setContent("Everything the character says is made up. Do not use AI for mental or medical health assistance.");
+                alert.addButton(new ButtonType("I Understand", ButtonBar.ButtonData.YES));
+                alert.onConfirm(event -> {
+                    character.setShownDisclaimer(true);
+                });
             }
         });
     }
