@@ -128,7 +128,7 @@ public class CharacterEditView {
 
         userDisplay = "";
         userPersona = "";
-        userIconPath = new File(App.getAppDirectory(), "icons/character.png");
+        userIconPath = characterIconPath; // Use the same default logo.
 
         chatFirstMessage = "";
         chatScenario = "";
@@ -197,7 +197,9 @@ public class CharacterEditView {
         if (user != null) {
             userDisplay = user.getDisplayName();
             userPersona = user.getPersona();
-            userIconPath = new File(user.getIconPath());
+            if (user.getIconPath() != null && !user.getIconPath().isEmpty()) {
+                userIconPath = new File(user.getIconPath());
+            }
         }
     }
 
@@ -211,7 +213,7 @@ public class CharacterEditView {
         infoFile.set("character-persona", characterPersona);
         infoFile.set("user-display", userDisplay);
         infoFile.set("user-persona", userPersona);
-        if (userIconPath != null && !userIconPath.isFile()) {
+        if (userIconPath != null && userIconPath.isFile()) {
             infoFile.set("icon-path-user", userIconPath.getAbsolutePath());
         }
         infoFile.set("lore", loreItems);
@@ -352,6 +354,8 @@ public class CharacterEditView {
                     user.setPersona(userTabInstance.getUserDescription().getCurrentText());
                     character.setUser(user);
                 }
+
+                App.getInstance().getCharacters().put(character.getId(), character);
 
                 App.window.clearContainers();
                 App.window.addContainer(new HomeView());
