@@ -224,7 +224,6 @@ public class DownloadTab extends Tab {
         long millisInDay = 1000L * 60 * 60 * 24;
 
         if ((difference < millisInDay && !downloadCache.getString(dlKey + ".name").equals("Unknown") && downloadCache.getLong(dlKey + ".size") > 0)) {
-            App.logger.info("Using cached download sizes.");
             if (downloadCache.has(dlKey)) {
                 String name = downloadCache.getString(dlKey + ".name");
                 long size = downloadCache.getLong(dlKey + ".size");
