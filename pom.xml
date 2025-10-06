@@ -199,6 +199,7 @@
                 </executions>
             </plugin>
 
+            <!-- YOU CAN SAFELY REMOVE THIS! This is for automating build releases. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -217,6 +218,11 @@
                                 <property name="destination.dir" value="${basedir}/src/main/resources/windows/chat-app/"/>
                                 <property name="destination.jar.path" value="${destination.dir}/character-chat-app.jar"/>
 
+                                <property name="release.zip.dir" value="${basedir}/src/main/resources/windows/"/>
+                                <property name="release.zip.file" value="${release.zip.dir}/Windows-release.zip"/>
+                                <property name="content.to.zip.dir" value="${basedir}/src/main/resources/windows/"/> <available file="${source.jar}" property="jar.exists"/>
+                                <fail unless="jar.exists" message="ERROR: Source JAR not found at ${source.jar}. Please ensure maven-shade-plugin is configured correctly and runs before this plugin."/>
+
                                 <!-- Check if the source JAR exists before attempting to move -->
                                 <available file="${source.jar}" property="jar.exists"/>
                                 <fail unless="jar.exists" message="ERROR: Source JAR not found at ${source.jar}. Please ensure maven-shade-plugin is configured correctly and runs before this plugin."/>
@@ -229,16 +235,24 @@
 
                                 <!-- Move the JAR file -->
                                 <copy file="${source.jar}" todir="${destination.dir}"/>
+
+                                <mkdir dir="${release.zip.dir}"/>
+
+                                <delete file="${release.zip.file}" failonerror="false"/>
+
+                                <zip destfile="${release.zip.file}" basedir="${content.to.zip.dir}"/>
                             </target>
                         </configuration>
                     </execution>
                 </executions>
+                <!-- YOU CAN SAFELY REMOVE THIS! This is for automating build releases. -->
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.ant</groupId>
                         <artifactId>ant</artifactId>
                         <version>1.10.12</version>
                     </dependency>
+                    <!-- YOU CAN SAFELY REMOVE THIS! This is for automating build releases. -->
                     <dependency>
                         <groupId>org.apache.ant</groupId>
                         <artifactId>ant-launcher</artifactId>
