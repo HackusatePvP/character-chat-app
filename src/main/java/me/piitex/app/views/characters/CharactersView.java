@@ -120,9 +120,8 @@ public class CharactersView {
 
                     App.getThreadPoolManager().submitTask(() -> {
                         ChatView chatView = new ChatView(character, character.getLastChat());
-
+                        Node assemble = chatView.assemble();
                         Platform.runLater(() -> {
-                            Node assemble = chatView.assemble();
                             App.window.clearContainers();
                             App.window.addContainer(chatView, assemble);
                         });
