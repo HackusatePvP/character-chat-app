@@ -44,8 +44,7 @@ public class Chat {
                 });
                 App.logger.debug("Loaded {} messages", count);
             } catch (IOException | IllegalBlockSizeException e) {
-                System.err.println("Error decrypting or reading chat file: " + file.getAbsolutePath());
-                e.printStackTrace();
+                App.logger.error("Error decrypting or reading chat file: {}", file.getAbsolutePath(), e);
             } finally {
                 if (out.exists()) {
                     out.delete();
@@ -62,8 +61,7 @@ public class Chat {
                     });
                 }
             } catch (IOException e) {
-                System.err.println("Error reading chat file in dev mode: " + file.getAbsolutePath());
-                e.printStackTrace();
+                App.logger.error("Error reading chat file in dev mode: {}", file.getAbsolutePath(), e);
             }
         }
     }
@@ -83,7 +81,7 @@ public class Chat {
             sender = Role.USER;
             contentPart = rawLine.substring("user:".length());
         } else {
-            System.err.println("Warning: Unrecognized chat line format: " + rawLine);
+            App.logger.warn("Unrecognized chat line format: {}", rawLine);
             return null;
         }
 
