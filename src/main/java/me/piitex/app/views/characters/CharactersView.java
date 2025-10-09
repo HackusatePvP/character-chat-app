@@ -189,14 +189,18 @@ public class CharactersView {
     }
 
     private void editCharacter(Character character) {
-        App.window.getStage().getScene().setCursor(Cursor.WAIT);
+        App.window.clearContainers();
+        EmptyContainer progressContainer = new EmptyContainer(App.getInstance().getAppSettings().getWidth(), App.getInstance().getAppSettings().getHeight());
+        progressContainer.addElement(new LoadingView("Loading character data...", progressContainer.getWidth(), progressContainer.getHeight()));
+        App.window.addContainer(progressContainer);
 
-        Container container = new CharacterEditView(character, false).getRoot();
-
-        Platform.runLater(() -> {
-            App.window.clearContainers();
-            App.window.addContainer(container);
-            App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+        App.getThreadPoolManager().submitTask(() -> {
+            Container container = new CharacterEditView(character, false).getRoot();
+            Node assemble = container.assemble();
+            Platform.runLater(() -> {
+                App.window.clearContainers();
+                App.window.addContainer(container, assemble);
+            });
         });
     }
 
@@ -211,12 +215,21 @@ public class CharactersView {
         // Allow the id to be edited and changed.
 
         // Create a copy of the character.
-        Character duplicated = new Character(newId, null);
-        duplicated.copy(character);
-
-        CharacterEditView editView = new CharacterEditView(duplicated, true);
         App.window.clearContainers();
-        App.window.addContainer(editView.getRoot());
+        EmptyContainer progressContainer = new EmptyContainer(App.getInstance().getAppSettings().getWidth(), App.getInstance().getAppSettings().getHeight());
+        progressContainer.addElement(new LoadingView("Loading character data...", progressContainer.getWidth(), progressContainer.getHeight()));
+        App.window.addContainer(progressContainer);
+
+        Character duplicated = new Character(newId, null);
+        App.getThreadPoolManager().submitTask(() -> {
+            duplicated.copy(character);
+            CharacterEditView editView = new CharacterEditView(duplicated, true);
+            Node assemble = editView.getRoot().assemble();
+            Platform.runLater(() -> {
+                App.window.clearContainers();
+                App.window.addContainer(editView.getRoot(), assemble);
+            });
+        });
     }
 
     private void deleteCharacter(FlowLayout base, CardContainer card, Character character, double x, double y) {
