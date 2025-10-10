@@ -340,11 +340,14 @@ public class App extends FXLoad {
     }
 
     public static File getAppDirectory() {
+        // If Main.app passes this is being executed by jpackage executable.
         // If Main.run passes this is being executed by the jar file.
         // When Main.run does not pass, it being executed by the IDE.
         // For testing within the IDE, use JavaFXLoad.main() as your entry point
         // For standard installation, run will pass.
-        if (Main.run) {
+        if (Main.app) {
+            return new File(System.getProperty("user.dir") + "/app/");
+        } else if (Main.run) {
             return new File(System.getProperty("user.dir"));
         } else {
             return new File(System.getenv("APPDATA") + "/chat-app/");
@@ -364,7 +367,7 @@ public class App extends FXLoad {
     }
 
     public static File getModelsDirectory() {
-        return new File(getAppDirectory(), "models/");
+        return new File(getDataDirectory(), "models/");
     }
 
     public static File getCharactersDirectory() {
