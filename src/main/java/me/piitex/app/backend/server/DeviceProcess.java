@@ -24,7 +24,7 @@ public class DeviceProcess {
         };
 
         ProcessBuilder builder = new ProcessBuilder(parameters);
-        builder.redirectOutput(new File(App.getAppDirectory(), "devices.txt"));
+        builder.redirectOutput(new File(App.getDataDirectory(), "devices.txt"));
 
         process = builder.start();
         try {
@@ -39,7 +39,7 @@ public class DeviceProcess {
     public void handleOutput() {
         App.logger.info("Handling input...");
         try {
-            LinkedList<String> lines = new LinkedList<>(Files.readAllLines(new File(App.getAppDirectory(), "devices.txt").toPath()));
+            LinkedList<String> lines = new LinkedList<>(Files.readAllLines(new File(App.getDataDirectory(), "devices.txt").toPath()));
             lines.removeFirst();
             App.getInstance().getSettings().setDevices(lines);
 
