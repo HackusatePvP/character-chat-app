@@ -67,7 +67,7 @@ public class ServerProcess {
         environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
 
         // The server output will be errors even though it's not errors. This is how Java works
-        builder.redirectError(new File(App.getAppDirectory(), "server.txt"));
+        builder.redirectError(new File(App.getDataDirectory(), "server.txt"));
 
         process = null;
         try {
@@ -213,7 +213,7 @@ public class ServerProcess {
 
     protected void waitForServer() {
         App.logger.info("Checking server state...");
-        File output = new File(App.getAppDirectory(), "server.txt");
+        File output = new File(App.getDataDirectory(), "server.txt");
         boolean started = false;
 
         while (!started) {
