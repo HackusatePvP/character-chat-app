@@ -87,12 +87,12 @@ public class App extends FXLoad {
 
         threadPoolManager.submitTask(() -> {
             loading = true;
-            if (Main.run) {
+            if (Main.run || Main.app) {
                 performUpdates();
             }
             loadUserTemplates();
             loadCharacters();
-            App.logger.info("Loaded character data.");
+            App.logger.info("Finished pre-initialization.");
             loading = false;
         });
         appSettings = new AppSettings();
