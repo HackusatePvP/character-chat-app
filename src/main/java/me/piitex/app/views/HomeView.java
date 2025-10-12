@@ -28,7 +28,7 @@ public class HomeView extends EmptyContainer {
         } else {
             setWidth(appSettings.getWidth());
             setHeight(height);
-            root = new HorizontalLayout(appSettings.getWidth() - 200, height);
+            root = new HorizontalLayout(appSettings.getWidth() - 20, height);
         }
 
         addElement(root);

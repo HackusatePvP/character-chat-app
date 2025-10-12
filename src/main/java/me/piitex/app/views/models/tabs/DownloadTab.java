@@ -34,11 +34,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static me.piitex.app.views.Positions.*;
+
 public class DownloadTab extends Tab {
     private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
     private final ScrollContainer scrollContainer;
-    private final VerticalLayout downloadListLayout;
+    private final VerticalLayout layout;
     private static final int TILE_LAYOUT_WIDTH = 400;
     private static final int TILE_LAYOUT_HEIGHT = 75;
     private static final int ICON_X_OFFSET = 20;
@@ -73,28 +75,19 @@ public class DownloadTab extends Tab {
             throw new RuntimeException(e);
         }
 
-        this.downloadListLayout = createMainLayout();
+        this.layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
+        layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
+        layout.setX(20);
+        layout.setPrefSize(appSettings.getWidth() - 500, -1);
 
-        this.scrollContainer = createScrollContainer(downloadListLayout);
+        this.scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setVerticalScroll(true);
+        scrollContainer.setScrollWhenNeeded(true);
+        scrollContainer.setHorizontalScroll(false);
+
         addElement(scrollContainer);
         loadAndBuildDownloadList();
-    }
-
-    private VerticalLayout createMainLayout() {
-        VerticalLayout layout = new VerticalLayout(0, -1);
-        layout.setX(20);
-        layout.setSpacing(10);
-        layout.setPrefSize(appSettings.getWidth() - 500, -1);
-        return layout;
-    }
-
-    private ScrollContainer createScrollContainer(VerticalLayout contentLayout) {
-        ScrollContainer container = new ScrollContainer(contentLayout, 0, 20, appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET, appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET);
-        container.setMaxSize(appSettings.getWidth() - SCROLL_MAX_WIDTH_OFFSET, appSettings.getHeight() - SCROLL_MAX_HEIGHT_OFFSET);
-        container.setVerticalScroll(true);
-        container.setScrollWhenNeeded(true);
-        container.setHorizontalScroll(false);
-        return container;
     }
 
     private void loadAndBuildDownloadList() {
@@ -116,7 +109,7 @@ public class DownloadTab extends Tab {
                 DownloadModel downloadModel = new DownloadModel(key, name, rawLinks);
                 TitledLayout downloadContainer = createDownloadContainer(name, description, downloadModel);
                 Platform.runLater(() -> {
-                    downloadListLayout.addElement(downloadContainer);
+                    layout.addElement(downloadContainer);
                 });
             }
 
@@ -201,8 +194,8 @@ public class DownloadTab extends Tab {
                     createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef, downloader);
 
                     // Add downloads to the top of the view.
-                    downloadListLayout.getPane().getChildren().remove(titledContainer.getTitledPane());
-                    downloadListLayout.getPane().getChildren().addFirst(titledContainer.getTitledPane());
+                    layout.getPane().getChildren().remove(titledContainer.getTitledPane());
+                    layout.getPane().getChildren().addFirst(titledContainer.getTitledPane());
                 }
             });
         }, 500, TimeUnit.MILLISECONDS);
@@ -283,8 +276,8 @@ public class DownloadTab extends Tab {
             }
 
             // Move card to top on download start
-            downloadListLayout.getPane().getChildren().remove(titledContainer.getTitledPane());
-            downloadListLayout.getPane().getChildren().addFirst(titledContainer.getTitledPane());
+            layout.getPane().getChildren().remove(titledContainer.getTitledPane());
+            layout.getPane().getChildren().addFirst(titledContainer.getTitledPane());
             titledContainer.setExpanded(true);
 
             createDownloadInputs(tileLayout, downloadIcon, url, modelKey, fileInfoRef, downloader);

@@ -27,6 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+import static me.piitex.app.views.Positions.*;
+import static me.piitex.app.views.Positions.MODEL_CONFIGURATION_LAYOUT_SPACING;
+
 public class ListTab extends Tab {
     private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
@@ -38,13 +41,12 @@ public class ListTab extends Tab {
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
-        VerticalLayout layout = new VerticalLayout(0, -1);
-        layout.setMaxSize(0, -1);
-        layout.setSpacing(10);
-        layout.setPrefSize(appSettings.getWidth() - 500, 0);
+        VerticalLayout layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
+        layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
+        layout.setX(20);
 
-        scrollContainer = new ScrollContainer(layout, 20, 20, appSettings.getWidth() - 320, appSettings.getHeight() - 200);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 320, appSettings.getHeight() - 200);
+        scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
@@ -73,8 +75,8 @@ public class ListTab extends Tab {
             DecimalFormat df = new DecimalFormat("#.##");
             String formattedFileSize = df.format(fileSizeInGB);
 
-            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 10, -1);
-            root.setMaxSize(scrollContainer.getWidth() - 10, -1);
+            TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 100, -1);
+            root.setMaxSize(root.getWidth(), -1);
             root.addStyle(Styles.DENSE);
             root.setSpacing(30);
             root.setAlignment(Pos.TOP_CENTER);

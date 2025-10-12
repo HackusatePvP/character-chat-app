@@ -31,11 +31,11 @@ public class ModelsView extends EmptyContainer {
         layout.addElement(new SidebarView(layout, false));
         addElement(layout);
 
-        VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
+        VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 265, appSettings.getHeight());
         layout.addElement(main);
 
         // Add the views
-        tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 300, appSettings.getHeight());
+        tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 265, appSettings.getHeight());
         main.addElement(tabsContainer);
 
         buildTabs(tab);

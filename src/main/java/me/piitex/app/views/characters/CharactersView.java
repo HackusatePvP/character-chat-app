@@ -43,7 +43,7 @@ public class CharactersView {
     public CharactersView() {
         VerticalLayout layout = new VerticalLayout(0, -1);
         AppSettings appSettings = App.getInstance().getAppSettings();
-        layout.setMaxSize(appSettings.getWidth() - 400, 0);
+        layout.setMaxSize(appSettings.getWidth() - 265, 0);
         layout.setSpacing(20);
 
         if (App.mobile) {
@@ -55,8 +55,8 @@ public class CharactersView {
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 10, 10, appSettings.getWidth() - 310, -1);
-            root.setMaxSize(appSettings.getWidth() - 300, appSettings.getHeight() - 100);
+            root = new ScrollContainer(layout, 10, 10, layout.getMaxWidth(), -1);
+            root.setMaxSize(root.getWidth(), appSettings.getHeight() - 100);
             imageWidth = 256;
             imageHeight = 256;
             cardWidth = 280;

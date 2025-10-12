@@ -66,7 +66,7 @@ public class Positions {
         // -1 is computed size
         CHAT_VIEW_SCROLL_X = 0;
         CHAT_VIEW_SCROLL_Y = 10; // Small y offset
-        CHAT_VIEW_SCROLL_WIDTH = window.getWidth() - 250;
+        CHAT_VIEW_SCROLL_WIDTH = window.getWidth() - 225;
         CHAT_VIEW_SCROLL_HEIGHT = window.getHeight() - 250;
         CHAT_VIEW_SELECTION_X = window.getWidth() / 2;
         CHAT_VIEW_SELECTION_WIDTH = 100;
@@ -83,9 +83,9 @@ public class Positions {
 
         SIDEBAR_WIDTH = 200;
         SIDEBAR_WIDTH_COLLAPSE = 50;
-        SIDEBAR_HEIGHT = 1000;
+        SIDEBAR_HEIGHT = (int) window.getHeight();
 
-        MODEL_CONFIGURATION_SCROLL_WIDTH = window.getWidth() - 300;
+        MODEL_CONFIGURATION_SCROLL_WIDTH = window.getWidth() - 265;
         MODEL_CONFIGURATION_SCROLL_HEIGHT = window.getHeight() - 200;
         MODEL_CONFIGURATION_LAYOUT_WIDTH = MODEL_CONFIGURATION_SCROLL_WIDTH - 20;
         MODEL_CONFIGURATION_LAYOUT_HEIGHT = -1;
