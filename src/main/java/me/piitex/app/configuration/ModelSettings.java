@@ -1,6 +1,5 @@
 package me.piitex.app.configuration;
 
-
 import com.drew.lang.annotations.Nullable;
 import me.piitex.engine.configurations.InfoFile;
 

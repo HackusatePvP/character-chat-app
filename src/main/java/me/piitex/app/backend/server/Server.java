@@ -293,9 +293,7 @@ public class Server {
      * Handles the logic for exiting the <think> block, collapsing the reasoning card,
      * and updating the final response card body.
      */
-    private static void handleThinkTagCleanupAndDisplay(
-            String updated, VerticalLayout chatMessageBox, CardContainer card, Response response) {
-
+    private static void handleThinkTagCleanupAndDisplay(String updated, VerticalLayout chatMessageBox, CardContainer card, Response response) {
         // Check if the </think> closing tag has appeared and there is content after it
         if (updated.contains("</think>") && updated.split("</think>").length > 1) {
 
