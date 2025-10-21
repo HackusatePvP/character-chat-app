@@ -47,12 +47,11 @@ A: Cuda and HIP typically provide better performance, but you will have to insta
 
 This section outlines the general steps to get you started. More detailed instructions for specific dependencies are provided in the sections that follow.
 
-1. Download [Releases.zip](https://github.com/HackusatePvP/character-chat-app/releases).
-2. (Optional) Download the updated jar if applicable.
-3. (Optional) Download AI GPU drivers (Cuda, HIP)
-4. Extract all files into `%APPDATA%/chat-app`
-5. Enter `chat-app`
-6. Run `run.bat`
+1. Download the [zip archive](https://github.com/HackusatePvP/character-chat-app/releases).
+2. (Optional) Download AI GPU drivers (Cuda, HIP)
+3. Extract all files into `%APPDATA%/chat-app`
+4. Enter `chat-app`
+5. Run `run.bat`
 
 ## Install Application
 Download the official release from [Releases](https://github.com/HackusatePvP/character-chat-app/releases)
@@ -81,18 +80,19 @@ You need to ensure you have the latest release downloaded and extracted into %ap
 
 
 ### Modifying
-Navigate to `JavaFXLoad.java`. Inside Intellij there will be a green arrow on the class line, and main() function. Click the green arrow on either of these.
+Navigate to `App.java`. Inside Intellij there will be a green arrow on the class line, and main() function. Click the green arrow on either of these.
 
 A configuration dialogue may open, if so set the JDK to 25. The app should start.
 
-Make changes to the source and test them by running the JavaFXLoad entry point.
+Make changes to the source and test them by running the App.main() entry point.
 
-`TIP: Run configurations will be pinned to the right. Just press the green arrow on the top right. (Shift+F10)`
+`TIP: Run configurations will be pinned to the right. Just press the green arrow on the top right or (Shift+F10)`
 
 ### Compiling
 Ensure you have [RenEngine](https://github.com/HackusatePvP/RenEngine) compiled following its instructions.
 
 In the project directory run the follow.
+
 ```bash
 mvnw clean install
 ```
