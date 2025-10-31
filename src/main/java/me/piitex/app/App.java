@@ -1,7 +1,9 @@
 package me.piitex.app;
+import atlantafx.base.theme.PrimerDark;
 import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -18,9 +20,14 @@ import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.configurations.InfoFile;
 import me.piitex.engine.Window;
+import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.fxloader.FXLoad;
 import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.overlays.AlertOverlay;
+import me.piitex.engine.overlays.ButtonBuilder;
+import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.os.FileDownloader;
+import me.piitex.os.ProcessUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +59,7 @@ public class App extends FXLoad {
     public static final Logger logger = LogManager.getLogger(App.class);
 
     private volatile boolean loading = true;
+    private volatile boolean error = false;
 
     // Used for testing with the IDE!
     static void main() {
@@ -63,6 +71,23 @@ public class App extends FXLoad {
     public void preInitialization() {
         logger.info("Initializing application...");
         instance = this;
+        settings = new ServerSettings();
+
+        long currentPid = ProcessHandle.current().pid();
+        if (settings.getInfoFile().hasKey("main-pid")) {
+            String pid = settings.getInfoFile().get("main-pid");
+            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
+                logger.error("Process already running!");
+                error = true;
+                Platform.runLater(() -> {
+                    buildErrorWindow("Process is already running!").render();
+                });
+                return;
+            }
+        }
+
+        settings.getInfoFile().set("main-pid", currentPid);
+
         threadPoolManager = new ThreadPoolManager();
 
         if (getAppDirectory().mkdirs()) {
@@ -96,12 +121,13 @@ public class App extends FXLoad {
             loading = false;
         });
         appSettings = new AppSettings();
-        settings = new ServerSettings();
-        settings.getInfoFile().set("main-pid", ProcessHandle.current().pid());
     }
 
     @Override
     public void initialization(Stage initialStage) {
+        // Error will pass if another instance is running,
+        if (error) return;
+
         AppSettings appSettings = App.getInstance().getAppSettings();
         Application.setUserAgentStylesheet(appSettings.getStyleTheme(appSettings.getTheme()).getUserAgentStylesheet());
 
@@ -143,7 +169,6 @@ public class App extends FXLoad {
             setWidth = width;
             setHeight = height;
         }
-
 
         logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
         logger.info("Screen Size ({},{})", dimension.width, dimension.height);
@@ -335,6 +360,45 @@ public class App extends FXLoad {
         return userTemplates;
     }
 
+    public Window buildErrorWindow(String message) {
+        if (window != null) {
+            window.close();
+        }
+
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+
+        EmptyContainer emptyContainer = new EmptyContainer(window.getWidth(), window.getHeight());
+        window.addContainer(emptyContainer);
+
+        AlertOverlay alertOverlay = new AlertOverlay("Error", Alert.AlertType.ERROR);
+        alertOverlay.setContent(message);
+        emptyContainer.addElement(alertOverlay);
+
+        ButtonOverlay kill = new ButtonBuilder("kill").setText("Kill").build();
+        kill.setX(200);
+        kill.setY(50);
+        emptyContainer.addElement(kill);
+        kill.onClick(event -> {
+            App.logger.info("Killing old process.");
+            if (ProcessUtil.killProcess(Long.parseLong(settings.getInfoFile().get("main-pid")))) {
+                App.logger.info("Old process was destroyed gracefully.");
+                Platform.exit();
+                System.exit(0);
+            } else {
+                App.logger.info("Forcefully killing old process.");
+                ProcessUtil.terminateProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
+            }
+        });
+
+        window.getStage().setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(1);
+        });
+
+        return window;
+    }
+
     public static App getInstance() {
         return instance;
     }
@@ -343,7 +407,7 @@ public class App extends FXLoad {
         // If Main.app passes this is being executed by jpackage executable.
         // If Main.run passes this is being executed by the jar file.
         // When Main.run does not pass, it being executed by the IDE.
-        // For testing within the IDE, use JavaFXLoad.main() as your entry point
+        // For testing within the IDE, use App.main() as your entry point
         // For standard installation, run will pass.
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
