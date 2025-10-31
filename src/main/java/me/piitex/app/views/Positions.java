@@ -72,13 +72,13 @@ public class Positions {
         CHAT_VIEW_SELECTION_WIDTH = 100;
         CHAT_VIEW_SELECTION_HEIGHT = 50;
         CHAT_BOX_WIDTH = CHAT_VIEW_SCROLL_WIDTH - 10;
-        CHAT_BOX_HEIGHT = VBox.USE_COMPUTED_SIZE;
+        CHAT_BOX_HEIGHT = -1;
         CHAT_BOX_IMAGE_WIDTH = window.getWidth() - (window.getWidth() / 3);
         CHAT_BOX_IMAGE_HEIGHT = -1;
         CHAT_BOX_BUTTON_BOX_WIDTH = 900;
         CHAT_BOX_BUTTON_BOX_HEIGHT = 50;
-        CHAT_SEND_BOX_WIDTH =  500;
-        CHAT_SEND_BOX_HEIGHT = -1;
+        CHAT_SEND_BOX_WIDTH =  600;
+        CHAT_SEND_BOX_HEIGHT = 150;
         CHAT_TEXTFLOW_WIDTH = CHAT_BOX_WIDTH - 50;
 
         SIDEBAR_WIDTH = 200;
