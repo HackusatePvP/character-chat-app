@@ -104,7 +104,8 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.openjfx</groupId>
-                    <artifactId>*</artifactId> </exclusion>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -209,11 +210,13 @@
                                 </filter>
                             </filters>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>me.piitex.app.Main</mainClass>
                                 </transformer>
                                 <!-- Need for Ikonli fonts to work -->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                         </configuration>
                     </execution>
@@ -225,47 +228,46 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>move-shaded-jar</id>
-                        <phase>package</phase> <!-- This phase runs after the JAR is created by shade plugin -->
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- Define source and destination paths -->
-                                <property name="source.jar" value="${project.build.directory}/character-chat-app.jar"/>
-                                <property name="destination.dir" value="${basedir}/src/main/resources/windows/chat-app/"/>
-                                <property name="destination.jar.path" value="${destination.dir}/character-chat-app.jar"/>
+                <configuration>
+                    <target>
+                        <!-- Define source and destination paths -->
+                        <property name="source.jar" value="${project.build.directory}/character-chat-app.jar"/>
+                        <property name="destination.dir" value="${basedir}/src/main/resources/windows/chat-app/"/>
+                        <property name="destination.jar.path" value="${destination.dir}/character-chat-app.jar"/>
 
-                                <property name="release.zip.dir" value="${basedir}/src/main/resources/windows/"/>
-                                <property name="release.zip.file" value="${release.zip.dir}/Windows-release.zip"/>
-                                <property name="content.to.zip.dir" value="${basedir}/src/main/resources/windows/"/> <available file="${source.jar}" property="jar.exists"/>
-                                <fail unless="jar.exists" message="ERROR: Source JAR not found at ${source.jar}. Please ensure maven-shade-plugin is configured correctly and runs before this plugin."/>
+                        <property name="release.zip.dir" value="${basedir}/src/main/resources/windows/"/>
+                        <property name="release.zip.file" value="${release.zip.dir}/Windows-release.zip"/>
+                        <property name="content.to.zip.dir" value="${basedir}/src/main/resources/windows/"/>
+                        <available file="${source.jar}" property="jar.exists"/>
 
-                                <!-- Check if the source JAR exists before attempting to move -->
-                                <available file="${source.jar}" property="jar.exists"/>
-                                <fail unless="jar.exists" message="ERROR: Source JAR not found at ${source.jar}. Please ensure maven-shade-plugin is configured correctly and runs before this plugin."/>
+                        <available file="${content.to.zip.dir}" type="dir" property="content.dir.found"/>
+                        <fail unless="content.dir.found"
+                              message="ERROR: Required content directory does not exist at path: ${content.to.zip.dir}"/>
 
-                                <!-- Optional: Delete existing JAR in destination to prevent conflicts/locks -->
-                                <delete file="${destination.jar.path}" failonerror="false"/>
+                        <fail unless="jar.exists"
+                              message="ERROR: Source JAR not found at ${source.jar}. Please ensure maven-shade-plugin is configured correctly and runs before this plugin."/>
 
-                                <!-- Create the destination directory if it doesn't exist -->
-                                <mkdir dir="${destination.dir}"/>
+                        <!-- Check if the source JAR exists before attempting to move -->
+                        <available file="${source.jar}" property="jar.exists"/>
+                        <fail unless="jar.exists"
+                              message="ERROR: Source JAR not found at ${source.jar}. Please ensure maven-shade-plugin is configured correctly and runs before this plugin."/>
 
-                                <!-- Move the JAR file -->
-                                <copy file="${source.jar}" todir="${destination.dir}"/>
+                        <!-- Optional: Delete existing JAR in destination to prevent conflicts/locks -->
+                        <delete file="${destination.jar.path}" failonerror="false"/>
 
-                                <mkdir dir="${release.zip.dir}"/>
+                        <!-- Create the destination directory if it doesn't exist -->
+                        <mkdir dir="${destination.dir}"/>
 
-                                <delete file="${release.zip.file}" failonerror="false"/>
+                        <!-- Move the JAR file -->
+                        <copy file="${source.jar}" todir="${destination.dir}"/>
 
-                                <zip destfile="${release.zip.file}" basedir="${content.to.zip.dir}"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
+                        <mkdir dir="${release.zip.dir}"/>
+
+                        <delete file="${release.zip.file}" failonerror="false"/>
+
+                        <zip destfile="${release.zip.file}" basedir="${content.to.zip.dir}"/>
+                    </target>
+                </configuration>
                 <!-- YOU CAN SAFELY REMOVE THIS! This is for automating build releases. -->
                 <dependencies>
                     <dependency>
