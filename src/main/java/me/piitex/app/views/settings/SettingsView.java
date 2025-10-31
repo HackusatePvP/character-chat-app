@@ -2,6 +2,7 @@ package me.piitex.app.views.settings;
 
 import atlantafx.base.theme.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
@@ -309,6 +310,11 @@ public class SettingsView {
                     (int)(color.getGreen() * 255) + "," +
                     (int)(color.getBlue() * 255) +
                     ")]\"This is quoted text.\"[/color]).");
+
+            Platform.runLater(() -> {
+                // Re-display main window
+                App.window.getStage().requestFocus();
+            });
         });
 
         tileContainer.setAction(colorPickerOverlay);
@@ -343,6 +349,11 @@ public class SettingsView {
                     (int)(color.getGreen() * 255) + "," +
                     (int)(color.getBlue() * 255) +
                     ")]*This is astrix text.*[/color]).");
+
+            Platform.runLater(() -> {
+                // Re-display main window
+                App.window.getStage().requestFocus();
+            });
         });
         tileContainer.setAction(colorPickerOverlay);
 
