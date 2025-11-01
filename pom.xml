@@ -41,7 +41,7 @@
         <!-- Compile from my GitHub repo, RenEngine. https://github.com/HackusatePvP/RenEngine -->
         <dependency>
             <groupId>me.piitex.engine</groupId>
-            <artifactId>RenEngine</artifactId>
+            <artifactId>ren-engine</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
