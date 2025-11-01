@@ -1,7 +1,7 @@
 package me.piitex.app.backend;
 
 import me.piitex.app.App;
-import me.piitex.engine.configurations.InfoFile;
+import me.piitex.os.configurations.InfoFile;
 import me.piitex.app.configuration.ModelSettings;
 
 import java.io.File;

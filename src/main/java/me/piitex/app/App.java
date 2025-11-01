@@ -18,7 +18,7 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
-import me.piitex.engine.configurations.InfoFile;
+import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.Window;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.fxloader.FXLoad;
@@ -142,7 +142,6 @@ public class App extends FXLoad {
         // For testing, remove later.
         //width = 600;
         //height = 1200;
-
         if (width < 900) {
             logger.info("Using mobile layouts...");
             // Set mobile view

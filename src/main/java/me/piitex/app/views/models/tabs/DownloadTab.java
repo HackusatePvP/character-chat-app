@@ -10,7 +10,7 @@ import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.engine.configurations.ConfigUtil;
+import me.piitex.os.configurations.ConfigUtil;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.containers.tabs.TabsContainer;

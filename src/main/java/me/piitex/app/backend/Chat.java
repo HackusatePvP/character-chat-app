@@ -1,7 +1,7 @@
 package me.piitex.app.backend;
 
 import me.piitex.app.App;
-import me.piitex.engine.configurations.FileCrypter;
+import me.piitex.os.configurations.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
 import java.io.File;

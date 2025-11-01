@@ -5,7 +5,7 @@ import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharacterEditView;
-import me.piitex.engine.configurations.InfoFile;
+import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;

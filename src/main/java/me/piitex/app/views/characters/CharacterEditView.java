@@ -17,7 +17,7 @@ import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.characters.tabs.*;
 import me.piitex.engine.Container;
 import me.piitex.engine.PopupPosition;
-import me.piitex.engine.configurations.InfoFile;
+import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.tabs.Tab;
