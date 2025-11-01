@@ -37,7 +37,6 @@ public class SettingsView {
     }
 
     public void build() {
-
         HorizontalLayout root = new HorizontalLayout(0, 0);
         root.setSpacing(35);
         container.addElement(root);
@@ -274,6 +273,11 @@ public class SettingsView {
                     (int)(color.getGreen() * 255) + "," +
                     (int)(color.getBlue() * 255) +
                     ")]This is regular text[/color]).");
+
+            Platform.runLater(() -> {
+                // Re-display main window
+                App.window.getStage().requestFocus();
+            });
         });
 
         tileContainer.setAction(colorPickerOverlay);
