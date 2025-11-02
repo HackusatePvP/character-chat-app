@@ -146,24 +146,8 @@ public class ButtonBoxLayout extends HorizontalLayout {
             regenerate.addStyle(Styles.WARNING);
             regenerate.setTooltip("Regenerate the response.");
             addElement(regenerate);
-            regenerate.onClick(event -> {
-                if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isLoading() || ServerProcess.getCurrentServer().isError()) return;
-
-                if (index + 1 != chat.getMessages().size()) {
-                    return;
-                }
-
-                // Remove the line which is the last line of the chat
-                chat.removeMessage(index);
-                parentView.getLayout().removeElement(parentView.getLayout().getElements().lastKey());
-
-                VerticalLayout responseBox = parentView.buildChatBox(chatMessage, chat.getMessages().size());
-                Response response = new Response(index, chat.getLastLine(index).getContent(), character, character.getUser(), chat);
-                chat.setResponse(response);
-
-                parentView.getSend().setEnabled(false);
-                parentView.getSubmit().setEnabled(false);
-                parentView.generateResponse(response, chatMessage, responseBox);
+            regenerate.onClick(_ -> {
+                parentView.regenerateLastResponse();
             });
         }
     }

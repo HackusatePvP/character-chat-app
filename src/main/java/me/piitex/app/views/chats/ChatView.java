@@ -441,6 +441,29 @@ public class ChatView extends EmptyContainer {
         topControls.addElement(stop);
     }
 
+    public void regenerateLastResponse() {
+        if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isLoading() || ServerProcess.getCurrentServer().isError()) return;
+        App.logger.info("Regenerating last response...");
+        int index = chat.getMessages().lastIndexOf(chat.getMessages().getLast());
+        if (index + 1 != chat.getMessages().size()) {
+            return;
+        }
+
+        ChatMessage chatMessage = chat.getMessages().getLast();
+
+        // Remove the line which is the last line of the chat
+        chat.removeMessage(index);
+        getLayout().removeElement(getLayout().getElements().lastKey());
+
+        VerticalLayout responseBox = buildChatBox(chatMessage, chat.getMessages().size());
+        Response response = new Response(index, chat.getLastLine(index).getContent(), character, character.getUser(), chat);
+        chat.setResponse(response);
+
+        getSend().setEnabled(false);
+        getSubmit().setEnabled(false);
+        generateResponse(response, chatMessage, responseBox);
+    }
+
     public VerticalLayout buildResponseProgress() {
         VerticalLayout root = new VerticalLayout(150, 30);
         root.setMaxSize(root.getWidth(), root.getHeight());
