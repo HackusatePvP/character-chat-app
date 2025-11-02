@@ -457,9 +457,9 @@ public class CharacterEditView {
         App.getThreadPoolManager().submitTask(() -> {
             try {
                 int tokenSize = Server.tokenize(textToTokenize.toString());
-                App.logger.warn("Character context size too big. ({}/{})", tokenSize, chatContextSize);
                 Platform.runLater(() -> {
                     if (tokenSize > (chatContextSize / 2)) {
+                        App.logger.warn("Character context size too big. ({}/{})", tokenSize, chatContextSize);
                         MessageOverlay tokenWarning = new MessageOverlay(0, 0, 400, 100, "Token Size", "Your character uses more context than you have configured. (" + tokenSize + "/" + chatContextSize + "). You should aim to use at most half the available context.");
                         tokenWarning.setMaxWidth(tokenWarning.getWidth());
                         tokenWarning.addStyle(Styles.WARNING);
