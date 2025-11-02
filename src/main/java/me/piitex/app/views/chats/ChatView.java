@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.util.Duration;
 import me.piitex.app.App;
@@ -100,6 +101,11 @@ public class ChatView extends EmptyContainer {
         setWidth(appSettings.getWidth());
         setHeight(appSettings.getHeight());
         addStyle(Styles.BG_INSET);
+        onKeyPress(event -> {
+            if (event.getEvent().isControlDown() && event.getEvent().getCode() == KeyCode.R) {
+                regenerateLastResponse();
+            }
+        });
 
         HorizontalLayout main = new HorizontalLayout(appSettings.getWidth(), 0);
         main.setSpacing(5);
