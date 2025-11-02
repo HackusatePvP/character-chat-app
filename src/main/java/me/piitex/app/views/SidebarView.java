@@ -8,6 +8,7 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
+import me.piitex.app.views.users.UsersView;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.Renderer;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -100,6 +101,9 @@ public class SidebarView extends VerticalLayout {
             MessageOverlay warning = new MessageOverlay("Development", "User templates are still in development.");
             warning.addStyle(Styles.WARNING);
             App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 400, 100, true);
+
+            App.window.clearContainers();
+            App.window.addContainer(new UsersView());
         });
 
         ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").build();
