@@ -22,11 +22,6 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
 ## 💻 Compatibility
 Only works with Windows 10/11. Linux and Mac are being explored.
 
-### Mobile
-Some views are mobile supported but the application isn't. You will have to use remote desktop applications to connect to your pc remotely.
-
-The views are extremely experimental and may not function properly.
-
 ## Code Stack
 * [JavaFX](https://openjfx.io) The GUI library.
 * [AtlantaFX](https://github.com/mkpaz/atlantafx) Modernized styling for JavaFX.
@@ -43,25 +38,11 @@ Q: What's the difference between the backends?
 
 A: Cuda and HIP typically provide better performance, but you will have to install necessary drivers. Vulkan works for most GPUs without the need of third party installations. Cuda requires an Nvidia card. HIP requires an AMD card.
 
-## 🚀 Installation
+## Download / Installation
+There are two ways to download and install the application. All downloads are located in [releases](https://github.com/HackusatePvP/character-chat-app/releases).
 
-This section outlines the general steps to get you started. More detailed instructions for specific dependencies are provided in the sections that follow.
-
-1. Download the [zip archive](https://github.com/HackusatePvP/character-chat-app/releases).
-2. (Optional) Download AI GPU drivers (Cuda, HIP)
-3. Extract all files into `%APPDATA%/chat-app`
-4. Enter `chat-app`
-5. Run `run.bat`
-
-## Install Application
-Download the official release from [Releases](https://github.com/HackusatePvP/character-chat-app/releases)
-
-Extract the zip file into %APPDATA%. In your Roaming folder you should see a new folder called `chat-app`
-
-Next run the application.
-
-1. You might be able to launch the .jar file by clicking on it like an exe. (Only works if you have java configured properly)
-2. Execute `run.bat` or use the java command `java -jar {jar-name}.jar`
+1. **Executable:** Download either the `.exe` or `.msi` installer. Launch the file to install the program. You can optionally create a start-menu and desktop short-cut.
+2. **Zip:** Download the `.zip` file and extract it. Use `run.bat` or `run_console.bat` to launch the app.
 
 ## Installing / Downloading Models
 Only GGUF format is supported. Please refer to [Converting Models]() for converting to GGUF models.
@@ -105,7 +86,7 @@ Download the latest releases. This is needed for necessary backend and sdk files
 
 ### Errors
 If the app does not launch check the following:
-1. Ensure C++ Redistruables are installed. This is required for both llamacpp and RenEngine.
+1. Ensure C++ Redistributables are installed. This is required for both llamacpp and RenEngine.
 2. Ensure your java compiler is set to JDK 25. Sometimes your Windows Java and IDE Java are two different things.
 3. Ensure you installed the latest release.
 4. Invalidate caches and restart.
