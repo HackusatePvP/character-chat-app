@@ -31,7 +31,6 @@ public class UserLoreBookTab extends Tab {
         buildLorebookTabContent();
     }
 
-
     public void buildLorebookTabContent() {
         removeAllElements();
 

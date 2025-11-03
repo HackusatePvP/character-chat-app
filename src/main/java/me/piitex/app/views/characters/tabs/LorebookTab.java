@@ -26,7 +26,7 @@ public class LorebookTab extends Tab {
     private InputFieldOverlay addKeyInput;
     private TextAreaOverlay addValueInput;
     private ScrollContainer scrollLoreContainer;
-    private final Map<String, String> loreItems ;
+    private final Map<String, String> loreItems;
 
 
     public LorebookTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
