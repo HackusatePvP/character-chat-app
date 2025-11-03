@@ -10,6 +10,7 @@ import java.io.File;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class User {
     private final String id;
@@ -19,7 +20,7 @@ public class User {
 
     private InfoFile infoFile;
 
-    private Map<String, String> lorebook = new HashMap<>();
+    private TreeMap<String, String> lorebook = new TreeMap<>();
 
     // Create user
     public User(String id) {
@@ -47,7 +48,7 @@ public class User {
             this.iconPath = infoFile.get("icon-path");
         }
         if (infoFile.hasKey("lore")) {
-            this.lorebook = infoFile.getStringMap("lore");
+            this.lorebook = infoFile.getSortedStringMap("lore");
         }
     }
 
@@ -64,7 +65,7 @@ public class User {
             this.iconPath = infoFile.get("icon-path");
         }
         if (infoFile.hasKey("lore")) {
-            this.lorebook = infoFile.getStringMap("lore");
+            this.lorebook = infoFile.getSortedStringMap("lore");
         }
     }
 
@@ -107,7 +108,7 @@ public class User {
         this.infoFile = new InfoFile(new File(getUserDirectory(), "user.info"), true);
     }
 
-    public Map<String, String> getLorebook() {
+    public TreeMap<String, String> getLorebook() {
         return lorebook;
     }
 
@@ -121,7 +122,7 @@ public class User {
         infoFile.set("lore", lorebook);
     }
 
-    public void setLorebook(Map<String, String> lorebook) {
+    public void setLorebook(TreeMap<String, String> lorebook) {
         this.lorebook = lorebook;
         infoFile.set("lore", lorebook);
     }
