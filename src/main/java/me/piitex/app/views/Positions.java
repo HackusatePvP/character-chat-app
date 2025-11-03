@@ -95,7 +95,6 @@ public class Positions {
     private static void initializeMobile() {
         // Assuming the view is 600 x 1200 (Vertical display)
         // Should work for other values but designed for that resolution
-        AppSettings appSettings = App.getInstance().getAppSettings();
         CHAT_VIEW_SCROLL_HEIGHT = App.window.getHeight() - 300;
         CHAT_VIEW_SCROLL_WIDTH = App.window.getWidth() - 100;
         CHAT_BOX_WIDTH = CHAT_VIEW_SCROLL_WIDTH - 10;
@@ -106,7 +105,7 @@ public class Positions {
         CHAT_BOX_BUTTON_BOX_WIDTH = CHAT_BOX_WIDTH;
         CHAT_BOX_BUTTON_BOX_HEIGHT = 50;
         CHAT_SEND_BOX_WIDTH = 400;
-        CHAT_SEND_BOX_HEIGHT = 100;
+        CHAT_SEND_BOX_HEIGHT = 200;
         CHAT_BOX_IMAGE_WIDTH = CHAT_BOX_WIDTH - 10;
         CHAT_TEXTFLOW_WIDTH = CHAT_BOX_WIDTH - 50;
 
