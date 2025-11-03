@@ -7,9 +7,6 @@ import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.ImageOverlay;
 
 import java.io.File;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class User {
@@ -140,6 +137,7 @@ public class User {
         if (!file.exists()) {
             return null;
         }
+
 
         ImageLoader loader = new ImageLoader(file);
         loader.setWidth(width);

@@ -1,14 +1,11 @@
-package me.piitex.app.views.characters.tabs;
+package me.piitex.app.views.users.tabs;
 
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
-import me.piitex.app.backend.Character;
-import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.os.configurations.InfoFile;
-import me.piitex.app.views.characters.CharacterEditView;
+import me.piitex.app.views.users.UserEditView;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
@@ -18,33 +15,25 @@ import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserTab extends Tab {
+    private final UserEditView userEditView;
 
-    private final AppSettings appSettings;
-    private final InfoFile infoFile;
-    private final CharacterEditView parentView;
-
+    private InputFieldOverlay userIdInput;
     private InputFieldOverlay userDisplayNameInput;
     private RichTextAreaOverlay userDescription;
 
     private ImageOverlay image;
 
-    public UserTab(AppSettings appSettings, InfoFile infoFile, Character character, CharacterEditView parentView) {
-        super("User");
-        this.appSettings = appSettings;
-        this.infoFile = infoFile;
-        this.parentView = parentView;
+    private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
-        buildUserTabContent();
+    public UserTab(String text, UserEditView userEditView) {
+        super(text);
+        this.userEditView = userEditView;
+        init();
     }
 
-    private void buildUserTabContent() {
-        this.setWidth(appSettings.getWidth() - 300);
-        this.setHeight(appSettings.getHeight());
-
+    public void init() {
         VerticalLayout rootLayout = new VerticalLayout(appSettings.getWidth() - 315, 0);
         rootLayout.setSpacing(40);
         rootLayout.setAlignment(Pos.TOP_CENTER);
@@ -66,15 +55,14 @@ public class UserTab extends Tab {
         displayBox.addElement(buildUserInput());
 
         double scaleFactor = (double) appSettings.getWidth() / 1920.0;
-        userDescription = new RichTextAreaOverlay(parentView.getUserPersona(), 600, 400 * scaleFactor);
+        userDescription = new RichTextAreaOverlay(userEditView.getUserPersona(), 600, 400 * scaleFactor);
         userDescription.setBackgroundColor(appSettings.getThemeDefaultColor(appSettings.getTheme()));
         userDescription.setBorderColor(appSettings.getThemeBorderColor(appSettings.getTheme()));
         userDescription.setTextFill(appSettings.getThemeTextColor(appSettings.getTheme()));
         userDescription.setMaxHeight(400 * scaleFactor);
         userDescription.setMaxWidth(600);
         userDescription.onInputSetEvent(event -> {
-            parentView.setUserPersona(event.getInput());
-            parentView.warnTokens();
+            userEditView.setUserPersona(event.getInput());
         });
         userDescription.addStyle(Styles.BG_DEFAULT);
         userDescription.addStyle(appSettings.getChatTextSize());
@@ -82,7 +70,7 @@ public class UserTab extends Tab {
 
         rootLayout.addElement(userDescription);
 
-        this.addElement(parentView.buildSubmitBox());
+        addElement(userEditView.buildSubmitBox());
     }
 
     private CardContainer buildUserDisplay() {
@@ -94,7 +82,7 @@ public class UserTab extends Tab {
         layout.setSpacing(25);
 
         // Use parentView's userIconPath
-        File currentIconPath = parentView.getUserIconPath();
+        File currentIconPath = userEditView.getUserIconPath();
         if (currentIconPath == null || !currentIconPath.exists() || currentIconPath.isDirectory()) {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
@@ -123,11 +111,9 @@ public class UserTab extends Tab {
             }
             File selectedFile = chooser.showOpenDialog(App.window.getStage());
             if (selectedFile != null) {
-                parentView.setUserIconPath(selectedFile);
+                userEditView.setUserIconPath(selectedFile);
                 appSettings.setImagesPath(selectedFile.getParent());
-                infoFile.set("icon-path-user", selectedFile.getAbsolutePath());
-
-                parentView.updateInfoData();
+                userEditView.setUserIconPath(selectedFile.getAbsoluteFile());
 
                 ImageLoader imageLoader = new ImageLoader(selectedFile);
                 imageLoader.setWidth(256);
@@ -146,52 +132,27 @@ public class UserTab extends Tab {
         root.setMaxSize(250, 200);
         root.setSpacing(10);
 
-        List<String> users = new ArrayList<>();
-        users.add("None");
-        users.addAll(App.getInstance().getUserTemplates().keySet());
+        userIdInput = new InputFieldOverlay(userEditView.getUserId(), 0, 0, 200, 50);
+        userIdInput.setEnabled(true);
+        userIdInput.setHintText("Unique Identifier");
+        userIdInput.onInputSetEvent(event -> {
+            userEditView.setUserId(event.getInput());
+        });
+        root.addElement(userIdInput);
 
-        ChoiceBoxOverlay templates = new ChoiceBoxOverlay(users, 200, 50);
-        root.addElement(templates);
-
-        userDisplayNameInput = new InputFieldOverlay(parentView.getUserDisplay(), 0, 0, 200, 50);
+        userDisplayNameInput = new InputFieldOverlay(userEditView.getUserDisplay(), 0, 0, 200, 50);
         userDisplayNameInput.setEnabled(true);
         userDisplayNameInput.setHintText("Display Name");
         userDisplayNameInput.onInputSetEvent(event -> {
-            parentView.setUserDisplay(event.getInput());
+            userEditView.setUserDisplay(event.getInput());
         });
         root.addElement(userDisplayNameInput);
 
-        // Set default selection for templates if a user is already set
-        if (parentView.getUser() != null) {
-            templates.setDefaultItem(parentView.getUser().getId()); // Assuming user ID is the template name
-        } else {
-            templates.setDefaultItem("None");
-        }
-
-        templates.onItemSelect(event -> {
-            String item = event.getNewValue();
-            if (item.isEmpty()) return;
-            User template = null;
-            if (!item.equalsIgnoreCase("none")) {
-                template = App.getInstance().getUser(item); // Set user object in parentView
-            } else {
-                userDescription.setCurrentText("");
-                userDisplayNameInput.setCurrentText("");
-            }
-
-            if (template != null) {
-                userDisplayNameInput.setCurrentText(template.getDisplayName());
-                userDescription.setCurrentText(template.getPersona());
-
-                if (template.getIconPath() != null && !template.getIconPath().isEmpty()) {
-                    parentView.setUserIconPath(new File(template.getIconPath()));
-                }
-            }
-
-            parentView.updateInfoData();
-        });
-
         return root;
+    }
+
+    public InputFieldOverlay getUserIdInput() {
+        return userIdInput;
     }
 
     public InputFieldOverlay getUserDisplayNameInput() {

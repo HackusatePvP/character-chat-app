@@ -50,6 +50,10 @@ public class UsersView extends EmptyContainer {
         ButtonOverlay newUser = new ButtonBuilder("new").setText("New User").build();
         newUser.addStyle(Styles.SUCCESS);
         newUser.addStyle(Styles.BUTTON_OUTLINED);
+        newUser.onClick(_ -> {
+            App.window.clearContainers();
+            App.window.addContainer(new UserEditView());
+        });
         header.addElement(newUser);
         header.addElement(new SeparatorOverlay(Orientation.HORIZONTAL));
 
