@@ -1,23 +1,33 @@
 package me.piitex.app.views.users;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.LoadingView;
 import me.piitex.app.views.SidebarView;
+import me.piitex.engine.Container;
 import me.piitex.engine.containers.CardContainer;
+import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
+import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class UsersView extends EmptyContainer {
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
@@ -86,15 +96,15 @@ public class UsersView extends EmptyContainer {
 
             MenuItem edit = new MenuItem("Edit");
             edit.setOnAction(event -> {
-
+                editUser(user);
             });
             MenuItem copy = new MenuItem("Copy");
             copy.setOnAction(event -> {
-
+                duplicateUser(user);
             });
             MenuItem delete = new MenuItem("Delete");
             delete.setOnAction(event -> {
-
+                deleteUser(user, flowLayout, card);
             });
 
             contextMenu.getItems().add(edit);
@@ -128,20 +138,20 @@ public class UsersView extends EmptyContainer {
         FontIcon editIcon = new FontIcon(Material2AL.EDIT);
         editIcon.setIconSize(16);
         TextOverlay edit = new TextOverlay(editIcon);
-        edit.setTooltip("Edit the character");
+        edit.setTooltip("Edit the user");
         edit.addStyle(Styles.ACCENT);
         edit.onClick(event -> {
-
+            editUser(user);
         });
         root.addElement(edit);
 
         FontIcon duplicateIcon = new FontIcon(Material2AL.FILE_COPY);
         duplicateIcon.setIconSize(16);
         TextOverlay duplicate = new TextOverlay(duplicateIcon);
-        duplicate.setTooltip("Duplicate the character.");
+        duplicate.setTooltip("Duplicate the user.");
         duplicate.addStyle(Styles.WARNING);
         duplicate.onClick(event -> {
-
+            duplicateUser(user);
         });
         root.addElement(duplicate);
 
@@ -149,11 +159,108 @@ public class UsersView extends EmptyContainer {
         TextOverlay delete = new TextOverlay(deleteIcon);
 
         delete.addStyle(Styles.DANGER);
-        delete.setTooltip("Delete the character.");
+        delete.setTooltip("Delete the user.");
         delete.onClick(event -> {
-
+            deleteUser(base, card, user, event.getHandler().getSceneX(), event.getHandler().getSceneY());
         });
         root.addElement(delete);
         return root;
+    }
+
+    private void editUser(User user) {
+        App.window.clearContainers();
+        EmptyContainer progressContainer = new EmptyContainer(App.getInstance().getAppSettings().getWidth(), App.getInstance().getAppSettings().getHeight());
+        progressContainer.addElement(new LoadingView("Loading User data...", progressContainer.getWidth(), progressContainer.getHeight()));
+        App.window.addContainer(progressContainer);
+
+        App.getThreadPoolManager().submitTask(() -> {
+            Container container = new UserEditView(user);
+            Node assemble = container.assemble();
+            Platform.runLater(() -> {
+                App.window.clearContainers();
+                App.window.addContainer(container, assemble);
+            });
+        });
+    }
+
+    private void duplicateUser(User user) {
+        // Duplicate the User.
+        String newId = user.getId() + " (copy)";
+        while (App.getInstance().getUser(newId) != null) {
+            newId += " (copy)";
+        }
+
+        // Edit the User in the edit view rather than duplicating the files
+        // Allow the id to be edited and changed.
+
+        // Create a copy of the User.
+        App.window.clearContainers();
+        EmptyContainer progressContainer = new EmptyContainer(App.getInstance().getAppSettings().getWidth(), App.getInstance().getAppSettings().getHeight());
+        progressContainer.addElement(new LoadingView("Loading User data...", progressContainer.getWidth(), progressContainer.getHeight()));
+        App.window.addContainer(progressContainer);
+
+        me.piitex.app.backend.User duplicated = new me.piitex.app.backend.User(newId, null);
+        App.getThreadPoolManager().submitTask(() -> {
+            duplicated.copy(user);
+            UserEditView editView = new UserEditView(duplicated);
+            Node assemble = editView.assemble();
+            Platform.runLater(() -> {
+                App.window.clearContainers();
+                App.window.addContainer(editView, assemble);
+            });
+        });
+    }
+
+    private void deleteUser(FlowLayout base, CardContainer card, User user, double x, double y) {
+        DialogueContainer dialogueContainer = new DialogueContainer("Delete '" + user.getId() + "'?", 500, 500);
+
+        ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
+        cancel.setWidth(150);
+        cancel.addStyle(Styles.SUCCESS);
+        cancel.onClick(event1 -> {
+            App.window.removeContainer(dialogueContainer);
+        });
+
+        ButtonOverlay confirm = new ButtonBuilder("confirm").setText("Delete").build();
+        confirm.setWidth(150);
+        confirm.addStyle(Styles.DANGER);
+        confirm.onClick(event1 -> {
+            App.getInstance().getUserTemplates().remove(user.getId());
+            App.window.removeContainer(dialogueContainer);
+
+            // Cleanup image usage
+            VerticalLayout verticalLayout = (VerticalLayout) card.getBody();
+            ImageOverlay imageOverlay = (ImageOverlay) verticalLayout.getElementAt(1);
+
+            // When setting to null the engine will dispose of the image and the JVM will call gc.
+            imageOverlay.setImage(null);
+
+            deleteUserDirectory(user);
+            base.removeElement(card);
+        });
+
+        dialogueContainer.setCancelButton(cancel);
+        dialogueContainer.setConfirmButton(confirm);
+
+        // Render this on top
+        App.window.renderPopup(dialogueContainer, x, y, 500, 500);
+    }
+
+    private void deleteUser(User user, FlowLayout base, CardContainer card) {
+        App.getInstance().getUserTemplates().remove(user.getId());
+        deleteUserDirectory(user);
+        base.removeElement(card);
+    }
+
+    private void deleteUserDirectory(User user) {
+        // Add a delay to ensure all io operations are completed.
+        App.getThreadPoolManager().submitSchedule(() -> {
+            App.logger.info("Deleting User: {}", user.getId());
+            try {
+                FileUtils.deleteDirectory(user.getUserDirectory());
+            } catch (IOException e) {
+                App.logger.error("Could not delete directory!", e);
+            }
+        }, 1, TimeUnit.SECONDS);
     }
 }
