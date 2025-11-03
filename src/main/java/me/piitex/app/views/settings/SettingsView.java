@@ -10,7 +10,7 @@ import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
-import me.piitex.engine.Container;
+import me.piitex.engine.containers.Container;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
