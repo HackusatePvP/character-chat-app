@@ -677,7 +677,6 @@ public class ModelEditView extends EmptyContainer {
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(jinja);
         switchOverlay.onToggle(event -> {
-            System.out.println("New Value: " + event.getNewValue());
             this.jinja = event.getNewValue();
         });
         tileContainer.setAction(switchOverlay);
