@@ -87,9 +87,9 @@ public class UsersView extends EmptyContainer {
             displayBox.setSpacing(15);
             displayBox.setAlignment(Pos.TOP_CENTER);
 
-            TextOverlay helper = new TextOverlay("Click to chat");
-            helper.setUnderline(true);
-            displayBox.addElement(helper);
+            TextOverlay id = new TextOverlay(user.getId());
+            displayBox.addElement(id);
+
 
             ContextMenu contextMenu = new ContextMenu();
 
@@ -109,7 +109,8 @@ public class UsersView extends EmptyContainer {
                 icon.setPreserveRatio(false);
                 displayBox.addElement(icon);
             }
-            TextOverlay name = new TextOverlay(user.getId());
+
+            TextOverlay name = new TextOverlay(user.getDisplayName());
             displayBox.addElement(name);
 
             card.setBody(displayBox);
