@@ -352,6 +352,9 @@ public class CharacterEditView {
                     user = new User(userTabInstance.getUserDisplayNameInput().getCurrentText(), new InfoFile(new File(currentCharacterInstance.getUserDirectory(), "user.info"), true));
                     user.setDisplayName(userTabInstance.getUserDisplayNameInput().getCurrentText());
                     user.setPersona(userTabInstance.getUserDescription().getCurrentText());
+                    if (userIconPath != null && userIconPath.exists()) {
+                        user.setIconPath(userIconPath.getAbsolutePath());
+                    }
                     character.setUser(user);
                 }
 
