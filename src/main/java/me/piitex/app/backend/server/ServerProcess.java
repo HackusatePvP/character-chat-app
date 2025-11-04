@@ -195,7 +195,7 @@ public class ServerProcess {
         }
 
         // Jinja Chat Template
-        if (settings.isJinja()) {
+        if (model.getSettings().isJinja()) {
             App.logger.debug("Using jinja...");
             parameters.add("--jinja");
         }
