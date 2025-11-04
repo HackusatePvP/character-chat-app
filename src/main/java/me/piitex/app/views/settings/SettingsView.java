@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
-import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
@@ -232,7 +231,7 @@ public class SettingsView {
         selection.onItemSelect(event -> {
             String item = event.getNewValue();
             appSettings.setTheme(item);
-            App.logger.info("Switching theme to " + item);
+            App.logger.info("Switching theme to {}", item);
 
             Application.setUserAgentStylesheet(appSettings.getStyleTheme(item).getUserAgentStylesheet());
         });

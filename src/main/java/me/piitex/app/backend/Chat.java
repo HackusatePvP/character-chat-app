@@ -26,7 +26,9 @@ public class Chat {
         messages.clear();
         if (!file.exists()) {
             try {
-                file.createNewFile();
+                if (file.createNewFile()) {
+                    App.logger.warn("Could not create chat file. It may already exist.");
+                }
             } catch (IOException e) {
                 throw new RuntimeException("Failed to create chat file: " + file.getAbsolutePath(), e);
             }
@@ -47,7 +49,11 @@ public class Chat {
                 App.logger.error("Error decrypting or reading chat file: {}", file.getAbsolutePath(), e);
             } finally {
                 if (out.exists()) {
-                    out.delete();
+                    try {
+                        Files.delete(out.toPath());
+                    } catch (IOException e) {
+                        App.logger.error("Failed to delete decrypted chat file!", e);
+                    }
                 }
             }
         } else {
@@ -216,7 +222,11 @@ public class Chat {
                 FileCrypter.encryptFile(tempIn, file);
             }
             if (tempIn.exists() && !dev) {
-                tempIn.delete();
+                try {
+                    Files.delete(tempIn.toPath());
+                } catch (IOException e) {
+                    App.logger.error("Could not delete temporary chat file during encryption!", e);
+                }
             }
         }
     }

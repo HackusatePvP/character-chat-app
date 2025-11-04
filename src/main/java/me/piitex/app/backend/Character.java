@@ -44,9 +44,15 @@ public class Character {
     }
 
     public void initializeDirectories() {
-        getCharacterDirectory().mkdirs();
-        getUserDirectory().mkdirs();
-        getChatDirectory().mkdirs();
+        if (getCharacterDirectory().mkdirs()) {
+            App.logger.info("Created base character directory '{}'", getCharacterDirectory().getAbsolutePath());
+        }
+        if (getUserDirectory().mkdirs()) {
+            App.logger.info("Created base user directory '{}'", getUserDirectory().getAbsolutePath());
+        }
+        if (getChatDirectory().mkdirs()) {
+            App.logger.info("Created base chat directory '{}'", getCharacterDirectory().getAbsolutePath());
+        }
 
         this.infoFile = new InfoFile(new File(getCharacterDirectory(), "character.info"), true);
         this.modelSettings = new ModelSettings(new InfoFile(new File(getCharacterDirectory(), "model-settings.info"), false));

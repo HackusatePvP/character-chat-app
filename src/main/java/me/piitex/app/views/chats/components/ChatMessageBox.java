@@ -11,7 +11,6 @@ import me.piitex.engine.layouts.VerticalLayout;
 import java.io.File;
 
 import static me.piitex.app.views.Positions.*;
-import static me.piitex.app.views.Positions.CHAT_BOX_IMAGE_HEIGHT;
 
 public class ChatMessageBox extends VerticalLayout {
     private final Character character;

@@ -2,7 +2,6 @@ package me.piitex.app.views.chats.components;
 
 import atlantafx.base.theme.Styles;
 import javafx.scene.Node;
-import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Chat;
@@ -20,7 +19,6 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.engine.overlays.RichTextAreaOverlay;
 import me.piitex.engine.overlays.TextOverlay;
-import org.fxmisc.richtext.StyledTextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;

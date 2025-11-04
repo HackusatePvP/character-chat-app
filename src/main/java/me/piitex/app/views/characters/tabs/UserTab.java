@@ -4,7 +4,6 @@ import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
-import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.os.configurations.InfoFile;

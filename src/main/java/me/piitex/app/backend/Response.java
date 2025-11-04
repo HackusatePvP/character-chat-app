@@ -41,7 +41,9 @@ public class Response {
         this.user = user;
         this.chat = chat;
         File dir = new File(getResponseDirectory(), chat.getFile().getName());
-        dir.mkdirs();
+        if (dir.mkdirs()) {
+            App.logger.info("Created response directory '{}'", getResponseDirectory().getAbsolutePath());
+        }
         File file = new File(dir, index + ".info");
 
         responseFile = new InfoFile(file, true); // False for testing switch later.

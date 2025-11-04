@@ -1,7 +1,6 @@
 package me.piitex.app.views.chats.components;
 
 import atlantafx.base.theme.Styles;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;

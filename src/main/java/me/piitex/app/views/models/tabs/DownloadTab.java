@@ -63,9 +63,11 @@ public class DownloadTab extends Tab {
 
         if (!file.exists()) {
             try {
-                file.createNewFile();
+                if (!file.createNewFile()) {
+                    App.logger.warn("Could not create model cache file. It may already exist.");
+                }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                App.logger.error("IO exception occurred while handling model cache file.", new RuntimeException());
             }
         }
 
@@ -165,15 +167,6 @@ public class DownloadTab extends Tab {
         tileLayout.addElement(sizeText);
 
         AtomicReference<FileInfo> fileInfoRef = new AtomicReference<>();
-
-        File file = new File(App.getModelsDirectory(), "download-cache.dat");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         setupFileInfoFetch(tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
         setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef, titledContainer); // Pass titledContainer for relocation
@@ -296,7 +289,9 @@ public class DownloadTab extends Tab {
 
         // Ensure the model's directory exists
         if (!modelDirectory.exists()) {
-            modelDirectory.mkdirs();
+            if (modelDirectory.mkdirs()) {
+                App.logger.error("Could not create model directory!", new RuntimeException());
+            }
             App.logger.info("Created model directory: {}", modelDirectory.getAbsolutePath());
         }
 
@@ -422,8 +417,11 @@ public class DownloadTab extends Tab {
 
             // Synchronous File Deletion (must be here as a final cleanup)
             if (fileToDelete.exists()) {
-                fileToDelete.delete();
-                App.logger.info("Deleted partial file: {}", fileToDelete.getName());
+                if (!fileToDelete.delete()) {
+                    App.logger.error("Failed to delete partial model file!", new RuntimeException());
+                } else {
+                    App.logger.info("Deleted partial file: {}", fileToDelete.getName());
+                }
             }
 
             fileInfoRef.get().setDownloaded(false);

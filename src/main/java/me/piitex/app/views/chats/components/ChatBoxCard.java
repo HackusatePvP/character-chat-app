@@ -4,7 +4,6 @@ import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
-import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Role;
 import me.piitex.app.views.chats.ChatView;
@@ -38,8 +37,8 @@ public class ChatBoxCard extends CardContainer {
 
     public void buildCard() {
         this.setMaxSize(messageBox.getWidth(), getHeight());
-        String iconPath = "";
-        String displayName = "";
+        String iconPath;
+        String displayName;
         Role role = chatMessage.getSender();
         if (role == Role.USER) {
             iconPath = (character.getUser() != null && character.getUser().getIconPath() != null && !character.getUser().getIconPath().isEmpty()? character.getUser().getIconPath() :  new File(App.getAppDirectory(), "icons/character.png").getAbsolutePath());

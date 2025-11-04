@@ -130,7 +130,7 @@ public class Server {
         try (CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext());
              Scanner scanner = new Scanner(httpResponse.getEntity().getContent())) {
 
-            boolean stopGenerating = false;
+            boolean stopGenerating;
             while (scanner.hasNextLine()) {
                 response.setResponse(appender.toString());
 
