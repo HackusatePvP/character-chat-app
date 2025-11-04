@@ -33,8 +33,7 @@ import static me.piitex.app.views.Positions.*;
 public class ConfigurationTab extends Tab {
     private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
-    private final ScrollContainer scrollContainer;
-    private VerticalLayout layout;
+    private final VerticalLayout layout;
     private InputFieldOverlay runningModel;
     private ButtonOverlay start, stop, reload;
 
@@ -50,7 +49,7 @@ public class ConfigurationTab extends Tab {
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
         layout.setX(20);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
         scrollContainer.setScrollWhenNeeded(true);

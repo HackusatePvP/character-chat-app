@@ -23,10 +23,6 @@ import java.util.List;
 
 public class SettingsView {
     private final Container container;
-    private final ServerSettings settings = App.getInstance().getSettings();
-
-    // The amount of spacing between the description and the input.
-    private final int layoutSpacing = 200;
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
 
@@ -41,7 +37,7 @@ public class SettingsView {
         root.setSpacing(35);
         container.addElement(root);
 
-        root.addElement(new SidebarView(root, false));
+        root.addElement(new SidebarView(false));
 
         VerticalLayout layout = new VerticalLayout(0, 0);
         layout.setOffsetX(20);

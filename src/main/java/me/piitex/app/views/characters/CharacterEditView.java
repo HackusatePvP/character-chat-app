@@ -42,7 +42,7 @@ import java.util.TreeMap;
 public class CharacterEditView {
     private Container root;
 
-    private InfoFile infoFile;
+    private final InfoFile infoFile;
 
     @Nullable
     private Character character;
@@ -66,7 +66,7 @@ public class CharacterEditView {
 
     private TabsContainer tabsContainer;
 
-    private AppSettings appSettings = App.getInstance().getAppSettings();
+    private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     private CharacterTab characterTabInstance;
     private UserTab userTabInstance;
@@ -227,7 +227,7 @@ public class CharacterEditView {
         root.addStyle(Styles.BG_INSET);
 
         HorizontalLayout mainLayout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        mainLayout.addElement(new SidebarView(mainLayout, false));
+        mainLayout.addElement(new SidebarView(false));
         root.addElement(mainLayout);
 
         VerticalLayout contentLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
@@ -239,7 +239,7 @@ public class CharacterEditView {
         characterTabInstance = new CharacterTab(appSettings, character, user, duplicate, this);
         tabsContainer.addTab(characterTabInstance);
 
-        userTabInstance = new UserTab(appSettings, infoFile, character, this);
+        userTabInstance = new UserTab(appSettings, infoFile, this);
         tabsContainer.addTab(userTabInstance);
 
         loreBookTabInstance = new LorebookTab(appSettings, infoFile, this);
@@ -281,14 +281,12 @@ public class CharacterEditView {
             ButtonOverlay stay = new ButtonBuilder("stay").setText("Stay").build();
             stay.setWidth(150);
             stay.addStyle(Styles.SUCCESS);
-            stay.onClick(event1 -> {
-                App.window.removeContainer(dialogueContainer);
-            });
+            stay.onClick(_ -> App.window.removeContainer(dialogueContainer));
 
             ButtonOverlay leave = new ButtonBuilder("leave").setText("Leave").build();
             leave.setWidth(150);
             leave.addStyle(Styles.DANGER);
-            leave.onClick(event1 -> {
+            leave.onClick(_ -> {
                 App.window.clearContainers();
                 App.window.addContainer(new HomeView());
             });
@@ -299,7 +297,7 @@ public class CharacterEditView {
             App.window.renderPopup(dialogueContainer, event.getHandler().getSceneX(), event.getHandler().getSceneY() - 100, 500, 500);
         });
 
-        submit.onClick(event -> {
+        submit.onClick(_ -> {
             if (!validate()) return;
 
             try {
@@ -427,7 +425,7 @@ public class CharacterEditView {
             App.logger.info("Backend server is still loading. Retrying token check in 10 seconds...");
             Platform.runLater(() -> {
                 PauseTransition delay = new PauseTransition(Duration.seconds(10));
-                delay.setOnFinished(event -> warnTokens());
+                delay.setOnFinished(_ -> warnTokens());
                 delay.play();
             });
             return;

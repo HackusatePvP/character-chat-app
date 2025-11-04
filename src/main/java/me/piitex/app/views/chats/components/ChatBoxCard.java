@@ -22,16 +22,14 @@ import static me.piitex.app.views.chats.ChatView.buildTextFlow;
 public class ChatBoxCard extends CardContainer {
     private final VerticalLayout messageBox;
     private final Character character;
-    private final Chat chat;
     private final ChatMessage chatMessage;
     private final int index;
     private final ChatView parentView;
 
-    public ChatBoxCard(VerticalLayout messageBox, Character character, Chat chat, ChatMessage chatMessage, int index, ChatView parentView, double width, double height) {
+    public ChatBoxCard(VerticalLayout messageBox, Character character, ChatMessage chatMessage, int index, ChatView parentView, double width, double height) {
         super(width, height);
         this.messageBox = messageBox;
         this.character = character;
-        this.chat = chat;
         this.chatMessage = chatMessage;
         this.index = index;
         this.parentView = parentView;

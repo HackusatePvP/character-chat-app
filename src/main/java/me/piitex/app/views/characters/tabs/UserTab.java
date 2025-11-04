@@ -32,7 +32,7 @@ public class UserTab extends Tab {
 
     private ImageOverlay image;
 
-    public UserTab(AppSettings appSettings, InfoFile infoFile, Character character, CharacterEditView parentView) {
+    public UserTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("User");
         this.appSettings = appSettings;
         this.infoFile = infoFile;
@@ -115,7 +115,7 @@ public class UserTab extends Tab {
         upload.setUnderline(true);
         layout.addElement(upload);
 
-        root.onClick(event -> {
+        root.onClick(_ -> {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.img", "*.png", "*.webp", "*.jpg", "*.gif"));
             if (appSettings.getImagesPath() != null && !appSettings.getImagesPath().isEmpty()) {

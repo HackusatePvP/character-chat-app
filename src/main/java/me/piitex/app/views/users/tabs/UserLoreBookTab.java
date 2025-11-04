@@ -15,7 +15,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 public class UserLoreBookTab extends Tab {
     private final UserEditView userEditView;
@@ -67,7 +66,7 @@ public class UserLoreBookTab extends Tab {
         addContainer.setFooter(buttonBox);
 
         scrollLoreContainer = getLoreItems();
-        add.onClick(event -> {
+        add.onClick(_ -> {
             String keyText = addKeyInput.getCurrentText();
             String valueText = addValueInput.getCurrentText();
 
@@ -116,9 +115,7 @@ public class UserLoreBookTab extends Tab {
         card.setHeader(entryKey);
 
         TextAreaOverlay entryValue = new TextAreaOverlay(userEditView.getLoreBook().get(key), 0, 0, 400, 200);
-        entryValue.onInputSetEvent(event -> {
-            userEditView.getLoreBook().put(key, event.getInput());
-        });
+        entryValue.onInputSetEvent(event -> userEditView.getLoreBook().put(key, event.getInput()));
         card.setBody(entryValue);
 
         ButtonOverlay remove = new ButtonBuilder("remove").setText("Remove").build();
@@ -127,7 +124,7 @@ public class UserLoreBookTab extends Tab {
         remove.addStyle(Styles.BUTTON_OUTLINED);
         card.setFooter(remove);
 
-        remove.onClick(event -> {
+        remove.onClick(_ -> {
             userEditView.getLoreBook().remove(key);
             scrollContainer.removeElement(card);
         });

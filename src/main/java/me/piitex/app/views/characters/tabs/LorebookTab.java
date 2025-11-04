@@ -20,7 +20,6 @@ import java.util.Map;
 public class LorebookTab extends Tab {
 
     private final AppSettings appSettings;
-    private final InfoFile infoFile;
     private final CharacterEditView parentView;
 
     private InputFieldOverlay addKeyInput;
@@ -32,7 +31,6 @@ public class LorebookTab extends Tab {
     public LorebookTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("Lorebook");
         this.appSettings = appSettings;
-        this.infoFile = infoFile;
         this.parentView = parentView;
         this.loreItems = parentView.getLoreItems();
         buildLorebookTabContent();
@@ -74,7 +72,7 @@ public class LorebookTab extends Tab {
         addContainer.setFooter(buttonBox);
 
         scrollLoreContainer = getLoreItems();
-        add.onClick(event -> {
+        add.onClick(_ -> {
             String keyText = addKeyInput.getCurrentText();
             String valueText = addValueInput.getCurrentText();
 
@@ -137,7 +135,7 @@ public class LorebookTab extends Tab {
         remove.addStyle(Styles.BUTTON_OUTLINED);
         card.setFooter(remove);
 
-        remove.onClick(event -> {
+        remove.onClick(_ -> {
             loreItems.remove(key);
             scrollContainer.removeElement(card);
 

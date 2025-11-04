@@ -51,7 +51,7 @@ public class ChatView extends EmptyContainer {
 
     private File image = null;
 
-    private AppSettings appSettings = App.getInstance().getAppSettings();
+    private final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public ChatView(Character character, @Nullable Chat chat) {
         super(800, 600);
@@ -110,7 +110,7 @@ public class ChatView extends EmptyContainer {
         HorizontalLayout main = new HorizontalLayout(appSettings.getWidth(), 0);
         main.setSpacing(5);
 
-        SidebarView sidebarView = new SidebarView(main, false);
+        SidebarView sidebarView = new SidebarView(false);
         main.addElement(sidebarView);
 
         addElement(main);
@@ -162,9 +162,7 @@ public class ChatView extends EmptyContainer {
                 alert.setHeight(250);
                 alert.setContent("Everything the character says is made up. Do not use AI for mental or medical health assistance.");
                 alert.addButton(new ButtonType("I Understand", ButtonBar.ButtonData.YES));
-                alert.onConfirm(event -> {
-                    character.setShownDisclaimer(true);
-                });
+                alert.onConfirm(_ -> character.setShownDisclaimer(true));
             }
         });
     }
@@ -192,7 +190,7 @@ public class ChatView extends EmptyContainer {
                 next.loadChat();
             }
 
-            ChoiceBox<String> choiceBox = (ChoiceBox<String>) selection.getNode();
+            ChoiceBox<String> choiceBox = selection.getChoiceBox();
             choiceBox.getSelectionModel().clearSelection();
 
             App.window.clearContainers();
@@ -439,7 +437,7 @@ public class ChatView extends EmptyContainer {
         Node stopNode = stop.render();
         Tooltip.install(stopNode, tooltip);
 
-        stop.onClick(event -> {
+        stop.onClick(_ -> {
             App.logger.info("Force stopping response...");
             stopNode.setDisable(true);
             thread.cancel(true);
@@ -528,7 +526,7 @@ public class ChatView extends EmptyContainer {
                     contextMenu.hide();
                     return;
                 }
-                copy.setOnAction(event1 -> {
+                copy.setOnAction(_ -> {
                     Clipboard clipboard = Clipboard.getSystemClipboard();
                     ClipboardContent clipboardContent = new ClipboardContent();
                     clipboardContent.putString(Placeholder.retrieveOriginalText(content));

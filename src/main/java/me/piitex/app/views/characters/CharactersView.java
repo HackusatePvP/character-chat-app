@@ -29,17 +29,16 @@ import java.util.concurrent.TimeUnit;
 public class CharactersView {
     private final ScrollContainer root;
 
-    private final int imageWidth, imageHeight;
-    private final double cardWidth, cardHeight;
-
-    private final int spacing = 20;
-
     public CharactersView() {
         VerticalLayout layout = new VerticalLayout(0, -1);
         AppSettings appSettings = App.getInstance().getAppSettings();
         layout.setMaxSize(appSettings.getWidth() - 265, 0);
         layout.setSpacing(20);
 
+        int imageWidth;
+        int imageHeight;
+        double cardWidth;
+        double cardHeight;
         if (App.mobile) {
             root = new ScrollContainer(layout, 0, 0, 400, -1);
             root.setMaxSize(400, 1000);
@@ -82,17 +81,11 @@ public class CharactersView {
             ContextMenu contextMenu = new ContextMenu();
 
             MenuItem edit = new MenuItem("Edit");
-            edit.setOnAction(event -> {
-                editCharacter(character);
-            });
+            edit.setOnAction(_ -> editCharacter(character));
             MenuItem copy = new MenuItem("Copy");
-            copy.setOnAction(event -> {
-                duplicateCharacter(character);
-            });
+            copy.setOnAction(_ -> duplicateCharacter(character));
             MenuItem delete = new MenuItem("Delete");
-            delete.setOnAction(event -> {
-                deleteCharacter(character, base, card);
-            });
+            delete.setOnAction(_ -> deleteCharacter(character, base, card));
 
             contextMenu.getItems().add(edit);
             contextMenu.getItems().add(copy);
@@ -145,6 +138,8 @@ public class CharactersView {
     public HorizontalLayout buildControlBox(FlowLayout base, CardContainer card, Character character) {
         HorizontalLayout root = new HorizontalLayout(200, 25);
         root.setIndex(10);
+
+        int spacing = 20;
         root.setSpacing(spacing);
         if (!App.mobile) {
             root.setAlignment(Pos.BASELINE_CENTER);
@@ -155,9 +150,7 @@ public class CharactersView {
         TextOverlay edit = new TextOverlay(editIcon);
         edit.setTooltip("Edit the character");
         edit.addStyle(Styles.ACCENT);
-        edit.onClick(event -> {
-            editCharacter(character);
-        });
+        edit.onClick(_ -> editCharacter(character));
         root.addElement(edit);
 
         FontIcon duplicateIcon = new FontIcon(Material2AL.FILE_COPY);
@@ -165,9 +158,7 @@ public class CharactersView {
         TextOverlay duplicate = new TextOverlay(duplicateIcon);
         duplicate.setTooltip("Duplicate the character.");
         duplicate.addStyle(Styles.WARNING);
-        duplicate.onClick(event -> {
-            duplicateCharacter(character);
-        });
+        duplicate.onClick(_ -> duplicateCharacter(character));
         root.addElement(duplicate);
 
         FontIcon deleteIcon = new FontIcon(Material2AL.DELETE_FOREVER);
@@ -232,14 +223,12 @@ public class CharactersView {
         ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
         cancel.setWidth(150);
         cancel.addStyle(Styles.SUCCESS);
-        cancel.onClick(event1 -> {
-            App.window.removeContainer(dialogueContainer);
-        });
+        cancel.onClick(_ -> App.window.removeContainer(dialogueContainer));
 
         ButtonOverlay confirm = new ButtonBuilder("confirm").setText("Delete").build();
         confirm.setWidth(150);
         confirm.addStyle(Styles.DANGER);
-        confirm.onClick(event1 -> {
+        confirm.onClick(_ -> {
             App.getInstance().getCharacters().remove(character.getId());
             App.window.removeContainer(dialogueContainer);
 

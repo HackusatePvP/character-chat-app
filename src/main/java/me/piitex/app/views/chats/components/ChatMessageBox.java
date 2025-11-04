@@ -41,7 +41,7 @@ public class ChatMessageBox extends VerticalLayout {
             addElement(new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, -1));
         }
 
-        CardContainer cardContainer = new ChatBoxCard(this, character, chat, chatMessage, index, parentView, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
+        CardContainer cardContainer = new ChatBoxCard(this, character, chatMessage, index, parentView, CHAT_BOX_WIDTH, CHAT_BOX_HEIGHT);
         addElement(cardContainer);
 
         // If there is an image attached to the response build the image card

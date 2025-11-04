@@ -24,16 +24,14 @@ import java.util.function.Consumer;
 import static me.piitex.app.views.Positions.*;
 
 public class SidebarView extends VerticalLayout {
-    private final Renderer parent;
 
     // Testing out consumer. Hopefully it's more efficient than interfaces.
     private Consumer<Boolean> onCollapseStateChange;
 
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
-    public SidebarView(Renderer parent, boolean collapse) {
+    public SidebarView(boolean collapse) {
         super(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
-        this.parent = parent;
         setAlignment(Pos.BASELINE_CENTER);
         addStyle(Styles.BORDER_DEFAULT);
         addStyle(Styles.BG_INSET);

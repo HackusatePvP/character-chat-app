@@ -25,23 +25,21 @@ import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class UsersView extends EmptyContainer {
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
-    private final HorizontalLayout root;
     private final VerticalLayout mainPage;
 
     public UsersView() {
         super(appSettings.getWidth(), appSettings.getHeight());
 
-        root = new HorizontalLayout(getWidth(), getHeight());
+        HorizontalLayout root = new HorizontalLayout(getWidth(), getHeight());
         root.setMaxSize(root.getWidth(), root.getHeight());
         addElement(root);
 
-        SidebarView sidebarView = new SidebarView(this, false);
+        SidebarView sidebarView = new SidebarView(false);
         root.addElement(sidebarView);
 
         mainPage = new VerticalLayout(appSettings.getWidth() - 200, 0);
@@ -95,17 +93,11 @@ public class UsersView extends EmptyContainer {
             ContextMenu contextMenu = new ContextMenu();
 
             MenuItem edit = new MenuItem("Edit");
-            edit.setOnAction(event -> {
-                editUser(user);
-            });
+            edit.setOnAction(_ -> editUser(user));
             MenuItem copy = new MenuItem("Copy");
-            copy.setOnAction(event -> {
-                duplicateUser(user);
-            });
+            copy.setOnAction(_ -> duplicateUser(user));
             MenuItem delete = new MenuItem("Delete");
-            delete.setOnAction(event -> {
-                deleteUser(user, flowLayout, card);
-            });
+            delete.setOnAction(_ -> deleteUser(user, flowLayout, card));
 
             contextMenu.getItems().add(edit);
             contextMenu.getItems().add(copy);
@@ -217,14 +209,14 @@ public class UsersView extends EmptyContainer {
         ButtonOverlay cancel = new ButtonBuilder("cancel").setText("Keep").build();
         cancel.setWidth(150);
         cancel.addStyle(Styles.SUCCESS);
-        cancel.onClick(event1 -> {
+        cancel.onClick(_ -> {
             App.window.removeContainer(dialogueContainer);
         });
 
         ButtonOverlay confirm = new ButtonBuilder("confirm").setText("Delete").build();
         confirm.setWidth(150);
         confirm.addStyle(Styles.DANGER);
-        confirm.onClick(event1 -> {
+        confirm.onClick(_ -> {
             App.getInstance().getUserTemplates().remove(user.getId());
             App.window.removeContainer(dialogueContainer);
 

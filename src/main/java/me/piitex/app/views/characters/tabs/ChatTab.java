@@ -25,8 +25,6 @@ public class ChatTab extends Tab {
     private RichTextAreaOverlay firstMessageInput;
     private RichTextAreaOverlay chatScenarioInput;
 
-    private final double TEXT_AREA_HEIGHT = -1;
-
     public ChatTab(AppSettings appSettings, InfoFile infoFile, CharacterEditView parentView) {
         super("Chat");
         this.appSettings = appSettings;
@@ -62,6 +60,7 @@ public class ChatTab extends Tab {
         firstDesc.setTextFillColor(Color.WHITE);
         firstBox.addElement(firstDesc);
 
+        double TEXT_AREA_HEIGHT = -1;
         firstMessageInput = new RichTextAreaOverlay(chatFirstMessage, (int) firstCard.getMaxWidth() / 2 - 20, TEXT_AREA_HEIGHT);
         firstMessageInput.setMaxWidth((int) firstCard.getMaxWidth() / 2 - 20);
         firstMessageInput.setMaxHeight(TEXT_AREA_HEIGHT);

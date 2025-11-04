@@ -27,9 +27,6 @@ import java.util.TreeMap;
 
 public class UserEditView extends EmptyContainer {
     private User user;
-    private final InfoFile infoFile;
-    private HorizontalLayout root;
-    private VerticalLayout mainPage;
     private String userId = "";
     private String userDisplay = "";
     private String userPersona = "";
@@ -40,13 +37,11 @@ public class UserEditView extends EmptyContainer {
 
     private TabsContainer tabsContainer;
     private UserTab userTab;
-    private UserLoreBookTab userLoreBookTab;
 
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public UserEditView() {
         super(appSettings.getWidth(), appSettings.getHeight());
-        this.infoFile = new InfoFile();
         this.loreBook = new TreeMap<>();
         init();
     }
@@ -54,7 +49,6 @@ public class UserEditView extends EmptyContainer {
     public UserEditView(User user) {
         super(appSettings.getWidth(), appSettings.getHeight());
         this.user = user;
-        this.infoFile = user.getInfoFile();
         this.userId = user.getId();
         this.userDisplay = user.getDisplayName();
         this.userPersona = user.getPersona();
@@ -64,14 +58,14 @@ public class UserEditView extends EmptyContainer {
     }
 
     public void init() {
-        root = new HorizontalLayout(getWidth(), getHeight());
+        HorizontalLayout root = new HorizontalLayout(getWidth(), getHeight());
         root.setMaxSize(root.getWidth(), root.getHeight());
         addElement(root);
 
-        SidebarView sidebarView = new SidebarView(this, false);
+        SidebarView sidebarView = new SidebarView(false);
         root.addElement(sidebarView);
 
-        mainPage = new VerticalLayout(appSettings.getWidth() - 200, 0);
+        VerticalLayout mainPage = new VerticalLayout(appSettings.getWidth() - 200, 0);
         mainPage.setMaxSize(mainPage.getWidth(), mainPage.getHeight());
         root.addElement(mainPage);
 
@@ -81,7 +75,7 @@ public class UserEditView extends EmptyContainer {
         userTab = new UserTab("User", this);
         tabsContainer.addTab(userTab);
 
-        userLoreBookTab = new UserLoreBookTab("Lorebook", this);
+        UserLoreBookTab userLoreBookTab = new UserLoreBookTab("Lorebook", this);
         tabsContainer.addTab(userLoreBookTab);
     }
 

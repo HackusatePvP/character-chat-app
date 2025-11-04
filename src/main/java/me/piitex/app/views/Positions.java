@@ -1,8 +1,6 @@
 package me.piitex.app.views;
 
-import javafx.scene.layout.VBox;
 import me.piitex.app.App;
-import me.piitex.app.configuration.AppSettings;
 import me.piitex.engine.Window;
 
 // Static fields to specify various positions of elements.
