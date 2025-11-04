@@ -480,7 +480,7 @@ public class ChatView extends EmptyContainer {
     }
 
     public VerticalLayout buildResponseProgress() {
-        VerticalLayout root = new VerticalLayout(150, 30);
+        VerticalLayout root = new VerticalLayout(150, -1);
         root.setMaxSize(root.getWidth(), root.getHeight());
         root.setAlignment(Pos.TOP_CENTER);
 
