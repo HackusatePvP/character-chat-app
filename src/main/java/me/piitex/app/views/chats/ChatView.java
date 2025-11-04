@@ -459,9 +459,6 @@ public class ChatView extends EmptyContainer {
         if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isLoading() || ServerProcess.getCurrentServer().isError()) return;
         App.logger.info("Regenerating last response...");
 
-        // Disable top controls to prevent duplicate calls
-        topControls.setEnabled(false);
-
         int index = chat.getMessages().lastIndexOf(chat.getMessages().getLast());
         if (index + 1 != chat.getMessages().size()) {
             return;
