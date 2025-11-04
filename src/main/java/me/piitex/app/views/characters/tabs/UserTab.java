@@ -185,6 +185,7 @@ public class UserTab extends Tab {
 
                 if (template.getIconPath() != null && !template.getIconPath().isEmpty()) {
                     parentView.setUserIconPath(new File(template.getIconPath()));
+                    image.setImage(new ImageLoader(parentView.getUserIconPath()));
                 }
             }
 
