@@ -199,7 +199,7 @@ public class UsersView extends EmptyContainer {
         progressContainer.addElement(new LoadingView("Loading User data...", progressContainer.getWidth(), progressContainer.getHeight()));
         App.window.addContainer(progressContainer);
 
-        me.piitex.app.backend.User duplicated = new me.piitex.app.backend.User(newId, null);
+        User duplicated = new User(newId, null);
         App.getThreadPoolManager().submitTask(() -> {
             duplicated.copy(user);
             UserEditView editView = new UserEditView(duplicated);
