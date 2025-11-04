@@ -20,9 +20,7 @@ import java.util.List;
 
 public class ModelEditView extends EmptyContainer {
     private final ModelSettings settings;
-    private int layoutSpacing = 150;
     private final AppSettings appSettings = App.getInstance().getAppSettings();
-
     private String instructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096;
     private double temperature = 0.8; // min 0
@@ -679,7 +677,8 @@ public class ModelEditView extends EmptyContainer {
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(jinja);
         switchOverlay.onToggle(event -> {
-            this.jinja = event.getNewValue(); // ???
+            System.out.println("New Value: " + event.getNewValue());
+            this.jinja = event.getNewValue();
         });
         tileContainer.setAction(switchOverlay);
 
