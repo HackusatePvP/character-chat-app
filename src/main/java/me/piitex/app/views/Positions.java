@@ -65,7 +65,7 @@ public class Positions {
         CHAT_VIEW_SCROLL_X = 0;
         CHAT_VIEW_SCROLL_Y = 10; // Small y offset
         CHAT_VIEW_SCROLL_WIDTH = window.getWidth() - 225;
-        CHAT_VIEW_SCROLL_HEIGHT = window.getHeight() - 250;
+        CHAT_VIEW_SCROLL_HEIGHT = window.getHeight() - 280;
         CHAT_VIEW_SELECTION_X = window.getWidth() / 2;
         CHAT_VIEW_SELECTION_WIDTH = 100;
         CHAT_VIEW_SELECTION_HEIGHT = 50;

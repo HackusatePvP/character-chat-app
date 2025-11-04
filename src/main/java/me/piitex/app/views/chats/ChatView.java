@@ -117,7 +117,7 @@ public class ChatView extends EmptyContainer {
 
         VerticalLayout chatView = new VerticalLayout(0, 0);
         chatView.setAlignment(Pos.TOP_CENTER);
-        chatView.setSpacing(40);
+        chatView.setSpacing(60);
         chatView.addStyle(Styles.BG_INSET);
         main.addElement(chatView);
 
