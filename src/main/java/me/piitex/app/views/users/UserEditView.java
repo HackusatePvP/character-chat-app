@@ -10,6 +10,7 @@ import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.users.tabs.UserLoreBookTab;
 import me.piitex.app.views.users.tabs.UserTab;
 import me.piitex.engine.PopupPosition;
+import me.piitex.engine.containers.DialogueContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -95,6 +96,27 @@ public class UserEditView extends EmptyContainer {
         submit.addStyle(Styles.BUTTON_OUTLINED);
         layout.addElements(submit);
 
+        cancel.onClick(event -> {
+            DialogueContainer dialogueContainer = new DialogueContainer("Do you want to exit without saving?", 500, 500);
+
+            ButtonOverlay stay = new ButtonBuilder("stay").setText("Stay").build();
+            stay.setWidth(150);
+            stay.addStyle(Styles.SUCCESS);
+            stay.onClick(_ -> App.window.removeContainer(dialogueContainer));
+
+            ButtonOverlay leave = new ButtonBuilder("leave").setText("Leave").build();
+            leave.setWidth(150);
+            leave.addStyle(Styles.DANGER);
+            leave.onClick(_ -> {
+                App.window.clearContainers();
+                App.window.addContainer(new UsersView());
+            });
+
+            dialogueContainer.setCancelButton(stay);
+            dialogueContainer.setConfirmButton(leave);
+
+            App.window.renderPopup(dialogueContainer, event.getHandler().getSceneX(), event.getHandler().getSceneY() - 100, 500, 500);
+        });
 
         submit.onClick(event -> {
             if (!validate()) {
