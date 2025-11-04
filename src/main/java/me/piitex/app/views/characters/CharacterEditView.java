@@ -325,7 +325,7 @@ public class CharacterEditView {
 
                 // Handle character icon file copy
                 if (characterIconPath != null && characterIconPath.exists()) {
-                    File output = new File(currentCharacterInstance.getCharacterDirectory(), characterIconPath.getName());
+                    File output = new File(currentCharacterInstance.getCharacterDirectory(), "character.png");
                     Files.copy(characterIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     currentCharacterInstance.setIconPath(output.getAbsolutePath());
                 }
