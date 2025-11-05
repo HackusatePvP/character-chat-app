@@ -1,6 +1,7 @@
 package me.piitex.app.backend;
 
 import me.piitex.app.App;
+import me.piitex.app.views.chats.ChatView;
 import me.piitex.os.configurations.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -16,13 +17,15 @@ public class Chat {
     private Response response;
     private final LinkedList<ChatMessage> messages = new LinkedList<>();
     private final boolean dev = false;
+    private ChatView cachedView;
 
 
     public Chat(File file) {
         this.file = file;
+        loadChat();
     }
 
-    public void loadChat() {
+    private void loadChat() {
         messages.clear();
         if (!file.exists()) {
             try {
@@ -33,7 +36,7 @@ public class Chat {
                 throw new RuntimeException("Failed to create chat file: " + file.getAbsolutePath(), e);
             }
         } else if (file.length() > 0 && !dev) {
-            File out = new File(file.getParent(), "out.dat"); // Temporary decrypted file
+            File out = new File(file.getParent(), file.getName() + "out.dat"); // Temporary decrypted file
             try {
                 FileCrypter.decryptFile(file, out);
                 AtomicInteger count = new AtomicInteger();
@@ -236,5 +239,13 @@ public class Chat {
 
     public void setResponse(Response response) {
         this.response = response;
+    }
+
+    public ChatView getCachedView() {
+        return cachedView;
+    }
+
+    public void setCachedView(ChatView cachedView) {
+        this.cachedView = cachedView;
     }
 }

@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
+import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.LoadingView;
@@ -102,22 +103,29 @@ public class CharactersView {
                     // Display progress
                     App.window.clearContainers();
 
-                    EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
-                    progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
-                    App.window.addContainer(progressContainer);
-
-                    App.getThreadPoolManager().submitTask(() -> {
-                        ChatView chatView = new ChatView(character, character.getLastChat());
-                        Node assemble = chatView.assemble();
+                    Chat chat = character.getLastChat();
+                    if (chat != null && chat.getCachedView() != null) {
                         Platform.runLater(() -> {
-                            App.window.clearContainers();
-                            App.window.addContainer(chatView, assemble);
+                            App.logger.info("Using cached chat view...");
+                            App.window.addContainer(chat.getCachedView());
                         });
+                    } else {
+                        EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
+                        progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
+                        App.window.addContainer(progressContainer);
 
-                    });
+                        App.getThreadPoolManager().submitTask(() -> {
+                            ChatView chatView = new ChatView(character, chat);
+                            Node assemble = chatView.assemble();
+                            Platform.runLater(() -> {
+                                App.window.clearContainers();
+                                App.window.addContainer(chatView, assemble);
+                            });
+                        });
+                    }
+
 
                 }
-
             });
 
             ImageOverlay icon = User.getUserAvatar(character.getIconPath(), imageWidth, imageHeight);

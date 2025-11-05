@@ -73,7 +73,6 @@ public class ChatView extends EmptyContainer {
             }
         }
         this.chat = chat;
-        chat.loadChat();
         character.setLastChat(chat);
         init();
     }
@@ -94,7 +93,6 @@ public class ChatView extends EmptyContainer {
             }
             this.chat = chat;
         }
-        chat.loadChat();
         character.setLastChat(chat);
         init();
     }
@@ -174,6 +172,8 @@ public class ChatView extends EmptyContainer {
                 alert.onConfirm(_ -> character.setShownDisclaimer(true));
             }
         });
+
+        chat.setCachedView(this);
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -195,15 +195,16 @@ public class ChatView extends EmptyContainer {
             }
 
             Chat next = character.getChat(item);
-            if (next != null && !next.getFile().getName().equalsIgnoreCase(chat.getFile().getName())) {
-                next.loadChat();
-            }
-
             ChoiceBox<String> choiceBox = selection.getChoiceBox();
             choiceBox.getSelectionModel().clearSelection();
-
             App.window.clearContainers();
-            App.window.addContainer(new ChatView(character, next, true));
+            if (next != null && next.getCachedView() != null) {
+                App.logger.info("Using cached selection view...");
+                App.window.addContainer(next.getCachedView());
+            } else {
+                App.window.clearContainers();
+                App.window.addContainer(new ChatView(character, next, true));
+            }
         });
 
         return selection;
@@ -241,7 +242,7 @@ public class ChatView extends EmptyContainer {
         topControls.setSpacing(20);
         topControls.setMaxSize(1000, -1);
 
-       return topControls;
+        return topControls;
     }
 
     public void checkServer() {
