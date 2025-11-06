@@ -44,6 +44,7 @@ public class ChatView extends EmptyContainer {
     private VerticalLayout layout;
     private ScrollContainer scrollContainer;
     private HorizontalLayout topControls;
+    private VerticalLayout sendBox;
 
     private RichTextAreaOverlay send;
 
@@ -232,7 +233,7 @@ public class ChatView extends EmptyContainer {
         send.setMaxHeight(CHAT_SEND_BOX_HEIGHT);
         submit = new ButtonBuilder("submit").setText("Send").build();
 
-        VerticalLayout sendBox = new SendBox(send, submit, this, CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
+        sendBox = new SendBox(send, submit, this, CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         sendBox.setMaxSize(CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         return sendBox;
     }
@@ -493,6 +494,12 @@ public class ChatView extends EmptyContainer {
         root.addElement(progressBarOverlay);
 
         return root;
+    }
+
+    public void resetTopControls() {
+        topControls.removeAllElements();
+        sendBox.replaceElement(0, buildTopControls());
+
     }
 
     public VerticalLayout getLayout() {
