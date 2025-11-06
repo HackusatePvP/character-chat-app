@@ -28,6 +28,7 @@ import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -229,13 +230,18 @@ public class DownloadTab extends Tab {
                 });
             }
         } else {
-            App.logger.info("Fetching download sizes...");
             App.getThreadPoolManager().submitTask(() -> {
-                long fileSize = downloader.getRemoteFileSize(url);
+                long fileSize = 0;
+                try {
+                    fileSize = downloader.getRemoteFileSize(url);
+                } catch (IOException e) {
+                    App.logger.warn("Failed to fetch download size. Connection could not be established: '{}'", url);
+                }
                 String fileName = url.substring(url.lastIndexOf('/') + 1);
 
+                long finalFileSize = fileSize;
                 Platform.runLater(() -> {
-                    FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
+                    FileInfo fileInfo = new FileInfo(finalFileSize, fileName, key);
                     fileInfoRef.set(fileInfo);
 
                     sizeText.setText(fileInfo.getDownloadSize());
@@ -247,11 +253,13 @@ public class DownloadTab extends Tab {
 
                     // Write to cache
                     downloadCache.set(dlKey + ".name", fileName);
-                    downloadCache.set(dlKey + ".size", fileSize);
+                    downloadCache.set(dlKey + ".size", finalFileSize);
                     downloadCache.set(dlKey + ".fetch", System.currentTimeMillis());
 
                     try {
                         downloadCache.save();
+                    } catch (SocketTimeoutException e) {
+                        App.logger.warn("Could not fetch download link '{}'. Internet may be offline.", url);
                     } catch (IOException e) {
                         App.logger.error("Error saving download cache", e);
                     }
