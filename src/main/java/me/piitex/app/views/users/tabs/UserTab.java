@@ -138,6 +138,9 @@ public class UserTab extends Tab {
         userIdInput.onInputSetEvent(event -> {
             userEditView.setUserId(event.getInput());
         });
+        if (userEditView.getUser() != null) {
+            userIdInput.setEnabled(false);
+        }
         root.addElement(userIdInput);
 
         userDisplayNameInput = new InputFieldOverlay(userEditView.getUserDisplay(), 0, 0, 200, 50);

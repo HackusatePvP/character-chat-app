@@ -4,7 +4,6 @@ import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import static me.piitex.app.views.Positions.*;
-import static me.piitex.app.views.Positions.MODEL_CONFIGURATION_LAYOUT_SPACING;
 
 public class ListTab extends Tab {
     private final TabsContainer tabsContainer;

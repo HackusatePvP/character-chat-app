@@ -3,6 +3,8 @@ package me.piitex.app.backend;
 import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.ModelSettings;
+import me.piitex.app.views.chats.ChatView;
+import me.piitex.engine.LimitedHashMap;
 import me.piitex.os.configurations.InfoFile;
 
 import java.io.File;
@@ -34,6 +36,7 @@ public class Character {
     private Map<String, String> exampleDialogue = new TreeMap<>();
 
     private final List<Chat> chats = new ArrayList<>();
+    private final Map<Chat, ChatView> chatViewCachedNodes = new LimitedHashMap<>(5);
 
     private boolean shownDisclaimer = false;
 
@@ -44,9 +47,15 @@ public class Character {
     }
 
     public void initializeDirectories() {
-        getCharacterDirectory().mkdirs();
-        getUserDirectory().mkdirs();
-        getChatDirectory().mkdirs();
+        if (getCharacterDirectory().mkdirs()) {
+            App.logger.info("Created base character directory '{}'", getCharacterDirectory().getAbsolutePath());
+        }
+        if (getUserDirectory().mkdirs()) {
+            App.logger.info("Created base user directory '{}'", getUserDirectory().getAbsolutePath());
+        }
+        if (getChatDirectory().mkdirs()) {
+            App.logger.info("Created base chat directory '{}'", getCharacterDirectory().getAbsolutePath());
+        }
 
         this.infoFile = new InfoFile(new File(getCharacterDirectory(), "character.info"), true);
         this.modelSettings = new ModelSettings(new InfoFile(new File(getCharacterDirectory(), "model-settings.info"), false));
@@ -277,6 +286,10 @@ public class Character {
 
     public InfoFile getInfoFile() {
         return infoFile;
+    }
+
+    public Map<Chat, ChatView> getChatViewCachedNodes() {
+        return chatViewCachedNodes;
     }
 
     public void copy(Character character) {

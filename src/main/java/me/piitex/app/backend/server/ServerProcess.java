@@ -110,13 +110,13 @@ public class ServerProcess {
                             App.logger.info("Destroying {} gracefully...", pid);
                         } catch (Exception e) {
                             if (processHandle.isAlive()) {
-                                App.logger.info("Destroying {} forcefully.", pid);
+                                App.logger.info("Process is still alive. Destroying {} forcefully.", pid);
                                 processHandle.destroyForcibly();
                             }
                         }
                     } else {
                         if (processHandle.isAlive()) {
-                            App.logger.info("Destroying {} forcefully.", pid);
+                            App.logger.info("Could not destroy. Destroying {} forcefully.", pid);
                             processHandle.destroyForcibly();
                         }
                     }
@@ -153,7 +153,7 @@ public class ServerProcess {
                 if (mmproj == null) {
                     App.logger.error("Could not load mmproj. (Invalid file)");
                 } else {
-                    App.logger.debug("MMPROJ: " + mmproj.getFile().getAbsolutePath());
+                    App.logger.debug("MMPROJ: {}", mmproj.getFile().getAbsolutePath());
                     parameters.add("--mmproj");
                     parameters.add(mmproj.getFile().getAbsolutePath());
                 }
@@ -195,7 +195,7 @@ public class ServerProcess {
         }
 
         // Jinja Chat Template
-        if (settings.isJinja()) {
+        if (model.getSettings().isJinja()) {
             App.logger.debug("Using jinja...");
             parameters.add("--jinja");
         }

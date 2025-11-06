@@ -44,6 +44,7 @@ public class ChatView extends EmptyContainer {
     private VerticalLayout layout;
     private ScrollContainer scrollContainer;
     private HorizontalLayout topControls;
+    private VerticalLayout sendBox;
 
     private RichTextAreaOverlay send;
 
@@ -52,6 +53,8 @@ public class ChatView extends EmptyContainer {
     private File image = null;
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
+
+    private Future<?> currentResponseThread;
 
     public ChatView(Character character, @Nullable Chat chat) {
         super(800, 600);
@@ -71,7 +74,6 @@ public class ChatView extends EmptyContainer {
             }
         }
         this.chat = chat;
-        chat.loadChat();
         character.setLastChat(chat);
         init();
     }
@@ -92,7 +94,6 @@ public class ChatView extends EmptyContainer {
             }
             this.chat = chat;
         }
-        chat.loadChat();
         character.setLastChat(chat);
         init();
     }
@@ -104,6 +105,13 @@ public class ChatView extends EmptyContainer {
         onKeyPress(event -> {
             if (event.getEvent().isControlDown() && event.getEvent().getCode() == KeyCode.R) {
                 regenerateLastResponse();
+            } else if (event.getEvent().isControlDown() && event.getEvent().getCode() == KeyCode.X) {
+                if (currentResponseThread != null) {
+                    App.logger.info("Canceling response from keybind.");
+                    currentResponseThread.cancel(true);
+                    topControls.removeElement(topControls.getElements().lastKey());
+                    topControls.removeElement(topControls.getElements().lastKey());
+                }
             }
         });
 
@@ -117,7 +125,7 @@ public class ChatView extends EmptyContainer {
 
         VerticalLayout chatView = new VerticalLayout(0, 0);
         chatView.setAlignment(Pos.TOP_CENTER);
-        chatView.setSpacing(40);
+        chatView.setSpacing(60);
         chatView.addStyle(Styles.BG_INSET);
         main.addElement(chatView);
 
@@ -165,6 +173,8 @@ public class ChatView extends EmptyContainer {
                 alert.onConfirm(_ -> character.setShownDisclaimer(true));
             }
         });
+
+        character.getChatViewCachedNodes().put(chat, this);
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -186,15 +196,17 @@ public class ChatView extends EmptyContainer {
             }
 
             Chat next = character.getChat(item);
-            if (next != null && !next.getFile().getName().equalsIgnoreCase(chat.getFile().getName())) {
-                next.loadChat();
-            }
-
             ChoiceBox<String> choiceBox = selection.getChoiceBox();
             choiceBox.getSelectionModel().clearSelection();
-
             App.window.clearContainers();
-            App.window.addContainer(new ChatView(character, next, true));
+            ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+            if (next != null && cachedView != null) {
+                App.logger.info("Using cached selection view...");
+                App.window.addContainer(cachedView);
+            } else {
+                App.window.clearContainers();
+                App.window.addContainer(new ChatView(character, next, true));
+            }
         });
 
         return selection;
@@ -221,7 +233,7 @@ public class ChatView extends EmptyContainer {
         send.setMaxHeight(CHAT_SEND_BOX_HEIGHT);
         submit = new ButtonBuilder("submit").setText("Send").build();
 
-        VerticalLayout sendBox = new SendBox(send, submit, this, CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
+        sendBox = new SendBox(send, submit, this, CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         sendBox.setMaxSize(CHAT_SEND_BOX_WIDTH, CHAT_SEND_BOX_HEIGHT);
         return sendBox;
     }
@@ -232,7 +244,7 @@ public class ChatView extends EmptyContainer {
         topControls.setSpacing(20);
         topControls.setMaxSize(1000, -1);
 
-       return topControls;
+        return topControls;
     }
 
     public void checkServer() {
@@ -385,7 +397,7 @@ public class ChatView extends EmptyContainer {
         // Notify the user a generation is pending...
         topControls.addElement(buildResponseProgress());
 
-        Future<?> thread = App.getThreadPoolManager().submitTask(() -> {
+        currentResponseThread = App.getThreadPoolManager().submitTask(() -> {
             // Response object holds all data regarding the response (message, context, image, ect)
             response.setPrompt(chatMessage.getContent());
             String received;
@@ -395,7 +407,7 @@ public class ChatView extends EmptyContainer {
             } catch (IOException e) {
                 Platform.runLater(() -> {
                     // If an exception is thrown for whatever reason, notify the user an error occured.
-                    MessageOverlay error = new MessageOverlay(0, 0, 600, 100,"Response Error", "Could not generate a response! Check backend status and settings.");
+                    MessageOverlay error = new MessageOverlay(0, 0, 600, 100, "Response Error", "Could not generate a response! Check backend status and settings.");
                     error.addStyle(Styles.DANGER);
                     error.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, true);
@@ -440,7 +452,7 @@ public class ChatView extends EmptyContainer {
         stop.onClick(_ -> {
             App.logger.info("Force stopping response...");
             stopNode.setDisable(true);
-            thread.cancel(true);
+            currentResponseThread.cancel(true);
         });
 
         topControls.addElement(stop);
@@ -449,9 +461,6 @@ public class ChatView extends EmptyContainer {
     public void regenerateLastResponse() {
         if (ServerProcess.getCurrentServer() == null || ServerProcess.getCurrentServer().isLoading() || ServerProcess.getCurrentServer().isError()) return;
         App.logger.info("Regenerating last response...");
-
-        // Disable top controls to prevent duplicate calls
-        topControls.setEnabled(false);
 
         int index = chat.getMessages().lastIndexOf(chat.getMessages().getLast());
         if (index + 1 != chat.getMessages().size()) {
@@ -474,7 +483,7 @@ public class ChatView extends EmptyContainer {
     }
 
     public VerticalLayout buildResponseProgress() {
-        VerticalLayout root = new VerticalLayout(150, 30);
+        VerticalLayout root = new VerticalLayout(150, -1);
         root.setMaxSize(root.getWidth(), root.getHeight());
         root.setAlignment(Pos.TOP_CENTER);
 
@@ -485,6 +494,12 @@ public class ChatView extends EmptyContainer {
         root.addElement(progressBarOverlay);
 
         return root;
+    }
+
+    public void resetTopControls() {
+        topControls.removeAllElements();
+        sendBox.replaceElement(0, buildTopControls());
+
     }
 
     public VerticalLayout getLayout() {

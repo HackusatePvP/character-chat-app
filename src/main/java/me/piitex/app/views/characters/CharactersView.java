@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
+import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.LoadingView;
@@ -71,8 +72,9 @@ public class CharactersView {
             CardContainer card = new CardContainer(0,0, cardWidth, cardHeight);
             card.setMaxSize(cardWidth, cardHeight);
 
-            VerticalLayout displayBox = new VerticalLayout(0, 0);
-            displayBox.setAlignment(Pos.BASELINE_CENTER);
+            VerticalLayout displayBox = new VerticalLayout(0, 330);
+            displayBox.setSpacing(15);
+            displayBox.setAlignment(Pos.TOP_CENTER);
 
             TextOverlay helper = new TextOverlay("Click to chat");
             helper.setUnderline(true);
@@ -101,22 +103,31 @@ public class CharactersView {
                     // Display progress
                     App.window.clearContainers();
 
-                    EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
-                    progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
-                    App.window.addContainer(progressContainer);
-
-                    App.getThreadPoolManager().submitTask(() -> {
-                        ChatView chatView = new ChatView(character, character.getLastChat());
-                        Node assemble = chatView.assemble();
+                    Chat chat = character.getLastChat();
+                    ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+                    if (chat != null && cachedView != null) {
                         Platform.runLater(() -> {
-                            App.window.clearContainers();
-                            App.window.addContainer(chatView, assemble);
+                            App.logger.info("Using cached chat view...");
+                            cachedView.resetTopControls();
+                            App.window.addContainer(cachedView);
                         });
+                    } else {
+                        EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
+                        progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
+                        App.window.addContainer(progressContainer);
 
-                    });
+                        App.getThreadPoolManager().submitTask(() -> {
+                            ChatView chatView = new ChatView(character, chat);
+                            Node assemble = chatView.assemble();
+                            Platform.runLater(() -> {
+                                App.window.clearContainers();
+                                App.window.addContainer(chatView, assemble);
+                            });
+                        });
+                    }
+
 
                 }
-
             });
 
             ImageOverlay icon = User.getUserAvatar(character.getIconPath(), imageWidth, imageHeight);

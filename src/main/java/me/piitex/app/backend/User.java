@@ -22,7 +22,9 @@ public class User {
     // Create user
     public User(String id) {
         this.id = id;
-        getUserDirectory().mkdirs();
+        if (getUserDirectory().mkdirs()) {
+            App.logger.info("Created user directory '{}'", getUserDirectory().getAbsolutePath());
+        }
         infoFile = new InfoFile(new File(getUserDirectory(), "user.info"), true);
         infoFile.set("id", id);
     }

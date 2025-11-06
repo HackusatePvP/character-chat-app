@@ -1,6 +1,7 @@
 package me.piitex.app.backend;
 
 import me.piitex.app.App;
+import me.piitex.app.views.chats.ChatView;
 import me.piitex.os.configurations.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -16,22 +17,26 @@ public class Chat {
     private Response response;
     private final LinkedList<ChatMessage> messages = new LinkedList<>();
     private final boolean dev = false;
+    private ChatView cachedView;
 
 
     public Chat(File file) {
         this.file = file;
+        loadChat();
     }
 
-    public void loadChat() {
+    private void loadChat() {
         messages.clear();
         if (!file.exists()) {
             try {
-                file.createNewFile();
+                if (file.createNewFile()) {
+                    App.logger.warn("Could not create chat file. It may already exist.");
+                }
             } catch (IOException e) {
                 throw new RuntimeException("Failed to create chat file: " + file.getAbsolutePath(), e);
             }
         } else if (file.length() > 0 && !dev) {
-            File out = new File(file.getParent(), "out.dat"); // Temporary decrypted file
+            File out = new File(file.getParent(), file.getName() + "out.dat"); // Temporary decrypted file
             try {
                 FileCrypter.decryptFile(file, out);
                 AtomicInteger count = new AtomicInteger();
@@ -47,7 +52,11 @@ public class Chat {
                 App.logger.error("Error decrypting or reading chat file: {}", file.getAbsolutePath(), e);
             } finally {
                 if (out.exists()) {
-                    out.delete();
+                    try {
+                        Files.delete(out.toPath());
+                    } catch (IOException e) {
+                        App.logger.error("Failed to delete decrypted chat file!", e);
+                    }
                 }
             }
         } else {
@@ -216,7 +225,11 @@ public class Chat {
                 FileCrypter.encryptFile(tempIn, file);
             }
             if (tempIn.exists() && !dev) {
-                tempIn.delete();
+                try {
+                    Files.delete(tempIn.toPath());
+                } catch (IOException e) {
+                    App.logger.error("Could not delete temporary chat file during encryption!", e);
+                }
             }
         }
     }
@@ -226,5 +239,13 @@ public class Chat {
 
     public void setResponse(Response response) {
         this.response = response;
+    }
+
+    public ChatView getCachedView() {
+        return cachedView;
+    }
+
+    public void setCachedView(ChatView cachedView) {
+        this.cachedView = cachedView;
     }
 }

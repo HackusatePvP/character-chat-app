@@ -11,7 +11,6 @@ import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.*;
 import me.piitex.app.backend.Character;
-import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.PopupPosition;

@@ -28,6 +28,7 @@ import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -63,9 +64,11 @@ public class DownloadTab extends Tab {
 
         if (!file.exists()) {
             try {
-                file.createNewFile();
+                if (!file.createNewFile()) {
+                    App.logger.warn("Could not create model cache file. It may already exist.");
+                }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                App.logger.error("IO exception occurred while handling model cache file.", new RuntimeException());
             }
         }
 
@@ -166,15 +169,6 @@ public class DownloadTab extends Tab {
 
         AtomicReference<FileInfo> fileInfoRef = new AtomicReference<>();
 
-        File file = new File(App.getModelsDirectory(), "download-cache.dat");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
         setupFileInfoFetch(tileLayout, modelKey, url, quantization, sizeText, downloadIcon, fileInfoRef);
         setupDownloadAction(tileLayout, downloadIcon, url, modelKey, fileInfoRef, titledContainer); // Pass titledContainer for relocation
 
@@ -236,13 +230,18 @@ public class DownloadTab extends Tab {
                 });
             }
         } else {
-            App.logger.info("Fetching download sizes...");
             App.getThreadPoolManager().submitTask(() -> {
-                long fileSize = downloader.getRemoteFileSize(url);
+                long fileSize = 0;
+                try {
+                    fileSize = downloader.getRemoteFileSize(url);
+                } catch (IOException e) {
+                    App.logger.warn("Failed to fetch download size. Connection could not be established: '{}'", url);
+                }
                 String fileName = url.substring(url.lastIndexOf('/') + 1);
 
+                long finalFileSize = fileSize;
                 Platform.runLater(() -> {
-                    FileInfo fileInfo = new FileInfo(fileSize, fileName, key);
+                    FileInfo fileInfo = new FileInfo(finalFileSize, fileName, key);
                     fileInfoRef.set(fileInfo);
 
                     sizeText.setText(fileInfo.getDownloadSize());
@@ -254,11 +253,13 @@ public class DownloadTab extends Tab {
 
                     // Write to cache
                     downloadCache.set(dlKey + ".name", fileName);
-                    downloadCache.set(dlKey + ".size", fileSize);
+                    downloadCache.set(dlKey + ".size", finalFileSize);
                     downloadCache.set(dlKey + ".fetch", System.currentTimeMillis());
 
                     try {
                         downloadCache.save();
+                    } catch (SocketTimeoutException e) {
+                        App.logger.warn("Could not fetch download link '{}'. Internet may be offline.", url);
                     } catch (IOException e) {
                         App.logger.error("Error saving download cache", e);
                     }
@@ -296,7 +297,9 @@ public class DownloadTab extends Tab {
 
         // Ensure the model's directory exists
         if (!modelDirectory.exists()) {
-            modelDirectory.mkdirs();
+            if (modelDirectory.mkdirs()) {
+                App.logger.error("Could not create model directory!", new RuntimeException());
+            }
             App.logger.info("Created model directory: {}", modelDirectory.getAbsolutePath());
         }
 
@@ -422,8 +425,11 @@ public class DownloadTab extends Tab {
 
             // Synchronous File Deletion (must be here as a final cleanup)
             if (fileToDelete.exists()) {
-                fileToDelete.delete();
-                App.logger.info("Deleted partial file: {}", fileToDelete.getName());
+                if (!fileToDelete.delete()) {
+                    App.logger.error("Failed to delete partial model file!", new RuntimeException());
+                } else {
+                    App.logger.info("Deleted partial file: {}", fileToDelete.getName());
+                }
             }
 
             fileInfoRef.get().setDownloaded(false);
