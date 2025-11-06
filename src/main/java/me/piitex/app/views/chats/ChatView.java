@@ -173,7 +173,7 @@ public class ChatView extends EmptyContainer {
             }
         });
 
-        chat.setCachedView(this);
+        character.getChatViewCachedNodes().put(chat, this);
     }
 
     public ChoiceBoxOverlay buildSelection() {
@@ -198,9 +198,10 @@ public class ChatView extends EmptyContainer {
             ChoiceBox<String> choiceBox = selection.getChoiceBox();
             choiceBox.getSelectionModel().clearSelection();
             App.window.clearContainers();
-            if (next != null && next.getCachedView() != null) {
+            ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+            if (next != null && cachedView != null) {
                 App.logger.info("Using cached selection view...");
-                App.window.addContainer(next.getCachedView());
+                App.window.addContainer(cachedView);
             } else {
                 App.window.clearContainers();
                 App.window.addContainer(new ChatView(character, next, true));

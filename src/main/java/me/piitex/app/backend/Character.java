@@ -3,6 +3,8 @@ package me.piitex.app.backend;
 import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.ModelSettings;
+import me.piitex.app.views.chats.ChatView;
+import me.piitex.engine.LimitedHashMap;
 import me.piitex.os.configurations.InfoFile;
 
 import java.io.File;
@@ -34,6 +36,7 @@ public class Character {
     private Map<String, String> exampleDialogue = new TreeMap<>();
 
     private final List<Chat> chats = new ArrayList<>();
+    private final Map<Chat, ChatView> chatViewCachedNodes = new LimitedHashMap<>(5);
 
     private boolean shownDisclaimer = false;
 
@@ -283,6 +286,10 @@ public class Character {
 
     public InfoFile getInfoFile() {
         return infoFile;
+    }
+
+    public Map<Chat, ChatView> getChatViewCachedNodes() {
+        return chatViewCachedNodes;
     }
 
     public void copy(Character character) {

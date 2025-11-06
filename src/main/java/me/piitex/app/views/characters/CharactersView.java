@@ -104,10 +104,12 @@ public class CharactersView {
                     App.window.clearContainers();
 
                     Chat chat = character.getLastChat();
-                    if (chat != null && chat.getCachedView() != null) {
+                    ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+                    if (chat != null && cachedView != null) {
                         Platform.runLater(() -> {
                             App.logger.info("Using cached chat view...");
-                            App.window.addContainer(chat.getCachedView());
+                            cachedView.resetTopControls();
+                            App.window.addContainer(cachedView);
                         });
                     } else {
                         EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
