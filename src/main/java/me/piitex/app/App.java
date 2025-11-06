@@ -89,9 +89,12 @@ public class App extends FXLoad {
         settings.getInfoFile().set("main-pid", currentPid);
 
         threadPoolManager = new ThreadPoolManager();
-
         if (getAppDirectory().mkdirs()) {
             logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
+        }
+
+        if (getDataDirectory().mkdirs()) {
+            logger.info("Created data directory: {}", getDataDirectory().getAbsolutePath());
         }
 
         if (getBackendDirectory().mkdirs()) {
@@ -311,14 +314,18 @@ public class App extends FXLoad {
         }
 
         long currentSize = currentData.length();
-        long downloadSize = downloader.getRemoteFileSize(dataFileUrl);
-        if (currentSize != downloadSize) {
-            logger.info("Updating model list...");
-            downloader.startDownload(dataFileUrl, currentData);
-        }
+        try {
+            long downloadSize = downloader.getRemoteFileSize(dataFileUrl);
+            if (currentSize != downloadSize) {
+                logger.info("Updating model list...");
+                downloader.startDownload(dataFileUrl, currentData);
+            }
 
-        logger.info("Model list updated...");
-        downloader.shutdown();
+            logger.info("Model list updated...");
+            downloader.shutdown();
+        } catch (IOException e) {
+            App.logger.error("Failed to fetch download size.");
+        }
 
     }
 
