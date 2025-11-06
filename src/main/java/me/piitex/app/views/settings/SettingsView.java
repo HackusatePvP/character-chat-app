@@ -91,6 +91,9 @@ public class SettingsView {
 
             Positions.initialize();
 
+            // Reset cached nodes as they will not reflect the size changes.
+            App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
+
             App.window.clearContainers();
             App.window.addContainer(new SettingsView().getContainer());
         });
