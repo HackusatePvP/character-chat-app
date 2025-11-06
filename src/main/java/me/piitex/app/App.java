@@ -71,6 +71,8 @@ public class App extends FXLoad {
     public void preInitialization() {
         logger.info("Initializing application...");
         instance = this;
+        setupDirectories();
+
         settings = new ServerSettings();
 
         long currentPid = ProcessHandle.current().pid();
@@ -89,30 +91,6 @@ public class App extends FXLoad {
         settings.getInfoFile().set("main-pid", currentPid);
 
         threadPoolManager = new ThreadPoolManager();
-        if (getAppDirectory().mkdirs()) {
-            logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
-        }
-
-        if (getDataDirectory().mkdirs()) {
-            logger.info("Created data directory: {}", getDataDirectory().getAbsolutePath());
-        }
-
-        if (getBackendDirectory().mkdirs()) {
-            logger.info("Created backend directory: {}", getBackendDirectory().getAbsolutePath());
-        }
-
-        if (getModelsDirectory().mkdirs()) {
-            logger.info("Created models directory: {}", getModelsDirectory().getAbsolutePath());
-        }
-
-        if (getCharactersDirectory().mkdirs()) {
-            logger.info("Created characters directory: {}", getCharactersDirectory().getAbsolutePath());
-        }
-
-        if (getUsersDirectory().mkdirs()) {
-            logger.info("Created users directory: {}", getUsersDirectory().getAbsolutePath());
-        }
-
         threadPoolManager.submitTask(() -> {
             loading = true;
             if (Main.run || Main.app) {
@@ -230,6 +208,33 @@ public class App extends FXLoad {
                 }
             }
         });
+    }
+
+    private void setupDirectories() {
+        if (getAppDirectory().mkdirs()) {
+            logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
+        }
+
+        if (getDataDirectory().mkdirs()) {
+            logger.info("Created data directory: {}", getDataDirectory().getAbsolutePath());
+        }
+
+        if (getBackendDirectory().mkdirs()) {
+            logger.info("Created backend directory: {}", getBackendDirectory().getAbsolutePath());
+        }
+
+        if (getModelsDirectory().mkdirs()) {
+            logger.info("Created models directory: {}", getModelsDirectory().getAbsolutePath());
+        }
+
+        if (getCharactersDirectory().mkdirs()) {
+            logger.info("Created characters directory: {}", getCharactersDirectory().getAbsolutePath());
+        }
+
+        if (getUsersDirectory().mkdirs()) {
+            logger.info("Created users directory: {}", getUsersDirectory().getAbsolutePath());
+        }
+
     }
 
     private void setStageInput(Window window) {
