@@ -201,6 +201,22 @@ public class CharacterCardImporter {
         return "";
     }
 
+    public static String getUserDisplay(JSONObject metaData) {
+        JSONObject characterJson = getCharacterJson(metaData);
+        if (characterJson.has("userDisplay")) {
+            return characterJson.getString("userDisplay");
+        }
+        return null;
+    }
+
+    public static String getUserPersona(JSONObject metaData) {
+        JSONObject characterJson = getCharacterJson(metaData);
+        if (characterJson.has("userPersona")) {
+            return characterJson.getString("userPersona");
+        }
+        return null;
+    }
+
     public static Map<String, String> getLoreItems(JSONObject metaData) throws JSONException {
         JSONObject characterJson = getCharacterJson(metaData);
         Map<String, String> map = new HashMap<>();

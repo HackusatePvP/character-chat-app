@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.CharacterCardExporter;
 import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -85,6 +86,16 @@ public class CharacterTab extends Tab {
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
 
         rootLayout.addElement(charDescription);
+
+        ButtonOverlay export = new ButtonBuilder("export").setText("Export Character").build();
+        export.addStyle(Styles.BUTTON_OUTLINED);
+        export.onClick(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save exported image as.", "*.png"));
+            File output = chooser.showSaveDialog(App.window.getStage());
+            new CharacterCardExporter(output, character);
+        });
+        rootLayout.addElement(export);
 
         //rootLayout.addElement(buildExampleDialogue());
 
@@ -193,6 +204,15 @@ public class CharacterTab extends Tab {
 
                 parentView.getChatTabInstance().getFirstMessageInput().setCurrentText(CharacterCardImporter.getFirstMessage(metadata));
                 parentView.getChatTabInstance().getChatScenarioInput().setCurrentText(CharacterCardImporter.getChatScenario(metadata));
+
+                String userDisplay = CharacterCardImporter.getUserDisplay(metadata);
+                if (userDisplay != null) {
+                    parentView.getUserTabInstance().getUserDisplayNameInput().setCurrentText(userDisplay);
+                }
+                String userPersona = CharacterCardImporter.getUserPersona(metadata);
+                if (userPersona != null) {
+                    parentView.getUserTabInstance().getUserDescription().setCurrentText(userPersona);
+                }
 
                 parentView.setCharacterIconPath(file);
                 parentView.getInfoFile().set("icon-path", file.getAbsolutePath());
