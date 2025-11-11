@@ -45,6 +45,7 @@ public class ChatBoxCard extends CardContainer {
             displayName = character.getUser().getDisplayName();
         } else {
             iconPath = (character != null && character.getIconPath() != null && !character.getIconPath().isEmpty() ? character.getIconPath() : new File(App.getAppDirectory(), "icons/character.png").getAbsolutePath());
+            assert character != null; // Character cannot be null at this stage. If the character is null, the error will be caught and thrown before this call.
             displayName = character.getDisplayName();
         }
 
