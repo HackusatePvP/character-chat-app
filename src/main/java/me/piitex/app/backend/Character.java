@@ -4,7 +4,7 @@ import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.views.chats.ChatView;
-import me.piitex.engine.LimitedHashMap;
+import me.piitex.engine.maps.LimitedHashMap;
 import me.piitex.os.configurations.InfoFile;
 
 import java.io.File;
