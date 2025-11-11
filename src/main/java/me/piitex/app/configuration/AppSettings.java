@@ -152,12 +152,13 @@ public class AppSettings {
 
     public void setWindowScaling(boolean windowScaling) {
         this.windowScaling = windowScaling;
+        infoFile.set("window-scaling", windowScaling);
     }
 
     /*
-                Utility functions for getting theme coloring.
-                Needed for RichTextFX components and BBCode
-             */
+      Utility functions for getting theme coloring.
+      Needed for RichTextFX components and BBCode
+    */
     public Theme getStyleTheme(String name) {
         if (name.equalsIgnoreCase("primer light")) {
             return new PrimerLight();
