@@ -160,7 +160,7 @@ public class App extends FXLoad {
         // This is because the pathing for the image doesn't change but the image gets replaced by the new image.
         ImageLoader.useCache = false;
 
-        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale(true).setDimensions(setWidth, setHeight).build();
+        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
         // Initialize global positions. Needed for the rendering process.
         Positions.initialize();
@@ -373,7 +373,7 @@ public class App extends FXLoad {
 
     public Window buildErrorWindow(String message) {
         if (window != null) {
-            window.close();
+            window.close(true);
         }
 
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
