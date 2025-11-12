@@ -207,6 +207,7 @@ public class ChatView extends EmptyContainer {
                 App.window.clearContainers();
                 App.window.addContainer(new ChatView(character, next, true));
             }
+            character.setLastChat(next);
         });
 
         return selection;
