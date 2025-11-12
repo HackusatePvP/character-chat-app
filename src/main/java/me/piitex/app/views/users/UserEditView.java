@@ -59,6 +59,8 @@ public class UserEditView extends EmptyContainer {
     }
 
     public void init() {
+        addStyle(Styles.BG_INSET);
+
         HorizontalLayout root = new HorizontalLayout(getWidth(), getHeight());
         root.setMaxSize(root.getWidth(), root.getHeight());
         addElement(root);

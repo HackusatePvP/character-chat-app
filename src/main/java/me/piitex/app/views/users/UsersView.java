@@ -2,7 +2,6 @@ package me.piitex.app.views.users;
 
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -34,7 +33,7 @@ public class UsersView extends EmptyContainer {
 
     public UsersView() {
         super(appSettings.getWidth(), appSettings.getHeight());
-
+        addStyle(Styles.BG_INSET);
         HorizontalLayout root = new HorizontalLayout(getWidth(), getHeight());
         root.setMaxSize(root.getWidth(), root.getHeight());
         addElement(root);
@@ -50,7 +49,8 @@ public class UsersView extends EmptyContainer {
     }
 
     public void init() {
-        VerticalLayout header = new VerticalLayout(appSettings.getWidth() - 200, 200);
+        VerticalLayout header = new VerticalLayout(appSettings.getWidth() - 200, 100);
+        header.addStyle(Styles.BG_DEFAULT);
         header.setMaxSize(header.getWidth(), header.getHeight());
         header.setAlignment(Pos.CENTER);
         mainPage.addElement(header);
@@ -63,7 +63,6 @@ public class UsersView extends EmptyContainer {
             App.window.addContainer(new UserEditView());
         });
         header.addElement(newUser);
-        header.addElement(new SeparatorOverlay(Orientation.HORIZONTAL));
 
         buildFlowLayout();
     }
@@ -75,6 +74,7 @@ public class UsersView extends EmptyContainer {
         base.setMaxSize(base.getWidth(), base.getHeight());
 
         FlowLayout flowLayout = new FlowLayout(appSettings.getWidth() - 200, 0);
+        flowLayout.setX(10);
         flowLayout.setMaxSize(flowLayout.getWidth(), flowLayout.getHeight());
         mainPage.addElement(flowLayout);
         flowLayout.addStyle(Styles.BORDER_DEFAULT);
