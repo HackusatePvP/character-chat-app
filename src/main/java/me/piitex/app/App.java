@@ -74,12 +74,13 @@ public class App extends FXLoad {
         setupDirectories();
 
         settings = new ServerSettings();
+        appSettings = new AppSettings();
 
         long currentPid = ProcessHandle.current().pid();
         if (settings.getInfoFile().hasKey("main-pid")) {
             String pid = settings.getInfoFile().get("main-pid");
             if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
-                logger.error("Process already running!");
+                logger.error("Process already running! '{}'", pid);
                 error = true;
                 Platform.runLater(() -> {
                     buildErrorWindow("Process is already running!").render();
@@ -101,7 +102,6 @@ public class App extends FXLoad {
             App.logger.info("Finished pre-initialization.");
             loading = false;
         });
-        appSettings = new AppSettings();
     }
 
     @Override
@@ -326,11 +326,21 @@ public class App extends FXLoad {
                 downloader.startDownload(dataFileUrl, currentData);
             }
 
-            logger.info("Model list updated...");
+            logger.info("Model list updated.");
             downloader.shutdown();
         } catch (IOException e) {
             App.logger.error("Failed to fetch download size.");
         }
+
+//        TODO: Automatically update llamacpp
+//        try {
+//            GitHubUtil gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggerganov/llama.cpp/");
+//            FileDownloader llamaDownloader = gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(), "llama-[a-zA-Z0-9]+-bin-win-cuda-12\\.4-x64\\.zip").getInt("id"), new File("output/download.zip"));
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
 
     }
 
@@ -400,6 +410,8 @@ public class App extends FXLoad {
                 App.logger.info("Forcefully killing old process.");
                 ProcessUtil.terminateProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
             }
+
+            appSettings.getInfoFile().set("main-pid", "");
         });
 
         window.getStage().setOnCloseRequest(event -> {
