@@ -167,6 +167,11 @@ public class SettingsView {
                 item = Styles.TEXT;
             }
             appSettings.setChatTextSize(item);
+
+            App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
+            App.window.clear();
+            App.window.close(false);
+            App.getInstance().initialization(App.window.getStage());
         });
 
         tileContainer.setAction(selection);
@@ -218,11 +223,10 @@ public class SettingsView {
             appSettings.setGlobalTextSize(item);
 
             // Refresh view to reflect changes.
-            container.getElements().clear();
-            build();
-            Pane pane = (Pane) container.getNode();
-            pane.getChildren().clear();
-            pane.getChildren().addAll(container.build());
+            App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
+            App.window.clear();
+            App.window.close(false);
+            App.getInstance().initialization(App.window.getStage());
 
         });
 
