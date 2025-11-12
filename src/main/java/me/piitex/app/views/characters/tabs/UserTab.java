@@ -1,11 +1,15 @@
 package me.piitex.app.views.characters.tabs;
 
 import atlantafx.base.theme.Styles;
+import com.drew.imaging.ImageProcessingException;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ImageCardExporter;
+import me.piitex.app.utils.UserCardImporter;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -15,8 +19,10 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,10 +84,26 @@ public class UserTab extends Tab {
         userDescription.addStyle(Styles.BG_DEFAULT);
         userDescription.addStyle(appSettings.getChatTextSize());
         userDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
-
         rootLayout.addElement(userDescription);
 
-        this.addElement(parentView.buildSubmitBox());
+        if (parentView.getUser() != null) {
+            ButtonOverlay export = new ButtonBuilder("export").setText("Export User").build();
+            export.addStyle(Styles.ACCENT);
+            export.addStyle(Styles.BUTTON_OUTLINED);
+            export.onClick(event -> {
+                FileChooser chooser = new FileChooser();
+                chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save exported image as.", "*.png"));
+                File output = chooser.showSaveDialog(App.window.getStage());
+                try {
+                    ImageCardExporter.exportUser(parentView.getUser(), output);
+                } catch (IOException e) {
+                    // Prompt the user with an error message
+                }
+            });
+            rootLayout.addElement(export);
+        }
+
+        addElement(parentView.buildSubmitBox());
     }
 
     private CardContainer buildUserDisplay() {
@@ -189,6 +211,44 @@ public class UserTab extends Tab {
             }
 
             parentView.updateInfoData();
+        });
+
+        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import Character Card").build();
+        if (parentView.getUser() != null) {
+            importCard.setEnabled(false);
+        }
+        importCard.addStyle(Styles.ACCENT);
+        importCard.addStyle(Styles.BUTTON_OUTLINED);
+        importCard.setWidth(200);
+        importCard.setHeight(50);
+
+        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
+        root.addElement(fileSelector);
+        fileSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                JSONObject metadata = UserCardImporter.getImageMetaData(file);
+                userDisplayNameInput.setCurrentText(UserCardImporter.getUserDisplay(metadata));
+                userDescription.setCurrentText(UserCardImporter.getUserPersona(metadata));
+
+                parentView.getLoreBookTabInstance().getItems().clear();
+                //TODO: Process user lorebook
+
+                parentView.setUserIconPath(file);
+                parentView.getInfoFile().set("icon-path-user", file.getAbsolutePath());
+                image.setImage(new ImageLoader(file));
+
+                parentView.updateInfoData();
+
+            } catch (ImageProcessingException | IOException e) {
+                App.logger.error("Error importing character card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
         });
 
         return root;

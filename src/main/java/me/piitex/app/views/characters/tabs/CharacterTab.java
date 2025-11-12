@@ -12,7 +12,7 @@ import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.utils.CharacterCardExporter;
+import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -87,15 +87,22 @@ public class CharacterTab extends Tab {
 
         rootLayout.addElement(charDescription);
 
-        ButtonOverlay export = new ButtonBuilder("export").setText("Export Character").build();
-        export.addStyle(Styles.BUTTON_OUTLINED);
-        export.onClick(event -> {
-            FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save exported image as.", "*.png"));
-            File output = chooser.showSaveDialog(App.window.getStage());
-            new CharacterCardExporter(output, character);
-        });
-        rootLayout.addElement(export);
+        if (character != null) {
+            ButtonOverlay export = new ButtonBuilder("export").setText("Export Character").build();
+            export.addStyle(Styles.ACCENT);
+            export.addStyle(Styles.BUTTON_OUTLINED);
+            export.onClick(event -> {
+                FileChooser chooser = new FileChooser();
+                chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save exported image as.", "*.png"));
+                File output = chooser.showSaveDialog(App.window.getStage());
+                try {
+                    ImageCardExporter.exportCharacter(character, output);
+                } catch (IOException e) {
+                    // Prompt the user with an error message
+                }
+            });
+            rootLayout.addElement(export);
+        }
 
         //rootLayout.addElement(buildExampleDialogue());
 
