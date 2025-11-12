@@ -208,6 +208,13 @@ public class UserTab extends Tab {
                     parentView.setUserIconPath(new File(template.getIconPath()));
                     image.setImage(new ImageLoader(parentView.getUserIconPath()));
                 }
+
+                if (parentView.getUser() != null) {
+                    parentView.getUser().getLorebook().keySet().forEach(s -> parentView.getLoreBookTabInstance().getItems().remove(s));
+                }
+
+                parentView.getLoreBookTabInstance().getItems().putAll(template.getLorebook());
+                parentView.getLoreBookTabInstance().buildLorebookTabContent();
             }
 
             parentView.updateInfoData();
@@ -231,8 +238,11 @@ public class UserTab extends Tab {
                 userDisplayNameInput.setCurrentText(UserCardImporter.getUserDisplay(metadata));
                 userDescription.setCurrentText(UserCardImporter.getUserPersona(metadata));
 
-                parentView.getLoreBookTabInstance().getItems().clear();
-                //TODO: Process user lorebook
+                if (parentView.getUser() != null) {
+                    parentView.getUser().getLorebook().keySet().forEach(s -> parentView.getLoreBookTabInstance().getItems().remove(s));
+                }
+                parentView.getLoreBookTabInstance().getItems().putAll(UserCardImporter.getLoreItems(metadata));
+                parentView.getLoreBookTabInstance().buildLorebookTabContent();
 
                 parentView.setUserIconPath(file);
                 parentView.getInfoFile().set("icon-path-user", file.getAbsolutePath());
