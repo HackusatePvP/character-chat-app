@@ -18,7 +18,6 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
-import me.piitex.os.configurations.InfoFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +37,7 @@ public class UserEditView extends EmptyContainer {
 
     private TabsContainer tabsContainer;
     private UserTab userTab;
+    private UserLoreBookTab userLoreBookTab;
 
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
@@ -76,7 +76,7 @@ public class UserEditView extends EmptyContainer {
         userTab = new UserTab("User", this);
         tabsContainer.addTab(userTab);
 
-        UserLoreBookTab userLoreBookTab = new UserLoreBookTab("Lorebook", this);
+        userLoreBookTab = new UserLoreBookTab("Lorebook", this);
         tabsContainer.addTab(userLoreBookTab);
     }
 
@@ -169,6 +169,14 @@ public class UserEditView extends EmptyContainer {
         } else {
             return true;
         }
+    }
+
+    public UserTab getUserTab() {
+        return userTab;
+    }
+
+    public UserLoreBookTab getUserLoreBookTab() {
+        return userLoreBookTab;
     }
 
     public User getUser() {

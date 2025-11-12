@@ -1,10 +1,13 @@
 package me.piitex.app.views.users.tabs;
 
 import atlantafx.base.theme.Styles;
+import com.drew.imaging.ImageProcessingException;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.UserCardImporter;
 import me.piitex.app.views.users.UserEditView;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.ScrollContainer;
@@ -13,8 +16,10 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 
 public class UserTab extends Tab {
     private final UserEditView userEditView;
@@ -150,6 +155,41 @@ public class UserTab extends Tab {
             userEditView.setUserDisplay(event.getInput());
         });
         root.addElement(userDisplayNameInput);
+
+        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import Character Card").build();
+        if (userEditView.getUser() != null) {
+            importCard.setEnabled(false);
+        }
+        importCard.addStyle(Styles.ACCENT);
+        importCard.addStyle(Styles.BUTTON_OUTLINED);
+        importCard.setWidth(200);
+        importCard.setHeight(50);
+
+        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
+        root.addElement(fileSelector);
+        fileSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                JSONObject metadata = UserCardImporter.getImageMetaData(file);
+                userDisplayNameInput.setCurrentText(UserCardImporter.getUserDisplay(metadata));
+                userDescription.setCurrentText(UserCardImporter.getUserPersona(metadata));
+
+                userEditView.getLoreBook().clear();
+                userEditView.getLoreBook().putAll(UserCardImporter.getLoreItems(metadata));
+                userEditView.getUserLoreBookTab().buildLorebookTabContent();
+
+                userEditView.setUserIconPath(file);
+                image.setImage(new ImageLoader(file));
+            } catch (ImageProcessingException | IOException e) {
+                App.logger.error("Error importing character card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
+        });
 
         return root;
     }
