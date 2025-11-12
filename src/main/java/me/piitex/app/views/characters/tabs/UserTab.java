@@ -220,10 +220,7 @@ public class UserTab extends Tab {
             parentView.updateInfoData();
         });
 
-        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import Character Card").build();
-        if (parentView.getUser() != null) {
-            importCard.setEnabled(false);
-        }
+        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import User Card").build();
         importCard.addStyle(Styles.ACCENT);
         importCard.addStyle(Styles.BUTTON_OUTLINED);
         importCard.setWidth(200);
