@@ -340,9 +340,11 @@ public class CharacterEditView {
                     characterSpecificUser.setPersona(userPersona);
 
                     if (userIconPath != null && userIconPath.exists()) {
-                        File output = new File(currentCharacterInstance.getUserDirectory(), userIconPath.getName());
-                        Files.copy(userIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        characterSpecificUser.setIconPath(output.getAbsolutePath());
+                        File output = new File(character.getUserDirectory(), userIconPath.getName());
+                        if (!userIconPath.toPath().equals(output.toPath())) {
+                            Files.copy(userIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            characterSpecificUser.setIconPath(output.getAbsolutePath());
+                        }
                     }
 
                     character.setUser(characterSpecificUser);
