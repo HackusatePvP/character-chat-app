@@ -1,7 +1,6 @@
 package me.piitex.app.backend;
 
 import me.piitex.app.App;
-import me.piitex.app.views.chats.ChatView;
 import me.piitex.os.configurations.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
@@ -17,7 +16,6 @@ public class Chat {
     private Response response;
     private final LinkedList<ChatMessage> messages = new LinkedList<>();
     private final boolean dev = false;
-    private ChatView cachedView;
 
 
     public Chat(File file) {
@@ -239,13 +237,5 @@ public class Chat {
 
     public void setResponse(Response response) {
         this.response = response;
-    }
-
-    public ChatView getCachedView() {
-        return cachedView;
-    }
-
-    public void setCachedView(ChatView cachedView) {
-        this.cachedView = cachedView;
     }
 }

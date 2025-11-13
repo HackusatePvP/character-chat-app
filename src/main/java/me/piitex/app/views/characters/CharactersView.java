@@ -19,6 +19,7 @@ import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -255,7 +256,9 @@ public class CharactersView {
             // Add a buffer to ensure image resources are disposed.
             App.getThreadPoolManager().submitSchedule(() -> {
                 try {
-                    App.logger.info("Deleting: {}", character.getId());
+                    App.logger.info("Removing image from cache '{}'", character.getIconPath());
+                    ImageLoader.imageCache.remove(character.getIconPath()); // Clear image from cache.
+                    App.logger.info("Deleting Character: {}", character.getId());
                     FileUtils.deleteDirectory(character.getCharacterDirectory());
                 } catch (IOException e) {
                     App.logger.error("Could not delete directory!", e);

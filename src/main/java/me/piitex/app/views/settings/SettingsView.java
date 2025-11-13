@@ -50,6 +50,7 @@ public class SettingsView {
         scrollContainer.setHorizontalScroll(false);
         root.addElement(scrollContainer);
 
+        layout.addElement(buildWindowScaling());
         layout.addElement(buildResolution());
         layout.addElement(buildGlobalChatSize());
         layout.addElement(buildChatSize());
@@ -57,6 +58,28 @@ public class SettingsView {
         layout.addElement(buildGeneralText());
         layout.addElement(buildQuotesColor());
         layout.addElement(buildAstrixColor());
+    }
+
+    public TileContainer buildWindowScaling() {
+        TileContainer tileContainer = new TileContainer(0, 0, appSettings.getWidth() - 300, 120);
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+
+        tileContainer.setTitle("Window Scaling");
+        tileContainer.setDescription("Enable/Disable window scaling. Can cause text to become blurry or stretched.");
+
+        ToggleSwitchOverlay toggleSwitchOverlay = new ToggleSwitchOverlay(appSettings.isWindowScaling());
+        toggleSwitchOverlay.onToggle(event -> {
+            App.window.clear();
+            App.window.close(false);
+            appSettings.setWindowScaling(event.getNewValue());
+            App.getInstance().initialization(App.window.getStage());
+        });
+        tileContainer.setAction(toggleSwitchOverlay);
+
+        return tileContainer;
     }
 
     public TileContainer buildResolution() {
@@ -144,6 +167,11 @@ public class SettingsView {
                 item = Styles.TEXT;
             }
             appSettings.setChatTextSize(item);
+
+            App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
+            App.window.clear();
+            App.window.close(false);
+            App.getInstance().initialization(App.window.getStage());
         });
 
         tileContainer.setAction(selection);
@@ -195,11 +223,10 @@ public class SettingsView {
             appSettings.setGlobalTextSize(item);
 
             // Refresh view to reflect changes.
-            container.getElements().clear();
-            build();
-            Pane pane = (Pane) container.getNode();
-            pane.getChildren().clear();
-            pane.getChildren().addAll(container.build());
+            App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
+            App.window.clear();
+            App.window.close(false);
+            App.getInstance().initialization(App.window.getStage());
 
         });
 

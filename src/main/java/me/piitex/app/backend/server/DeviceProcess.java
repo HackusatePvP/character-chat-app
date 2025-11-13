@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedList;
+import java.util.List;
 
 public class DeviceProcess {
     private final Process process;
@@ -37,12 +38,11 @@ public class DeviceProcess {
     }
 
     public void handleOutput() {
-        App.logger.info("Handling input...");
         try {
             LinkedList<String> lines = new LinkedList<>(Files.readAllLines(new File(App.getDataDirectory(), "devices.txt").toPath()));
             lines.removeFirst();
             App.getInstance().getSettings().setDevices(lines);
-
+            App.logger.info("Devices: {}", List.of(lines));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

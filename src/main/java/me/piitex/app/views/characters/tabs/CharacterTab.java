@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.utils.CharacterCardImporter;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -85,7 +86,6 @@ public class CharacterTab extends Tab {
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
 
         rootLayout.addElement(charDescription);
-
         //rootLayout.addElement(buildExampleDialogue());
 
         this.addElement(parentView.buildSubmitBox());
@@ -177,9 +177,11 @@ public class CharacterTab extends Tab {
         importCard.setWidth(200);
         importCard.setHeight(50);
 
-        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
-        root.addElement(fileSelector);
-        fileSelector.onFileSelect(event -> {
+        FileChooserOverlay importSelector = new FileChooserOverlay(App.window, importCard);
+        importSelector.setText("Import character card.");
+        importSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(importSelector);
+        importSelector.onFileSelect(event -> {
             File file = event.getDirectory();
             try {
                 JSONObject metadata = CharacterCardImporter.getImageMetaData(file);
@@ -193,6 +195,15 @@ public class CharacterTab extends Tab {
 
                 parentView.getChatTabInstance().getFirstMessageInput().setCurrentText(CharacterCardImporter.getFirstMessage(metadata));
                 parentView.getChatTabInstance().getChatScenarioInput().setCurrentText(CharacterCardImporter.getChatScenario(metadata));
+
+                String userDisplay = CharacterCardImporter.getUserDisplay(metadata);
+                if (userDisplay != null) {
+                    parentView.getUserTabInstance().getUserDisplayNameInput().setCurrentText(userDisplay);
+                }
+                String userPersona = CharacterCardImporter.getUserPersona(metadata);
+                if (userPersona != null) {
+                    parentView.getUserTabInstance().getUserDescription().setCurrentText(userPersona);
+                }
 
                 parentView.setCharacterIconPath(file);
                 parentView.getInfoFile().set("icon-path", file.getAbsolutePath());
@@ -211,6 +222,34 @@ public class CharacterTab extends Tab {
             }
         });
 
+        ButtonOverlay exportCard = new ButtonBuilder("import").setText("Export Character Card").build();
+        if (character == null) {
+            exportCard.setEnabled(false);
+        }
+        exportCard.addStyle(Styles.ACCENT);
+        exportCard.addStyle(Styles.BUTTON_OUTLINED);
+        exportCard.setWidth(200);
+        exportCard.setHeight(50);
+
+        FileChooserOverlay exportSelector = new FileChooserOverlay(App.window, exportCard);
+        exportSelector.setText("Export character card as.");
+        exportSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(exportSelector);
+        exportSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                // Character cannot be null as the button is disabled if it is.
+                ImageCardExporter.exportCharacter(character, file);
+            } catch (IOException e) {
+                App.logger.error("Error importing character card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
+        });
         return root;
     }
 

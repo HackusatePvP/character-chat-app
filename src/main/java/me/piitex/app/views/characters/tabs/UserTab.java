@@ -1,11 +1,15 @@
 package me.piitex.app.views.characters.tabs;
 
 import atlantafx.base.theme.Styles;
+import com.drew.imaging.ImageProcessingException;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ImageCardExporter;
+import me.piitex.app.utils.UserCardImporter;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -15,8 +19,10 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,10 +84,9 @@ public class UserTab extends Tab {
         userDescription.addStyle(Styles.BG_DEFAULT);
         userDescription.addStyle(appSettings.getChatTextSize());
         userDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
-
         rootLayout.addElement(userDescription);
 
-        this.addElement(parentView.buildSubmitBox());
+        addElement(parentView.buildSubmitBox());
     }
 
     private CardContainer buildUserDisplay() {
@@ -186,9 +191,85 @@ public class UserTab extends Tab {
                     parentView.setUserIconPath(new File(template.getIconPath()));
                     image.setImage(new ImageLoader(parentView.getUserIconPath()));
                 }
+
+                if (parentView.getUser() != null) {
+                    parentView.getUser().getLorebook().keySet().forEach(s -> parentView.getLoreBookTabInstance().getItems().remove(s));
+                }
+
+                parentView.getLoreBookTabInstance().getItems().putAll(template.getLorebook());
+                parentView.getLoreBookTabInstance().buildLorebookTabContent();
             }
 
             parentView.updateInfoData();
+        });
+
+        ButtonOverlay importCard = new ButtonBuilder("import").setText("Import User Card").build();
+        importCard.addStyle(Styles.ACCENT);
+        importCard.addStyle(Styles.BUTTON_OUTLINED);
+        importCard.setWidth(200);
+        importCard.setHeight(50);
+
+        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
+        fileSelector.setText("Import user card.");
+        fileSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(fileSelector);
+        fileSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                JSONObject metadata = UserCardImporter.getImageMetaData(file);
+                userDisplayNameInput.setCurrentText(UserCardImporter.getUserDisplay(metadata));
+                userDescription.setCurrentText(UserCardImporter.getUserPersona(metadata));
+
+                if (parentView.getUser() != null) {
+                    parentView.getUser().getLorebook().keySet().forEach(s -> parentView.getLoreBookTabInstance().getItems().remove(s));
+                }
+                parentView.getLoreBookTabInstance().getItems().putAll(UserCardImporter.getLoreItems(metadata));
+                parentView.getLoreBookTabInstance().buildLorebookTabContent();
+
+                parentView.setUserIconPath(file);
+                parentView.getInfoFile().set("icon-path-user", file.getAbsolutePath());
+                image.setImage(new ImageLoader(file));
+
+                parentView.updateInfoData();
+
+            } catch (ImageProcessingException | IOException e) {
+                App.logger.error("Error importing user card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import user card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
+        });
+
+        ButtonOverlay exportCard = new ButtonBuilder("export").setText("Export User Card").build();
+        if (parentView.getUser() == null) {
+            exportCard.setEnabled(false);
+        }
+        exportCard.addStyle(Styles.ACCENT);
+        exportCard.addStyle(Styles.BUTTON_OUTLINED);
+        exportCard.setWidth(200);
+        exportCard.setHeight(50);
+
+        FileChooserOverlay exportSelector = new FileChooserOverlay(App.window, exportCard);
+        exportSelector.setText("Export user card as.");
+        exportSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(exportSelector);
+        exportSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                // User cannot be null as the button is disabled if it is.
+                ImageCardExporter.exportUser(parentView.getUser(), file);
+            } catch (IOException e) {
+                App.logger.error("Error importing character card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import user card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
         });
 
         return root;

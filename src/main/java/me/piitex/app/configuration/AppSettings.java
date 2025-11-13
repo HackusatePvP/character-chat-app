@@ -16,6 +16,7 @@ public class AppSettings {
     private String textColor;
     private String quoteColor;
     private String astrixColor;
+    private boolean windowScaling = false;
 
     private final InfoFile infoFile;
 
@@ -54,6 +55,9 @@ public class AppSettings {
             this.astrixColor = infoFile.get("astrix-color");
         } else {
             this.astrixColor = Color.DODGERBLUE.toString();
+        }
+        if (infoFile.hasKey("window-scaling")) {
+            this.windowScaling = infoFile.getBoolean("window-scaling");
         }
     }
 
@@ -142,10 +146,19 @@ public class AppSettings {
         infoFile.set("astrix-color", astrixColor);
     }
 
+    public boolean isWindowScaling() {
+        return windowScaling;
+    }
+
+    public void setWindowScaling(boolean windowScaling) {
+        this.windowScaling = windowScaling;
+        infoFile.set("window-scaling", windowScaling);
+    }
+
     /*
-        Utility functions for getting theme coloring.
-        Needed for RichTextFX components and BBCode
-     */
+      Utility functions for getting theme coloring.
+      Needed for RichTextFX components and BBCode
+    */
     public Theme getStyleTheme(String name) {
         if (name.equalsIgnoreCase("primer light")) {
             return new PrimerLight();

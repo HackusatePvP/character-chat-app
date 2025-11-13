@@ -199,7 +199,7 @@ public class ChatView extends EmptyContainer {
             ChoiceBox<String> choiceBox = selection.getChoiceBox();
             choiceBox.getSelectionModel().clearSelection();
             App.window.clearContainers();
-            ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+            ChatView cachedView = character.getChatViewCachedNodes().get(next);
             if (next != null && cachedView != null) {
                 App.logger.info("Using cached selection view...");
                 App.window.addContainer(cachedView);
@@ -207,6 +207,7 @@ public class ChatView extends EmptyContainer {
                 App.window.clearContainers();
                 App.window.addContainer(new ChatView(character, next, true));
             }
+            character.setLastChat(next);
         });
 
         return selection;
