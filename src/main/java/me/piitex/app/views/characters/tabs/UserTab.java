@@ -86,23 +86,6 @@ public class UserTab extends Tab {
         userDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
         rootLayout.addElement(userDescription);
 
-        if (parentView.getUser() != null) {
-            ButtonOverlay export = new ButtonBuilder("export").setText("Export User").build();
-            export.addStyle(Styles.ACCENT);
-            export.addStyle(Styles.BUTTON_OUTLINED);
-            export.onClick(event -> {
-                FileChooser chooser = new FileChooser();
-                chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save exported image as.", "*.png"));
-                File output = chooser.showSaveDialog(App.window.getStage());
-                try {
-                    ImageCardExporter.exportUser(parentView.getUser(), output);
-                } catch (IOException e) {
-                    // Prompt the user with an error message
-                }
-            });
-            rootLayout.addElement(export);
-        }
-
         addElement(parentView.buildSubmitBox());
     }
 
@@ -227,6 +210,8 @@ public class UserTab extends Tab {
         importCard.setHeight(50);
 
         FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
+        fileSelector.setText("Import user card.");
+        fileSelector.setFileExtensions(new String[]{"*.png"});
         root.addElement(fileSelector);
         fileSelector.onFileSelect(event -> {
             File file = event.getDirectory();
@@ -248,9 +233,38 @@ public class UserTab extends Tab {
                 parentView.updateInfoData();
 
             } catch (ImageProcessingException | IOException e) {
+                App.logger.error("Error importing user card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import user card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
+        });
+
+        ButtonOverlay exportCard = new ButtonBuilder("export").setText("Export User Card").build();
+        if (parentView.getUser() == null) {
+            exportCard.setEnabled(false);
+        }
+        exportCard.addStyle(Styles.ACCENT);
+        exportCard.addStyle(Styles.BUTTON_OUTLINED);
+        exportCard.setWidth(200);
+        exportCard.setHeight(50);
+
+        FileChooserOverlay exportSelector = new FileChooserOverlay(App.window, exportCard);
+        exportSelector.setText("Export user card as.");
+        exportSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(exportSelector);
+        exportSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                // User cannot be null as the button is disabled if it is.
+                ImageCardExporter.exportUser(parentView.getUser(), file);
+            } catch (IOException e) {
                 App.logger.error("Error importing character card: ", e);
                 Platform.runLater(() -> {
-                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import user card: " + e.getMessage());
                     errorOverlay.addStyle(Styles.DANGER);
                     errorOverlay.addStyle(Styles.BG_DEFAULT);
                     App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);

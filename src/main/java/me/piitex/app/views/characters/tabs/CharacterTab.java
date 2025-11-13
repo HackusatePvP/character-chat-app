@@ -86,24 +86,6 @@ public class CharacterTab extends Tab {
         charDescription.addStyle(Styles.TEXT_ON_EMPHASIS);
 
         rootLayout.addElement(charDescription);
-
-        if (character != null) {
-            ButtonOverlay export = new ButtonBuilder("export").setText("Export Character").build();
-            export.addStyle(Styles.ACCENT);
-            export.addStyle(Styles.BUTTON_OUTLINED);
-            export.onClick(event -> {
-                FileChooser chooser = new FileChooser();
-                chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Save exported image as.", "*.png"));
-                File output = chooser.showSaveDialog(App.window.getStage());
-                try {
-                    ImageCardExporter.exportCharacter(character, output);
-                } catch (IOException e) {
-                    // Prompt the user with an error message
-                }
-            });
-            rootLayout.addElement(export);
-        }
-
         //rootLayout.addElement(buildExampleDialogue());
 
         this.addElement(parentView.buildSubmitBox());
@@ -195,9 +177,11 @@ public class CharacterTab extends Tab {
         importCard.setWidth(200);
         importCard.setHeight(50);
 
-        FileChooserOverlay fileSelector = new FileChooserOverlay(App.window, importCard);
-        root.addElement(fileSelector);
-        fileSelector.onFileSelect(event -> {
+        FileChooserOverlay importSelector = new FileChooserOverlay(App.window, importCard);
+        importSelector.setText("Import character card.");
+        importSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(importSelector);
+        importSelector.onFileSelect(event -> {
             File file = event.getDirectory();
             try {
                 JSONObject metadata = CharacterCardImporter.getImageMetaData(file);
@@ -238,6 +222,34 @@ public class CharacterTab extends Tab {
             }
         });
 
+        ButtonOverlay exportCard = new ButtonBuilder("import").setText("Export Character Card").build();
+        if (character == null) {
+            exportCard.setEnabled(false);
+        }
+        exportCard.addStyle(Styles.ACCENT);
+        exportCard.addStyle(Styles.BUTTON_OUTLINED);
+        exportCard.setWidth(200);
+        exportCard.setHeight(50);
+
+        FileChooserOverlay exportSelector = new FileChooserOverlay(App.window, exportCard);
+        exportSelector.setText("Export character card as.");
+        exportSelector.setFileExtensions(new String[]{"*.png"});
+        root.addElement(exportSelector);
+        exportSelector.onFileSelect(event -> {
+            File file = event.getDirectory();
+            try {
+                // Character cannot be null as the button is disabled if it is.
+                ImageCardExporter.exportCharacter(character, file);
+            } catch (IOException e) {
+                App.logger.error("Error importing character card: ", e);
+                Platform.runLater(() -> {
+                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 500, 50, "Import Failed", "Could not import character card: " + e.getMessage());
+                    errorOverlay.addStyle(Styles.DANGER);
+                    errorOverlay.addStyle(Styles.BG_DEFAULT);
+                    App.window.renderPopup(errorOverlay, 650, 870, 500, 50, false, null);
+                });
+            }
+        });
         return root;
     }
 
