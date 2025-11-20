@@ -30,6 +30,9 @@ public class ModelSettings {
     private boolean useDefault;
     private boolean jinja = false;
     private int totalLayers = 0;
+    private double dataPerLayer;
+    private double kvCacheSize;
+    private double computeBufferSize; // This is compute buffer size.
 
     @Nullable
     private InfoFile infoFile;
@@ -167,6 +170,15 @@ public class ModelSettings {
         }
         if (infoFile.hasKey("total-layers")) {
             this.totalLayers = infoFile.getInteger("total-layers");
+        }
+        if (infoFile.hasKey("kv-cache")) {
+            this.kvCacheSize = infoFile.getDouble("kv-cache");
+        }
+        if (infoFile.hasKey("compute-buffer-size")) {
+            this.computeBufferSize = infoFile.getDouble("compute-buffer-size");
+        }
+        if (infoFile.hasKey("data-per-layer")) {
+            this.dataPerLayer = infoFile.getDouble("data-per-layer");
         }
     }
 
@@ -420,6 +432,33 @@ public class ModelSettings {
     public void setTotalLayers(int totalLayers) {
         this.totalLayers = totalLayers;
         infoFile.set("total-layers", totalLayers);
+    }
+
+    public double getDataPerLayer() {
+        return dataPerLayer;
+    }
+
+    public void setDataPerLayer(double dataPerLayer) {
+        this.dataPerLayer = dataPerLayer;
+        infoFile.set("data-per-layer", dataPerLayer);
+    }
+
+    public double getKvCacheSize() {
+        return kvCacheSize;
+    }
+
+    public void setKvCacheSize(double kvCacheSize) {
+        this.kvCacheSize = kvCacheSize;
+        infoFile.set("kv-cache", kvCacheSize);
+    }
+
+    public double getComputeBufferSize() {
+        return computeBufferSize;
+    }
+
+    public void setComputeBufferSize(double computeBufferSize) {
+        this.computeBufferSize = computeBufferSize;
+        infoFile.set("compute-buffer-size", computeBufferSize);
     }
 
     @Nullable

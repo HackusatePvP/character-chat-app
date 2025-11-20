@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
+import javafx.util.StringConverter;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
@@ -155,7 +156,7 @@ public class ConfigurationTab extends Tab {
     public TileContainer buildGpuLayers() {
         TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
-        container.setTitle("GPU Layers");
+        container.setTitle("GPU Usage");
         container.setDescription("Percentage of the GPU to use. Always leave some headroom for the operating system.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
@@ -165,6 +166,18 @@ public class ConfigurationTab extends Tab {
         input.getSlider().setShowTickLabels(true);
         input.getSlider().setShowTickMarks(true);
         input.getSlider().setMinorTickCount(4);
+        input.addStyle(Styles.LARGE);
+        input.getSlider().setLabelFormatter(new StringConverter<>() {
+            @Override
+            public String toString(Double value) {
+                return String.format("%.0f%%", value);
+            }
+
+            @Override
+            public Double fromString(String string) {
+                return 0.0;
+            }
+        });
         input.onSliderMove(event -> {
             settings.setGpuUsage(event.getNewValue());
         });

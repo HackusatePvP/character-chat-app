@@ -17,6 +17,7 @@ public class AppSettings {
     private String quoteColor;
     private String astrixColor;
     private boolean windowScaling = false;
+    private double totalGpuVram;
 
     private final InfoFile infoFile;
 
@@ -59,6 +60,9 @@ public class AppSettings {
         if (infoFile.hasKey("window-scaling")) {
             this.windowScaling = infoFile.getBoolean("window-scaling");
         }
+        if (infoFile.hasKey("total-vram")) {
+            this.totalGpuVram = infoFile.getDouble("total-vram");
+        }
     }
 
     public int getWidth() {
@@ -77,6 +81,15 @@ public class AppSettings {
     public void setHeight(int height) {
         this.height = height;
         infoFile.set("height", height);
+    }
+
+    public double getTotalGpuVram() {
+        return totalGpuVram;
+    }
+
+    public void setTotalGpuVram(double totalGpuVram) {
+        this.totalGpuVram = totalGpuVram;
+        infoFile.set("total-vram", totalGpuVram);
     }
 
     public InfoFile getInfoFile() {

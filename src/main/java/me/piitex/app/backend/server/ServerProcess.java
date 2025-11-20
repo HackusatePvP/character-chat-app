@@ -24,7 +24,6 @@ public class ServerProcess {
 
     private boolean error = false;
     private volatile boolean loading = false;
-
     private final List<ServerLoadingListener> listeners = new CopyOnWriteArrayList<>();
 
 
@@ -160,14 +159,62 @@ public class ServerProcess {
             }
         }
 
-        // GPU layers
-        parameters.add("-ngl");
-
         // GPU layers have been refactored to GPU usage.
         // The usage is a percentage of the total layers (model.getGpuLayers());
-        double usagePercentage = settings.getGpuUsage() / 100.0;
-        int layers = (int) Math.ceil(model.getSettings().getTotalLayers() * usagePercentage);
-        App.logger.info("Using '{}'% of the GPU to load '{}'/'{}' layers", (usagePercentage * 100), layers, model.getSettings().getTotalLayers());
+        double TOTAL_AVAILABLE_VRAM_MIB = App.getInstance().getAppSettings().getTotalGpuVram();
+
+        // Caculate the cache sizes llama.cpp uses. This is typically the kvCache and the compute buffer size.
+        double kvCacheMiB = model.getSettings().getKvCacheSize();
+        double computeBufferMiB = model.getSettings().getComputeBufferSize();
+
+        // Combine the two values to accurately calculate the exact vram usage.
+        double FIXED_OVERHEAD_MIB = kvCacheMiB + computeBufferMiB;
+
+        if (FIXED_OVERHEAD_MIB <= 0.0) {
+            // Fallback value for the total fixed overhead observed in the log (3300.00 + 946.00)
+            App.logger.warn("Fixed overhead was 0.0. Using empirical fallback (4246.00 MiB).");
+            FIXED_OVERHEAD_MIB = 4246.00;
+        }
+
+        // The size of each model layer. Represented by the total vram of the models layer / by the total layers.
+        final double VRAM_PER_LAYER_MIB = model.getSettings().getDataPerLayer();
+
+        // The percentage of VRAM to use.
+        double usagePercentage = settings.getGpuUsage();
+
+        // Calculate the VRAM available for offloading layers.
+        double layerAllocatableVram = TOTAL_AVAILABLE_VRAM_MIB - FIXED_OVERHEAD_MIB;
+
+        // Apply the percentage budget to the VRAM reserved for layers only.
+        double layerBudgetMiB = layerAllocatableVram * (usagePercentage / 100.0);
+
+
+        // Calculate the number of layers that fit into the Layer Budget
+        int layers;
+
+        if (VRAM_PER_LAYER_MIB > 0.0) {
+            layers = (int) Math.floor(layerBudgetMiB / VRAM_PER_LAYER_MIB);
+        } else {
+            // Log a warning and default to 0 layers when VRAM per layer is unknown/zero.
+            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to 0 to prevent Integer.MAX_VALUE.");
+            layers = 0;
+        }
+
+        int totalModelLayers = model.getSettings().getTotalLayers();
+        System.out.println("Layers: " + layers);
+
+        // Cap the offloaded layers
+        layers = Math.min(layers, totalModelLayers);
+        System.out.println("Adjusted Layers: " + layers);
+
+        parameters.add("-ngl");
+        App.logger.info("Using VRAM utilization of '{}'% (Layer Budget: {} MiB, Total VRAM Usage: {} MiB) to load '{}'/'{}' layers",
+                usagePercentage,
+                (int) layerBudgetMiB,
+                (int) (layerBudgetMiB + FIXED_OVERHEAD_MIB), // This is the estimated TOTAL VRAM usage
+                layers,
+                totalModelLayers);
+
         String num = Integer.toString(layers);
         parameters.add(num);
 
@@ -215,7 +262,6 @@ public class ServerProcess {
         App.logger.info("Checking server state...");
         File output = new File(App.getDataDirectory(), "server.txt");
         boolean started = false;
-
         while (!started) {
             try {
                 Thread.sleep(100); // Wait for 100 milliseconds before checking the file again

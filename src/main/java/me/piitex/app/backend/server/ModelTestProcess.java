@@ -87,7 +87,7 @@ public class ModelTestProcess {
         }
 
         parameters.add("-c");
-        parameters.add(1 + "");
+        parameters.add(model.getSettings().getContextSize() + "");
 
         // Server port and WebUI
         parameters.add("--port");
@@ -135,7 +135,9 @@ public class ModelTestProcess {
         App.logger.info("Checking server state...");
         File output = new File(App.getDataDirectory(), "server.txt");
         boolean started = false;
-
+        double totalModelVramMiB = 0.0;
+        double kvCacheSizeMiB = 0.0;
+        double computeBufferMiB = 0.0;
         while (!started) {
             try {
                 Thread.sleep(100); // Wait for 100 milliseconds before checking the file again
@@ -150,6 +152,18 @@ public class ModelTestProcess {
                         }
                         if (line.contains("starting the main loop")) {
                             App.logger.info("Backend server stated!");
+                            int totalLayers = model.getSettings().getTotalLayers();
+                            if (totalLayers > 0 && totalModelVramMiB > 0.0) {
+                                double vramPerLayer = totalModelVramMiB / totalLayers;
+                                model.getSettings().setDataPerLayer(vramPerLayer);
+                                App.logger.info("Calculated VRAM per layer: {} MiB/layer", String.format("%.2f", vramPerLayer));
+                            }
+                            if (kvCacheSizeMiB > 0.0) {
+                                model.getSettings().setKvCacheSize(kvCacheSizeMiB);
+                            }
+                            if (computeBufferMiB > 0.0) {
+                                model.getSettings().setComputeBufferSize(computeBufferMiB);
+                            }
                             started = true;
                             break;
                         }
@@ -157,7 +171,43 @@ public class ModelTestProcess {
                             line = line.split("=")[1].trim();
                             App.logger.info("Total Model Layers: {}", line);
                             model.getSettings().setTotalLayers(Integer.parseInt(line));
-                            break;
+                        }
+                        if (line.startsWith("llama_model_load_from_file_impl:")) {
+                            line = line.split("-")[1].trim().split(" ")[0];
+                            App.getInstance().getAppSettings().setTotalGpuVram(Double.parseDouble(line));
+                        }
+                        if (!line.contains("CPU_Mapped") && line.contains("model buffer size =") && totalModelVramMiB == 0.0) {
+                            String valueWithUnit = line.split("=")[1].trim();
+                            String vramValueStr = valueWithUnit.split(" ")[0];
+
+                            totalModelVramMiB = Double.parseDouble(vramValueStr);
+                            App.logger.debug("Extracted Model Weights VRAM: {} MiB", totalModelVramMiB);
+                        }
+                        if (line.contains("llama_kv_cache: size =") && line.contains("MiB") && kvCacheSizeMiB == 0.0) {
+                            try {
+                                String part = line.split("size =")[1].trim();
+                                String kvSizeStr = part.split(" ")[0];
+                                kvCacheSizeMiB = Double.parseDouble(kvSizeStr);
+                                App.logger.debug("Extracted KV Cache Size: {} MiB", kvCacheSizeMiB);
+                            } catch (Exception e) {
+                                App.logger.error("Failed to parse KV cache size: {}", e.getMessage());
+                            }
+                        }
+                        if (line.contains("compute buffer size =") && line.contains("MiB") && !line.contains("Host")) {
+                            try {
+                                String part = line.split("=")[1].trim();
+                                String bufferSizeStr = part.split(" ")[0];
+                                System.out.println("Line: " + line);
+                                double currentComputeMiB = Double.parseDouble(bufferSizeStr);
+
+                                // Keep the largest value found (which will be the GPU allocation)
+                                if (currentComputeMiB > computeBufferMiB) {
+                                    computeBufferMiB = currentComputeMiB;
+                                    App.logger.info("Using '{}'MiB for compute buffer.", computeBufferMiB);
+                                }
+                            } catch (Exception e) {
+                                App.logger.error("Failed to parse Compute Buffer MiB: {}", e.getMessage());
+                            }
                         }
                     }
                 }
