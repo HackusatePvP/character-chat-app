@@ -36,6 +36,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class App extends FXLoad {
     private ServerSettings settings;
@@ -43,7 +44,12 @@ public class App extends FXLoad {
 
     // Character ID, Character object
     private final Map<String, Character> characters = new TreeMap<>();
+    // User ID, User object
     private final Map<String, User> userTemplates = new TreeMap<>();
+    private final TreeMap<String, Model> models = new TreeMap<>();
+    private final TreeMap<String, Model> mmprojModels = new TreeMap<>();
+
+    // Cached FileDownloader for performance
     private static final FileDownloader fileDownloader = new FileDownloader();
 
     private static App instance;
@@ -197,15 +203,22 @@ public class App extends FXLoad {
             }
 
             App.logger.info("Looking for model to load...");
-            if (App.getInstance().getSettings().getGlobalModel() != null) {
-                new ServerProcess(App.getInstance().getSettings().getGlobalModel());
-            } else {
-                for (Model model : App.getModels("exclude").values()) {
-                    if (model.getSettings().isDefault()) {
-                        new ServerProcess(model);
+            reloadModelList();
+            Model model = App.getInstance().getSettings().getGlobalModel();
+            if (model == null) {
+                for (Model model1 : App.getModels("exclude")) {
+                    if (model1.getSettings().isDefault()) {
+                        model = model1;
                         break;
                     }
                 }
+            }
+
+            if (model != null) {
+                // Run Test process.
+                // Run Server.
+                new ModelTestProcess(model);
+                new ServerProcess(model);
             }
         });
     }
@@ -470,7 +483,7 @@ public class App extends FXLoad {
     }
 
     public static Model getDefaultModel() {
-        for (Model model : getModels("exclude").values()) {
+        for (Model model : getModels("exclude")) {
             if (model.getSettings().isDefault()) {
                 return model;
             }
@@ -478,7 +491,24 @@ public class App extends FXLoad {
         return null;
     }
 
-    public static TreeMap<String, Model> getModels(String filterType) {
+    public TreeMap<String, Model> getModels() {
+        return models;
+    }
+
+    public TreeMap<String, Model> getMmprojModels() {
+        return mmprojModels;
+    }
+
+    public static void reloadModelList() {
+        getInstance().getModels().clear();
+        getInstance().getMmprojModels().clear();
+        getInstance().getModels().putAll(loadModels("exclude"));
+        getInstance().getMmprojModels().putAll(loadModels("mmproj"));
+
+    }
+
+
+    private static TreeMap<String, Model> loadModels(String filterType) {
         TreeMap<String, Model> models = new TreeMap<>();
 
         if (App.getInstance().getSettings().getModelPath().isEmpty()) {
@@ -500,10 +530,6 @@ public class App extends FXLoad {
         }
         findGGUFModelsRecursive(modelPath, models, filterType);
         return models;
-    }
-
-    public static TreeMap<String, Model> getModels() {
-        return getModels(null);
     }
 
     private static void findGGUFModelsRecursive(@NotNull File directory, TreeMap<String, Model> models, String filterType) {
@@ -536,16 +562,45 @@ public class App extends FXLoad {
         }
     }
 
+    public static Collection<Model> getModels(String filter) {
+       Collection<Model> toReturn = new HashSet<>();
+       if (filter.equalsIgnoreCase("exclude")) {
+           toReturn.addAll(getInstance().getModels().values());
+       } else if (filter.equalsIgnoreCase("mmproj")) {
+           toReturn.addAll(getInstance().getModels().values());
+       } else {
+           toReturn.addAll(getInstance().getModels().values());
+           toReturn.addAll(getInstance().getMmprojModels().values());
+       }
+       return toReturn;
+    }
+
     public static Set<String> getModelNames(String filter) {
         Set<String> toReturn = new TreeSet<>();
-        for (Model model : getModels(filter).values()) {
-            toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
+        if (filter.equalsIgnoreCase("exlude")) {
+            for (Model model : getInstance().getModels().values()) {
+                toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
+            }
+        } else if (filter.equalsIgnoreCase("mmproj")) {
+            for (Model model : getInstance().getMmprojModels().values()) {
+                toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
+            }
+        } else {
+            Collection<Model> all = new HashSet<>(getInstance().getModels().values());
+            all.addAll(getInstance().getMmprojModels().values());
+            for (Model model : all) {
+                toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
+            }
         }
         return toReturn;
     }
 
     public static Model getModelByName(String directory, String name) {
-        return getModels("all").values().stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name) && new File(model.getFile().getParent()).getName().equalsIgnoreCase(directory)).findAny().orElse(null);
+        return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name) && new File(model.getFile().getParent()).getName().equalsIgnoreCase(directory)).findAny().orElse(null);
+    }
+
+    public static List<Model> getModelsByName(String name) {
+        return getModels("all").stream().filter(model -> model.getFile().getName().equalsIgnoreCase(name)).toList();
     }
 
     public static void shutdown() {
