@@ -1,46 +1,26 @@
 package me.piitex.app.backend.server;
 
-
-import atlantafx.base.theme.Styles;
-import javafx.application.Platform;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
-import me.piitex.engine.PopupPosition;
-import me.piitex.engine.overlays.MessageOverlay;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class ServerProcess {
+public class ModelTestProcess {
     private Process process;
     private final Model model;
-
-    private static ServerProcess currentServer;
 
     private boolean error = false;
     private volatile boolean loading = false;
 
-    private final List<ServerLoadingListener> listeners = new CopyOnWriteArrayList<>();
-
-
-    public ServerProcess(Model model) {
+    public ModelTestProcess(Model model) {
         this.model = model;
-        if (currentServer != null) {
-            App.logger.info("Shutting down previous server...");
-            currentServer.stop();
-        }
-
         App.logger.info("Verifying server PID...");
-
-        // Checks current state of PID. If the pid is active properly shut it down.
         checkProcessID();
-
-        currentServer = this;
 
         if (model == null) {
             App.logger.error("Model was undefined. Unable to start server.");
@@ -93,6 +73,30 @@ public class ServerProcess {
         }
     }
 
+    private LinkedList<String> getParameters(File server, ServerSettings settings) {
+        LinkedList<String> parameters = new LinkedList<>();
+        parameters.add(server.getAbsolutePath());
+
+        // Model file
+        parameters.add("-m");
+        parameters.add(model.getFile().getAbsolutePath());
+        if (!settings.getDevice().equalsIgnoreCase("auto")) {
+            App.logger.debug("Setting device...");
+            parameters.add("-dev");
+            parameters.add(settings.getFormattedDevice().trim());
+        }
+
+        parameters.add("-c");
+        parameters.add(1 + "");
+
+        // Server port and WebUI
+        parameters.add("--port");
+        parameters.add("8187");
+        parameters.add("--no-webui");
+
+        return parameters;
+    }
+
     private void checkProcessID() {
         if (App.getInstance().getSettings().getInfoFile().hasKey("pid")) {
             long pid = App.getInstance().getSettings().getInfoFile().getLong("pid");
@@ -127,90 +131,6 @@ public class ServerProcess {
         }
     }
 
-    private LinkedList<String> getParameters(File server, ServerSettings settings) {
-        LinkedList<String> parameters = new LinkedList<>();
-        parameters.add(server.getAbsolutePath());
-
-        // Model file
-        parameters.add("-m");
-        parameters.add(model.getFile().getAbsolutePath());
-        if (!settings.getDevice().equalsIgnoreCase("auto")) {
-            App.logger.debug("Setting device...");
-            parameters.add("-dev");
-            parameters.add(settings.getFormattedDevice().trim());
-        }
-
-        // Vision model file
-        if (!model.getSettings().getMmProj().equalsIgnoreCase("")) {
-            if (model.getSettings().getMmProj().startsWith("None")) {
-                App.logger.warn("MMProj not specified.");
-                parameters.add("--no-mmproj");
-            } else {
-
-                String dir = model.getSettings().getMmProj().split("/")[0];
-                String file = model.getSettings().getMmProj().split("/")[1];
-                Model mmproj = App.getModelByName(dir, file);
-                if (mmproj == null) {
-                    App.logger.error("Could not load mmproj. (Invalid file)");
-                } else {
-                    App.logger.debug("MMPROJ: {}", mmproj.getFile().getAbsolutePath());
-                    parameters.add("--mmproj");
-                    parameters.add(mmproj.getFile().getAbsolutePath());
-                }
-            }
-        }
-
-        // GPU layers
-        parameters.add("-ngl");
-
-        // GPU layers have been refactored to GPU usage.
-        // The usage is a percentage of the total layers (model.getGpuLayers());
-        double usagePercentage = settings.getGpuUsage() / 100.0;
-        int layers = (int) Math.ceil(model.getSettings().getTotalLayers() * usagePercentage);
-        App.logger.info("Using '{}'% of the GPU to load '{}'/'{}' layers", (usagePercentage * 100), layers, model.getSettings().getTotalLayers());
-        String num = Integer.toString(layers);
-        parameters.add(num);
-
-        // Memory swapping
-        if (settings.isMemoryLock()) {
-            parameters.add("--mlock");
-        }
-        // Flash attention
-        if (settings.isFlashAttention()) {
-            parameters.add("-fa");
-            parameters.add("auto");
-        }
-
-        // Reasoning Template
-        if (!model.getSettings().getReasoningTemplate().equalsIgnoreCase("disabled") && !settings.getReasoningTemplate().equalsIgnoreCase("none")) {
-            App.logger.debug("Enabling response format...");
-            parameters.add("--reasoning-format");
-            parameters.add(model.getSettings().getReasoningTemplate());
-        }
-
-        if (!model.getSettings().getChatTemplate().equalsIgnoreCase("default")) {
-            App.logger.debug("Setting chat template...");
-            parameters.add("--chat-template");
-            parameters.add(model.getSettings().getChatTemplate());
-        }
-
-        // Jinja Chat Template
-        if (model.getSettings().isJinja()) {
-            App.logger.debug("Using jinja...");
-            parameters.add("--jinja");
-        }
-
-        parameters.add("-c");
-        parameters.add(model.getSettings().getContextSize() + "");
-
-        // Server port and WebUI
-        parameters.add("--port");
-        parameters.add("8187");
-        parameters.add("--no-webui");
-
-        return parameters;
-    }
-
     protected void waitForServer() {
         App.logger.info("Checking server state...");
         File output = new File(App.getDataDirectory(), "server.txt");
@@ -237,6 +157,7 @@ public class ServerProcess {
                             line = line.split("=")[1].trim();
                             App.logger.info("Total Model Layers: {}", line);
                             model.getSettings().setTotalLayers(Integer.parseInt(line));
+                            break;
                         }
                     }
                 }
@@ -248,43 +169,15 @@ public class ServerProcess {
                 Thread.currentThread().interrupt();
                 App.logger.error("Server validation thread interrupted.");
                 error = true;
-                break;
-            }
-
-            if (error) {
-                Platform.runLater(() -> {
-                    MessageOverlay errorOverlay = new MessageOverlay(0, 0, 600, 100,"Error", "An error occurred when starting the backend server. The process never started or failed to start.");
-                    errorOverlay.addStyle(Styles.DANGER);
-                    errorOverlay.addStyle(Styles.BG_DEFAULT);
-                    App.window.renderPopup(errorOverlay, PopupPosition.BOTTOM_CENTER, 600, 100, false);
-                });
+                stop();
                 break;
             }
         }
-        loading = false;
-        fireServerLoadingCompleteEvent(!error);
-    }
 
-    public Process getProcess() {
-        return process;
-    }
-
-    public synchronized boolean isError() {
-        return error;
-    }
-
-    public synchronized boolean isAlive() {
-        if (process == null) return false;
-        return process.isAlive();
-    }
-
-    public synchronized boolean isLoading() {
-        return loading;
+        stop();
     }
 
     public boolean stop() {
-        listeners.clear();
-
         if (process == null) {
             return true;
         }
@@ -313,30 +206,5 @@ public class ServerProcess {
             process.destroyForcibly();
             return !process.isAlive();
         }
-    }
-    public static ServerProcess getCurrentServer() {
-        return currentServer;
-    }
-
-    public void addServerLoadingListener(ServerLoadingListener listener) {
-        if (listener != null) {
-            listeners.add(listener);
-        }
-    }
-
-    public void removeServerLoadingListener(ServerLoadingListener listener) {
-        if (listener != null) {
-            listeners.remove(listener);
-        }
-    }
-
-    private void fireServerLoadingCompleteEvent(boolean success) {
-        for (ServerLoadingListener listener : listeners) {
-            listener.onServerLoadingComplete(success);
-        }
-    }
-
-    public Model getModel() {
-        return model;
     }
 }

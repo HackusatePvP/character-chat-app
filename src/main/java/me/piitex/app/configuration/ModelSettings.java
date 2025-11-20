@@ -28,6 +28,7 @@ public class ModelSettings {
     private String reasoningTemplate = "disabled";
     private boolean useDefault;
     private boolean jinja = false;
+    private int totalLayers = 0;
 
     @Nullable
     private InfoFile infoFile;
@@ -157,6 +158,9 @@ public class ModelSettings {
             mmProj = infoFile.get("mm-proj");
         } else {
             infoFile.set("mm-proj", mmProj);
+        }
+        if (infoFile.hasKey("total-layers")) {
+            this.totalLayers = infoFile.getInteger("total-layers");
         }
     }
 
@@ -392,6 +396,15 @@ public class ModelSettings {
     public void setMmProj(String mmProj) {
         this.mmProj = mmProj;
         infoFile.set("mm-proj", mmProj);
+    }
+
+    public int getTotalLayers() {
+        return totalLayers;
+    }
+
+    public void setTotalLayers(int totalLayers) {
+        this.totalLayers = totalLayers;
+        infoFile.set("total-layers", totalLayers);
     }
 
     @Nullable

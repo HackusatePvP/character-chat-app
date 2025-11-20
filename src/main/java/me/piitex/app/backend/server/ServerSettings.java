@@ -11,7 +11,7 @@ public class ServerSettings {
     private final InfoFile infoFile;
     private String backend = "Vulkan";
     private String device = "Auto";
-    private int gpuLayers = 10;
+    private double gpuUsage = 10;
     private boolean memoryLock = false;
     private String chatTemplate = "default";
     private String reasoningTemplate = "none";
@@ -37,10 +37,10 @@ public class ServerSettings {
         } else {
             infoFile.set("device", device);
         }
-        if (infoFile.hasKey("gpu-layers")) {
-            gpuLayers = infoFile.getInteger("gpu-layers");
+        if (infoFile.hasKey("gpu-usage")) {
+            gpuUsage = infoFile.getDouble("gpu-usage");
         } else {
-            infoFile.set("gpu-layers", gpuLayers + "");
+            infoFile.set("gpu-usage", gpuUsage + "");
         }
         if (infoFile.hasKey("memory-lock")) {
             memoryLock = infoFile.getBoolean("memory-lock");
@@ -118,13 +118,13 @@ public class ServerSettings {
         infoFile.set("device", device);
     }
 
-    public int getGpuLayers() {
-        return gpuLayers;
+    public double getGpuUsage() {
+        return gpuUsage;
     }
 
-    public void setGpuLayers(int gpuLayers) {
-        this.gpuLayers = gpuLayers;
-        infoFile.set("gpu-layers", gpuLayers + "");
+    public void setGpuUsage(double gpuUsage) {
+        this.gpuUsage = gpuUsage;
+        infoFile.set("gpu-usage", gpuUsage + "");
     }
 
     public boolean isMemoryLock() {

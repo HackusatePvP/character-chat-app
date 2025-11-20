@@ -56,6 +56,9 @@ public class ConfigurationTab extends Tab {
         scrollContainer.setHorizontalScroll(false);
         addElement(scrollContainer); // Adds the scroll container
 
+        // TODO: Allow remote server routing.
+        //       When enabled it allows the user to remotely connect to an endpoint.
+        //       Not sure how control of the server would work.
         layout.addElement(buildServerZone());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
@@ -153,14 +156,17 @@ public class ConfigurationTab extends Tab {
         TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("GPU Layers");
-        container.setDescription("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.");
+        container.setDescription("Percentage of the GPU to use. Always leave some headroom for the operating system.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, 200, settings.getGpuLayers());
-        input.onValueChange(event -> {
-            settings.setGpuLayers((int) event.getNewValue());
+        SliderOverlay input = new SliderOverlay(0, 100, settings.getGpuUsage());
+        input.getSlider().setShowTickLabels(true);
+        input.getSlider().setShowTickMarks(true);
+        input.getSlider().setMinorTickCount(4);
+        input.onSliderMove(event -> {
+            settings.setGpuUsage(event.getNewValue());
         });
         container.setAction(input);
 
@@ -297,7 +303,8 @@ public class ConfigurationTab extends Tab {
             Model model = (settings.getGlobalModel() != null ? settings.getGlobalModel() : ServerProcess.getCurrentServer().getModel());
             if (model == null) {
                 // Lastly, look for the default model.
-                model = App.getModels("exlude").values().stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
+                App.logger.info("Falling back to default model.");
+                model = App.getModels("exclude").stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
             }
 
             if (model == null) {
@@ -305,7 +312,9 @@ public class ConfigurationTab extends Tab {
                 error.addStyle(Styles.DANGER);
                 error.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                return;
             }
+            App.logger.info("Calculated model layers: {}", model.getSettings().getTotalLayers());
 
             start.setEnabled(false);
             reload.setEnabled(false);

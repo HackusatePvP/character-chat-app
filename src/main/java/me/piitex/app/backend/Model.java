@@ -9,7 +9,6 @@ import java.io.File;
 public class Model {
     private final File file;
     private final ModelSettings settings;
-    private int gpuLayers;
 
     public Model(File file) {
         this.file = file;
@@ -18,14 +17,6 @@ public class Model {
 
     public ModelSettings getSettings() {
         return settings;
-    }
-
-    public int getGpuLayers() {
-        return gpuLayers;
-    }
-
-    public void setGpuLayers(int gpuLayers) {
-        this.gpuLayers = gpuLayers;
     }
 
     public File getFile() {

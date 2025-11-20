@@ -12,6 +12,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.DeviceProcess;
+import me.piitex.app.backend.server.ModelTestProcess;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
