@@ -6,6 +6,7 @@ import me.piitex.os.configurations.InfoFile;
 public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096; // 4096 is a good baseline. Most modern models can go way higher (32k)
+    private boolean contextShift; // Def: False, CCA manages context tokens automatically.
     private double temperature = 0.8; // min 0
     private double topP = 1; // min 0
     private double minP = 0.1; // min 0.05
@@ -48,6 +49,11 @@ public class ModelSettings {
             contextSize = infoFile.getInteger("tokens");
         } else {
             infoFile.set("tokens", contextSize);
+        }
+        if (infoFile.hasKey("context-shift")) {
+            this.contextShift = infoFile.getBoolean("context-shift");
+        } else {
+            infoFile.set("context-shift", contextShift);
         }
         if (infoFile.hasKey("temperature")) {
             this.temperature = infoFile.getDouble("temperature");
@@ -182,6 +188,15 @@ public class ModelSettings {
     public void setContextSize(int contextSize) {
         this.contextSize = contextSize;
         infoFile.set("tokens", contextSize);
+    }
+
+    public boolean isContextShift() {
+        return contextShift;
+    }
+
+    public void setContextShift(boolean contextShift) {
+        this.contextShift = contextShift;
+        infoFile.set("context-shift", contextShift);
     }
 
     public double getTemperature() {

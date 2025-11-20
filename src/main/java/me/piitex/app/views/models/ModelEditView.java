@@ -23,6 +23,7 @@ public class ModelEditView extends EmptyContainer {
     private final AppSettings appSettings = App.getInstance().getAppSettings();
     private String instructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096;
+    private boolean contextShift = false; // Def: False, CCA controls the context automatically.
     private double temperature = 0.8; // min 0
     private double topP = 1; // min 0
     private double minP = 0.1; // min 0.05
@@ -70,6 +71,7 @@ public class ModelEditView extends EmptyContainer {
 
         layout.addElement(buildInstructions());
         layout.addElement(buildContextSize());
+        layout.addElement(buildContextShift());
         layout.addElement(buildModalFile());
         layout.addElement(buildTemperature());
         layout.addElement(buildDynamicTempRange());
@@ -98,6 +100,7 @@ public class ModelEditView extends EmptyContainer {
     private void initializeSettings() {
         this.instructions = settings.getModelInstructions();
         this.contextSize = settings.getContextSize();
+        this.contextShift = settings.isContextShift();
         this.mmProj = settings.getMmProj();
         this.temperature = settings.getTemperature();
         this.dynamicTempRage = settings.getDynamicTempRage();
@@ -166,6 +169,29 @@ public class ModelEditView extends EmptyContainer {
 
         return tileContainer;
     }
+
+    private TileContainer buildContextShift() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Context Shift");
+        tileContainer.setDescription("Enables or disables context shift.");
+
+        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        info.setTooltip("When the context input exceeds the maximum size, it will remove older tokens automatically.");
+        tileContainer.setGraphic(info);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(contextShift);
+        switchOverlay.onToggle(event -> {
+            this.contextShift = event.getNewValue();
+        });
+        tileContainer.setAction(switchOverlay);
+
+        return tileContainer;
+    }
+
 
     private TileContainer buildModalFile() {
         TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
@@ -705,6 +731,7 @@ public class ModelEditView extends EmptyContainer {
         submit.onClick(event -> {
             settings.setModelInstructions(instructions);
             settings.setContextSize(contextSize);
+            settings.setContextShift(contextShift);
             settings.setTemperature(temperature);
             settings.setTopP(topP);
             settings.setMinP(minP);
