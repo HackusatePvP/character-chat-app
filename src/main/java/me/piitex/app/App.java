@@ -15,6 +15,7 @@ import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.updater.BackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
@@ -100,13 +101,14 @@ public class App extends FXLoad {
         threadPoolManager = new ThreadPoolManager();
         threadPoolManager.submitTask(() -> {
             loading = true;
-            if (Main.run || Main.app) {
-                performUpdates();
-            }
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Finished pre-initialization.");
             loading = false;
+            // Will not perform updates when using App.main(); This prevents development builds from being backported.
+            if (Main.run || Main.app) {
+                performUpdates();
+            }
         });
     }
 
@@ -234,6 +236,15 @@ public class App extends FXLoad {
 
         if (getBackendDirectory().mkdirs()) {
             logger.info("Created backend directory: {}", getBackendDirectory().getAbsolutePath());
+            logger.info("Creating placeholder llama version...");
+            File file = new File(getBackendDirectory(), "0.txt");
+            try {
+                if (file.createNewFile()) {
+                    logger.info("Created placeholder file: {}", file.getAbsolutePath());
+                }
+            } catch (IOException e) {
+                logger.error("Failed to make placeholder file!", e);
+            }
         }
 
         if (getModelsDirectory().mkdirs()) {
@@ -345,16 +356,17 @@ public class App extends FXLoad {
             App.logger.error("Failed to fetch download size.");
         }
 
-//        TODO: Automatically update llamacpp
-//        try {
-//            GitHubUtil gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggerganov/llama.cpp/");
-//            FileDownloader llamaDownloader = gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(), "llama-[a-zA-Z0-9]+-bin-win-cuda-12\\.4-x64\\.zip").getInt("id"), new File("output/download.zip"));
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
-
+        // Microsoft, the multi trillion dollar company that can't handle more than 50 API requests.
+        App.logger.info("Checking for backend version...");
+        File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+        if (backendVersionFile != null) {
+            BackendUpdater updater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+            App.logger.info("Looking for updates...");
+            updater.checkForUpdates();
+        } else {
+            App.logger.error("Update file not found!");
+        }
+        App.logger.info("Finished updates.");
     }
 
     public AppSettings getAppSettings() {
@@ -463,7 +475,7 @@ public class App extends FXLoad {
     }
 
     public static File getBackendDirectory() {
-        return new File(getAppDirectory(), "/backend/");
+        return new File(getDataDirectory(), "/backend/");
     }
 
     public static File getModelsDirectory() {
