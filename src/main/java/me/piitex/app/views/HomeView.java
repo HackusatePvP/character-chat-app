@@ -14,6 +14,8 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 
+import java.util.concurrent.TimeUnit;
+
 public class HomeView extends EmptyContainer {
     private final HorizontalLayout root;
 
@@ -43,13 +45,7 @@ public class HomeView extends EmptyContainer {
 
         if (App.getInstance().isLoading()) {
             root.addElement(new LoadingView("Loading data...", root.getWidth(), 650));
-        } else {
-            buildBody();
-        }
-
-        addElement(new ServerLayout(appSettings.getWidth(), 50));
-        if (App.getInstance().isLoading()) {
-            addRenderEvent(event -> App.getThreadPoolManager().submitTask(() -> {
+            App.getThreadPoolManager().submitSchedule(() -> {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
@@ -59,8 +55,12 @@ public class HomeView extends EmptyContainer {
                     root.removeElement(1);
                     buildBody();
                 });
-            }));
+            }, 1, TimeUnit.SECONDS);
+        } else {
+            buildBody();
         }
+
+        addElement(new ServerLayout(appSettings.getWidth(), 50));
     }
 
     public VerticalLayout buildInstructions() {
