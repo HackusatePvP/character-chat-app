@@ -203,11 +203,11 @@ public class ChatView extends EmptyContainer {
             if (next != null && cachedView != null) {
                 App.logger.info("Using cached selection view...");
                 App.window.addContainer(cachedView);
+                character.setLastChat(next);
             } else {
                 App.window.clearContainers();
                 App.window.addContainer(new ChatView(character, next, true));
             }
-            character.setLastChat(next);
         });
 
         return selection;
