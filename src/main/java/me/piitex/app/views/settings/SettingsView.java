@@ -3,7 +3,6 @@ package me.piitex.app.views.settings;
 import atlantafx.base.theme.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;

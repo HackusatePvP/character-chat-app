@@ -4,8 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.utils.Version;
-import me.piitex.app.utils.VersionUtil;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.containers.Container;
