@@ -6,7 +6,7 @@ import me.piitex.os.configurations.InfoFile;
 public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096; // 4096 is a good baseline. Most modern models can go way higher (32k)
-    private boolean contextShift; // Def: False, CCA manages context tokens automatically.
+    private boolean contextShift; // Def: True, CCA manages context tokens automatically. This will be a safeguard to prevent errors.
     private double temperature = 0.8; // min 0
     private double topP = 1; // min 0
     private double minP = 0.1; // min 0.05
@@ -33,6 +33,7 @@ public class ModelSettings {
     private double dataPerLayer;
     private double kvCacheSize;
     private double computeBufferSize; // This is compute buffer size.
+    private boolean change = false; // Flags if the model settings have been changed.
 
     @Nullable
     private InfoFile infoFile;
@@ -179,6 +180,9 @@ public class ModelSettings {
         }
         if (infoFile.hasKey("data-per-layer")) {
             this.dataPerLayer = infoFile.getDouble("data-per-layer");
+        }
+        if (infoFile.hasKey("changed")) {
+            this.change = infoFile.getBoolean("changed");
         }
     }
 
@@ -459,6 +463,15 @@ public class ModelSettings {
     public void setComputeBufferSize(double computeBufferSize) {
         this.computeBufferSize = computeBufferSize;
         infoFile.set("compute-buffer-size", computeBufferSize);
+    }
+
+    public boolean isChange() {
+        return change;
+    }
+
+    public void setChange(boolean change) {
+        this.change = change;
+        infoFile.set("change", change);
     }
 
     @Nullable
