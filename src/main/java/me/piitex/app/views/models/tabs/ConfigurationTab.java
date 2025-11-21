@@ -157,16 +157,19 @@ public class ConfigurationTab extends Tab {
         TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
         container.setTitle("GPU Usage");
-        container.setDescription("Percentage of the GPU to use. Always leave some headroom for the operating system.");
+        container.setDescription("Percentage of total VRAM to use. Recommended to keep below 80%.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout action = new VerticalLayout(200, 100);
+        action.setAlignment(Pos.CENTER);
 
         SliderOverlay input = new SliderOverlay(0, 100, settings.getGpuUsage());
         input.getSlider().setShowTickLabels(true);
         input.getSlider().setShowTickMarks(true);
         input.getSlider().setMinorTickCount(4);
-        input.addStyle(Styles.LARGE);
+        input.getSlider().getStyleClass().add(Styles.LARGE);
         input.getSlider().setLabelFormatter(new StringConverter<>() {
             @Override
             public String toString(Double value) {
@@ -178,10 +181,17 @@ public class ConfigurationTab extends Tab {
                 return 0.0;
             }
         });
+        action.addElement(input);
+        long currentValue = (long) (appSettings.getTotalGpuVram() * (input.getSlider().getValue() / 100));
+        TextOverlay textOverlay = new TextOverlay(String.format("%d", (long) input.getSlider().getValue()) + "%: " + String.format("%d", currentValue) + "MiB");
+        action.addElement(textOverlay);
+        container.setAction(action);
+
         input.onSliderMove(event -> {
             settings.setGpuUsage(event.getNewValue());
+            long value = (long) (appSettings.getTotalGpuVram() * (event.getNewValue() / 100));
+            textOverlay.setText(String.format("%d", (long) input.getSlider().getValue()) + "%: " + String.format("%d", value) + "MiB");
         });
-        container.setAction(input);
 
         return container;
     }
@@ -294,6 +304,9 @@ public class ConfigurationTab extends Tab {
             Model model = settings.getGlobalModel();
             if (model == null) {
                 model = App.getDefaultModel();
+            }
+            if (model != null && model.getSettings().getTotalLayers() == 0) {
+                new ModelTestProcess(model);
             }
             startServer(model);
 

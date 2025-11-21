@@ -35,7 +35,7 @@ public class ModelTestProcess {
         ServerSettings settings = App.getInstance().getSettings();
 
         File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
-        File server = new File(backendDirectory, "llama-server.exe");
+        File server = new File(backendDirectory, "llama-cli.exe");
         List<String> parameters = getParameters(server, settings);
         App.logger.debug("Server Parameters: {}", parameters);
 
@@ -47,7 +47,7 @@ public class ModelTestProcess {
         environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
 
         // The server output will be errors even though it's not errors. This is how Java works
-        builder.redirectError(new File(App.getDataDirectory(), "server.txt"));
+        builder.redirectError(new File(App.getDataDirectory(), "model-output.txt"));
 
         process = null;
         try {
@@ -66,7 +66,12 @@ public class ModelTestProcess {
 
         // Creates a thread-blocking scanner to ensure the server has started properly.
         // It also checks for errors and logs them.
-        waitForServer();
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        processOutput();
 
         if (!error) {
             App.logger.info("Started llama-server successfully.");
@@ -89,10 +94,14 @@ public class ModelTestProcess {
         parameters.add("-c");
         parameters.add(model.getSettings().getContextSize() + "");
 
-        // Server port and WebUI
-        parameters.add("--port");
-        parameters.add("8187");
-        parameters.add("--no-webui");
+        parameters.add("-p");
+        parameters.add("The quick brown fox jumps.");
+
+        parameters.add("-n");
+        parameters.add("1");
+
+        parameters.add("-no-cnv");
+        parameters.add("--no-warmup");
 
         return parameters;
     }
@@ -131,99 +140,81 @@ public class ModelTestProcess {
         }
     }
 
-    protected void waitForServer() {
+    protected void processOutput() {
         App.logger.info("Checking server state...");
-        File output = new File(App.getDataDirectory(), "server.txt");
+        File output = new File(App.getDataDirectory(), "model-output.txt");
         boolean started = false;
         double totalModelVramMiB = 0.0;
         double kvCacheSizeMiB = 0.0;
         double computeBufferMiB = 0.0;
-        while (!started) {
-            try {
-                Thread.sleep(100); // Wait for 100 milliseconds before checking the file again
-                try (Scanner scanner = new Scanner(new FileInputStream(output))) {
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        if (line.contains("cleaning up before exit...") || line.contains("failed to load model") || line.contains("error while handling") || line.startsWith("error:") || line.startsWith("ROCm error:")) {
-                            App.logger.error("ERROR: Could not start backend server.");
-                            error = true;
-                            process.destroy();
-                            break;
-                        }
-                        if (line.contains("starting the main loop")) {
-                            App.logger.info("Backend server stated!");
-                            int totalLayers = model.getSettings().getTotalLayers();
-                            if (totalLayers > 0 && totalModelVramMiB > 0.0) {
-                                double vramPerLayer = totalModelVramMiB / totalLayers;
-                                model.getSettings().setDataPerLayer(vramPerLayer);
-                                App.logger.info("Calculated VRAM per layer: {} MiB/layer", String.format("%.2f", vramPerLayer));
-                            }
-                            if (kvCacheSizeMiB > 0.0) {
-                                model.getSettings().setKvCacheSize(kvCacheSizeMiB);
-                            }
-                            if (computeBufferMiB > 0.0) {
-                                model.getSettings().setComputeBufferSize(computeBufferMiB);
-                            }
-                            started = true;
-                            break;
-                        }
-                        if (line.startsWith("print_info: n_layer") && model.getSettings().getTotalLayers() == 0) {
-                            line = line.split("=")[1].trim();
-                            App.logger.info("Total Model Layers: {}", line);
-                            model.getSettings().setTotalLayers(Integer.parseInt(line));
-                        }
-                        if (line.startsWith("llama_model_load_from_file_impl:")) {
-                            line = line.split("-")[1].trim().split(" ")[0];
-                            App.getInstance().getAppSettings().setTotalGpuVram(Double.parseDouble(line));
-                        }
-                        if (!line.contains("CPU_Mapped") && line.contains("model buffer size =") && totalModelVramMiB == 0.0) {
-                            String valueWithUnit = line.split("=")[1].trim();
-                            String vramValueStr = valueWithUnit.split(" ")[0];
 
-                            totalModelVramMiB = Double.parseDouble(vramValueStr);
-                            App.logger.debug("Extracted Model Weights VRAM: {} MiB", totalModelVramMiB);
-                        }
-                        if (line.contains("llama_kv_cache: size =") && line.contains("MiB") && kvCacheSizeMiB == 0.0) {
-                            try {
-                                String part = line.split("size =")[1].trim();
-                                String kvSizeStr = part.split(" ")[0];
-                                kvCacheSizeMiB = Double.parseDouble(kvSizeStr);
-                                App.logger.debug("Extracted KV Cache Size: {} MiB", kvCacheSizeMiB);
-                            } catch (Exception e) {
-                                App.logger.error("Failed to parse KV cache size: {}", e.getMessage());
-                            }
-                        }
-                        if (line.contains("compute buffer size =") && line.contains("MiB") && !line.contains("Host")) {
-                            try {
-                                String part = line.split("=")[1].trim();
-                                String bufferSizeStr = part.split(" ")[0];
-                                System.out.println("Line: " + line);
-                                double currentComputeMiB = Double.parseDouble(bufferSizeStr);
+        try (Scanner scanner = new Scanner(new FileInputStream(output))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.contains("cleaning up before exit...") || line.contains("failed to load model") || line.contains("error while handling") || line.startsWith("error:") || line.startsWith("ROCm error:")) {
+                    App.logger.error("ERROR: Could not start backend server.");
+                    error = true;
+                    break;
+                }
+                if (line.startsWith("print_info: n_layer") && model.getSettings().getTotalLayers() == 0) {
+                    line = line.split("=")[1].trim();
+                    App.logger.info("Total Model Layers: {}", line);
+                    model.getSettings().setTotalLayers(Integer.parseInt(line));
+                }
+                if (line.startsWith("llama_model_load_from_file_impl:")) {
+                    line = line.split("-")[1].trim().split(" ")[0];
+                    App.getInstance().getAppSettings().setTotalGpuVram(Double.parseDouble(line));
+                }
+                if (!line.contains("CPU_Mapped") && line.contains("model buffer size =") && totalModelVramMiB == 0.0) {
+                    String valueWithUnit = line.split("=")[1].trim();
+                    String vramValueStr = valueWithUnit.split(" ")[0];
 
-                                // Keep the largest value found (which will be the GPU allocation)
-                                if (currentComputeMiB > computeBufferMiB) {
-                                    computeBufferMiB = currentComputeMiB;
-                                    App.logger.info("Using '{}'MiB for compute buffer.", computeBufferMiB);
-                                }
-                            } catch (Exception e) {
-                                App.logger.error("Failed to parse Compute Buffer MiB: {}", e.getMessage());
-                            }
-                        }
+                    totalModelVramMiB = Double.parseDouble(vramValueStr);
+                    App.logger.debug("Extracted Model Weights VRAM: {} MiB", totalModelVramMiB);
+                }
+                if (line.contains("llama_kv_cache: size =") && line.contains("MiB") && kvCacheSizeMiB == 0.0) {
+                    try {
+                        String part = line.split("size =")[1].trim();
+                        String kvSizeStr = part.split(" ")[0];
+                        kvCacheSizeMiB = Double.parseDouble(kvSizeStr);
+                        App.logger.debug("Extracted KV Cache Size: {} MiB", kvCacheSizeMiB);
+                    } catch (Exception e) {
+                        App.logger.error("Failed to parse KV cache size: {}", e.getMessage());
                     }
                 }
+                if (line.contains("compute buffer size =") && line.contains("MiB") && !line.contains("Host")) {
+                    try {
+                        String part = line.split("=")[1].trim();
+                        String bufferSizeStr = part.split(" ")[0];
+                        double currentComputeMiB = Double.parseDouble(bufferSizeStr);
 
-            } catch (FileNotFoundException e) {
-                App.logger.warn("Server output file not found yet (will retry): {}", e.getMessage());
-            } catch (InterruptedException e) {
-                // Handle if the thread is interrupted while sleeping
-                Thread.currentThread().interrupt();
-                App.logger.error("Server validation thread interrupted.");
-                error = true;
-                stop();
-                break;
+                        // Keep the largest value found (which will be the GPU allocation)
+                        if (currentComputeMiB > computeBufferMiB) {
+                            computeBufferMiB = currentComputeMiB;
+                            App.logger.info("Using '{}'MiB for compute buffer.", computeBufferMiB);
+                        }
+                    } catch (Exception e) {
+                        App.logger.error("Failed to parse Compute Buffer MiB: {}", e.getMessage());
+                    }
+                }
             }
-        }
 
+            int totalLayers = model.getSettings().getTotalLayers();
+            if (totalLayers > 0 && totalModelVramMiB > 0.0) {
+                double vramPerLayer = totalModelVramMiB / totalLayers;
+                model.getSettings().setDataPerLayer(vramPerLayer);
+                App.logger.info("Calculated VRAM per layer: {} MiB/layer", String.format("%.2f", vramPerLayer));
+            }
+            if (kvCacheSizeMiB > 0.0) {
+                model.getSettings().setKvCacheSize(kvCacheSizeMiB);
+            }
+            if (computeBufferMiB > 0.0) {
+                model.getSettings().setComputeBufferSize(computeBufferMiB);
+            }
+        } catch (FileNotFoundException e) {
+            error = true;
+            stop();
+        }
         stop();
     }
 

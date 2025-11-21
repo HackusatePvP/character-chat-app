@@ -163,55 +163,49 @@ public class ServerProcess {
         // The usage is a percentage of the total layers (model.getGpuLayers());
         double TOTAL_AVAILABLE_VRAM_MIB = App.getInstance().getAppSettings().getTotalGpuVram();
 
-        // Caculate the cache sizes llama.cpp uses. This is typically the kvCache and the compute buffer size.
         double kvCacheMiB = model.getSettings().getKvCacheSize();
         double computeBufferMiB = model.getSettings().getComputeBufferSize();
-
-        // Combine the two values to accurately calculate the exact vram usage.
         double FIXED_OVERHEAD_MIB = kvCacheMiB + computeBufferMiB;
 
         if (FIXED_OVERHEAD_MIB <= 0.0) {
-            // Fallback value for the total fixed overhead observed in the log (3300.00 + 946.00)
-            App.logger.warn("Fixed overhead was 0.0. Using empirical fallback (4246.00 MiB).");
+            // Fallback check
             FIXED_OVERHEAD_MIB = 4246.00;
         }
 
-        // The size of each model layer. Represented by the total vram of the models layer / by the total layers.
         final double VRAM_PER_LAYER_MIB = model.getSettings().getDataPerLayer();
-
-        // The percentage of VRAM to use.
         double usagePercentage = settings.getGpuUsage();
 
-        // Calculate the VRAM available for offloading layers.
-        double layerAllocatableVram = TOTAL_AVAILABLE_VRAM_MIB - FIXED_OVERHEAD_MIB;
+        // Calculate the total vram allowed by the percentage.
+        double totalVramBudget = TOTAL_AVAILABLE_VRAM_MIB * (usagePercentage / 100.0);
 
-        // Apply the percentage budget to the VRAM reserved for layers only.
-        double layerBudgetMiB = layerAllocatableVram * (usagePercentage / 100.0);
+        // Calculate the max by subtracting the required FIXED OVERHEAD.
+        double layerBudgetMiB = totalVramBudget - FIXED_OVERHEAD_MIB;
 
-
-        // Calculate the number of layers that fit into the Layer Budget
-        int layers;
-
-        if (VRAM_PER_LAYER_MIB > 0.0) {
-            layers = (int) Math.floor(layerBudgetMiB / VRAM_PER_LAYER_MIB);
-        } else {
-            // Log a warning and default to 0 layers when VRAM per layer is unknown/zero.
-            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to 0 to prevent Integer.MAX_VALUE.");
-            layers = 0;
+        // Ensure nothing is negative.
+        if (layerBudgetMiB < 0) {
+            App.logger.warn("Total VRAM Budget ({}) is less than Fixed Overhead ({}). Setting Layer Budget to 0.", totalVramBudget, FIXED_OVERHEAD_MIB);
+            layerBudgetMiB = 0;
         }
 
         int totalModelLayers = model.getSettings().getTotalLayers();
-        System.out.println("Layers: " + layers);
+        int layers;
+
+        // Calculate the number of layers that fit into the budget
+        if (VRAM_PER_LAYER_MIB > 0.0) {
+            layers = (int) Math.floor(layerBudgetMiB / VRAM_PER_LAYER_MIB);
+        } else {
+            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to 0.");
+            layers = 0;
+        }
 
         // Cap the offloaded layers
         layers = Math.min(layers, totalModelLayers);
-        System.out.println("Adjusted Layers: " + layers);
 
         parameters.add("-ngl");
-        App.logger.info("Using VRAM utilization of '{}'% (Layer Budget: {} MiB, Total VRAM Usage: {} MiB) to load '{}'/'{}' layers",
+        App.logger.info("Using VRAM utilization of '{}'% (Total VRAM Budget: {} MiB, Layers VRAM Usage: {} MiB) to load '{}'/'{}' layers",
                 usagePercentage,
-                (int) layerBudgetMiB,
-                (int) (layerBudgetMiB + FIXED_OVERHEAD_MIB), // This is the estimated TOTAL VRAM usage
+                (int) totalVramBudget,
+                (int) (layers * VRAM_PER_LAYER_MIB),
                 layers,
                 totalModelLayers);
 
