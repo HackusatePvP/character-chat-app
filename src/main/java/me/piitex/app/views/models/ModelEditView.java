@@ -753,6 +753,7 @@ public class ModelEditView extends EmptyContainer {
             settings.setChatTemplate(chatTemplate);
             settings.setReasoningTemplate(reasoningTemplate);
             settings.setJinja(jinja);
+            settings.setChange(true);
 
             App.window.clearContainers();
             App.window.addContainer(new ModelsView("List"));

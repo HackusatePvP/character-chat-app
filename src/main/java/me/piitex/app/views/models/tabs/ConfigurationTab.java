@@ -305,9 +305,6 @@ public class ConfigurationTab extends Tab {
             if (model == null) {
                 model = App.getDefaultModel();
             }
-            if (model != null && model.getSettings().getTotalLayers() == 0) {
-                new ModelTestProcess(model);
-            }
             startServer(model);
 
         });

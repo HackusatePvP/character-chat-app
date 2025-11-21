@@ -218,9 +218,7 @@ public class App extends FXLoad {
             }
 
             if (model != null) {
-                // Run Test process.
                 // Run Server.
-                new ModelTestProcess(model);
                 new ServerProcess(model);
             }
         });

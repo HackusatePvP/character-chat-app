@@ -15,11 +15,9 @@ public class ModelTestProcess {
     private final Model model;
 
     private boolean error = false;
-    private volatile boolean loading = false;
 
     public ModelTestProcess(Model model) {
         this.model = model;
-        App.logger.info("Verifying server PID...");
         checkProcessID();
 
         if (model == null) {
@@ -29,15 +27,12 @@ public class ModelTestProcess {
         }
         App.logger.info("Loading {}", model.getFile().getAbsolutePath());
 
-        loading = true;
-
         // Fetch server/model settings.
         ServerSettings settings = App.getInstance().getSettings();
 
         File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
         File server = new File(backendDirectory, "llama-cli.exe");
         List<String> parameters = getParameters(server, settings);
-        App.logger.debug("Server Parameters: {}", parameters);
 
         // Build the process
         ProcessBuilder builder = new ProcessBuilder(parameters);
@@ -86,7 +81,6 @@ public class ModelTestProcess {
         parameters.add("-m");
         parameters.add(model.getFile().getAbsolutePath());
         if (!settings.getDevice().equalsIgnoreCase("auto")) {
-            App.logger.debug("Setting device...");
             parameters.add("-dev");
             parameters.add(settings.getFormattedDevice().trim());
         }
@@ -141,7 +135,7 @@ public class ModelTestProcess {
     }
 
     protected void processOutput() {
-        App.logger.info("Checking server state...");
+        App.logger.info("Processing model data...");
         File output = new File(App.getDataDirectory(), "model-output.txt");
         boolean started = false;
         double totalModelVramMiB = 0.0;
@@ -159,7 +153,7 @@ public class ModelTestProcess {
                 if (line.startsWith("print_info: n_layer") && model.getSettings().getTotalLayers() == 0) {
                     line = line.split("=")[1].trim();
                     App.logger.info("Total Model Layers: {}", line);
-                    model.getSettings().setTotalLayers(Integer.parseInt(line));
+                    model.getSettings().setTotalLayers(Integer.parseInt(line) + 1);
                 }
                 if (line.startsWith("llama_model_load_from_file_impl:")) {
                     line = line.split("-")[1].trim().split(" ")[0];
