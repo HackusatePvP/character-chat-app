@@ -18,6 +18,7 @@ module me.piitex.app {
     requires annotations;
     requires org.fxmisc.richtext;
     requires javafx.graphics;
+    requires org.kordamp.ikonli.coreui;
 
     opens me.piitex.app to javafx.fxml;
     exports me.piitex.app;
