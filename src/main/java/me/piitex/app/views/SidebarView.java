@@ -10,14 +10,15 @@ import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
 import me.piitex.app.views.users.UsersView;
 import me.piitex.engine.PopupPosition;
-import me.piitex.engine.Renderer;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.engine.overlays.TextOverlay;
+import org.kordamp.ikonli.coreui.CoreUiBrands;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
+import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.util.function.Consumer;
 
@@ -45,7 +46,7 @@ public class SidebarView extends VerticalLayout {
     }
 
     public void build() {
-        double rootWidth = SIDEBAR_WIDTH - 20;
+        double rootWidth = SIDEBAR_WIDTH - 30;
 
         TextOverlay close = new TextOverlay(new FontIcon(Material2AL.CLOSE));
         close.setX(getMaxWidth() - 5);
@@ -60,7 +61,7 @@ public class SidebarView extends VerticalLayout {
             addElement(buttonOverlay);
         });
 
-        ButtonOverlay home = new ButtonBuilder("home").setText("Home").build();
+        ButtonOverlay home = new ButtonBuilder("home").setText("Home").setIcon(new FontIcon(Material2AL.HOME)).build();
         home.addStyle(appSettings.getGlobalTextSize());
         home.setWidth(rootWidth);
         addElement(home);
@@ -69,7 +70,7 @@ public class SidebarView extends VerticalLayout {
             App.window.addContainer(new HomeView());
         });
 
-        ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").build();
+        ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").setIcon(new FontIcon(Material2MZ.SETTINGS)).build();
         settings.addStyle(appSettings.getGlobalTextSize());
         settings.setWidth(rootWidth);
         addElement(settings);
@@ -78,7 +79,7 @@ public class SidebarView extends VerticalLayout {
             App.window.addContainer(new SettingsView().getContainer());
         });
 
-        ButtonOverlay models = new ButtonBuilder("models").setText("Models / Backend").build();
+        ButtonOverlay models = new ButtonBuilder("models").setText("Models").setIcon(new FontIcon(Material2MZ.ROCKET)).build();
         models.addStyle(appSettings.getGlobalTextSize());
         models.setWidth(rootWidth);
         addElement(models);
@@ -91,7 +92,7 @@ public class SidebarView extends VerticalLayout {
 
         });
 
-        ButtonOverlay users = new ButtonBuilder("users").setText("User Template").build();
+        ButtonOverlay users = new ButtonBuilder("users").setText("User Templates").setIcon(new FontIcon(Material2MZ.MEMORY)).build();
         users.addStyle(appSettings.getGlobalTextSize());
         users.setWidth(rootWidth);
         addElement(users);
@@ -104,7 +105,7 @@ public class SidebarView extends VerticalLayout {
             App.window.addContainer(new UsersView());
         });
 
-        ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").build();
+        ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").setIcon(new FontIcon(Material2MZ.PERSON)).build();
         characters.addStyle(appSettings.getGlobalTextSize());
         characters.setWidth(rootWidth);
         addElement(characters);
@@ -112,6 +113,12 @@ public class SidebarView extends VerticalLayout {
             App.window.clearContainers();
             App.window.addContainer(new CharacterEditView(null).getRoot());
         });
+
+        TextOverlay gitHub = new TextOverlay(new FontIcon(CoreUiBrands.GITHUB));
+        gitHub.onClick(event -> {
+            App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app/");
+        });
+
     }
 
     public void setOnCollapseStateChange(Consumer<Boolean> onCollapseStateChange) {
