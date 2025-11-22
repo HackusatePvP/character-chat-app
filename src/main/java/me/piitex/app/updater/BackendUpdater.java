@@ -139,7 +139,7 @@ public class BackendUpdater {
 
 
             } catch (IOException | URISyntaxException e) {
-                App.logger.info("Unable to download latest release!");
+                App.logger.error("Unable to download cuda release!", e);
             }
         });
     }
@@ -183,7 +183,7 @@ public class BackendUpdater {
                         }
                     });
         } catch (IOException | URISyntaxException e) {
-            App.logger.info("Unable to download latest release!");
+            App.logger.error("Unable to download vulkan release!", e);
         }
     }
 
@@ -228,7 +228,7 @@ public class BackendUpdater {
                         }
                     });
         } catch (IOException | URISyntaxException e) {
-            App.logger.info("Unable to download latest release!");
+            App.logger.error("Unable to download hip release!", e);
         }
     }
 
