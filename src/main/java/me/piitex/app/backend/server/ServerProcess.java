@@ -7,6 +7,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.overlays.MessageOverlay;
+import me.piitex.os.OSUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,8 +59,16 @@ public class ServerProcess {
         // Fetch server/model settings.
         ServerSettings settings = App.getInstance().getSettings();
 
-        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
-        File server = new File(backendDirectory, "llama-server.exe");
+        File server;
+        
+        if (OSUtil.getOS().contains("Windows")) {
+            File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
+            server = new File(backendDirectory, "llama-server.exe");
+        } else {
+            File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/build/bin/");
+            server = new File(backendDirectory, "llama-server");
+            server.setExecutable(true, true);
+        }
         List<String> parameters = getParameters(server, settings);
         App.logger.debug("Server Parameters: {}", parameters);
 

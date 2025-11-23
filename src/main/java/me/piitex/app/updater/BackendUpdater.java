@@ -90,7 +90,15 @@ public class BackendUpdater {
             progressBarOverlay.setX(150);
             progressBarOverlay.setY(70);
             container.addElement(progressBarOverlay);
-            downloadCudaBackend(gitHubUtil, updateInfo, progressBarOverlay);
+            if (OSUtil.getOS().contains("Windows")) {
+                App.getThreadPoolManager().submitTask(() -> {
+                    downloadCudaBackend(gitHubUtil, updateInfo, progressBarOverlay);
+                });
+            } else {
+                App.getThreadPoolManager().submitTask(() -> {
+                    downloadVulkan(gitHubUtil, null, updateInfo, progressBarOverlay);
+                });
+            }
         });
         App.window.getStage().getScene().getRoot().setDisable(true);
         window.getStage().setAlwaysOnTop(true);
@@ -98,57 +106,57 @@ public class BackendUpdater {
     }
 
     public void downloadCudaBackend(GitHubUtil gitHubUtil, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
-        App.getThreadPoolManager().submitTask(() -> {
-            try {
-                gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
-                                "llama-[a-zA-Z0-9]+-bin-win-cuda-12\\.4-x64\\.zip").getInt("id"),
-                        new File(App.getBackendDirectory(), "cuda.zip"),
-                        new DownloadListener() {
-                            @Override
-                            public void onDownloadStart(DownloadInfo info) {
-                                Platform.runLater(() -> {
-                                    progressBarOverlay.getProgressBar().progressProperty().set(0);
-                                    textOverlay.setText("Downloading Cuda backend...");
-                                });
-                            }
 
-                            @Override
-                            public void onDownloadProgress(DownloadInfo info) {
-                                Platform.runLater(() -> {
-                                    // Update UI
-                                    progressBarOverlay.getProgressBar().progressProperty().set(info.getDownloadProgress());
-                                });
-                            }
+        try {
+            gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
+                            "llama-[a-zA-Z0-9]+-bin-win-cuda-12\\.4-x64\\.zip").getInt("id"),
+                    new File(App.getBackendDirectory(), "cuda.zip"),
+                    new DownloadListener() {
+                        @Override
+                        public void onDownloadStart(DownloadInfo info) {
+                            Platform.runLater(() -> {
+                                progressBarOverlay.getProgressBar().progressProperty().set(0);
+                                textOverlay.setText("Downloading Cuda backend...");
+                            });
+                        }
 
-                            @Override
-                            public void onDownloadComplete(DownloadInfo info, File outputFile) {
-                                App.logger.info("Download for Cuda completed!");
-                                downloadVulkan(gitHubUtil, outputFile, textOverlay, progressBarOverlay);
-                            }
+                        @Override
+                        public void onDownloadProgress(DownloadInfo info) {
+                            Platform.runLater(() -> {
+                                // Update UI
+                                progressBarOverlay.getProgressBar().progressProperty().set(info.getDownloadProgress());
+                            });
+                        }
 
-                            @Override
-                            public void onDownloadError(DownloadInfo info, Exception e) {
+                        @Override
+                        public void onDownloadComplete(DownloadInfo info, File outputFile) {
+                            App.logger.info("Download for Cuda completed!");
+                            downloadVulkan(gitHubUtil, outputFile, textOverlay, progressBarOverlay);
+                        }
 
-                            }
+                        @Override
+                        public void onDownloadError(DownloadInfo info, Exception e) {
 
-                            @Override
-                            public void onDownloadCancel(DownloadInfo info) {
+                        }
 
-                            }
-                        });
+                        @Override
+                        public void onDownloadCancel(DownloadInfo info) {
+
+                        }
+                    });
 
 
-            } catch (IOException | URISyntaxException e) {
-                App.logger.error("Unable to download cuda release!", e);
-            }
-        });
+        } catch (IOException | URISyntaxException e) {
+            App.logger.error("Unable to download cuda release!", e);
+        }
     }
 
     public void downloadVulkan(GitHubUtil gitHubUtil, File cudaZip, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
         try {
             //llama-b7087-bin-win-vulkan-x64.zip
+            String os = OSUtil.getOS().contains("Windows") ? "win" : "ubuntu";
             gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
-                            "llama-[a-zA-Z0-9]+-bin-win-vulkan-x64\\.zip").getInt("id"),
+                            "llama-[a-zA-Z0-9]+-bin-" + os + "-vulkan-x64\\.zip").getInt("id"),
                     new File(App.getBackendDirectory(), "vulkan.zip"),
                     new DownloadListener() {
                         @Override
@@ -169,7 +177,11 @@ public class BackendUpdater {
 
                         @Override
                         public void onDownloadComplete(DownloadInfo info, File outputFile) {
-                            downloadHip(gitHubUtil, cudaZip, outputFile, textOverlay, progressBarOverlay);
+                            if (OSUtil.getOS().contains("Windows")) {
+                                downloadHip(gitHubUtil, cudaZip, outputFile, textOverlay, progressBarOverlay);
+                            } else {
+                                prepareInstallation(gitHubUtil, null, outputFile, null, textOverlay, progressBarOverlay);
+                            }
                         }
 
                         @Override
@@ -233,31 +245,35 @@ public class BackendUpdater {
     }
 
     public void prepareInstallation(GitHubUtil gitHubUtil, File cudaZip, File vulkanZip, File hipZip, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
-        if (!cudaZip.exists() || !vulkanZip.exists() || !hipZip.exists()) {
-            throw new RuntimeException("Critical installation file missing!");
-        }
-
         Platform.runLater(() -> {
             textOverlay.setText("Deleting old files...");
             progressBarOverlay.getProgressBar().setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         });
-        File cudaDir = new File(App.getBackendDirectory(), "cuda/");
-        try {
-            FileUtils.deleteDirectory(cudaDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (cudaZip != null) {
+            File cudaDir = new File(App.getBackendDirectory(), "cuda/");
+            try {
+                FileUtils.deleteDirectory(cudaDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        File hipDir = new File(App.getBackendDirectory(), "hip/");
-        try {
-            FileUtils.deleteDirectory(hipDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        if (hipZip != null) {
+            File hipDir = new File(App.getBackendDirectory(), "hip/");
+            try {
+                FileUtils.deleteDirectory(hipDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        File vulkanDir = new File(App.getBackendDirectory(), "vulkan/");
-        try {
-            FileUtils.deleteDirectory(vulkanDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        if (vulkanZip != null) {
+            File vulkanDir = new File(App.getBackendDirectory(), "vulkan/");
+            try {
+                FileUtils.deleteDirectory(vulkanDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Platform.runLater(() -> {
@@ -266,9 +282,12 @@ public class BackendUpdater {
         });
         try {
             App.logger.info("Unzipping backend files...");
-            ZipUtil.unzipFile(cudaZip, new File(App.getBackendDirectory(), "cuda/"));
-            ZipUtil.unzipFile(hipZip, new File(App.getBackendDirectory(), "hip/"));
-            ZipUtil.unzipFile(vulkanZip, new File(App.getBackendDirectory(), "vulkan/"));
+            if (cudaZip != null)
+                ZipUtil.unzipFile(cudaZip, new File(App.getBackendDirectory(), "cuda/"));
+            if (hipZip != null)
+                ZipUtil.unzipFile(hipZip, new File(App.getBackendDirectory(), "hip/"));
+            if (vulkanZip != null)
+                ZipUtil.unzipFile(vulkanZip, new File(App.getBackendDirectory(), "vulkan/"));
 
             App.logger.info("Finished unzipping!");
             Platform.runLater(() -> {

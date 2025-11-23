@@ -2,6 +2,8 @@ package me.piitex.app.backend.server;
 
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.os.OSPathing;
+import me.piitex.os.OSUtil;
 import me.piitex.os.configurations.InfoFile;
 
 import java.io.File;
@@ -173,7 +175,11 @@ public class ServerSettings {
     }
 
     public String getModelPath() {
-        modelPath = modelPath.replace("%APPDATA%", System.getenv("APPDATA"));
+        if (OSUtil.getOS().contains("Windows")) {
+            modelPath = modelPath.replace("%APPDATA%", System.getenv("APPDATA"));
+        } else {
+            modelPath = modelPath.replace("%APPDATA%", OSPathing.getAppDataDirectory().getAbsolutePath());
+        }
         return modelPath;
     }
 

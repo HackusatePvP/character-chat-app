@@ -12,14 +12,16 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.DeviceProcess;
-import me.piitex.app.backend.server.ModelTestProcess;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.updater.ApplicationUpdater;
 import me.piitex.app.updater.BackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
+import me.piitex.os.OSPathing;
+import me.piitex.os.OSUtil;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.Window;
 import me.piitex.engine.containers.EmptyContainer;
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 
@@ -85,17 +88,17 @@ public class App extends FXLoad {
         appSettings = new AppSettings();
 
         long currentPid = ProcessHandle.current().pid();
-        if (settings.getInfoFile().hasKey("main-pid")) {
-            String pid = settings.getInfoFile().get("main-pid");
-            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
-                logger.error("Process already running! '{}'", pid);
-                error = true;
-                Platform.runLater(() -> {
-                    buildErrorWindow("Process is already running!").render();
-                });
-                return;
-            }
-        }
+//        if (settings.getInfoFile().hasKey("main-pid")) {
+//            String pid = settings.getInfoFile().get("main-pid");
+//            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
+//                logger.error("Process already running! '{}'", pid);
+//                error = true;
+//                Platform.runLater(() -> {
+//                    buildErrorWindow("Process is already running!").render();
+//                });
+//                return;
+//            }
+//        }
 
         settings.getInfoFile().set("main-pid", currentPid);
 
@@ -107,7 +110,7 @@ public class App extends FXLoad {
             App.logger.info("Finished pre-initialization.");
             loading = false;
             // Will not perform updates when using App.main(); This prevents development builds from being backported.
-            if (Main.run || Main.app) {
+            if (true) {
                 performUpdates();
             }
         });
@@ -117,7 +120,7 @@ public class App extends FXLoad {
     public void initialization(Stage initialStage) {
         // Error will pass if another instance is running,
         if (error) return;
-
+        App.logger.info("Loading app from '{}'", getAppDirectory().getAbsolutePath());
         AppSettings appSettings = App.getInstance().getAppSettings();
         Application.setUserAgentStylesheet(appSettings.getStyleTheme(appSettings.getTheme()).getUserAgentStylesheet());
 
@@ -175,7 +178,7 @@ public class App extends FXLoad {
         Positions.initialize();
 
         Stage stage = window.getStage();
-        stage.setOnCloseRequest(windowEvent -> App.shutdown());
+        stage.setOnCloseRequest(_ -> App.shutdown());
 
         // Debug hot keys.
         setStageInput(window);
@@ -186,16 +189,18 @@ public class App extends FXLoad {
         HomeView homeView = new HomeView();
         window.addContainer(homeView);
 
-        FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
-        icon.addExitItem("Exit", e -> App.shutdown());
-        icon.setOnAction(event -> {
-            App.logger.info("Handling tray action");
-            stage.show();
-            stage.toFront();
-            stage.setIconified(false);
-        });
+        if (OSUtil.getOS().contains("Windows")) {
+            FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
+            icon.addExitItem("Exit", e -> App.shutdown());
+            icon.setOnAction(event -> {
+                App.logger.info("Handling tray action");
+                stage.show();
+                stage.toFront();
+                stage.setIconified(false);
+            });
 
-        icon.show();
+            icon.show();
+        }
 
         // Sub thread as not to block JavaFX from initializing.
         App.getThreadPoolManager().submitTask(() -> {
@@ -356,6 +361,10 @@ public class App extends FXLoad {
         }
 
         // Microsoft, the multi trillion dollar company that can't handle more than 50 API requests.
+        App.logger.info("Checking for application updates...");
+        ApplicationUpdater applicationUpdater = new ApplicationUpdater(getVersion());
+        applicationUpdater.checkForUpdates();
+
         App.logger.info("Checking for backend version...");
         File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
         if (backendVersionFile != null) {
@@ -461,7 +470,7 @@ public class App extends FXLoad {
         } else if (Main.run) {
             return new File(System.getProperty("user.dir"));
         } else {
-            return new File(System.getenv("APPDATA") + "/chat-app/");
+            return new File(OSPathing.getAppDataDirectory() + "/chat-app/");
         }
     }
 
@@ -470,7 +479,7 @@ public class App extends FXLoad {
     }
 
     public static File getDataDirectory() {
-        return new File(System.getenv("APPDATA") + "/chat-app/");
+        return new File(OSPathing.getAppDataDirectory() + "/chat-app/");
     }
 
     public static File getBackendDirectory() {
@@ -526,7 +535,7 @@ public class App extends FXLoad {
             return models;
         }
 
-        String path = App.getInstance().getSettings().getModelPath().replace("%APPDATA%", System.getenv("APPDATA"));
+        String path = App.getInstance().getSettings().getModelPath().replace("%APPDATA%", OSPathing.getAppDataDirectory().getAbsolutePath());
         File modelPath = new File(path);
 
         if (!modelPath.exists()) {
@@ -630,5 +639,43 @@ public class App extends FXLoad {
         }
         Platform.exit();
         System.exit(0);
+    }
+
+    public String getVersion() {
+        String version = null;
+
+        // try to load from maven properties first
+        try {
+            Properties p = new Properties();
+            InputStream is = getClass().getResourceAsStream("/META-INF/maven/me.piitex.app/character-chat-app/pom.properties");
+            if (is != null) {
+                p.load(is);
+                version = p.getProperty("version", "");
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+
+        // fallback to using Java API
+        if (version == null) {
+            Package aPackage = getClass().getPackage();
+            if (aPackage != null) {
+                version = aPackage.getImplementationVersion();
+                if (version == null) {
+                    version = aPackage.getSpecificationVersion();
+                }
+            }
+        }
+
+        if (version == null) {
+            // we could not compute the version so use a blank
+            version = "";
+        }
+
+        if (!Main.app && !Main.run) {
+            version = "v1.1.0";
+        }
+
+        return version;
     }
 }

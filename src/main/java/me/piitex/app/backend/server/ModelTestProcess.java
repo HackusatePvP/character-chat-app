@@ -2,6 +2,7 @@ package me.piitex.app.backend.server;
 
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.os.OSUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,14 +26,40 @@ public class ModelTestProcess {
             error = true;
             return;
         }
+
+        if (!model.getFile().exists()) {
+            App.logger.error("Incompatible model!: {}", model.getFile().getAbsolutePath());
+        } else {
+
+            if (model.getFile().setExecutable(true)) {
+                App.logger.info("Changed file permissions for '{}'", model.getFile().getAbsolutePath());
+            }
+        }
+
+
         App.logger.info("Loading {}", model.getFile().getAbsolutePath());
 
         // Fetch server/model settings.
         ServerSettings settings = App.getInstance().getSettings();
 
-        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
-        File server = new File(backendDirectory, "llama-cli.exe");
+        File server;
+        if (OSUtil.getOS().contains("Windows")) {
+            File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
+            server = new File(backendDirectory, "llama-cli.exe");
+        } else {
+            File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/build/bin/");
+            server = new File(backendDirectory, "llama-cli");
+            server.setExecutable(true, false);
+        }
+
+        if (!server.canExecute()) {
+            App.logger.error("Failed to set executable permission on: {}", server.getAbsolutePath());
+            // The permission may fail if the file is on a non-UNIX filesystem
+            // (like FAT32 or NTFS) mounted without execution permissions.
+        }
+
         List<String> parameters = getParameters(server, settings);
+        App.logger.debug("Parameters: {}", parameters);
 
         // Build the process
         ProcessBuilder builder = new ProcessBuilder(parameters);
@@ -49,15 +76,20 @@ public class ModelTestProcess {
             // When the server starts it will not be automatically shutdown.
             // The process will remain open until this application is properly closed.
             process = builder.start();
+            App.logger.info("Process started...");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            App.logger.error("Error occurred while gathering model data!", e);
         } finally {
             if (process != null) {
                 // Save PID to terminate the process later.
                 ProcessHandle handle = process.toHandle();
                 App.getInstance().getSettings().getInfoFile().set("pid", handle.pid());
+            } else {
+                App.logger.error("Process returned null.");
             }
         }
+
+        App.logger.info("Process created, waiting for output...");
 
         // Creates a thread-blocking scanner to ensure the server has started properly.
         // It also checks for errors and logs them.
@@ -66,6 +98,9 @@ public class ModelTestProcess {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+
+        App.logger.info("Process completed.");
         processOutput();
 
         if (!error) {
@@ -137,7 +172,6 @@ public class ModelTestProcess {
     protected void processOutput() {
         App.logger.info("Processing model data...");
         File output = new File(App.getDataDirectory(), "model-output.txt");
-        boolean started = false;
         double totalModelVramMiB = 0.0;
         double kvCacheSizeMiB = 0.0;
         double computeBufferMiB = 0.0;

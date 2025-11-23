@@ -2,6 +2,7 @@ package me.piitex.app.backend.server;
 
 
 import me.piitex.app.App;
+import me.piitex.os.OSUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,14 +17,28 @@ public class DeviceProcess {
         App.logger.info("Scanning devices for {} backend.", backend);
 
         backend = backend.replace("-", "").toLowerCase();
+        File server;
+        String[] parameters;
+        if (OSUtil.getOS().contains("Windows")) {
+            File backendDirectory = new File(App.getBackendDirectory(), backend + "/");
+            server = new File(backendDirectory, "llama-server.exe");
+            parameters = new String[] {
+                    server.getAbsolutePath(),
+                    "--list-devices"
+            };
 
-        File backendDirectory = new File(App.getBackendDirectory(), backend + "/");
-        File server = new File(backendDirectory, "llama-server.exe");
-        String[] parameters = new String[] {
-                server.getAbsolutePath(),
-                "--list-devices"
-        };
+        } else {
+            File backendDirectory = new File(App.getBackendDirectory(), backend + "/build/bin/");
+            server = new File(backendDirectory, "llama-server");
+            if (server.setExecutable(true, false)) {
+                App.logger.info("Modified file permissions: {}", server.getAbsolutePath());
+            }
+            parameters = new String[] {
+                    server.getAbsolutePath(),
+                    "--list-devices"
+            };
 
+        }
         ProcessBuilder builder = new ProcessBuilder(parameters);
         builder.redirectOutput(new File(App.getDataDirectory(), "devices.txt"));
 

@@ -22,6 +22,7 @@ import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
+import me.piitex.os.OSUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,9 +93,18 @@ public class ConfigurationTab extends Tab {
         container.setAction(button);
         button.onClick(event -> {
             DirectoryChooser chooser = new DirectoryChooser();
-            File currentPath = new File(settings.getModelPath());
-            if (currentPath.exists() && currentPath.isDirectory()) {
-                chooser.setInitialDirectory(currentPath);
+            if (OSUtil.getOS().contains("Linux") || OSUtil.getOS().contains("Ubuntu")) {
+                File media = new File("/media/");
+                if (media.exists() && media.isDirectory()) {
+                    chooser.setInitialDirectory(media);
+                } else {
+                    chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+                }
+            } else {
+                File currentPath = new File(settings.getModelPath());
+                if (currentPath.exists() && currentPath.isDirectory()) {
+                    chooser.setInitialDirectory(currentPath);
+                }
             }
             File file = chooser.showDialog(App.window.getStage());
             if (file == null) return;
