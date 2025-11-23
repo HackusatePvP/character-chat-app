@@ -88,17 +88,17 @@ public class App extends FXLoad {
         appSettings = new AppSettings();
 
         long currentPid = ProcessHandle.current().pid();
-//        if (settings.getInfoFile().hasKey("main-pid")) {
-//            String pid = settings.getInfoFile().get("main-pid");
-//            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
-//                logger.error("Process already running! '{}'", pid);
-//                error = true;
-//                Platform.runLater(() -> {
-//                    buildErrorWindow("Process is already running!").render();
-//                });
-//                return;
-//            }
-//        }
+        if (settings.getInfoFile().hasKey("main-pid")) {
+            String pid = settings.getInfoFile().get("main-pid");
+            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
+                logger.error("Process already running! '{}'", pid);
+                error = true;
+                Platform.runLater(() -> {
+                    buildErrorWindow("Process is already running!").render();
+                });
+                return;
+            }
+        }
 
         settings.getInfoFile().set("main-pid", currentPid);
 
@@ -110,7 +110,7 @@ public class App extends FXLoad {
             App.logger.info("Finished pre-initialization.");
             loading = false;
             // Will not perform updates when using App.main(); This prevents development builds from being backported.
-            if (true) {
+            if (Main.app || Main.run) {
                 performUpdates();
             }
         });
