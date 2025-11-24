@@ -181,8 +181,8 @@ public class ModelSettings {
         if (infoFile.hasKey("data-per-layer")) {
             this.dataPerLayer = infoFile.getDouble("data-per-layer");
         }
-        if (infoFile.hasKey("changed")) {
-            this.change = infoFile.getBoolean("changed");
+        if (infoFile.hasKey("change")) {
+            this.change = infoFile.getBoolean("change");
         }
     }
 
