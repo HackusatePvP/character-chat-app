@@ -87,20 +87,23 @@ public class App extends FXLoad {
         settings = new ServerSettings();
         appSettings = new AppSettings();
 
-        long currentPid = ProcessHandle.current().pid();
-        if (settings.getInfoFile().hasKey("main-pid")) {
-            String pid = settings.getInfoFile().get("main-pid");
-            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
-                logger.error("Process already running! '{}'", pid);
-                error = true;
-                Platform.runLater(() -> {
-                    buildErrorWindow("Process is already running!").render();
-                });
-                return;
-            }
-        }
 
-        settings.getInfoFile().set("main-pid", currentPid);
+        if (OSUtil.getOS().contains("Windows")) {
+            long currentPid = ProcessHandle.current().pid();
+            if (settings.getInfoFile().hasKey("main-pid")) {
+                String pid = settings.getInfoFile().get("main-pid");
+                if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
+                    logger.error("Process already running! '{}'", pid);
+                    error = true;
+                    Platform.runLater(() -> {
+                        buildErrorWindow("Process is already running!").render();
+                    });
+                    return;
+                }
+            }
+
+            settings.getInfoFile().set("main-pid", currentPid);
+        }
 
         threadPoolManager = new ThreadPoolManager();
         threadPoolManager.submitTask(() -> {
