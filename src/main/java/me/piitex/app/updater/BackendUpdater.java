@@ -3,6 +3,7 @@ package me.piitex.app.updater;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import me.piitex.app.App;
+import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
@@ -301,7 +302,15 @@ public class BackendUpdater {
             }
 
             File llamaVersion = new File(App.getBackendDirectory(), gitHubUtil.getLatestReleaseJson().getString("tag_name") + ".txt");
-            llamaVersion.createNewFile();
+            if (llamaVersion.createNewFile()) {
+                App.logger.info("Created llama.cpp version file.");
+            }
+
+            // Updates may alter model efficiency. Flag the models to be rescanned after update.
+            App.logger.info("Flagging all models to be rescanned...");
+            for (Model model : App.getModels("excluded")) {
+                model.getSettings().setChange(true);
+            }
 
             Platform.runLater(() -> {
                 textOverlay.setText("Update completed. Please re-launch the application.");
