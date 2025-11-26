@@ -69,7 +69,7 @@ public class ModelTestProcess {
         environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
 
         // The server output will be errors even though it's not errors. This is how Java works
-        builder.redirectError(new File(App.getDataDirectory(), "model-output.txt"));
+        builder.redirectError(new File(App.getAppDirectory(), "model-output.txt"));
 
         process = null;
         try {
@@ -171,7 +171,7 @@ public class ModelTestProcess {
 
     protected void processOutput() {
         App.logger.info("Processing model data...");
-        File output = new File(App.getDataDirectory(), "model-output.txt");
+        File output = new File(App.getAppDirectory(), "model-output.txt");
         double totalModelVramMiB = 0.0;
         double kvCacheSizeMiB = 0.0;
         double computeBufferMiB = 0.0;
@@ -187,7 +187,7 @@ public class ModelTestProcess {
                 if (line.startsWith("print_info: n_layer") && model.getSettings().getTotalLayers() == 0) {
                     line = line.split("=")[1].trim();
                     App.logger.info("Total Model Layers: {}", line);
-                    model.getSettings().setTotalLayers(Integer.parseInt(line) + 1);
+                    model.getSettings().setTotalLayers(Integer.parseInt(line));
                 }
                 if (line.startsWith("llama_model_load_from_file_impl:")) {
                     line = line.split("-")[1].trim().split(" ")[0];
