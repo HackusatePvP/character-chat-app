@@ -347,6 +347,11 @@ public class ConfigurationTab extends Tab {
                 App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
                 return;
             }
+
+            if (model.getFile().setExecutable(true)) {
+                App.logger.info("Updated file permission for model: {}", model.getFile().getAbsolutePath());
+            }
+
             App.logger.info("Calculated model layers: {}", model.getSettings().getTotalLayers());
 
             start.setEnabled(false);
