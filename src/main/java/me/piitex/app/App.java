@@ -175,7 +175,8 @@ public class App extends FXLoad {
         // This is because the pathing for the image doesn't change but the image gets replaced by the new image.
         ImageLoader.useCache = false;
 
-        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
+        File logo = new File(getAppDirectory(), "logo.png");
+        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
         // Initialize global positions. Needed for the rendering process.
         Positions.initialize();
@@ -233,12 +234,14 @@ public class App extends FXLoad {
     }
 
     private void setupDirectories() {
+        App.logger.info("Operating System: {} version: {}", OSUtil.getOS(), OSUtil.getVersion());
+
         if (getAppDirectory().mkdirs()) {
             logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
         }
 
-        if (getDataDirectory().mkdirs()) {
-            logger.info("Created data directory: {}", getDataDirectory().getAbsolutePath());
+        if (getAppDirectory().mkdirs()) {
+            logger.info("Created data directory: {}", getAppDirectory().getAbsolutePath());
         }
 
         if (getBackendDirectory().mkdirs()) {
@@ -423,7 +426,8 @@ public class App extends FXLoad {
         }
 
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+        File logo = new File(getAppDirectory(), "logo.png");
+        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(logo)).build();
 
         EmptyContainer emptyContainer = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(emptyContainer);
@@ -473,7 +477,11 @@ public class App extends FXLoad {
         } else if (Main.run) {
             return new File(System.getProperty("user.dir"));
         } else {
-            return new File(OSPathing.getAppDataDirectory() + "/chat-app/");
+            if (OSUtil.getOS().contains("Linux")) {
+                OSPathing.groupId = "me.piitex.cca";
+                return OSPathing.getAppDataDirectory();
+            }
+            return new File(OSPathing.getAppDataDirectory(), "chat-app/");
         }
     }
 
@@ -481,28 +489,24 @@ public class App extends FXLoad {
         return fileDownloader;
     }
 
-    public static File getDataDirectory() {
-        return new File(OSPathing.getAppDataDirectory() + "/chat-app/");
-    }
-
     public static File getBackendDirectory() {
-        return new File(getDataDirectory(), "/backend/");
+        return new File(getAppDirectory(), "/backend/");
     }
 
     public static File getModelsDirectory() {
-        return new File(getDataDirectory(), "models/");
+        return new File(getAppDirectory(), "models/");
     }
 
     public static File getCharactersDirectory() {
-        return new File(getDataDirectory(), "characters/");
+        return new File(getAppDirectory(), "characters/");
     }
 
     public static File getUsersDirectory() {
-        return new File(getDataDirectory(), "users/");
+        return new File(getAppDirectory(), "users/");
     }
 
     public static File getImagesDirectory() {
-        return new File(getDataDirectory(), "images/");
+        return new File(getAppDirectory(), "images/");
     }
 
     public static Model getDefaultModel() {
