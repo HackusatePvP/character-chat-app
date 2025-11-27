@@ -67,7 +67,7 @@ public class Positions {
         CHAT_VIEW_SCROLL_WIDTH = window.getWidth() - 225;
         CHAT_VIEW_SCROLL_HEIGHT = window.getHeight() - 280;
         CHAT_VIEW_SELECTION_X = window.getWidth() / 2;
-        CHAT_VIEW_SELECTION_WIDTH = 100;
+        CHAT_VIEW_SELECTION_WIDTH = 200;
         CHAT_VIEW_SELECTION_HEIGHT = 50;
         CHAT_BOX_WIDTH = CHAT_VIEW_SCROLL_WIDTH - 10;
         CHAT_BOX_HEIGHT = -1;

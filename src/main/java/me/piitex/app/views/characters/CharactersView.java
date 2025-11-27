@@ -65,7 +65,7 @@ public class CharactersView {
         FlowLayout base = new FlowLayout(root.getWidth(), -1);
         base.setVerticalSpacing(20);
         base.setHorizontalSpacing(20);
-        base.addStyle(Styles.BORDER_DEFAULT);
+        base.addStyle(Styles.BG_INSET);
 
         layout.addElement(base);
         for (Character character : App.getInstance().getCharacters().values()) {

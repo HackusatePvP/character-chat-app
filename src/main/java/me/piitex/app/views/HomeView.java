@@ -34,7 +34,7 @@ public class HomeView extends EmptyContainer {
         }
 
         addElement(root);
-
+        addStyle(Styles.BG_INSET);
         init();
     }
 
@@ -119,6 +119,7 @@ public class HomeView extends EmptyContainer {
         if (!App.getInstance().getCharacters().isEmpty()) {
             CharactersView charactersView = new CharactersView();
             root.addElement(charactersView.getRoot());
+            root.addStyle(Styles.BG_INSET);
         } else {
             root.addElement(buildInstructions());
         }
