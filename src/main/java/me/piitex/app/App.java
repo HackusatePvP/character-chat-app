@@ -88,7 +88,7 @@ public class App extends FXLoad {
         appSettings = new AppSettings();
 
 
-        if (OSUtil.getOS().contains("Windows")) {
+        if (ProcessUtil.isValidOS()) {
             long currentPid = ProcessHandle.current().pid();
             if (settings.getInfoFile().hasKey("main-pid")) {
                 String pid = settings.getInfoFile().get("main-pid");
@@ -108,6 +108,8 @@ public class App extends FXLoad {
         threadPoolManager = new ThreadPoolManager();
         threadPoolManager.submitTask(() -> {
             loading = true;
+            App.logger.info("Looking for model to load '{}'", getModelsDirectory().getAbsolutePath());
+            reloadModelList();
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Finished pre-initialization.");
@@ -196,7 +198,7 @@ public class App extends FXLoad {
         if (OSUtil.getOS().contains("Windows")) {
             FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
             icon.addExitItem("Exit", e -> App.shutdown());
-            icon.setOnAction(event -> {
+            icon.setOnAction(_ -> {
                 App.logger.info("Handling tray action");
                 stage.show();
                 stage.toFront();
@@ -213,9 +215,6 @@ public class App extends FXLoad {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-            App.logger.info("Looking for model to load...");
-            reloadModelList();
             Model model = App.getInstance().getSettings().getGlobalModel();
             if (model == null) {
                 for (Model model1 : App.getModels("exclude")) {
