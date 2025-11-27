@@ -177,7 +177,7 @@ public class App extends FXLoad {
         // This is because the pathing for the image doesn't change but the image gets replaced by the new image.
         ImageLoader.useCache = false;
 
-        File logo = new File(getAppDirectory(), "logo.png");
+        File logo = new File(getExecutedDirectory(), "logo.png");
         window = new WindowBuilder("Chat App").setIcon(new ImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
         // Initialize global positions. Needed for the rendering process.
@@ -425,7 +425,7 @@ public class App extends FXLoad {
         }
 
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-        File logo = new File(getAppDirectory(), "logo.png");
+        File logo = new File(getExecutedDirectory(), "logo.png");
         window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(logo)).build();
 
         EmptyContainer emptyContainer = new EmptyContainer(window.getWidth(), window.getHeight());
@@ -471,17 +471,23 @@ public class App extends FXLoad {
         // When Main.run does not pass, it being executed by the IDE.
         // For testing within the IDE, use App.main() as your entry point
         // For standard installation, run will pass.
+
+        if (OSUtil.getOS().contains("Linux")) {
+            OSPathing.groupId = "me.piitex.cca";
+            return OSPathing.getAppDataDirectory();
+        }
+        return new File(OSPathing.getAppDataDirectory(), "chat-app/");
+
+    }
+
+    public static File getExecutedDirectory() {
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
-        } else if (Main.run) {
-            return new File(System.getProperty("user.dir"));
-        } else {
-            if (OSUtil.getOS().contains("Linux")) {
-                OSPathing.groupId = "me.piitex.cca";
-                return OSPathing.getAppDataDirectory();
-            }
-            return new File(OSPathing.getAppDataDirectory(), "chat-app/");
         }
+        if (!Main.run) {
+            return getAppDirectory();
+        }
+        return new File(System.getProperty("user.dir"));
     }
 
     public static FileDownloader getFileDownloader() {
