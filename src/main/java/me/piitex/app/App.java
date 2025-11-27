@@ -494,6 +494,12 @@ public class App extends FXLoad {
     }
 
     public static File getModelsDirectory() {
+        if (getInstance().getSettings() != null) {
+            File file = new File(getInstance().getSettings().getModelPath());
+            if (file.exists()) {
+                return file;
+            }
+        }
         return new File(getAppDirectory(), "models/");
     }
 
