@@ -36,6 +36,7 @@ public class SidebarView extends VerticalLayout {
         setAlignment(Pos.BASELINE_CENTER);
         addStyle(Styles.BORDER_DEFAULT);
         addStyle(Styles.BG_INSET);
+        setSpacing(25);
         if (collapse) {
             ButtonOverlay expand = buildExpand();
             setWidth(SIDEBAR_WIDTH_COLLAPSE);
@@ -64,6 +65,8 @@ public class SidebarView extends VerticalLayout {
         ButtonOverlay home = new ButtonBuilder("home").setText("Home").setIcon(new FontIcon(Material2AL.HOME)).build();
         home.addStyle(appSettings.getGlobalTextSize());
         home.setWidth(rootWidth);
+        home.setAlignment(Pos.BASELINE_LEFT);
+        home.addStyle(Styles.BUTTON_OUTLINED);
         addElement(home);
         home.onClick(event -> {
             App.window.clearContainers();
@@ -73,6 +76,9 @@ public class SidebarView extends VerticalLayout {
         ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").setIcon(new FontIcon(Material2MZ.SETTINGS)).build();
         settings.addStyle(appSettings.getGlobalTextSize());
         settings.setWidth(rootWidth);
+        settings.setAlignment(Pos.BASELINE_LEFT);
+        settings.addStyle(Styles.ACCENT);
+        settings.addStyle(Styles.BUTTON_OUTLINED);
         addElement(settings);
         settings.onClick(event -> {
             App.window.clearContainers();
@@ -82,6 +88,9 @@ public class SidebarView extends VerticalLayout {
         ButtonOverlay models = new ButtonBuilder("models").setText("Models").setIcon(new FontIcon(Material2MZ.ROCKET)).build();
         models.addStyle(appSettings.getGlobalTextSize());
         models.setWidth(rootWidth);
+        models.setAlignment(Pos.BASELINE_LEFT);
+        models.addStyle(Styles.ACCENT);
+        models.addStyle(Styles.BUTTON_OUTLINED);
         addElement(models);
         models.onClick(event -> {
             App.window.getStage().getScene().setCursor(Cursor.WAIT);
