@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class UserLoreBookTab extends Tab {
     private final UserEditView userEditView;
-    private InputFieldOverlay addKeyInput;
+    private TextFieldOverlay addKeyInput;
     private TextAreaOverlay addValueInput;
     private ScrollContainer scrollLoreContainer;
 
@@ -50,7 +50,7 @@ public class UserLoreBookTab extends Tab {
         CardContainer addContainer = new CardContainer(0, 0, 400, 400);
         addContainer.setMaxSize(400, 400);
 
-        addKeyInput = new InputFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
+        addKeyInput = new TextFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
         addContainer.setHeader(addKeyInput);
 
         addValueInput = new TextAreaOverlay("", "Enter the lore info", 0, 0, 400, 200);
@@ -110,7 +110,7 @@ public class UserLoreBookTab extends Tab {
     private CardContainer buildLoreEntry(String key, VerticalLayout scrollContainer) {
         CardContainer card = new CardContainer(0, 0, 400, 300);
 
-        InputFieldOverlay entryKey = new InputFieldOverlay(key, 0, 0, 400, 50);
+        TextFieldOverlay entryKey = new TextFieldOverlay(key, 0, 0, 400, 50);
         entryKey.setEnabled(false); // Make key read-only
         card.setHeader(entryKey);
 

@@ -36,7 +36,7 @@ public class ConfigurationTab extends Tab {
     private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
     private final VerticalLayout layout;
-    private InputFieldOverlay runningModel;
+    private TextFieldOverlay runningModel;
     private ButtonOverlay start, stop, reload;
 
     private final ServerSettings settings = App.getInstance().getSettings();
@@ -257,7 +257,7 @@ public class ConfigurationTab extends Tab {
         }
         String input = (model != null ? model.getFile().getAbsolutePath() : "null");
 
-        runningModel = new InputFieldOverlay(input, 0, 0, 400, 50);
+        runningModel = new TextFieldOverlay(input, 0, 0, 400, 50);
         runningModel.setEnabled(false);
 
         container.setAction(runningModel);

@@ -98,7 +98,7 @@ public class ListTab extends Tab {
                 }
             });
 
-            InputFieldOverlay location = new InputFieldOverlay(model.getFile().getAbsolutePath(), 0, 0, 500, 50);
+            TextFieldOverlay location = new TextFieldOverlay(model.getFile().getAbsolutePath(), 0, 0, 500, 50);
             location.setEnabled(false);
             body.addElement(location);
 
