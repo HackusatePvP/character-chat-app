@@ -7,7 +7,6 @@ import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharactersView;
-import me.piitex.app.views.server.ServerLayout;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -59,8 +58,6 @@ public class HomeView extends EmptyContainer {
         } else {
             buildBody();
         }
-
-        addElement(new ServerLayout(appSettings.getWidth(), 50));
     }
 
     public VerticalLayout buildInstructions() {
