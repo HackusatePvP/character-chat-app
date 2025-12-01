@@ -362,7 +362,7 @@ public class App extends FXLoad {
             logger.info("Model list updated.");
             downloader.shutdown();
         } catch (IOException e) {
-            App.logger.error("Failed to fetch download size.");
+            App.logger.error("Failed to fetch download size.", e);
         }
 
         // Microsoft, the multi trillion dollar company that can't handle more than 50 API requests.
