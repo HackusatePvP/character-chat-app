@@ -69,22 +69,19 @@ public class CreatorView extends EmptyContainer {
     }
 
 
-    public Container buildCharacterGraphic() {
-        Container container = new EmptyContainer(400, 250);
-
+    public VerticalLayout buildCharacterGraphic() {
         VerticalLayout root = new VerticalLayout(400, 250);
         root.setSpacing(50);
-        container.addElement(root);
         root.setAlignment(Pos.CENTER);
 
         TextOverlay textOverlay = new TextOverlay("Character");
         textOverlay.addStyle(Styles.TITLE_3);
         root.addElement(textOverlay);
 
-        TextFlowOverlay paragraph = new TextFlowOverlay("Create a new unique character to chat with. This character is only usable to you.", 400, 0);
+        TextFlowOverlay paragraph = new TextFlowOverlay("Create or Import a new unique character to chat with.", 400, 0);
         root.addElement(paragraph);
 
-        return container;
+        return root;
     }
 
     public ButtonOverlay getUserCreator() {
@@ -96,13 +93,10 @@ public class CreatorView extends EmptyContainer {
     }
 
 
-    public Container buildUserCreator() {
-        Container container = new EmptyContainer(400, 250);
-
+    public VerticalLayout buildUserCreator() {
         VerticalLayout root = new VerticalLayout(400, 250);
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
-        container.addElement(root);
 
         TextOverlay textOverlay = new TextOverlay("User");
         textOverlay.addStyle(Styles.TITLE_3);
@@ -111,7 +105,7 @@ public class CreatorView extends EmptyContainer {
         TextFlowOverlay paragraph = new TextFlowOverlay("Create a new user template which can be used for every character.", 400, 0);
         root.addElement(paragraph);
 
-        return container;
+        return root;
     }
 
 

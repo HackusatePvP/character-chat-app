@@ -31,8 +31,14 @@ public class CharacterCreator extends EmptyContainer {
     private IconOverlay characterIcon;
     private IconOverlay userIcon;
     private IconOverlay chatIcon;
+    private ButtonOverlay submission;
 
+    // Display content holds the configuration tab
     private HorizontalLayout displayContent;
+
+    // Cache all current displays to quickly naviagte between them
+    private CharacterCustomizationView characterCustomizationView;
+    private UserCustomizationView userCustomizationView;
     private Container currentView;
 
     public CharacterCreator(@Nullable Character character) {
@@ -64,34 +70,58 @@ public class CharacterCreator extends EmptyContainer {
         displayContent.setSpacing(20);
         main.addElement(displayContent);
 
+        double contentWidth = appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350;
+        double contentHeight = appSettings.getHeight();
+        characterCustomizationView = new CharacterCustomizationView(this, infoFile, contentWidth, contentHeight);
+        userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
+        currentView = characterCustomizationView;
+
         displayContent.addElement(buildChecklist());
 
-        currentView = new CharacterCustomizationView((infoFile), appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350, appSettings.getHeight());
-        displayContent.addElement(currentView);
+        // Character Customization will be displayed first.
+        displayContent.addElement(characterCustomizationView);
     }
 
     private VerticalLayout buildChecklist() {
         VerticalLayout root = new VerticalLayout(300, appSettings.getHeight());
         root.setSpacing(40);
         root.addStyle(Styles.BORDER_SUBTLE);
-        root.setAlignment(Pos.CENTER);
+        root.setAlignment(Pos.TOP_CENTER);
 
         ButtonOverlay characterButton = new ButtonBuilder("cc").setGraphic(buildCharacterButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(characterButton);
         characterButton.onClick(event -> {
-            if (currentView != null) {
-                displayContent.replaceElement(currentView.getIndex(), new CharacterCustomizationView(infoFile, appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350, appSettings.getHeight()));
-            }
+            displayContent.removeElement(displayContent.getElements().lastKey());
+            displayContent.addElement(characterCustomizationView);
+            currentView = characterCustomizationView;
         });
 
         ButtonOverlay userButton = new ButtonBuilder("uc").setGraphic(buildUserButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(userButton);
+        userButton.onClick(event -> {
+            displayContent.removeElement(displayContent.getElements().lastKey());
+            displayContent.addElement(userCustomizationView);
+            currentView = userCustomizationView;
+        });
 
         ButtonOverlay chatButton = new ButtonBuilder("ccc").setGraphic(buildChatButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(chatButton);
 
         ButtonOverlay finishButton = new ButtonBuilder("finish").setGraphic(buildFinishButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(finishButton);
+
+        if (currentView != null && currentView.hasProperty("progress")) {
+            submission = new ButtonBuilder("fin").setText("Next").addStyle(Styles.SUCCESS).addStyle(Styles.BUTTON_OUTLINED).setWidth(root.getWidth()).build();
+            submission.onClick(event -> {
+                if (currentView == characterCustomizationView) {
+                    // View user
+                    displayContent.removeElement(displayContent.getElements().lastKey());
+                    displayContent.addElement(userCustomizationView);
+                    currentView = userCustomizationView;
+                }
+            });
+            root.addElement(submission);
+        }
 
         return root;
     }
@@ -162,5 +192,41 @@ public class CharacterCreator extends EmptyContainer {
 
     public Character getCharacter() {
         return character;
+    }
+
+    public IconOverlay getCharacterIcon() {
+        return characterIcon;
+    }
+
+    public IconOverlay getUserIcon() {
+        return userIcon;
+    }
+
+    public IconOverlay getChatIcon() {
+        return chatIcon;
+    }
+
+    public ButtonOverlay getSubmission() {
+        return submission;
+    }
+
+    public HorizontalLayout getDisplayContent() {
+        return displayContent;
+    }
+
+    public Container getCurrentView() {
+        return currentView;
+    }
+
+    public void setCurrentView(Container currentView) {
+        this.currentView = currentView;
+    }
+
+    public CharacterCustomizationView getCharacterCustomizationView() {
+        return characterCustomizationView;
+    }
+
+    public UserCustomizationView getUserCustomizationView() {
+        return userCustomizationView;
     }
 }
