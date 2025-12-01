@@ -7,6 +7,8 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,6 +100,20 @@ public class Placeholder {
         if (user != null) {
             content = content.replace("{user}", user.getDisplayName()).replace("{{user}}", user.getDisplayName()).replace("{usr}", user.getDisplayName()).replace("{{usr}}", user.getDisplayName());
         }
+
+        if (content.contains("{time}")) {
+            LocalTime currentTime = LocalTime.now();
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            content = content.replace("{time}", timeFormatter.format(currentTime));
+        }
+
+        if (content.contains("{date}")) {
+            LocalTime currentTime = LocalTime.now();
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d");
+            content = content.replace("{date}", dateFormatter.format(currentTime));
+        }
+
+
 
         return content;
     }
