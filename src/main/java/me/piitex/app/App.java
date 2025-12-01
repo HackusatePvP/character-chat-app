@@ -196,7 +196,7 @@ public class App extends FXLoad {
         window.addContainer(homeView);
 
         if (OSUtil.getOS().contains("Windows")) {
-            FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
+            FXTrayIcon icon = new FXTrayIcon(window.getStage(), logo, 128, 128);
             icon.addExitItem("Exit", e -> App.shutdown());
             icon.setOnAction(_ -> {
                 App.logger.info("Handling tray action");
@@ -484,10 +484,11 @@ public class App extends FXLoad {
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
         }
-        if (!Main.run) {
-            return getAppDirectory();
+        if (OSUtil.getOS().contains("Linux")) {
+            return OSPathing.getAppDataDirectory();
+        } else {
+            return new File(OSPathing.getAppDataDirectory(), "chat-app/");
         }
-        return new File(System.getProperty("user.dir"));
     }
 
     public static FileDownloader getFileDownloader() {
