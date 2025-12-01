@@ -231,9 +231,10 @@ public class CharacterTab extends Tab {
         exportCard.setWidth(200);
         exportCard.setHeight(50);
 
-        FileChooserOverlay exportSelector = new FileChooserOverlay(App.window, exportCard);
+        FileSaveOverlay exportSelector = new FileSaveOverlay(App.window, exportCard);
         exportSelector.setText("Export character card as.");
         exportSelector.setFileExtensions(new String[]{"*.png"});
+        exportSelector.setDefaultFileName(charIdInput.getCurrentText() + ".png");
         root.addElement(exportSelector);
         exportSelector.onFileSelect(event -> {
             File file = event.getDirectory();
