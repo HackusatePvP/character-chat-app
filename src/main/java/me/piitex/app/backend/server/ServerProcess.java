@@ -60,12 +60,11 @@ public class ServerProcess {
         ServerSettings settings = App.getInstance().getSettings();
 
         File server;
+        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/");
         
         if (OSUtil.getOS().contains("Windows")) {
-            File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
             server = new File(backendDirectory, "llama-server.exe");
         } else {
-            File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/build/bin/");
             server = new File(backendDirectory, "llama-server");
             server.setExecutable(true, true);
         }

@@ -19,8 +19,9 @@ public class DeviceProcess {
         backend = backend.replace("-", "").toLowerCase();
         File server;
         String[] parameters;
+
+        File backendDirectory = new File(App.getBackendDirectory(), backend + "/");
         if (OSUtil.getOS().contains("Windows")) {
-            File backendDirectory = new File(App.getBackendDirectory(), backend + "/");
             server = new File(backendDirectory, "llama-server.exe");
             parameters = new String[] {
                     server.getAbsolutePath(),
@@ -28,7 +29,6 @@ public class DeviceProcess {
             };
 
         } else {
-            File backendDirectory = new File(App.getBackendDirectory(), backend + "/build/bin/");
             server = new File(backendDirectory, "llama-server");
             if (server.setExecutable(true, false)) {
                 App.logger.info("Modified file permissions: {}", server.getAbsolutePath());
