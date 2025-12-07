@@ -234,15 +234,17 @@ public class App extends FXLoad {
         }
 
         // Sub thread as not to block JavaFX from initializing.
+        // Scans models and starts backend server.
         App.getThreadPoolManager().submitTask(() -> {
             try {
                 new DeviceProcess(App.getInstance().getSettings().getBackend());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                App.logger.error("Could not scan for devices!", e);
             }
             Model model = App.getInstance().getSettings().getGlobalModel();
             if (model == null) {
                 for (Model model1 : App.getModels("exclude")) {
+                    App.logger.info("Loading base model: {}", model1.getFile().getAbsolutePath());
                     if (model1.getSettings().isDefault()) {
                         model = model1;
                         break;
@@ -572,9 +574,7 @@ public class App extends FXLoad {
         getInstance().getMmprojModels().clear();
         getInstance().getModels().putAll(loadModels("exclude"));
         getInstance().getMmprojModels().putAll(loadModels("mmproj"));
-
     }
-
 
     private static TreeMap<String, Model> loadModels(String filterType) {
         TreeMap<String, Model> models = new TreeMap<>();
