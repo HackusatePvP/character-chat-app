@@ -328,6 +328,7 @@ public class App extends FXLoad {
             return;
         }
         for (File file : files) {
+            logger.info("Loading character '{}'...", file.getName());
             if (file.isDirectory()) {
                 String id = file.getName();
                 // Check if info file exists
@@ -335,6 +336,8 @@ public class App extends FXLoad {
                 if (info.exists()) {
                     InfoFile infoFile = new InfoFile(info, true);
                     characters.put(id, new Character(id, infoFile));
+                } else {
+                    logger.error("Character file does not exist for '{}'", file.getName());
                 }
             }
         }
