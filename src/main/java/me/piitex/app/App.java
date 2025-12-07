@@ -563,6 +563,10 @@ public class App extends FXLoad {
         return mmprojModels;
     }
 
+    public BackendUpdater getBackendUpdater() {
+        return backendUpdater;
+    }
+
     public static void reloadModelList() {
         getInstance().getModels().clear();
         getInstance().getMmprojModels().clear();

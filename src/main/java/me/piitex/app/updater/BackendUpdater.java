@@ -33,30 +33,44 @@ public class BackendUpdater {
     private Window window;
     private Container container;
 
+    private final GitHubUtil gitHubUtil;
+    private Version current, latest;
+
     public BackendUpdater(String currentVersion) {
         this.currentVersion = currentVersion;
+
+        gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggml-org/llama.cpp/");
+        fetchLatestRelease();
     }
 
-    public void checkForUpdates() {
-        GitHubUtil gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggml-org/llama.cpp/");
+    private void fetchLatestRelease() {
+        String release = null;
         try {
-            String release = gitHubUtil.getLatestReleaseJson().getString("tag_name");
-            App.logger.info("Using '{}' backend version.", currentVersion);
-            App.logger.info("Checking '{}' for possible update...", release);
-
-
-            Version current = VersionUtil.parseVersion(currentVersion);
-            Version next = VersionUtil.parseVersion(release);
-            App.logger.info("Comparing '{}' to '{}'", current.getCalculatedVersion(), next.getCalculatedVersion());
-            if (next.compareTo(current) > 0) {
-                App.logger.info("LLamaCPP update is available.");
-                Platform.runLater(() -> {
-                    buildAndDisplayUpdateWindow(gitHubUtil);
-                });
-            }
+            release = gitHubUtil.getLatestReleaseJson().getString("tag_name");
         } catch (IOException | URISyntaxException e) {
-            App.logger.error("Error occurred while checking for backend updates!", e);
+            App.logger.error("Could not fetch latest tag!", e);
         }
+        if (release != null) {
+            current = VersionUtil.parseVersion(currentVersion);
+            latest = VersionUtil.parseVersion(release);
+        }
+    }
+
+    public boolean isUpdateAvailable() {
+        if (current != null && latest != null) {
+            return current.compareTo(latest) < 0;
+        }
+        return false;
+    }
+
+    public boolean startUpdate() {
+        if (isUpdateAvailable()) {
+            Platform.runLater(() -> {
+                buildAndDisplayUpdateWindow(gitHubUtil);
+            });
+            return true;
+        }
+        return false;
     }
 
     public void buildAndDisplayUpdateWindow(GitHubUtil gitHubUtil) {
