@@ -291,14 +291,14 @@ public class CharacterTab extends Tab {
         if (value != null) {
             add.setEnabled(false);
 
-            ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new FontIcon(Material2AL.DELETE)).build();
+            ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new IconOverlay(Material2AL.DELETE)).build();
             delete.addStyle(Styles.DANGER);
             delete.onClick(event1 -> {
                 root.removeElement(dialogueBox);
             });
             dialogueBox.addElement(delete);
         } else {
-            ButtonOverlay insert = new ButtonBuilder("insert").setIcon(new FontIcon(Material2AL.ADD)).build();
+            ButtonOverlay insert = new ButtonBuilder("insert").setIcon(new IconOverlay(Material2AL.ADD)).build();
             dialogueBox.addElement(insert);
 
             insert.onClick(event -> {
@@ -311,7 +311,7 @@ public class CharacterTab extends Tab {
                 add.setEnabled(false);
                 dialogueBox.removeElement(insert);
 
-                ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new FontIcon(Material2AL.DELETE)).build();
+                ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new IconOverlay(Material2AL.DELETE)).build();
                 delete.addStyle(Styles.DANGER);
                 delete.onClick(event1 -> {
                     root.removeElement(dialogueBox);
