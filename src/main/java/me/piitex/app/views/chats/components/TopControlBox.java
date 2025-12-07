@@ -2,6 +2,7 @@ package me.piitex.app.views.chats.components;
 
 import atlantafx.base.theme.Styles;
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Chat;
@@ -10,12 +11,14 @@ import me.piitex.app.backend.Model;
 import me.piitex.app.backend.Role;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ChatUtil;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.overlays.IconOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.engine.overlays.RichTextAreaOverlay;
 import me.piitex.engine.overlays.TextOverlay;
@@ -24,6 +27,9 @@ import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
+import java.io.IOException;
+
+import static me.piitex.app.views.Positions.CHAT_VIEW_SELECTION_X;
 
 public class TopControlBox extends HorizontalLayout {
     private final Chat chat;
@@ -154,5 +160,27 @@ public class TopControlBox extends HorizontalLayout {
             });
             getPane().getChildren().add(node);
         });
+
+        IconOverlay exporter = new IconOverlay(Material2AL.IMPORT_EXPORT);
+        exporter.setTooltip("Export current chat.");
+        exporter.setColor(Color.LAVENDER);
+        exporter.setIconSize(16);
+        addElement(exporter);
+        exporter.onClick(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Save chat file.", "*.*"));
+            chooser.setInitialFileName(chat.getFile().getName());
+            File file = chooser.showSaveDialog(App.window.getStage());
+            if (file != null) {
+                try {
+                    ChatUtil.exportChat(chat, file);
+                } catch (IOException e) {
+                    App.logger.error("Could not export chat file!", e);
+                }
+            } else {
+                App.logger.error("Incorrect output path.");
+            }
+        });
+
     }
 }

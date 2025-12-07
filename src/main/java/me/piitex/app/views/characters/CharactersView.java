@@ -8,11 +8,14 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ChatUtil;
 import me.piitex.app.views.LoadingView;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.containers.*;
@@ -25,6 +28,8 @@ import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import javax.crypto.IllegalBlockSizeException;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -175,13 +180,33 @@ public class CharactersView {
 
         FontIcon deleteIcon = new FontIcon(Material2AL.DELETE_FOREVER);
         TextOverlay delete = new TextOverlay(deleteIcon);
-
         delete.addStyle(Styles.DANGER);
         delete.setTooltip("Delete the character.");
         delete.onClick(event -> {
             deleteCharacter(base, card, character, event.getHandler().getSceneX(), event.getHandler().getSceneY());
         });
         root.addElement(delete);
+
+        IconOverlay importChat = new IconOverlay(Material2AL.IMPORT_EXPORT);
+        importChat.setColor(Color.LAVENDER);
+        importChat.setIconSize(16);
+        importChat.onClick(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Select the chat file.", "*.*"));
+
+            File file = chooser.showOpenDialog(App.window.getStage());
+            if (file != null && file.exists() && file.isFile()) {
+                try {
+                    ChatUtil.importChat(character, file);
+                } catch (IOException | IllegalBlockSizeException e) {
+                    App.logger.error("Could not import chat file!", e);
+                }
+            }
+            character.getChatViewCachedNodes().clear();
+
+        });
+        root.addElement(importChat);
+
         return root;
     }
 

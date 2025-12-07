@@ -27,7 +27,7 @@ public class Chat {
         messages.clear();
         if (!file.exists()) {
             try {
-                if (file.createNewFile()) {
+                if (!file.createNewFile()) {
                     App.logger.warn("Could not create chat file. It may already exist.");
                 }
             } catch (IOException e) {
@@ -77,7 +77,7 @@ public class Chat {
         return file;
     }
 
-    private ChatMessage parseLineToChatMessage(String rawLine) {
+    public ChatMessage parseLineToChatMessage(String rawLine) {
         Role sender;
         String contentPart;
 
@@ -127,7 +127,7 @@ public class Chat {
         return new ChatMessage(sender, content, imageUrl, reasoning);
     }
 
-    private String chatMessageToRawLine(ChatMessage message) {
+    public String chatMessageToRawLine(ChatMessage message) {
         String formattedContent = message.getContent().replace("\n", "!@!");
         StringBuilder rawLineBuilder = new StringBuilder();
         rawLineBuilder.append(message.getSender().name().toLowerCase()).append(":");
