@@ -74,7 +74,12 @@ public class App extends FXLoad {
     private volatile boolean error = false;
 
     // Used for testing with the IDE!
-    static void main() {
+    public static void main(String[] args) {
+        logger.info("Initializing IDE run configuration...");
+        if (Arrays.asList(args).contains("--force-updates")) {
+            logger.info("Forcing app/backend updates.");
+            Main.forceUpdate = true;
+        }
         new App();
         Application.launch(App.class);
     }
@@ -119,6 +124,19 @@ public class App extends FXLoad {
             // Will not perform updates when using App.main(); This prevents development builds from being backported.
             if (Main.app || Main.run) {
                 performUpdates();
+            } else {
+                if (Main.forceUpdate) {
+                    performUpdates();
+                } else if (OSUtil.getOS().contains("Windows")) {
+                    if (!new File(getBackendDirectory(), "vulkan/").exists() || !new File(getBackendDirectory(), "cuda/").exists() || !new File(getBackendDirectory(), "hip/").exists()) {
+                        App.logger.info("Windows updates available.");
+                        performUpdates();
+                    }
+                } else if (OSUtil.getOS().contains("Linux")) {
+                    if (!new File(getBackendDirectory(), "vulkan/").exists()) {
+                        performUpdates();
+                    }
+                }
             }
         });
     }

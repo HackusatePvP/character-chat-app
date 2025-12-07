@@ -7,6 +7,7 @@ import java.util.Arrays;
 public class Main {
     public static boolean run = false;
     public static boolean app = false;
+    public static boolean forceUpdate = false;
 
     public static void main(String[] args) {
         // run and app are flags which dictate how the running directory should be set.
@@ -16,6 +17,9 @@ public class Main {
             app = true;
         } else {
             run = true;
+        }
+        if (Arrays.asList(args).contains("--force-updates")) {
+            forceUpdate = true;
         }
         new App();
         Application.launch(App.class);
