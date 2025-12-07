@@ -16,11 +16,14 @@ import me.piitex.engine.overlays.ProgressBarOverlay;
 import me.piitex.engine.overlays.TextOverlay;
 import me.piitex.os.*;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,7 +38,7 @@ public class BackendUpdater {
     }
 
     public void checkForUpdates() {
-        GitHubUtil gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggerganov/llama.cpp/");
+        GitHubUtil gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggml-org/llama.cpp/");
         try {
             String release = gitHubUtil.getLatestReleaseJson().getString("tag_name");
             App.logger.info("Using '{}' backend version.", currentVersion);
@@ -156,13 +159,16 @@ public class BackendUpdater {
         try {
             //llama-b7087-bin-win-vulkan-x64.zip
             String os = OSUtil.getOS().contains("Windows") ? "win" : "ubuntu";
-            gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
-                            "llama-[a-zA-Z0-9]+-bin-" + os + "-vulkan-x64\\.zip").getInt("id"),
-                    new File(App.getBackendDirectory(), "vulkan.zip"),
+            String extension = OSUtil.getOS().contains("Windows") ? "zip" : "tar.gz";
+            JSONObject releaseAsset = gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
+                    "llama-[a-zA-Z0-9]+-bin-" + os + "-vulkan-x64\\." + extension);
+            gitHubUtil.downloadAsset(releaseAsset.getInt("id"),
+                    new File(App.getBackendDirectory(), releaseAsset.getString("name")),
                     new DownloadListener() {
                         @Override
                         public void onDownloadStart(DownloadInfo info) {
                             Platform.runLater(() -> {
+                                String fileName = info.getFileName();
                                 progressBarOverlay.getProgressBar().progressProperty().set(0);
                                 textOverlay.setText("Downloading Vulkan backend...");
                             });
@@ -250,8 +256,17 @@ public class BackendUpdater {
             textOverlay.setText("Deleting old files...");
             progressBarOverlay.getProgressBar().setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         });
+
+        if (ServerProcess.getCurrentServer() != null) {
+            if (ServerProcess.getCurrentServer().isAlive() && !ServerProcess.getCurrentServer().stop()) {
+                App.logger.warn("Could not stop llama-server. Installation may fail.");
+            }
+        }
+        File cudaDir = new File(App.getBackendDirectory(), "cuda/");
+        File hipDir = new File(App.getBackendDirectory(), "hip/");
+        File vulkanDir = new File(App.getBackendDirectory(), "vulkan/");
+
         if (cudaZip != null) {
-            File cudaDir = new File(App.getBackendDirectory(), "cuda/");
             try {
                 FileUtils.deleteDirectory(cudaDir);
             } catch (IOException e) {
@@ -260,7 +275,6 @@ public class BackendUpdater {
         }
 
         if (hipZip != null) {
-            File hipDir = new File(App.getBackendDirectory(), "hip/");
             try {
                 FileUtils.deleteDirectory(hipDir);
             } catch (IOException e) {
@@ -269,7 +283,6 @@ public class BackendUpdater {
         }
 
         if (vulkanZip != null) {
-            File vulkanDir = new File(App.getBackendDirectory(), "vulkan/");
             try {
                 FileUtils.deleteDirectory(vulkanDir);
             } catch (IOException e) {
@@ -283,12 +296,26 @@ public class BackendUpdater {
         });
         try {
             App.logger.info("Unzipping backend files...");
-            if (cudaZip != null)
+            if (cudaZip != null) {
                 ZipUtil.unzipFile(cudaZip, new File(App.getBackendDirectory(), "cuda/"));
-            if (hipZip != null)
+            } else {
+                App.logger.warn("Could not find cuda installation!");
+            }
+            if (hipZip != null) {
                 ZipUtil.unzipFile(hipZip, new File(App.getBackendDirectory(), "hip/"));
-            if (vulkanZip != null)
-                ZipUtil.unzipFile(vulkanZip, new File(App.getBackendDirectory(), "vulkan/"));
+            } else {
+                App.logger.warn("Could not find HIP installation!");
+            }
+            if (vulkanZip != null) {
+                App.logger.info("Unzipping {} ...", vulkanZip.getName());
+                if (vulkanZip.getName().endsWith(".tar.gz")) {
+                    ZipUtil.unzipTarGzFile(vulkanZip, new File(App.getBackendDirectory(), "vulkan/"));
+                } else {
+                    ZipUtil.unzipFile(vulkanZip, new File(App.getBackendDirectory(), "vulkan/"));
+                }
+            } else {
+                App.logger.error("Could not find vulkan installation!"); // Every os should have Vulkan
+            }
 
             App.logger.info("Finished unzipping!");
             Platform.runLater(() -> {
@@ -312,6 +339,27 @@ public class BackendUpdater {
                 model.getSettings().setChange(true);
             }
 
+            // Verify that all files are in the base directory. Not sub-directories.
+            File[] vulkanFiles = vulkanDir.listFiles();
+            if (vulkanFiles.length == 1 && vulkanFiles[0].isDirectory()) {
+                File parentDir = vulkanFiles[0];
+                for (File file : parentDir.listFiles()) {
+                    Path sourcePath = file.toPath();
+                    Path destinationPath = vulkanDir.toPath().resolve(file.getName());
+
+                    Files.move(
+                            sourcePath,
+                            destinationPath,
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                }
+            }
+
+            // Update permissions
+            for (File file : vulkanDir.listFiles()) {
+                file.setExecutable(true);
+            }
+
             Platform.runLater(() -> {
                 textOverlay.setText("Update completed. Please re-launch the application.");
                 container.removeElement(progressBarOverlay);
@@ -328,7 +376,7 @@ public class BackendUpdater {
 
 
         } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+            App.logger.error("Error occurred during post installation process!", e);
         }
     }
 
