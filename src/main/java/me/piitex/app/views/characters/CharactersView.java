@@ -17,6 +17,7 @@ import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.ChatUtil;
 import me.piitex.app.views.LoadingView;
+import me.piitex.app.views.Positions;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.FlowLayout;
@@ -37,9 +38,11 @@ public class CharactersView {
     private final ScrollContainer root;
 
     public CharactersView() {
-        VerticalLayout layout = new VerticalLayout(0, -1);
+        VerticalLayout layout = new VerticalLayout(-1, App.getInstance().getAppSettings().getHeight());
+        layout.addStyle(Styles.BG_INSET);
+
         AppSettings appSettings = App.getInstance().getAppSettings();
-        layout.setMaxSize(appSettings.getWidth() - 265, 0);
+        layout.setMaxSize(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, 0);
         layout.setSpacing(20);
 
         int imageWidth;
@@ -55,8 +58,8 @@ public class CharactersView {
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 10, 10, layout.getMaxWidth(), -1);
-            root.setMaxSize(root.getWidth(), appSettings.getHeight() - 100);
+            root = new ScrollContainer(layout, 0, 0, layout.getMaxWidth(), -1);
+            root.setMaxSize(root.getWidth(), appSettings.getHeight());
             imageWidth = 256;
             imageHeight = 256;
             cardWidth = 280;
@@ -68,9 +71,10 @@ public class CharactersView {
 
 
         FlowLayout base = new FlowLayout(root.getWidth(), -1);
+        base.setX(20);
+        base.setY(20);
         base.setVerticalSpacing(20);
         base.setHorizontalSpacing(20);
-        base.addStyle(Styles.BG_INSET);
 
         layout.addElement(base);
         for (Character character : App.getInstance().getCharacters().values()) {
