@@ -3,20 +3,21 @@ package me.piitex.app.views;
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.views.characters.CharacterEditView;
+import me.piitex.app.updater.BackendUpdater;
+import me.piitex.app.views.creator.CreatorView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
-import me.piitex.app.views.users.UsersView;
-import me.piitex.engine.PopupPosition;
+import me.piitex.engine.containers.EmptyContainer;
+import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.MessageOverlay;
+import me.piitex.engine.overlays.IconOverlay;
 import me.piitex.engine.overlays.TextOverlay;
 import org.kordamp.ikonli.coreui.CoreUiBrands;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -24,74 +25,69 @@ import java.util.function.Consumer;
 
 import static me.piitex.app.views.Positions.*;
 
-public class SidebarView extends VerticalLayout {
+public class SidebarView extends EmptyContainer {
+    private final VerticalLayout root;
 
     // Testing out consumer. Hopefully it's more efficient than interfaces.
     private Consumer<Boolean> onCollapseStateChange;
+    double rootWidth = SIDEBAR_WIDTH - 30;
 
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
     public SidebarView(boolean collapse) {
         super(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
-        setAlignment(Pos.BASELINE_CENTER);
-        addStyle(Styles.BORDER_DEFAULT);
+        setMaxSize(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
         addStyle(Styles.BG_INSET);
-        setSpacing(25);
-        if (collapse) {
-            ButtonOverlay expand = buildExpand();
-            setWidth(SIDEBAR_WIDTH_COLLAPSE);
-            addElement(expand);
-        } else {
-            build();
-        }
+        addStyle(Styles.BORDER_DEFAULT);
+
+        root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
+        root.setY(20);
+        root.setMaxSize(root.getWidth(), root.getHeight());
+        root.setAlignment(Pos.TOP_CENTER);
+        root.setSpacing(75);
+        addElement(root);
+
+        init();
     }
 
-    public void build() {
-        double rootWidth = SIDEBAR_WIDTH - 30;
+    private void init() {
+        root.addElement(buildTopLayout());
+        root.addElement(buildBottomLayout());
+    }
 
-        TextOverlay close = new TextOverlay(new FontIcon(Material2AL.CLOSE));
-        close.setX(getMaxWidth() - 5);
-        addElement(close);
-        close.onClick(event -> {
-            setMaxSize(50, SIDEBAR_HEIGHT);
-            setWidth(50);
-            setHeight(SIDEBAR_HEIGHT);
-            ButtonOverlay buttonOverlay = buildExpand();
+    private VerticalLayout buildTopLayout() {
 
-            removeAllElements();
-            addElement(buttonOverlay);
-        });
+        VerticalLayout top = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT - 200);
+        top.setMaxSize(top.getWidth(), top.getHeight());
+        top.setAlignment(Pos.CENTER);
+        top.setSpacing(25);
+        root.addElement(top);
 
-        ButtonOverlay home = new ButtonBuilder("home").setText("Home").setIcon(new FontIcon(Material2AL.HOME)).build();
+        ButtonOverlay home = new ButtonBuilder("home").setText("Home").setIcon(new IconOverlay(Material2AL.HOME)).addStyle(Styles.FLAT).build();
         home.addStyle(appSettings.getGlobalTextSize());
         home.setWidth(rootWidth);
         home.setAlignment(Pos.BASELINE_LEFT);
-        home.addStyle(Styles.BUTTON_OUTLINED);
-        addElement(home);
+        top.addElement(home);
         home.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new HomeView());
         });
 
-        ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").setIcon(new FontIcon(Material2MZ.SETTINGS)).build();
+        ButtonOverlay settings = new ButtonBuilder("settings").setText("Settings").setIcon(new IconOverlay(Material2MZ.SETTINGS)).addStyle(Styles.FLAT).build();
         settings.addStyle(appSettings.getGlobalTextSize());
         settings.setWidth(rootWidth);
         settings.setAlignment(Pos.BASELINE_LEFT);
-        settings.addStyle(Styles.ACCENT);
-        settings.addStyle(Styles.BUTTON_OUTLINED);
-        addElement(settings);
+        top.addElement(settings);
         settings.onClick(event -> {
             App.window.clearContainers();
             App.window.addContainer(new SettingsView().getContainer());
         });
 
-        ButtonOverlay models = new ButtonBuilder("models").setText("Models").setIcon(new FontIcon(Material2MZ.ROCKET)).build();
+        ButtonOverlay models = new ButtonBuilder("models").setText("Models").setIcon(new IconOverlay(Material2AL.CODE)).addStyle(Styles.FLAT).build();
         models.addStyle(appSettings.getGlobalTextSize());
         models.setWidth(rootWidth);
         models.setAlignment(Pos.BASELINE_LEFT);
-        models.addStyle(Styles.ACCENT);
-        models.addStyle(Styles.BUTTON_OUTLINED);
-        addElement(models);
+        top.addElement(models);
         models.onClick(event -> {
             App.window.getStage().getScene().setCursor(Cursor.WAIT);
 
@@ -101,33 +97,88 @@ public class SidebarView extends VerticalLayout {
 
         });
 
-        ButtonOverlay users = new ButtonBuilder("users").setText("User Templates").setIcon(new FontIcon(Material2MZ.MEMORY)).build();
-        users.addStyle(appSettings.getGlobalTextSize());
-        users.setWidth(rootWidth);
-        addElement(users);
-        users.onClick(event -> {
-            MessageOverlay warning = new MessageOverlay("Development", "User templates are still in development.");
-            warning.addStyle(Styles.WARNING);
-            App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 400, 100, true);
-
+        ButtonOverlay create = new ButtonBuilder("create").setText("Create").setIcon(new IconOverlay(Material2AL.EDIT)).addStyle(Styles.FLAT).build();
+        create.addStyle(appSettings.getGlobalTextSize());
+        create.setWidth(rootWidth);
+        create.setAlignment(Pos.BASELINE_LEFT);
+        top.addElement(create);
+        create.onClick(_ -> {
+            // Put both character and user create in one menu.
+            // This will open a new menu which will go through the creation process.
             App.window.clearContainers();
-            App.window.addContainer(new UsersView());
+            App.window.addContainer(new CreatorView());
         });
 
-        ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").setIcon(new FontIcon(Material2MZ.PERSON)).build();
-        characters.addStyle(appSettings.getGlobalTextSize());
-        characters.setWidth(rootWidth);
-        addElement(characters);
-        characters.onClick(event -> {
-            App.window.clearContainers();
-            App.window.addContainer(new CharacterEditView(null).getRoot());
+        return top;
+    }
+
+    private VerticalLayout buildBottomLayout() {
+        VerticalLayout layout = new VerticalLayout(0, 0);
+        layout.setAlignment(Pos.CENTER);
+
+        // An update is available, display it.
+        BackendUpdater updater = App.getInstance().getBackendUpdater();
+        if (updater != null && updater.isUpdateAvailable()) {
+            App.logger.info("Adding update button.");
+            ButtonOverlay update = new ButtonBuilder("update").setText("Updates Available").setIcon(new IconOverlay(Material2MZ.SYSTEM_UPDATE_ALT)).addStyle(Styles.FLAT).build();
+            update.setWidth(rootWidth);
+            update.onClick(event -> {
+                if (!updater.startUpdate()) {
+                    App.logger.error("Could not start backend update!");
+                }
+
+            });
+            layout.addElement(update);
+        }
+
+        layout.addElement(buildHelpLayout());
+        layout.addElement(buildVersionLayout());
+
+        return layout;
+    }
+
+    private HorizontalLayout buildHelpLayout() {
+        HorizontalLayout layout = new HorizontalLayout(0, 0);
+        layout.setAlignment(Pos.CENTER);
+        layout.setSpacing(20);
+
+        IconOverlay githubPage = new IconOverlay(CoreUiBrands.GITHUB);
+        githubPage.setIconSize(24);
+        layout.addElement(githubPage);
+        githubPage.onClick(_ -> {
+            App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app");
         });
 
-        TextOverlay gitHub = new TextOverlay(new FontIcon(CoreUiBrands.GITHUB));
-        gitHub.onClick(event -> {
-            App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app/");
+        IconOverlay bugReport = new IconOverlay(Material2AL.BUG_REPORT);
+        bugReport.setColor(Color.rgb(255, 148, 122));
+        bugReport.setIconSize(24);
+        layout.addElement(bugReport);
+        bugReport.onClick(_ -> {
+            App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app/issues");
         });
 
+        IconOverlay wiki = new IconOverlay(Material2AL.LOCAL_LIBRARY);
+        wiki.setColor(Color.rgb(160, 255, 122));
+        wiki.setIconSize(24);
+        layout.addElement(wiki);
+        wiki.onClick(_ -> {
+            App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app/wiki");
+        });
+
+        return layout;
+    }
+
+    private VerticalLayout buildVersionLayout() {
+        VerticalLayout layout = new VerticalLayout(0, 0);
+        layout.setAlignment(Pos.CENTER);
+        layout.addStyle(Styles.BORDER_DEFAULT);
+
+        TextOverlay version = new TextOverlay("CCA " + App.getInstance().getVersion());
+        version.addStyle(Styles.TEXT_BOLD);
+        version.addStyle(Styles.TEXT_SMALL);
+        layout.addElement(version);
+
+        return layout;
     }
 
     public void setOnCollapseStateChange(Consumer<Boolean> onCollapseStateChange) {
@@ -135,7 +186,7 @@ public class SidebarView extends VerticalLayout {
     }
 
     private ButtonOverlay buildExpand() {
-        ButtonOverlay buttonOverlay = new ButtonBuilder("expand").setIcon(new FontIcon(Material2AL.KEYBOARD_ARROW_RIGHT)).build();
+        ButtonOverlay buttonOverlay = new ButtonBuilder("expand").setIcon(new IconOverlay(Material2AL.KEYBOARD_ARROW_RIGHT)).build();
         buttonOverlay.setWidth(32);
         buttonOverlay.setHeight(32);
 
@@ -160,3 +211,28 @@ public class SidebarView extends VerticalLayout {
         return buttonOverlay;
     }
 }
+
+//        ButtonOverlay users = new ButtonBuilder("users").setText("User Templates").setIcon(new FontIcon(Material2MZ.MEMORY)).build();
+//        users.addStyle(appSettings.getGlobalTextSize());
+//        users.setWidth(rootWidth);
+//        users.setAlignment(Pos.BASELINE_LEFT);
+//        addElement(users);
+//        users.onClick(event -> {
+//            MessageOverlay warning = new MessageOverlay("Development", "User templates are still in development.");
+//            warning.addStyle(Styles.WARNING);
+//            App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 400, 100, true);
+//
+//            App.window.clearContainers();
+//            App.window.addContainer(new UsersView());
+//        });
+//
+//        ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").setIcon(new FontIcon(Material2MZ.PERSON)).build();
+//        characters.addStyle(appSettings.getGlobalTextSize());
+//        characters.setWidth(rootWidth);
+//        addElement(characters);
+//        characters.setAlignment(Pos.BASELINE_LEFT);
+//        characters.onClick(event -> {
+//            App.window.clearContainers();
+//            App.window.addContainer(new CharacterEditView(null).getRoot());
+//        });
+
