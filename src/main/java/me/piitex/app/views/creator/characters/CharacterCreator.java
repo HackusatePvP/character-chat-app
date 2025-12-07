@@ -1,6 +1,7 @@
 package me.piitex.app.views.creator.characters;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
@@ -188,6 +189,40 @@ public class CharacterCreator extends EmptyContainer {
         root.addElement(textOverlay);
 
         return root;
+    }
+
+    public void revalidate() {
+        boolean characterFailed = false;
+        boolean userFailed = false;
+        if (characterCustomizationView.getCharacterIdInput().getCurrentText().isEmpty()) {
+            characterFailed = true;
+        }
+        if (characterCustomizationView.getCharacterDisplayInput().getCurrentText().isEmpty()) {
+            characterFailed = true;
+        }
+        if (userCustomizationView.getUserDisplayInput().getCurrentText().isEmpty()) {
+            userFailed = true;
+        }
+
+        if (characterFailed) {
+            getCharacterIcon().setColor(Color.RED);
+        } else {
+            getCharacterIcon().setColor(Color.GREEN);
+        }
+
+        if (userFailed) {
+            getUserIcon().setColor(Color.RED);
+        } else {
+            getUserIcon().setColor(Color.GREEN);
+        }
+
+        if (characterFailed || userFailed) {
+            getSubmission().getButton().getStyleClass().removeAll(Styles.SUCCESS);
+            getSubmission().getButton().getStyleClass().add(Styles.DANGER);
+        } else {
+            getSubmission().getButton().getStyleClass().removeAll(Styles.DANGER);
+            getSubmission().getButton().getStyleClass().add(Styles.SUCCESS);
+        }
     }
 
     public Character getCharacter() {

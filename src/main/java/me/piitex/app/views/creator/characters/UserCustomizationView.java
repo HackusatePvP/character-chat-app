@@ -104,15 +104,8 @@ public class UserCustomizationView extends EmptyContainer  {
 
         userDisplayInput.onInputSetEvent(event -> {
             infoFile.set("user-display-name", event.getInput());
-            if (!event.getInput().isBlank()) {
-                parent.getUserIcon().setColor(Color.GREEN);
-                parent.getSubmission().getButton().getStyleClass().removeAll(Styles.DANGER);
-                parent.getSubmission().getButton().getStyleClass().add(Styles.SUCCESS);
-            } else {
-                parent.getUserIcon().setColor(Color.RED);
-                parent.getSubmission().getButton().getStyleClass().removeAll(Styles.SUCCESS);
-                parent.getSubmission().getButton().getStyleClass().add(Styles.DANGER);
-            }
+            System.out.println("Revalidating...");
+            parent.revalidate();
         });
 
         if (parent.getCharacter() != null) {

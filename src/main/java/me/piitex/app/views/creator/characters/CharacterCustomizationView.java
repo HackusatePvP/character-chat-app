@@ -116,28 +116,12 @@ public class CharacterCustomizationView extends EmptyContainer {
 
         characterIdInput.onInputSetEvent(event -> {
             infoFile.set("id", event.getInput());
-            if (!characterDisplayInput.getTextField().getText().isBlank() && !event.getInput().isBlank()) {
-                parent.getCharacterIcon().setColor(Color.GREEN);
-                parent.getSubmission().getButton().getStyleClass().remove(Styles.DANGER);
-                parent.getSubmission().getButton().getStyleClass().add(Styles.SUCCESS);
-            } else {
-                parent.getCharacterIcon().setColor(Color.RED);
-                parent.getSubmission().getButton().getStyleClass().remove(Styles.SUCCESS);
-                parent.getSubmission().getButton().getStyleClass().add(Styles.DANGER);
-            }
+            parent.revalidate();
         });
 
         characterDisplayInput.onInputSetEvent(event -> {
             infoFile.set("display-name", event.getInput());
-            if (!characterIdInput.getTextField().getText().isBlank() && !event.getInput().isBlank()) {
-                parent.getCharacterIcon().setColor(Color.GREEN);
-                parent.getSubmission().getButton().getStyleClass().removeAll(Styles.DANGER);
-                parent.getSubmission().getButton().getStyleClass().add(Styles.SUCCESS);
-            } else {
-                parent.getCharacterIcon().setColor(Color.RED);
-                parent.getSubmission().getButton().getStyleClass().removeAll(Styles.SUCCESS);
-                parent.getSubmission().getButton().getStyleClass().add(Styles.DANGER);
-            }
+            parent.revalidate();
         });
 
         if (parent.getCharacter() != null) {
