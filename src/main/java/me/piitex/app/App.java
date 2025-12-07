@@ -73,6 +73,8 @@ public class App extends FXLoad {
     private volatile boolean loading = true;
     private volatile boolean error = false;
 
+    private BackendUpdater backendUpdater;
+
     // Used for testing with the IDE!
     public static void main(String[] args) {
         logger.info("Initializing IDE run configuration...");
@@ -121,23 +123,6 @@ public class App extends FXLoad {
             loadCharacters();
             App.logger.info("Finished pre-initialization.");
             loading = false;
-            // Will not perform updates when using App.main(); This prevents development builds from being backported.
-            if (Main.app || Main.run) {
-                performUpdates();
-            } else {
-                if (Main.forceUpdate) {
-                    performUpdates();
-                } else if (OSUtil.getOS().contains("Windows")) {
-                    if (!new File(getBackendDirectory(), "vulkan/").exists() || !new File(getBackendDirectory(), "cuda/").exists() || !new File(getBackendDirectory(), "hip/").exists()) {
-                        App.logger.info("Windows updates available.");
-                        performUpdates();
-                    }
-                } else if (OSUtil.getOS().contains("Linux")) {
-                    if (!new File(getBackendDirectory(), "vulkan/").exists()) {
-                        performUpdates();
-                    }
-                }
-            }
         });
     }
 
@@ -148,6 +133,26 @@ public class App extends FXLoad {
         App.logger.info("Loading app from '{}'", getAppDirectory().getAbsolutePath());
         AppSettings appSettings = App.getInstance().getAppSettings();
         Application.setUserAgentStylesheet(appSettings.getStyleTheme(appSettings.getTheme()).getUserAgentStylesheet());
+
+        // Check for updates first.
+        // Will not perform updates when using App.main(); This prevents development builds from being backported.
+        if (Main.app || Main.run) {
+            performUpdates();
+        } else {
+            if (Main.forceUpdate) {
+                App.logger.info("Force checking updates...");
+                performUpdates();
+            } else if (OSUtil.getOS().contains("Windows")) {
+                if (!new File(getBackendDirectory(), "vulkan/").exists() || !new File(getBackendDirectory(), "cuda/").exists() || !new File(getBackendDirectory(), "hip/").exists()) {
+                    App.logger.info("Windows updates available.");
+                    performUpdates();
+                }
+            } else if (OSUtil.getOS().contains("Linux")) {
+                if (!new File(getBackendDirectory(), "vulkan/").exists()) {
+                    performUpdates();
+                }
+            }
+        }
 
         int setWidth = appSettings.getWidth();
         int setHeight = appSettings.getHeight();
@@ -396,13 +401,8 @@ public class App extends FXLoad {
         App.logger.info("Checking for backend version...");
         File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
         if (backendVersionFile != null) {
-            BackendUpdater updater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
-            App.logger.info("Looking for updates...");
-            updater.checkForUpdates();
-        } else {
-            App.logger.error("Update file not found!");
-            BackendUpdater updater = new BackendUpdater("0");
-            updater.checkForUpdates();
+            backendUpdater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+
         }
         App.logger.info("Finished updates.");
     }
