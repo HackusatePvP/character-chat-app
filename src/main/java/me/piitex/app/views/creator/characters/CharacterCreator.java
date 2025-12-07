@@ -21,6 +21,10 @@ import me.piitex.os.configurations.InfoFile;
 import org.jetbrains.annotations.Nullable;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CharacterCreator extends EmptyContainer {
     private final AppSettings appSettings = App.getInstance().getAppSettings();
     private final Character character;
@@ -40,6 +44,8 @@ public class CharacterCreator extends EmptyContainer {
     // Cache all current displays to quickly naviagte between them
     private CharacterCustomizationView characterCustomizationView;
     private UserCustomizationView userCustomizationView;
+    private ChatCustomizationView chatCustomizationView;
+    private List<File> importedChatFiles = new ArrayList<>();
     private Container currentView;
 
     public CharacterCreator(@Nullable Character character) {
@@ -75,6 +81,7 @@ public class CharacterCreator extends EmptyContainer {
         double contentHeight = appSettings.getHeight();
         characterCustomizationView = new CharacterCustomizationView(this, infoFile, contentWidth, contentHeight);
         userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
+        chatCustomizationView = new ChatCustomizationView(this, infoFile, contentWidth, contentHeight);
         currentView = characterCustomizationView;
 
         displayContent.addElement(buildChecklist());
@@ -119,6 +126,11 @@ public class CharacterCreator extends EmptyContainer {
                     displayContent.removeElement(displayContent.getElements().lastKey());
                     displayContent.addElement(userCustomizationView);
                     currentView = userCustomizationView;
+                } else if (currentView == userCustomizationView) {
+                    // View chat
+                    displayContent.removeElement(displayContent.getElements().lastKey());
+                    displayContent.addElement(chatCustomizationView);
+                    currentView = chatCustomizationView;
                 }
             });
             root.addElement(submission);
@@ -263,5 +275,9 @@ public class CharacterCreator extends EmptyContainer {
 
     public UserCustomizationView getUserCustomizationView() {
         return userCustomizationView;
+    }
+
+    public List<File> getImportedChatFiles() {
+        return importedChatFiles;
     }
 }
