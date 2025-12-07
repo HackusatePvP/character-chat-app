@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.engine.overlays.IconOverlay;
 import me.piitex.os.configurations.ConfigUtil;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
@@ -78,16 +79,14 @@ public class DownloadTab extends Tab {
             throw new RuntimeException(e);
         }
 
-        this.layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
+        layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
-        layout.setX(20);
-        layout.setPrefSize(appSettings.getWidth() - 500, -1);
 
-        this.scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
-        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer = new ScrollContainer(layout, 0, 0, MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
-        scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setScrollWhenNeeded(false);
 
         addElement(scrollContainer);
         loadAndBuildDownloadList();
@@ -149,7 +148,7 @@ public class DownloadTab extends Tab {
         tileLayout.addStyle(appSettings.getGlobalTextSize());
         tileLayout.setSpacing(50);
 
-        ButtonOverlay downloadIcon = new ButtonBuilder("download").setIcon(new FontIcon(Material2MZ.SAVE_ALT)).build();
+        ButtonOverlay downloadIcon = new ButtonBuilder("download").setIcon(new IconOverlay(Material2MZ.SAVE_ALT)).build();
         downloadIcon.addStyle(Styles.ACCENT);
         downloadIcon.addStyle(Styles.BUTTON_CIRCLE);
         downloadIcon.addStyle(Styles.BUTTON_OUTLINED);

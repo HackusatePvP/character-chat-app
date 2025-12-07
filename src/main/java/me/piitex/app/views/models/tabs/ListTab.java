@@ -41,13 +41,12 @@ public class ListTab extends Tab {
         // Build the list view for the models.
         VerticalLayout layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
-        layout.setX(20);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
-        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer = new ScrollContainer(layout, 0, 0, MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
-        scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setScrollWhenNeeded(false);
         addElement(scrollContainer); // Adds the scroll container
 
         buildModelCards(layout); // Adds the models to the view
@@ -76,7 +75,7 @@ public class ListTab extends Tab {
             TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 100, -1);
             root.setMaxSize(root.getWidth(), -1);
             root.addStyle(Styles.DENSE);
-            root.setSpacing(30);
+            root.setSpacing(50);
             root.setAlignment(Pos.TOP_CENTER);
             root.addStyle(Tweaks.ALT_ICON);
             root.setExpanded(model.getSettings().isDefault());

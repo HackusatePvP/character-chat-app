@@ -121,7 +121,7 @@ public class ModelTab extends Tab {
         container.setTitle("Model Settings");
         container.setDescription("Click on the gear icon to edit character specific model settings. This will override global model settings.");
 
-        ButtonOverlay buttonOverlay = new ButtonBuilder("").setIcon(new FontIcon(Material2MZ.SETTINGS)).build();
+        ButtonOverlay buttonOverlay = new ButtonBuilder("").setIcon(new IconOverlay(Material2MZ.SETTINGS)).build();
         buttonOverlay.onClick(event -> {
             if (character == null) {
                 MessageOverlay messageOverlay = new MessageOverlay("Warning", "You must create the character before editing the model settings.");

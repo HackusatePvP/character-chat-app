@@ -43,19 +43,21 @@ public class ConfigurationTab extends Tab {
 
     public ConfigurationTab(TabsContainer tabsContainer) {
         super("Settings");
+        setPrefSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_LAYOUT_HEIGHT);
+        setMaxSize(getWidth(), getHeight());
         this.tabsContainer = tabsContainer;
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
+        System.out.println("Width: " + MODEL_CONFIGURATION_LAYOUT_WIDTH);
         layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
-        layout.setX(20);
 
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
-        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 0, MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
-        scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setScrollWhenNeeded(false);
         addElement(scrollContainer); // Adds the scroll container
 
         // TODO: Allow remote server routing.
