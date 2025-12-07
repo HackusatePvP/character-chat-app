@@ -401,6 +401,8 @@ public class App extends FXLoad {
             updater.checkForUpdates();
         } else {
             App.logger.error("Update file not found!");
+            BackendUpdater updater = new BackendUpdater("0");
+            updater.checkForUpdates();
         }
         App.logger.info("Finished updates.");
     }
