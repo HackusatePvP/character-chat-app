@@ -32,6 +32,7 @@ import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.os.FileDownloader;
 import me.piitex.os.ProcessUtil;
+import me.piitex.os.configurations.MasterKeyManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -83,6 +84,7 @@ public class App extends FXLoad {
         logger.info("Initializing application...");
         instance = this;
         setupDirectories();
+        MasterKeyManager.getPersistentPassKey(); // Generates a new master key if one doesn't exist.
 
         settings = new ServerSettings();
         appSettings = new AppSettings();
