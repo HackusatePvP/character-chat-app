@@ -49,7 +49,6 @@ public class ConfigurationTab extends Tab {
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
-        System.out.println("Width: " + MODEL_CONFIGURATION_LAYOUT_WIDTH);
         layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
 

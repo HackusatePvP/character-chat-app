@@ -104,7 +104,6 @@ public class UserCustomizationView extends EmptyContainer  {
 
         userDisplayInput.onInputSetEvent(event -> {
             infoFile.set("user-display-name", event.getInput());
-            System.out.println("Revalidating...");
             parent.revalidate();
         });
 
