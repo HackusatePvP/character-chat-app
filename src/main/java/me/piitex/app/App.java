@@ -391,7 +391,7 @@ public class App extends FXLoad {
         // Microsoft, the multi trillion dollar company that can't handle more than 50 API requests.
         App.logger.info("Checking for application updates...");
         ApplicationUpdater applicationUpdater = new ApplicationUpdater(getVersion());
-        applicationUpdater.checkForUpdates();
+        //applicationUpdater.checkForUpdates();
 
         App.logger.info("Checking for backend version...");
         File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
