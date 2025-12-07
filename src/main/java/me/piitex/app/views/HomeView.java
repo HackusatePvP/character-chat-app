@@ -22,7 +22,6 @@ public class HomeView extends EmptyContainer {
 
     public HomeView() {
         int height = App.getInstance().getAppSettings().getHeight() - 50;
-
         super(600, height);
         if (App.mobile) {
             root = new HorizontalLayout(600, height);
@@ -31,14 +30,13 @@ public class HomeView extends EmptyContainer {
             setHeight(height);
             root = new HorizontalLayout(appSettings.getWidth() - 20, height);
         }
-
+        root.setSpacing(10);
         addElement(root);
-        addStyle(Styles.BG_INSET);
+
         init();
     }
 
     public void init() {
-        root.addStyle(Styles.BG_INSET);
         root.addElement(new SidebarView(false));
         root.setSpacing(35);
 
@@ -116,7 +114,6 @@ public class HomeView extends EmptyContainer {
         if (!App.getInstance().getCharacters().isEmpty()) {
             CharactersView charactersView = new CharactersView();
             root.addElement(charactersView.getRoot());
-            root.addStyle(Styles.BG_INSET);
         } else {
             root.addElement(buildInstructions());
         }
