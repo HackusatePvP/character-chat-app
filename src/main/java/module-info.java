@@ -19,6 +19,8 @@ module me.piitex.app {
     requires org.fxmisc.richtext;
     requires javafx.graphics;
     requires org.kordamp.ikonli.coreui;
+    requires org.apache.commons.lang3;
+    requires org.apache.commons.compress;
 
     opens me.piitex.app to javafx.fxml;
     exports me.piitex.app;
