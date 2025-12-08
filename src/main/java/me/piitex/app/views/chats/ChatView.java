@@ -64,7 +64,7 @@ public class ChatView extends EmptyContainer {
             if (character.getLastChat() != null) {
                 chat = character.getLastChat();
             } else {
-                chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length));
+                chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length + ".bin"));
                 character.getChats().add(chat);
 
                 // Add first message to chat if it exists.
@@ -84,7 +84,7 @@ public class ChatView extends EmptyContainer {
         this.character = character;
         if (create) {
             if (chat == null) {
-                chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length));
+                chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length + ".bin"));
                 character.getChats().add(chat);
                 // Add first message to chat if it exists.
                 if (character.getFirstMessage() != null && !character.getFirstMessage().isEmpty()) {
@@ -145,6 +145,7 @@ public class ChatView extends EmptyContainer {
         chatView.addElement(scrollContainer);
         chatView.addElement(buildSendBox());
 
+        // TODO: Move this to a dedicated layout
         addElement(buildSelection());
 
         // Layout is the chat window.
