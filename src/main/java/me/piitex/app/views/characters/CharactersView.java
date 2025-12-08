@@ -191,23 +191,25 @@ public class CharactersView {
         });
         root.addElement(delete);
 
-        IconOverlay importChat = new IconOverlay(Material2AL.IMPORT_EXPORT);
-        importChat.setColor(Color.LAVENDER);
-        importChat.setIconSize(16);
-        importChat.onClick(event -> {
+        IconOverlay export = new IconOverlay(Material2AL.CLOUD_DOWNLOAD);
+        export.setIconSize(16);
+        export.setColor(Color.LIGHTBLUE);
+        export.setTooltip("Export the character.");
+        export.onClick(_ -> {
             FileChooser chooser = new FileChooser();
-            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Select the chat file.", "*.*"));
+            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Save character card as.", "*.png"));
+            chooser.setInitialFileName(character.getId() + ".png");
 
-            File file = chooser.showOpenDialog(App.window.getStage());
-            if (file != null && file.exists() && file.isFile()) {
+            File file = chooser.showSaveDialog(App.window.getStage());
+            if (file != null) {
                 try {
-                    ChatUtil.importChat(character, file);
-                } catch (IOException | IllegalBlockSizeException e) {
-                    App.logger.error("Could not import chat file!", e);
+                    ImageCardExporter.exportCharacter(character, file);
+                } catch (IOException e) {
+                    App.logger.error("Could not save character card!", e);
                 }
+            } else {
+                App.logger.error("Could not locate character file!");
             }
-            character.getChatViewCachedNodes().clear();
-
         });
         root.addElement(importChat);
 
