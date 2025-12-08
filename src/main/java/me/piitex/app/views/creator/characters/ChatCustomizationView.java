@@ -51,7 +51,9 @@ public class ChatCustomizationView extends EmptyContainer  {
     }
 
     private VerticalLayout buildChatSettings() {
-        VerticalLayout layout = new VerticalLayout(720, VBox.USE_COMPUTED_SIZE);
+        VerticalLayout layout = new VerticalLayout(720, 400);
+        layout.addStyle(Styles.BORDER_DEFAULT);
+        layout.setSpacing(50);
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setAlignment(Pos.TOP_CENTER);
 
@@ -72,7 +74,8 @@ public class ChatCustomizationView extends EmptyContainer  {
         layout.setSpacing(5);
         layout.setAlignment(Pos.CENTER);
 
-        VerticalLayout wrapper = new VerticalLayout(0, 0);
+        VerticalLayout wrapper = new VerticalLayout(650, 0);
+        wrapper.setMaxSize(wrapper.getWidth(), wrapper.getHeight());
         wrapper.setSpacing(5);
         wrapper.setAlignment(Pos.CENTER_LEFT);
         layout.addElement(wrapper);
@@ -85,7 +88,7 @@ public class ChatCustomizationView extends EmptyContainer  {
         description.addStyle(Styles.TEXT_LIGHTER);
         wrapper.addElement(description);
 
-        RichTextAreaOverlay chatScenarioInput = new RichTextAreaOverlay(infoFile.get("chat-scenario"), 720, -1);
+        RichTextAreaOverlay chatScenarioInput = new RichTextAreaOverlay(infoFile.get("chat-scenario"), 650, -1);
         chatScenarioInput.setMaxSize(chatScenarioInput.getWidth(), chatScenarioInput.getHeight());
         chatScenarioInput.setBackgroundColor(App.getInstance().getAppSettings().getThemeDefaultColor(App.getInstance().getAppSettings().getTheme()));
         chatScenarioInput.setBorderColor(App.getInstance().getAppSettings().getThemeBorderColor(App.getInstance().getAppSettings().getTheme()));
@@ -105,7 +108,8 @@ public class ChatCustomizationView extends EmptyContainer  {
         layout.setSpacing(5);
         layout.setAlignment(Pos.CENTER);
 
-        VerticalLayout wrapper = new VerticalLayout(0, 0);
+        VerticalLayout wrapper = new VerticalLayout(650, 0);
+        wrapper.setMaxSize(wrapper.getWidth(), wrapper.getHeight());
         wrapper.setSpacing(5);
         wrapper.setAlignment(Pos.CENTER_LEFT);
         layout.addElement(wrapper);
@@ -118,7 +122,7 @@ public class ChatCustomizationView extends EmptyContainer  {
         description.addStyle(Styles.TEXT_LIGHTER);
         wrapper.addElement(description);
 
-        RichTextAreaOverlay chatScenarioInput = new RichTextAreaOverlay(infoFile.get("chat-first-message"), 720, -1);
+        RichTextAreaOverlay chatScenarioInput = new RichTextAreaOverlay(infoFile.get("chat-first-message"), 650, -1);
         chatScenarioInput.setMaxSize(chatScenarioInput.getWidth(), chatScenarioInput.getHeight());
         chatScenarioInput.setBackgroundColor(App.getInstance().getAppSettings().getThemeDefaultColor(App.getInstance().getAppSettings().getTheme()));
         chatScenarioInput.setBorderColor(App.getInstance().getAppSettings().getThemeBorderColor(App.getInstance().getAppSettings().getTheme()));
