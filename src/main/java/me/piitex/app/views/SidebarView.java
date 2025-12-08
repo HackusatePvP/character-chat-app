@@ -1,6 +1,7 @@
 package me.piitex.app.views;
 
 import atlantafx.base.theme.Styles;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
@@ -13,10 +14,7 @@ import me.piitex.app.views.settings.SettingsView;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.ButtonBuilder;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.IconOverlay;
-import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.coreui.CoreUiBrands;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
@@ -116,6 +114,10 @@ public class SidebarView extends EmptyContainer {
         VerticalLayout layout = new VerticalLayout(0, 0);
         layout.setAlignment(Pos.CENTER);
 
+        SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
+        separator.addStyle(Styles.ACCENT);
+        layout.addElement(separator);
+
         // An update is available, display it.
         BackendUpdater updater = App.getInstance().getBackendUpdater();
         if (updater != null && updater.isUpdateAvailable()) {
@@ -144,6 +146,7 @@ public class SidebarView extends EmptyContainer {
 
         IconOverlay githubPage = new IconOverlay(CoreUiBrands.GITHUB);
         githubPage.setIconSize(24);
+        githubPage.setTooltip("Checkout the project page.");
         layout.addElement(githubPage);
         githubPage.onClick(_ -> {
             App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app");
@@ -152,6 +155,7 @@ public class SidebarView extends EmptyContainer {
         IconOverlay bugReport = new IconOverlay(Material2AL.BUG_REPORT);
         bugReport.setColor(Color.rgb(255, 148, 122));
         bugReport.setIconSize(24);
+        bugReport.setTooltip("Report issues you have.");
         layout.addElement(bugReport);
         bugReport.onClick(_ -> {
             App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app/issues");
@@ -160,6 +164,7 @@ public class SidebarView extends EmptyContainer {
         IconOverlay wiki = new IconOverlay(Material2AL.LOCAL_LIBRARY);
         wiki.setColor(Color.rgb(160, 255, 122));
         wiki.setIconSize(24);
+        wiki.setTooltip("View documentation and guides.");
         layout.addElement(wiki);
         wiki.onClick(_ -> {
             App.getInstance().getHostServices().showDocument("https://github.com/HackusatePvP/character-chat-app/wiki");
