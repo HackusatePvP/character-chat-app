@@ -132,8 +132,8 @@ public class User {
 
     public static ImageOverlay getUserAvatar(String iconPath, double width, double height) {
         File file = new File(iconPath);
-        if (!file.exists()) {
-            file = new File(App.getAppDirectory(), "icons/avatar.png");
+        if (!file.exists() || iconPath.isEmpty()) {
+            file = new File(App.getExecutedDirectory(), "icons/character.png");
         }
 
         if (!file.exists()) {
