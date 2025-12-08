@@ -48,6 +48,10 @@ public class CharacterCreator extends EmptyContainer {
     private List<File> importedChatFiles = new ArrayList<>();
     private Container currentView;
 
+    // Calculated sizing for panel content
+    private final double contentWidth = appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350;
+    private final double contentHeight = appSettings.getHeight();
+
     public CharacterCreator(@Nullable Character character) {
         // Two buttons that will guide through either the character or user view.
         super(800, 600);
@@ -77,8 +81,6 @@ public class CharacterCreator extends EmptyContainer {
         displayContent.setSpacing(20);
         main.addElement(displayContent);
 
-        double contentWidth = appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350;
-        double contentHeight = appSettings.getHeight();
         characterCustomizationView = new CharacterCustomizationView(this, infoFile, contentWidth, contentHeight);
         userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
         chatCustomizationView = new ChatCustomizationView(this, infoFile, contentWidth, contentHeight);
@@ -98,7 +100,7 @@ public class CharacterCreator extends EmptyContainer {
 
         ButtonOverlay characterButton = new ButtonBuilder("cc").setGraphic(buildCharacterButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(characterButton);
-        characterButton.onClick(event -> {
+        characterButton.onClick(_ -> {
             displayContent.removeElement(displayContent.getElements().lastKey());
             displayContent.addElement(characterCustomizationView);
             currentView = characterCustomizationView;
@@ -106,7 +108,7 @@ public class CharacterCreator extends EmptyContainer {
 
         ButtonOverlay userButton = new ButtonBuilder("uc").setGraphic(buildUserButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(userButton);
-        userButton.onClick(event -> {
+        userButton.onClick(_ -> {
             displayContent.removeElement(displayContent.getElements().lastKey());
             displayContent.addElement(userCustomizationView);
             currentView = userCustomizationView;
@@ -114,6 +116,11 @@ public class CharacterCreator extends EmptyContainer {
 
         ButtonOverlay chatButton = new ButtonBuilder("ccc").setGraphic(buildChatButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(chatButton);
+        chatButton.onClick(_ -> {
+            displayContent.removeElement(displayContent.getElements().lastKey());
+            displayContent.addElement(chatCustomizationView);
+            currentView = userCustomizationView;
+        });
 
         ButtonOverlay finishButton = new ButtonBuilder("finish").setGraphic(buildFinishButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(finishButton);
