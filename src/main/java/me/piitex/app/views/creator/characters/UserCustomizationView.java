@@ -282,8 +282,8 @@ public class UserCustomizationView extends EmptyContainer  {
             loreLayout.addElement(buildLoreEntry("", ""), 0);
         });
 
-        if (infoFile.hasKey("user-lorebook")) {
-            infoFile.getSortedStringMap("user-lorebook").forEach((key, value) -> {
+        if (infoFile.hasKey("user-lore")) {
+            infoFile.getSortedStringMap("user-lore").forEach((key, value) -> {
                 loreLayout.addElement(buildLoreEntry(key, value));
             });
         }
@@ -354,5 +354,9 @@ public class UserCustomizationView extends EmptyContainer  {
 
     public ImageOverlay getUserImage() {
         return userImage;
+    }
+
+    public VerticalLayout getLoreLayout() {
+        return loreLayout;
     }
 }
