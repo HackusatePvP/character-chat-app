@@ -22,7 +22,6 @@ import me.piitex.engine.overlays.IconOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.engine.overlays.RichTextAreaOverlay;
 import me.piitex.engine.overlays.TextOverlay;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -47,7 +46,7 @@ public class TopControlBox extends HorizontalLayout {
     }
 
     public void buildTopControls() {
-        TextOverlay undo = new TextOverlay(new FontIcon(Material2MZ.UNDO));
+        IconOverlay undo = new IconOverlay(Material2MZ.UNDO);
         undo.addStyle(Styles.DANGER);
         undo.setTooltip("Undo the last message.");
         addElement(undo);
@@ -110,7 +109,7 @@ public class TopControlBox extends HorizontalLayout {
 
         });
 
-        TextOverlay impersonate = new TextOverlay(new FontIcon(Material2AL.BRUSH));
+        IconOverlay impersonate = new IconOverlay(Material2AL.BRUSH);
         impersonate.addStyle(Styles.ACCENT);
         impersonate.setTooltip("Generate your response.");
         addElement(impersonate);
@@ -118,7 +117,7 @@ public class TopControlBox extends HorizontalLayout {
 
         });
 
-        TextOverlay addMedia = new TextOverlay(new FontIcon(Material2AL.ADD));
+        IconOverlay addMedia = new IconOverlay(Material2AL.ADD);
         addMedia.addStyle(Styles.WARNING);
         addMedia.setTooltip("Attach an image to your prompt.");
         addElement(addMedia);
@@ -149,7 +148,7 @@ public class TopControlBox extends HorizontalLayout {
             imgBox.setSpacing(20);
 
             imgBox.addElement(new TextOverlay(image.getName()));
-            TextOverlay remove = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));
+            IconOverlay remove = new IconOverlay(Material2AL.DELETE_FOREVER);
             remove.addStyle(Styles.DANGER);
             imgBox.addElement(remove);
 

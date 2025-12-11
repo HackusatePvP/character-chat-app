@@ -5,13 +5,12 @@ import com.drew.lang.annotations.Nullable;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.util.Duration;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.*;
 import me.piitex.app.backend.Character;
@@ -27,7 +26,6 @@ import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
@@ -443,17 +441,12 @@ public class ChatView extends EmptyContainer {
             });
         });
 
-        TextOverlay stop = new TextOverlay(new FontIcon(Material2MZ.STOP_CIRCLE));
-        stop.addStyle(Styles.DANGER);
-
-        Tooltip tooltip = new Tooltip("Stop the response stream.");
-        tooltip.setShowDelay(Duration.millis(250));
-        Node stopNode = stop.render();
-        Tooltip.install(stopNode, tooltip);
+        IconOverlay stop = new IconOverlay(Material2MZ.STOP_CIRCLE);
+        stop.setColor(Color.RED);
 
         stop.onClick(_ -> {
             App.logger.info("Force stopping response...");
-            stopNode.setDisable(true);
+            stop.setEnabled(false);
             currentResponseThread.cancel(true);
         });
 

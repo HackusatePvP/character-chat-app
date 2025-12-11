@@ -15,7 +15,7 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.utils.ChatUtil;
+import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.views.LoadingView;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.chats.ChatView;
@@ -26,10 +26,8 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
-import javax.crypto.IllegalBlockSizeException;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -166,25 +164,20 @@ public class CharactersView {
             root.setAlignment(Pos.BASELINE_CENTER);
         }
 
-        FontIcon editIcon = new FontIcon(Material2AL.EDIT);
-        editIcon.setIconSize(16);
-        TextOverlay edit = new TextOverlay(editIcon);
+        IconOverlay edit = new IconOverlay(Material2AL.EDIT);
         edit.setTooltip("Edit the character");
-        edit.addStyle(Styles.ACCENT);
+        edit.setColor(Color.GREEN);
         edit.onClick(_ -> editCharacter(character));
         root.addElement(edit);
 
-        FontIcon duplicateIcon = new FontIcon(Material2AL.FILE_COPY);
-        duplicateIcon.setIconSize(16);
-        TextOverlay duplicate = new TextOverlay(duplicateIcon);
+        IconOverlay duplicate = new IconOverlay(Material2AL.FILE_COPY);
+        duplicate.setColor(Color.YELLOW);
         duplicate.setTooltip("Duplicate the character.");
-        duplicate.addStyle(Styles.WARNING);
         duplicate.onClick(_ -> duplicateCharacter(character));
         root.addElement(duplicate);
 
-        FontIcon deleteIcon = new FontIcon(Material2AL.DELETE_FOREVER);
-        TextOverlay delete = new TextOverlay(deleteIcon);
-        delete.addStyle(Styles.DANGER);
+        IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
+        delete.setColor(Color.RED);
         delete.setTooltip("Delete the character.");
         delete.onClick(event -> {
             deleteCharacter(base, card, character, event.getHandler().getSceneX(), event.getHandler().getSceneY());
@@ -193,7 +186,7 @@ public class CharactersView {
 
         IconOverlay export = new IconOverlay(Material2AL.CLOUD_DOWNLOAD);
         export.setIconSize(16);
-        export.setColor(Color.LIGHTBLUE);
+        export.setColor(Color.BLUE);
         export.setTooltip("Export the character.");
         export.onClick(_ -> {
             FileChooser chooser = new FileChooser();
@@ -211,7 +204,7 @@ public class CharactersView {
                 App.logger.error("Could not locate character file!");
             }
         });
-        root.addElement(importChat);
+        root.addElement(export);
 
         return root;
     }

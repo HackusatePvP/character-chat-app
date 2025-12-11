@@ -18,7 +18,6 @@ import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.TitledLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -85,7 +84,7 @@ public class ListTab extends Tab {
             body.setSpacing(10);
             root.addElement(body);
 
-            TextOverlay folder = new TextOverlay(new FontIcon(Material2AL.FOLDER));
+            IconOverlay folder = new IconOverlay(Material2AL.FOLDER);
             folder.setY(15);
             folder.setTooltip("Open file location.");
             body.addElement(folder);
@@ -129,7 +128,7 @@ public class ListTab extends Tab {
             subFooter.setSpacing(40);
             footer.addElement(subFooter);
 
-            TextOverlay settings = new TextOverlay(new FontIcon(Material2MZ.SETTINGS));
+            IconOverlay settings = new IconOverlay(Material2MZ.SETTINGS);
             settings.setTooltip("Go to model settings.");
             subFooter.addElement(settings);
             settings.addStyle(Styles.ACCENT);
@@ -139,7 +138,7 @@ public class ListTab extends Tab {
                 App.window.addContainer(new ModelEditView(model.getSettings()));
             });
 
-            TextOverlay delete = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));
+            IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
             delete.setTooltip("Delete the model.");
             delete.addStyle(Styles.DANGER);
             subFooter.addElement(delete);

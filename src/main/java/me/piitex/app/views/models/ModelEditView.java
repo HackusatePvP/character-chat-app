@@ -11,7 +11,6 @@ import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.util.ArrayList;
@@ -132,7 +131,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Model Instructions");
         tileContainer.setDescription("Provide base instructions for the model.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Supports placeholders for both character and user. {chara} {character} {char} {user} {usr}");
         tileContainer.setGraphic(info);
 
@@ -157,7 +156,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Context Size");
         tileContainer.setDescription("Maximum size for context tokens. Recommended setting this between 4096 - 16834.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("The max amount of tokens to store for context. -1 will auto assign this value to the max. Higher values will consume large amounts of V-Ram.");
         tileContainer.setGraphic(info);
 
@@ -179,7 +178,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Context Shift");
         tileContainer.setDescription("Enables or disables context shift.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("When the context input exceeds the maximum size, it will remove older tokens automatically.");
         tileContainer.setGraphic(info);
 
@@ -202,7 +201,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Multimodal Support");
         tileContainer.setDescription("Set multimodal file.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Set the MM-Proj file for vision support. The file will have to contain 'mmproj' . Only works if the model has a supported MM-Proj. Without setting this, image processing won't work");
         tileContainer.setGraphic(info);
 
@@ -230,7 +229,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Temperature");
         tileContainer.setDescription("Set the temperature for the model.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Controls the randomness of the generated text by affecting the probability distribution of the output tokens. Higher = more random, lower = more focused.");
         tileContainer.setGraphic(info);
 
@@ -252,7 +251,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Dynamic Temperature Range");
         tileContainer.setDescription("Addon for the temperature sampler.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("The added value to the range of dynamic temperature, which adjusts probabilities by entropy of tokens.");
         tileContainer.setGraphic(info);
 
@@ -274,7 +273,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Dynamic Temperature Exponent");
         tileContainer.setDescription("Addon for the temperature sampler.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Smoothes out the probability redistribution based on the most probable token.");
         tileContainer.setGraphic(info);
 
@@ -296,7 +295,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Top P");
         tileContainer.setDescription("Set the top-p value for the model.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Limits tokens to those that together have a cumulative probability of at least p");
         tileContainer.setGraphic(info);
 
@@ -318,7 +317,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Min-P");
         tileContainer.setDescription("Filters out less likely tokens during generation.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Limits tokens based on the minimum probability for a token to be considered, relative to the probability of the most likely token.");
         tileContainer.setGraphic(info);
 
@@ -340,7 +339,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Top K");
         tileContainer.setDescription("Limit the next token selection to the K most probable tokens..");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Default is 40.");
         tileContainer.setGraphic(info);
 
@@ -362,7 +361,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Repeat Penalty");
         tileContainer.setDescription("Adjusts how strongly the model is penalized for repeating tokens that have appeared recently in the generated text.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Higher values (e.g, 1.1-1.5) aggressively discourage repetition, while a value of 1.0 applies no penalty. This helps in generating more varied and natural-sounding responses.");
         tileContainer.setGraphic(info);
 
@@ -384,7 +383,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Repeat Tokens");
         tileContainer.setDescription("Specifies the number of recent tokens (from the model's output history) to consider when applying the repetition penalty.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("A larger value means the model will look further back in its generated text to avoid repeating phrases or patterns. -1 will use context size.");
         tileContainer.setGraphic(info);
 
@@ -406,7 +405,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Presence Penalty");
         tileContainer.setDescription("Limits tokens based on whether they appear in the output or not.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Repeat alpha presence penalty. Default: 0.0, which is disabled.");
         tileContainer.setGraphic(info);
 
@@ -428,7 +427,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Frequency Penalty");
         tileContainer.setDescription("Limits tokens based on how often they appear in the output.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Repeat alpha frequency penalty. Default: 0.0, which is disabled.");
         tileContainer.setGraphic(info);
 
@@ -450,7 +449,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("XTC Probability");
         tileContainer.setDescription("Set the chance for token removal via XTC sampler.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Controls the chance of cutting tokens at all. 0 disables XTC.");
         tileContainer.setGraphic(info);
 
@@ -472,7 +471,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("XTC Threshold");
         tileContainer.setDescription("Set a minimum probability threshold for tokens to be removed");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Controls the token probability that is required to cut that token.");
         tileContainer.setGraphic(info);
 
@@ -494,7 +493,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Typical P");
         tileContainer.setDescription("Sorts and limits tokens based on the difference between log-probability and entropy.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Enable locally typical sampling with parameter p. Default: 1.0, which is disabled.");
         tileContainer.setGraphic(info);
 
@@ -516,7 +515,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Dry Multiplier");
         tileContainer.setDescription("Set the DRY (Don't Repeat Yourself) repetition penalty multiplier.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Default: 0.0, which is disabled.");
         tileContainer.setGraphic(info);
 
@@ -538,7 +537,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Dry Base");
         tileContainer.setDescription("Set the DRY repetition penalty base value.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Default: 1.75");
         tileContainer.setGraphic(info);
 
@@ -560,7 +559,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Dry Length");
         tileContainer.setDescription("Tokens that extend repetition beyond this receive exponentially increasing penalty.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("multiplier * base ^ (length of repeating sequence before token - allowed length). Default: 2");
         tileContainer.setGraphic(info);
 
@@ -582,7 +581,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Dry Penalty Last Token");
         tileContainer.setDescription("How many tokens to scan for repetitions.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Default: -1, where 0 is disabled and -1 is context size.");
         tileContainer.setGraphic(info);
 
@@ -604,7 +603,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Chat Template");
         tileContainer.setDescription("Set the chat format template.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Changing this could drastically effect generation quality.");
         tileContainer.setGraphic(info);
 
@@ -669,7 +668,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Reasoning Template");
         tileContainer.setDescription("Set the reasoning format template. Only works for models that support reasoning.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Controls the integration and extraction of internal 'thought' processes from the model's output. When enabled, the model might include special tags (e.g, `<thought>...</thought>`) showing its reasoning steps.");
         tileContainer.setGraphic(info);
 
@@ -697,7 +696,7 @@ public class ModelEditView extends EmptyContainer {
         tileContainer.setTitle("Jinja Template");
         tileContainer.setDescription("Enables or disables the use of Jinja templating for chat formatting.");
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Only enable if your model explicitly supports Jinja templating, as incorrect usage can lead to malformed outputs.");
         tileContainer.setGraphic(info);
 
