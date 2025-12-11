@@ -21,7 +21,6 @@ import java.util.Map;
 // Shout out to the 30 kilos of cocaine it took to figure this out.
 // Works with SillyTavern cards and Backyard AI cards. Prroobablyy...
 // This is lazy importing and only gathers the data that is needed.
-// This app does not create character cards.
 public class CharacterCardImporter {
 
     public static JSONObject getImageMetaData(File file) throws ImageProcessingException, IOException {
@@ -96,8 +95,11 @@ public class CharacterCardImporter {
 
     public static String getCharacterId(JSONObject metaData) throws JSONException {
         JSONObject characterJson = getCharacterJson(metaData);
-        if (characterJson.has("aiDisplayName")) {
-            return characterJson.getString("aiDisplayName");
+        if (characterJson.has("aiName")) {
+            return characterJson.getString("aiName");
+        }
+        if (characterJson.has("display-name")) {
+            return characterJson.getString("display-name");
         }
         if (characterJson.has("name")) {
             return characterJson.getString("name");
@@ -118,8 +120,8 @@ public class CharacterCardImporter {
 
     public static String getCharacterDisplayName(JSONObject metaData) throws JSONException {
         JSONObject characterJson = getCharacterJson(metaData);
-        if (characterJson.has("aiName")) {
-            return characterJson.getString("aiName");
+        if (characterJson.has("aiDisplayName")) {
+            return characterJson.getString("aiDisplayName");
         }
         if (characterJson.has("name")) {
             return characterJson.getString("name");
