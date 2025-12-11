@@ -10,6 +10,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.views.HomeView;
+import me.piitex.engine.Element;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.TreeMap;
 
 public class FinishCharacterCreatorView extends EmptyContainer {
     private final VerticalLayout root;
@@ -59,6 +61,8 @@ public class FinishCharacterCreatorView extends EmptyContainer {
         ButtonOverlay submit = new ButtonBuilder("submit").setGraphic(buildFinishButton(400)).addStyle(Styles.SUCCESS).addStyle(Styles.BUTTON_OUTLINED).build();
         root.addElement(submit);
         submit.onClick(event -> {
+            System.out.println("Character: " + parent.getCharacter());
+
             if (!validate()) {
                 return;
             }
@@ -88,8 +92,9 @@ public class FinishCharacterCreatorView extends EmptyContainer {
                 App.logger.error("Could not copy new character image!", e);
             }
             character.setIconPath(characterImage.getAbsolutePath());
+            character.setLorebook(compileCharacterLore());
 
-            User user = new User(infoFile.get("user-display-name"));
+            User user = new User(infoFile.get("user-display-name"), new InfoFile(new File(character.getUserDirectory(), "user.info"), true));
             user.setDisplayName(infoFile.get("user-display-name"));
             user.setPersona(infoFile.getOrDefault("user-persona", ""));
 
@@ -101,6 +106,8 @@ public class FinishCharacterCreatorView extends EmptyContainer {
                 App.logger.error("Could not copy new user image!", e);
             }
             user.setIconPath(userImage.getAbsolutePath());
+            user.setLorebook(compileUserLore());
+            character.setUser(user);
 
             character.setChatScenario(infoFile.getOrDefault("chat-scenario", ""));
             character.setFirstMessage(infoFile.getOrDefault("first-message", ""));
@@ -110,6 +117,64 @@ public class FinishCharacterCreatorView extends EmptyContainer {
             App.window.clearContainers();
             App.window.addContainer(new HomeView());
         });
+    }
+
+    private TreeMap<String, String> compileCharacterLore() {
+        TreeMap<String, String> toReturn = new TreeMap<>();
+
+        for (Element element : parent.getCharacterCustomizationView().getLoreLayout().getElements().values()) {
+            // All entires are vertical layouts
+            VerticalLayout root = (VerticalLayout) element;
+
+            // The key is in the first horizontal layout at the first index.
+            HorizontalLayout horizontalLayout = (HorizontalLayout) root.getElements().firstEntry().getValue();
+
+            TextFieldOverlay loreKey = (TextFieldOverlay) horizontalLayout.getElements().firstEntry().getValue();
+            String key = loreKey.getCurrentText();
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+
+            // The value is the second index of the root
+            RichTextAreaOverlay loreValue = (RichTextAreaOverlay) root.getElements().lastEntry().getValue();
+            String value = loreValue.getCurrentText();
+            if (value == null || value.isEmpty()) {
+                continue;
+            }
+
+            toReturn.put(key, value);
+        }
+
+        return toReturn;
+    }
+
+    private TreeMap<String, String> compileUserLore() {
+        TreeMap<String, String> toReturn = new TreeMap<>();
+
+        for (Element element : parent.getUserCustomizationView().getLoreLayout().getElements().values()) {
+            // All entires are vertical layouts
+            VerticalLayout root = (VerticalLayout) element;
+
+            // The key is in the first horizontal layout at the first index.
+            HorizontalLayout horizontalLayout = (HorizontalLayout) root.getElements().firstEntry().getValue();
+
+            TextFieldOverlay loreKey = (TextFieldOverlay) horizontalLayout.getElements().firstEntry().getValue();
+            String key = loreKey.getCurrentText();
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+
+            // The value is the second index of the root
+            RichTextAreaOverlay loreValue = (RichTextAreaOverlay) root.getElements().lastEntry().getValue();
+            String value = loreValue.getCurrentText();
+            if (value == null || value.isEmpty()) {
+                continue;
+            }
+
+            toReturn.put(key, value);
+        }
+
+        return toReturn;
     }
 
     private HorizontalLayout buildDisplayBox() {
@@ -194,7 +259,7 @@ public class FinishCharacterCreatorView extends EmptyContainer {
     }
 
     private boolean validate() {
-        if (parent.getCharacterCustomizationView().getCharacterIdInput() == null || parent.getCharacterCustomizationView().getCharacterIdInput().getCurrentText().isEmpty()) {
+        if (parent.getCharacter() == null && (parent.getCharacterCustomizationView().getCharacterIdInput() == null || parent.getCharacterCustomizationView().getCharacterIdInput().getCurrentText().isEmpty())) {
             // Display and select the field with a popover
             parent.getDisplayContent().removeElement(parent.getDisplayContent().getElements().lastKey());
             parent.getDisplayContent().addElement(parent.getCharacterCustomizationView());
