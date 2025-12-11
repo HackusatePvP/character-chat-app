@@ -75,6 +75,7 @@ public class SetupModelView extends VerticalLayout {
         ButtonOverlay next = new ButtonBuilder("next").setText("Next").addStyle(Styles.SUCCESS).addStyle(Styles.BUTTON_OUTLINED).build();
         addElement(next);
         next.onClick(event -> {
+            appSettings.setSetup(true);
             App.window.clearContainers();
             App.window.addContainer(new CharacterCreator(null));
         });
