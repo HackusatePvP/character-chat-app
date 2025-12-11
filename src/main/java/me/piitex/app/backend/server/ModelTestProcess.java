@@ -45,9 +45,9 @@ public class ModelTestProcess {
         File server;
         File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/");
         if (OSUtil.getOS().contains("Windows")) {
-            server = new File(backendDirectory, "llama-cli.exe");
+            server = new File(backendDirectory, "llama-completion.exe");
         } else {
-            server = new File(backendDirectory, "llama-cli");
+            server = new File(backendDirectory, "llama-completion");
             server.setExecutable(true, false);
         }
 
