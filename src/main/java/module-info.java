@@ -21,6 +21,7 @@ module me.piitex.app {
     requires org.kordamp.ikonli.coreui;
     requires org.apache.commons.lang3;
     requires org.apache.commons.compress;
+    requires javafx.base;
 
     opens me.piitex.app to javafx.fxml;
     exports me.piitex.app;
