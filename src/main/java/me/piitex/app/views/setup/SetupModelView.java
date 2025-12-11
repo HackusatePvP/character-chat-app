@@ -10,13 +10,13 @@ import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
-import me.piitex.app.views.creator.CreatorView;
 import me.piitex.app.views.creator.characters.CharacterCreator;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.DownloadInfo;
 import me.piitex.os.DownloadListener;
 import me.piitex.os.FileDownloader;
+import me.piitex.os.OSUtil;
 
 import java.awt.*;
 import java.io.File;
@@ -61,16 +61,14 @@ public class SetupModelView extends VerticalLayout {
         addElement(openModelsFolder);
         openModelsFolder.onClick(event -> {
             File directoryToOpen = App.getModelsDirectory();
-            if (Desktop.isDesktopSupported() && directoryToOpen.exists() && directoryToOpen.isDirectory()) {
-                Platform.runLater(() -> {
-                    try {
-                        Desktop.getDesktop().open(directoryToOpen);
-                    } catch (IOException e) {
-                        System.err.println("Failed to open directory: " + e.getMessage());
-                    }
-                });
-            } else {
-                System.err.println("Desktop API is not supported or directory is invalid.");
+            try {
+                if (OSUtil.getOS().contains("Windows")) {
+                    Runtime.getRuntime().exec(new String[]{"explorer.exe", "/select,", directoryToOpen.getAbsolutePath()});
+                } else if (OSUtil.getOS().contains("Linux")) {
+                    Runtime.getRuntime().exec(new String[] {"xdg-open", directoryToOpen.getAbsolutePath()});
+                }
+            } catch (IOException e) {
+                App.logger.error("Could not open directory!", e);
             }
         });
 
