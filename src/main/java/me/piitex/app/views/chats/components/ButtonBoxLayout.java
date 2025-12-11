@@ -17,11 +17,7 @@ import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.ModalContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.overlays.ButtonBuilder;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.TextAreaOverlay;
-import me.piitex.engine.overlays.TextOverlay;
-import org.kordamp.ikonli.javafx.FontIcon;
+import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -50,7 +46,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
         setSpacing(20);
         setMaxSize(getWidth(), getHeight());
 
-        TextOverlay copy = new TextOverlay(new FontIcon(Material2AL.CONTENT_COPY));
+        IconOverlay copy = new IconOverlay(Material2AL.CONTENT_COPY);
         copy.setTooltip("Copy text to clipboard.");
         addElement(copy);
         copy.onClick(event -> {
@@ -70,7 +66,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
             timeline.play();
         });
 
-        TextOverlay edit = new TextOverlay(new FontIcon(Material2AL.EDIT));
+        IconOverlay edit = new IconOverlay(Material2AL.EDIT);
         edit.addStyle(Styles.ACCENT);
         edit.setTooltip("Edit the message.");
         addElement(edit);
@@ -128,7 +124,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
         });
 
-        TextOverlay delete = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));
+        IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
         delete.addStyle(Styles.DANGER);
         delete.setTooltip("Delete the message.");
         addElement(delete);
@@ -141,7 +137,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
         // Doesn't make sense to regenerate the configured message.
         String firstMsg = (character.getFirstMessage() == null || character.getFirstMessage().isEmpty() ? "null" : character.getFirstMessage());
         if (chatMessage.getSender() == Role.ASSISTANT && !firstMsg.equalsIgnoreCase(chatMessage.getContent())) {
-            TextOverlay regenerate = new TextOverlay(new FontIcon(Material2MZ.REFRESH));
+            IconOverlay regenerate = new IconOverlay(Material2MZ.REFRESH);
             regenerate.addStyle(Styles.WARNING);
             regenerate.setTooltip("Regenerate the response.");
             addElement(regenerate);
