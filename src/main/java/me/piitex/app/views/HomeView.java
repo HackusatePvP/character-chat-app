@@ -114,7 +114,7 @@ public class HomeView extends EmptyContainer {
     }
 
     public void buildBody() {
-        if (!App.getInstance().getCharacters().isEmpty()) {
+        if (appSettings.isSetup()) {
             CharactersView charactersView = new CharactersView();
             root.addElement(charactersView.getRoot());
         } else {

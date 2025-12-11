@@ -18,6 +18,7 @@ public class AppSettings {
     private String astrixColor;
     private boolean windowScaling = false;
     private double totalGpuVram;
+    private boolean setup = false;
 
     private final InfoFile infoFile;
 
@@ -62,6 +63,9 @@ public class AppSettings {
         }
         if (infoFile.hasKey("total-vram")) {
             this.totalGpuVram = infoFile.getDouble("total-vram");
+        }
+        if (infoFile.hasKey("setup")) {
+            this.setup = infoFile.getBoolean("setup");
         }
     }
 
@@ -168,10 +172,19 @@ public class AppSettings {
         infoFile.set("window-scaling", windowScaling);
     }
 
+    public boolean isSetup() {
+        return setup;
+    }
+
+    public void setSetup(boolean setup) {
+        this.setup = setup;
+        infoFile.set("setup", setup);
+    }
+
     /*
-      Utility functions for getting theme coloring.
-      Needed for RichTextFX components and BBCode
-    */
+              Utility functions for getting theme coloring.
+              Needed for RichTextFX components and BBCode
+            */
     public Theme getStyleTheme(String name) {
         if (name.equalsIgnoreCase("primer light")) {
             return new PrimerLight();
