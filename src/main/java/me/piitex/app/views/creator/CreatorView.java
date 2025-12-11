@@ -1,18 +1,20 @@
 package me.piitex.app.views.creator;
 
 import atlantafx.base.theme.Styles;
-import com.drew.lang.annotations.Nullable;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.creator.characters.CharacterCreator;
-import me.piitex.engine.containers.Container;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
+import org.kordamp.ikonli.material2.Material2AL;
+import org.kordamp.ikonli.material2.Material2MZ;
 
 public class CreatorView extends EmptyContainer {
     private final AppSettings appSettings = App.getInstance().getAppSettings();
@@ -74,12 +76,22 @@ public class CreatorView extends EmptyContainer {
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
+        IconOverlay overlay = new IconOverlay(Material2AL.ANDROID);
+        overlay.setIconSize(64);
+        overlay.setColor(Color.GREEN);
+        root.addElement(overlay);
+
         TextOverlay textOverlay = new TextOverlay("Character");
-        textOverlay.addStyle(Styles.TITLE_3);
+        textOverlay.addStyle(Styles.TITLE_2);
         root.addElement(textOverlay);
 
-        TextFlowOverlay paragraph = new TextFlowOverlay("Create or Import a new unique character to chat with.", 400, 0);
-        root.addElement(paragraph);
+        root.getPane().addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            textOverlay.setText("Create or import a character.");
+        });
+
+        root.getPane().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            textOverlay.setText("Character");
+        });
 
         return root;
     }
@@ -98,12 +110,22 @@ public class CreatorView extends EmptyContainer {
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
+        IconOverlay overlay = new IconOverlay(Material2MZ.PERSON);
+        overlay.setIconSize(64);
+        overlay.setColor(Color.BLUE);
+        root.addElement(overlay);
+
         TextOverlay textOverlay = new TextOverlay("User");
-        textOverlay.addStyle(Styles.TITLE_3);
+        textOverlay.addStyle(Styles.TITLE_2);
         root.addElement(textOverlay);
 
-        TextFlowOverlay paragraph = new TextFlowOverlay("Create a new user template which can be used for every character.", 400, 0);
-        root.addElement(paragraph);
+        root.getPane().addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            textOverlay.setText("Create or import a user.");
+        });
+
+        root.getPane().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            textOverlay.setText("User");
+        });
 
         return root;
     }
