@@ -121,6 +121,10 @@ public class BackendUpdater {
         App.window.getStage().getScene().getRoot().setDisable(true);
         window.getStage().setAlwaysOnTop(true);
         window.render();
+
+        window.getStage().setOnCloseRequest(windowEvent -> {
+            App.window.getScene().getRoot().setDisable(false);
+        });
     }
 
     public void downloadCudaBackend(GitHubUtil gitHubUtil, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
