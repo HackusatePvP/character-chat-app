@@ -498,11 +498,6 @@ public class App extends FXLoad {
         // When Main.run does not pass, it being executed by the IDE.
         // For testing within the IDE, use App.main() as your entry point
         // For standard installation, run will pass.
-
-        if (OSUtil.getOS().contains("Linux")) {
-            OSPathing.groupId = "me.piitex.cca";
-            return OSPathing.getAppDataDirectory();
-        }
         return new File(OSPathing.getAppDataDirectory(), "chat-app/");
 
     }
@@ -511,11 +506,7 @@ public class App extends FXLoad {
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
         }
-        if (OSUtil.getOS().contains("Linux")) {
-            return OSPathing.getAppDataDirectory();
-        } else {
-            return new File(OSPathing.getAppDataDirectory(), "chat-app/");
-        }
+        return new File(OSPathing.getAppDataDirectory(), "chat-app/");
     }
 
     public static FileDownloader getFileDownloader() {
