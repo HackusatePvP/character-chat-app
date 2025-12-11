@@ -19,6 +19,7 @@ import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.views.LoadingView;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.creator.characters.CharacterCreator;
 import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -216,11 +217,9 @@ public class CharactersView {
         App.window.addContainer(progressContainer);
 
         App.getThreadPoolManager().submitTask(() -> {
-            Container container = new CharacterEditView(character, false).getRoot();
-            Node assemble = container.assemble();
             Platform.runLater(() -> {
                 App.window.clearContainers();
-                App.window.addContainer(container, assemble);
+                App.window.addContainer(new CharacterCreator(character));
             });
         });
     }
