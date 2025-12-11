@@ -124,6 +124,11 @@ public class CharacterCreator extends EmptyContainer {
 
         ButtonOverlay finishButton = new ButtonBuilder("finish").setGraphic(buildFinishButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(finishButton);
+        finishButton.onClick(_ -> {
+            displayContent.removeElement(displayContent.getElements().lastKey());
+            displayContent.addElement(new FinishCharacterCreatorView(this, infoFile, contentWidth, contentHeight));
+            currentView = userCustomizationView;
+        });
 
         if (currentView != null && currentView.hasProperty("progress")) {
             submission = new ButtonBuilder("fin").setText("Next").addStyle(Styles.SUCCESS).addStyle(Styles.BUTTON_OUTLINED).setWidth(root.getWidth()).build();
