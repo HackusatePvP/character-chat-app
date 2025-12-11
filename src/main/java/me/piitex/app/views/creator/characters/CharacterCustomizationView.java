@@ -104,6 +104,7 @@ public class CharacterCustomizationView extends EmptyContainer {
 
         characterIdInput = new TextFieldOverlay((infoFile.hasKey("id") ? infoFile.get("id") : ""), "Character Id", 100, 35);
         characterId.setAction(characterIdInput);
+        characterIdInput.setEditable(parent.getCharacter() == null);
 
         TileContainer characterDisplay = new TileContainer(layout.getWidth(), 100);
         characterDisplay.setMaxSize(characterId.getWidth(), characterId.getHeight());
