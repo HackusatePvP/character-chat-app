@@ -147,6 +147,7 @@ public class CharacterCustomizationView extends EmptyContainer {
                         infoFile.set("id", id);
                         infoFile.set("display-name", displayName);
                         infoFile.set("persona", persona);
+                        infoFile.set("icon-path", file.getAbsolutePath());
                         tempLore.clear();
                         characterIdInput.setCurrentText(id);
                         characterDisplayInput.setCurrentText(displayName);
@@ -247,7 +248,7 @@ public class CharacterCustomizationView extends EmptyContainer {
             chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.png", "*.jpg"));
 
             File file = chooser.showOpenDialog(App.window.getStage());
-            if (file != null && !file.isDirectory() && file.exists()) {
+            if (file != null && file.isFile() && file.exists()) {
 
                 App.logger.info("Updating image to '{}'", file.getAbsoluteFile());
                 ImageLoader newImage = new ImageLoader(file);

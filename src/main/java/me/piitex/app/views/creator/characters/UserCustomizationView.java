@@ -209,7 +209,7 @@ public class UserCustomizationView extends EmptyContainer  {
         layout.addElement(imageWrapper);
 
         ImageLoader imageLoader;
-        if (infoFile.hasKey("icon-path")) {
+        if (infoFile.hasKey("user-icon-path")) {
             imageLoader = new ImageLoader(new File(infoFile.get("user-icon-path")));
         } else {
             imageLoader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
