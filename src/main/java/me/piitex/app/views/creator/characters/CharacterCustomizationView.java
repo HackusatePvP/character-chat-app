@@ -36,6 +36,8 @@ public class CharacterCustomizationView extends EmptyContainer {
     private ImageOverlay characterImage;
     private VerticalLayout loreLayout;
 
+    private final ScrollContainer scrollContainer;
+
     // Stores lore index with the string key+delimiter+value
     private final LinkedHashMap<Integer, String> tempLore = new LinkedHashMap<>();
 
@@ -50,7 +52,7 @@ public class CharacterCustomizationView extends EmptyContainer {
         root.setAlignment(Pos.CENTER);
         addProperties("progress", "Character");
 
-        ScrollContainer scrollContainer = new ScrollContainer(root, width - 5, height - 40);
+        scrollContainer = new ScrollContainer(root, width - 5, height - 40);
         scrollContainer.setMaxSize(scrollContainer.getWidth(), scrollContainer.getHeight());
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setScrollWhenNeeded(false);
@@ -112,7 +114,7 @@ public class CharacterCustomizationView extends EmptyContainer {
         characterDisplay.setDescription("The display name for your character.");
         layout.addElement(characterDisplay);
 
-        characterDisplayInput = new TextFieldOverlay((infoFile.hasKey("id") ? infoFile.get("id") : ""), "Character Display", 100, 35);
+        characterDisplayInput = new TextFieldOverlay((infoFile.hasKey("display-name") ? infoFile.get("display-name") : ""), "Character Display", 100, 35);
         characterDisplay.setAction(characterDisplayInput);
 
         characterIdInput.onInputSetEvent(event -> {
@@ -184,7 +186,7 @@ public class CharacterCustomizationView extends EmptyContainer {
         description.addStyle(Styles.TEXT_LIGHTER);
         wrapper.addElement(description);
 
-        characterPersonaInput = new RichTextAreaOverlay("", 720, -1);
+        characterPersonaInput = new RichTextAreaOverlay(infoFile.get("persona"), 720, -1);
         characterPersonaInput.setMaxSize(characterPersonaInput.getWidth(), characterPersonaInput.getHeight());
         characterPersonaInput.setBackgroundColor(App.getInstance().getAppSettings().getThemeDefaultColor(App.getInstance().getAppSettings().getTheme()));
         characterPersonaInput.setBorderColor(App.getInstance().getAppSettings().getThemeBorderColor(App.getInstance().getAppSettings().getTheme()));
@@ -301,10 +303,11 @@ public class CharacterCustomizationView extends EmptyContainer {
 
         addEntry.onClick(_ -> {
             loreLayout.addElement(buildLoreEntry("", ""), 0);
+            scrollContainer.getScrollPane().setVvalue(scrollContainer.getScrollPane().getVmax());
         });
 
-        if (infoFile.hasKey("lorebook")) {
-            infoFile.getSortedStringMap("lorebook").forEach((key, value) -> {
+        if (infoFile.hasKey("lore")) {
+            infoFile.getSortedStringMap("lore").forEach((key, value) -> {
                 loreLayout.addElement(buildLoreEntry(key, value));
             });
         }
