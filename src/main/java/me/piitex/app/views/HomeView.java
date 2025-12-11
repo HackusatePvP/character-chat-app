@@ -4,10 +4,11 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.input.MouseEvent;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.characters.CharactersView;
-import me.piitex.engine.containers.CardContainer;
+import me.piitex.app.views.setup.SetupView;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -19,10 +20,12 @@ public class HomeView extends EmptyContainer {
     private final HorizontalLayout root;
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
+    private final SidebarView sidebarView;
 
     public HomeView() {
         int height = App.getInstance().getAppSettings().getHeight() - 50;
         super(600, height);
+        this.sidebarView = new SidebarView(false);
         if (App.mobile) {
             root = new HorizontalLayout(600, height);
         } else {
@@ -37,7 +40,7 @@ public class HomeView extends EmptyContainer {
     }
 
     public void init() {
-        root.addElement(new SidebarView(false));
+        root.addElement(sidebarView);
         root.setSpacing(35);
 
         if (App.getInstance().isLoading()) {
@@ -59,55 +62,55 @@ public class HomeView extends EmptyContainer {
     }
 
     public VerticalLayout buildInstructions() {
-        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 300, -1);
-        layout.setAlignment(Pos.TOP_CENTER);
+        VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - 265, appSettings.getHeight());
+        layout.setSpacing(20);
+        layout.setAlignment(Pos.CENTER);
 
-        CardContainer card = new CardContainer(0, 0,0, 0);
-        card.setMaxSize(600, appSettings.getHeight() - 100);
-        layout.addElement(card);
+        TextOverlay header = new TextOverlay("Guided Setup");
+        header.addStyle(Styles.TITLE_2);
+        layout.addElement(header);
 
-        VerticalLayout headerLayout = new VerticalLayout(600, 50);
-        headerLayout.setAlignment(Pos.TOP_CENTER);
+        SeparatorOverlay separatorOverlay = new SeparatorOverlay(Orientation.HORIZONTAL);
+        separatorOverlay.setMaxWidth(1000);
+        layout.addElement(separatorOverlay);
 
-        TextOverlay header = new TextOverlay("Setup Instructions");
-        header.addStyle(Styles.TITLE_1);
-        headerLayout.addElement(header);
-
-        SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
-        separator.setX(-12);
-        separator.addStyle(Styles.MEDIUM);
-        headerLayout.addElement(separator);
-
-        card.setHeader(headerLayout);
-
-        VerticalLayout bodyLayout = new VerticalLayout(600, -1);
-
-        TextFlowOverlay body = new TextFlowOverlay("", 600, -1);
-        bodyLayout.addElement(body);
-
-        body.add(new TextOverlay("1. Navigate to \"Models / Backend\".\n\n"));
-        body.add(new TextOverlay("2. Set a compatible backend. If you do not want to download drivers select Vulkan.\n\n"));
-        body.add(new TextOverlay("3. Set a GPU. Ensure there is another option besides auto.\n\n"));
-        body.add(new TextOverlay("4. Select the models directory (Recommended).\n\n"));
-        body.add(new TextOverlay("5. Download a GGUF model from the \"Download\" tab.\n\n"));
-        body.add(new TextOverlay("6. Select the model or set as a default. (REQUIRED).\n\n"));
-        body.add(new TextOverlay("7. (Optional) Configure the model settings by clicking the blue gear.\n\n"));
-        body.add(new TextOverlay("8. Go back to settings and start the server.\n\n"));
-        body.add(new TextOverlay("9. (Optional) Create a User Template.\n\n"));
-        body.add(new TextOverlay("10. Create a character.\n"));
-
-        card.setBody(bodyLayout);
-
-        VerticalLayout footerLayout = new VerticalLayout(600, 50);
-        footerLayout.setAlignment(Pos.BOTTOM_CENTER);
-
-        TextOverlay footer = new TextOverlay("These instructions will remain on this page until a character is created.");
-        footerLayout.addElement(footer);
-
-        card.setFooter(footerLayout);
+        layout.addElement(getSetupButon());
 
         return layout;
+    }
 
+    public ButtonOverlay getSetupButon() {
+        ButtonOverlay button = new ButtonBuilder("cc").setGraphic(buildSetupGraphic()).build();
+        button.addStyle(Styles.ACCENT);
+        button.onClick(event -> {
+            App.window.clearContainers();
+            App.window.addContainer(new SetupView(sidebarView));
+
+        });
+
+        return button;
+    }
+
+
+    public VerticalLayout buildSetupGraphic() {
+        VerticalLayout root = new VerticalLayout(400, 250);
+        root.setMaxSize(root.getWidth(), root.getHeight());
+        root.setSpacing(50);
+        root.setAlignment(Pos.CENTER);
+
+        TextOverlay textOverlay = new TextOverlay("Quick Setup");
+        textOverlay.addStyle(Styles.TITLE_2);
+        root.addElement(textOverlay);
+
+        root.getPane().addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            textOverlay.setText("Guided setup instructions.");
+        });
+
+        root.getPane().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            textOverlay.setText("Get Started");
+        });
+
+        return root;
     }
 
     public void buildBody() {
@@ -115,6 +118,7 @@ public class HomeView extends EmptyContainer {
             CharactersView charactersView = new CharactersView();
             root.addElement(charactersView.getRoot());
         } else {
+            sidebarView.setEnabled(false);
             root.addElement(buildInstructions());
         }
     }
