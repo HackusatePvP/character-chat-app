@@ -45,7 +45,6 @@ public class CharacterCreator extends EmptyContainer {
     private CharacterCustomizationView characterCustomizationView;
     private UserCustomizationView userCustomizationView;
     private ChatCustomizationView chatCustomizationView;
-    private FinishCharacterCreatorView finishCharacterCreatorView;
     private List<File> importedChatFiles = new ArrayList<>();
     private Container currentView;
 
@@ -59,6 +58,11 @@ public class CharacterCreator extends EmptyContainer {
         this.character = character;
         if (character != null) {
             infoFile = InfoFile.copy(character.getInfoFile());
+            if (character.getUser() != null) {
+                infoFile.set("user-display-name", character.getUser().getDisplayName());
+                infoFile.set("user-icon-path", character.getUser().getIconPath());
+                infoFile.set("user-persona", character.getUser().getPersona());
+            }
         } else {
             infoFile = new InfoFile();
         }
@@ -85,7 +89,6 @@ public class CharacterCreator extends EmptyContainer {
         characterCustomizationView = new CharacterCustomizationView(this, infoFile, contentWidth, contentHeight);
         userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
         chatCustomizationView = new ChatCustomizationView(this, infoFile, contentWidth, contentHeight);
-        finishCharacterCreatorView = new FinishCharacterCreatorView(this, infoFile, contentWidth, contentHeight);
 
         currentView = characterCustomizationView;
 
@@ -129,7 +132,7 @@ public class CharacterCreator extends EmptyContainer {
         root.addElement(finishButton);
         finishButton.onClick(_ -> {
             displayContent.removeElement(displayContent.getElements().lastKey());
-            displayContent.addElement(finishCharacterCreatorView);
+            displayContent.addElement(new FinishCharacterCreatorView(this, infoFile, contentWidth, contentHeight));
             currentView = userCustomizationView;
         });
 
@@ -148,7 +151,7 @@ public class CharacterCreator extends EmptyContainer {
                     currentView = chatCustomizationView;
                 } else if (currentView == chatCustomizationView) {
                     displayContent.removeElement(displayContent.getElements().lastKey());
-                    displayContent.addElement(finishCharacterCreatorView);
+                    displayContent.addElement(new FinishCharacterCreatorView(this, infoFile, contentWidth, contentHeight));
                     currentView = chatCustomizationView;
                 }
             });
