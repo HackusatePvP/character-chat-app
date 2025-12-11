@@ -136,23 +136,25 @@ public class App extends FXLoad {
 
         // Check for updates first.
         // Will not perform updates when using App.main(); This prevents development builds from being backported.
-        if (Main.app || Main.run) {
-            performUpdates();
-        } else {
-            if (Main.forceUpdate) {
-                App.logger.info("Force checking updates...");
+        getThreadPoolManager().submitTask(() -> {
+            if (Main.app || Main.run) {
                 performUpdates();
-            } else if (OSUtil.getOS().contains("Windows")) {
-                if (!new File(getBackendDirectory(), "vulkan/").exists() || !new File(getBackendDirectory(), "cuda/").exists() || !new File(getBackendDirectory(), "hip/").exists()) {
-                    App.logger.info("Windows updates available.");
+            } else {
+                if (Main.forceUpdate) {
+                    App.logger.info("Force checking updates...");
                     performUpdates();
-                }
-            } else if (OSUtil.getOS().contains("Linux")) {
-                if (!new File(getBackendDirectory(), "vulkan/").exists()) {
-                    performUpdates();
+                } else if (OSUtil.getOS().contains("Windows")) {
+                    if (!new File(getBackendDirectory(), "vulkan/").exists() || !new File(getBackendDirectory(), "cuda/").exists() || !new File(getBackendDirectory(), "hip/").exists()) {
+                        App.logger.info("Windows updates available.");
+                        performUpdates();
+                    }
+                } else if (OSUtil.getOS().contains("Linux")) {
+                    if (!new File(getBackendDirectory(), "vulkan/").exists()) {
+                        performUpdates();
+                    }
                 }
             }
-        }
+        });
 
         int setWidth = appSettings.getWidth();
         int setHeight = appSettings.getHeight();
