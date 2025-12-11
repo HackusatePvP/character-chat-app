@@ -39,10 +39,8 @@ public class SidebarView extends EmptyContainer {
         addStyle(Styles.BORDER_DEFAULT);
 
         root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
-        root.setY(20);
         root.setMaxSize(root.getWidth(), root.getHeight());
         root.setAlignment(Pos.TOP_CENTER);
-        root.setSpacing(75);
         addElement(root);
 
         init();
@@ -55,7 +53,7 @@ public class SidebarView extends EmptyContainer {
 
     private VerticalLayout buildTopLayout() {
 
-        VerticalLayout top = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT - 200);
+        VerticalLayout top = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT - 150);
         top.setMaxSize(top.getWidth(), top.getHeight());
         top.setAlignment(Pos.CENTER);
         top.setSpacing(25);
@@ -111,8 +109,9 @@ public class SidebarView extends EmptyContainer {
     }
 
     private VerticalLayout buildBottomLayout() {
-        VerticalLayout layout = new VerticalLayout(0, 0);
-        layout.setAlignment(Pos.CENTER);
+        VerticalLayout layout = new VerticalLayout(0, -1);
+        layout.setAlignment(Pos.BOTTOM_CENTER);
+        layout.setSpacing(15);
 
         SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
         separator.addStyle(Styles.ACCENT);
@@ -131,6 +130,7 @@ public class SidebarView extends EmptyContainer {
 
             });
             layout.addElement(update);
+            layout.setSpacing(5);
         }
 
         layout.addElement(buildHelpLayout());
