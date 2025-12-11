@@ -45,6 +45,7 @@ public class CharacterCreator extends EmptyContainer {
     private CharacterCustomizationView characterCustomizationView;
     private UserCustomizationView userCustomizationView;
     private ChatCustomizationView chatCustomizationView;
+    private FinishCharacterCreatorView finishCharacterCreatorView;
     private List<File> importedChatFiles = new ArrayList<>();
     private Container currentView;
 
@@ -84,6 +85,8 @@ public class CharacterCreator extends EmptyContainer {
         characterCustomizationView = new CharacterCustomizationView(this, infoFile, contentWidth, contentHeight);
         userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
         chatCustomizationView = new ChatCustomizationView(this, infoFile, contentWidth, contentHeight);
+        finishCharacterCreatorView = new FinishCharacterCreatorView(this, infoFile, contentWidth, contentHeight);
+
         currentView = characterCustomizationView;
 
         displayContent.addElement(buildChecklist());
@@ -126,7 +129,7 @@ public class CharacterCreator extends EmptyContainer {
         root.addElement(finishButton);
         finishButton.onClick(_ -> {
             displayContent.removeElement(displayContent.getElements().lastKey());
-            displayContent.addElement(new FinishCharacterCreatorView(this, infoFile, contentWidth, contentHeight));
+            displayContent.addElement(finishCharacterCreatorView);
             currentView = userCustomizationView;
         });
 
@@ -142,6 +145,10 @@ public class CharacterCreator extends EmptyContainer {
                     // View chat
                     displayContent.removeElement(displayContent.getElements().lastKey());
                     displayContent.addElement(chatCustomizationView);
+                    currentView = chatCustomizationView;
+                } else if (currentView == chatCustomizationView) {
+                    displayContent.removeElement(displayContent.getElements().lastKey());
+                    displayContent.addElement(finishCharacterCreatorView);
                     currentView = chatCustomizationView;
                 }
             });
