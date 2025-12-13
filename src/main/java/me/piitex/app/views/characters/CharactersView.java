@@ -37,11 +37,11 @@ public class CharactersView {
     private final ScrollContainer root;
 
     public CharactersView() {
-        VerticalLayout layout = new VerticalLayout(-1, App.getInstance().getAppSettings().getHeight());
-        layout.addStyle(Styles.BG_INSET);
-
         AppSettings appSettings = App.getInstance().getAppSettings();
-        layout.setMaxSize(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, 0);
+
+        VerticalLayout layout = new VerticalLayout(-1, -1);
+        layout.setMaxSize(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, layout.getHeight());
+        layout.addStyle(Styles.BG_INSET);
         layout.setSpacing(20);
 
         int imageWidth;
@@ -57,8 +57,8 @@ public class CharactersView {
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 0, 0, layout.getMaxWidth(), -1);
-            root.setMaxSize(root.getWidth(), appSettings.getHeight());
+            root = new ScrollContainer(layout, 0, 0, layout.getMaxWidth(), appSettings.getHeight() - 50);
+            root.setMaxSize(root.getWidth(), root.getHeight());
             imageWidth = 256;
             imageHeight = 256;
             cardWidth = 280;
@@ -70,8 +70,6 @@ public class CharactersView {
 
 
         FlowLayout base = new FlowLayout(root.getWidth(), -1);
-        base.setX(20);
-        base.setY(20);
         base.setVerticalSpacing(20);
         base.setHorizontalSpacing(20);
 
@@ -240,14 +238,12 @@ public class CharactersView {
         progressContainer.addElement(new LoadingView("Loading character data...", progressContainer.getWidth(), progressContainer.getHeight()));
         App.window.addContainer(progressContainer);
 
-        Character duplicated = new Character(newId, null);
         App.getThreadPoolManager().submitTask(() -> {
-            duplicated.copy(character);
-            CharacterEditView editView = new CharacterEditView(duplicated, true);
-            Node assemble = editView.getRoot().assemble();
+            CharacterCreator characterCreator = new CharacterCreator(character, character.getUser());
+            Node assemble = characterCreator.assemble();
             Platform.runLater(() -> {
                 App.window.clearContainers();
-                App.window.addContainer(editView.getRoot(), assemble);
+                App.window.addContainer(characterCreator, assemble);
             });
         });
     }
