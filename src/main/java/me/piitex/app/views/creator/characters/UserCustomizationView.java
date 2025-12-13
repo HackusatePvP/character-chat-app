@@ -163,7 +163,7 @@ public class UserCustomizationView extends EmptyContainer  {
         description.addStyle(Styles.TEXT_LIGHTER);
         wrapper.addElement(description);
 
-        userPersonaInput = new RichTextAreaOverlay("", 720, -1);
+        userPersonaInput = new RichTextAreaOverlay(infoFile.getOrDefault("user-persona", ""), 720, -1);
         userPersonaInput.setMaxSize(userPersonaInput.getWidth(), userPersonaInput.getHeight());
         userPersonaInput.setBackgroundColor(App.getInstance().getAppSettings().getThemeDefaultColor(App.getInstance().getAppSettings().getTheme()));
         userPersonaInput.setBorderColor(App.getInstance().getAppSettings().getThemeBorderColor(App.getInstance().getAppSettings().getTheme()));
