@@ -30,7 +30,6 @@ public class ConfigureModelView extends VerticalLayout {
         addStyle(Styles.BG_DEFAULT);
         setAlignment(Pos.CENTER);
 
-
         init();
     }
 
@@ -74,11 +73,10 @@ public class ConfigureModelView extends VerticalLayout {
         ButtonOverlay next = new ButtonBuilder("next").setText("Next").addStyle(Styles.BUTTON_OUTLINED).addStyle(Styles.SUCCESS).build();
         addElement(next);
         next.onClick(event -> {
+            App.reloadModelList();
             parent.getRoot().removeAllElements();
             parent.getRoot().addElement(new GPUSetupView(parent));
         });
-
-
     }
 
     private void handleClick(TextFieldOverlay modelPath) {
