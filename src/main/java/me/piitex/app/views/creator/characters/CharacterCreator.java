@@ -1,11 +1,11 @@
 package me.piitex.app.views.creator.characters;
 
 import atlantafx.base.theme.Styles;
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
+import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
@@ -18,6 +18,7 @@ import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.IconOverlay;
 import me.piitex.engine.overlays.TextOverlay;
 import me.piitex.os.configurations.InfoFile;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kordamp.ikonli.material2.Material2AL;
 
@@ -52,6 +53,10 @@ public class CharacterCreator extends EmptyContainer {
     private final double contentWidth = appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350;
     private final double contentHeight = appSettings.getHeight();
 
+    /**
+     * Construtor for editing or creating a character
+     * @param character If null a new character will be created. Else it will be editing an existing character.
+     */
     public CharacterCreator(@Nullable Character character) {
         // Two buttons that will guide through either the character or user view.
         super(800, 600);
@@ -66,13 +71,30 @@ public class CharacterCreator extends EmptyContainer {
         } else {
             infoFile = new InfoFile();
         }
-        setWidth(appSettings.getWidth());
-        setHeight(appSettings.getHeight());
-        addStyle(Styles.BG_INSET);
+        init();
+    }
+
+    /**
+     * Constructor for duplicating a character.
+     * @param character The {@link Character} to be duplicated.
+     * @param user the {@link User} to be duplicated.
+     */
+    public CharacterCreator(@NotNull Character character, User user) {
+        super(800, 600);
+        this.character = null;
+        infoFile = InfoFile.copy(character.getInfoFile());
+        infoFile.set("id", character.getId() + " (copy)");
+        infoFile.set("user-display-name", user.getDisplayName());
+        infoFile.set("user-icon-path", user.getIconPath());
+        infoFile.set("user-persona", user.getPersona());
         init();
     }
 
     public void init() {
+        setWidth(appSettings.getWidth());
+        setHeight(appSettings.getHeight());
+        addStyle(Styles.BG_INSET);
+
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         layout.addStyle(Styles.BG_INSET);
         layout.addElement(new SidebarView(false));
