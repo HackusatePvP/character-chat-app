@@ -47,7 +47,7 @@ public class TopControlBox extends HorizontalLayout {
 
     public void buildTopControls() {
         IconOverlay undo = new IconOverlay(Material2MZ.UNDO);
-        undo.addStyle(Styles.DANGER);
+        undo.setColor(Color.RED);
         undo.setTooltip("Undo the last message.");
         addElement(undo);
         undo.onClick(event -> {
@@ -110,7 +110,7 @@ public class TopControlBox extends HorizontalLayout {
         });
 
         IconOverlay impersonate = new IconOverlay(Material2AL.BRUSH);
-        impersonate.addStyle(Styles.ACCENT);
+        impersonate.setColor(Color.MAGENTA);
         impersonate.setTooltip("Generate your response.");
         addElement(impersonate);
         impersonate.onClick(event -> {
@@ -118,7 +118,7 @@ public class TopControlBox extends HorizontalLayout {
         });
 
         IconOverlay addMedia = new IconOverlay(Material2AL.ADD);
-        addMedia.addStyle(Styles.WARNING);
+        addMedia.setColor(Color.LIGHTGREEN);
         addMedia.setTooltip("Attach an image to your prompt.");
         addElement(addMedia);
         addMedia.onClick(event -> {

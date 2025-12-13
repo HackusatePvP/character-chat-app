@@ -7,6 +7,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import me.piitex.app.App;
 import me.piitex.app.backend.*;
@@ -48,6 +49,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
 
         IconOverlay copy = new IconOverlay(Material2AL.CONTENT_COPY);
         copy.setTooltip("Copy text to clipboard.");
+        copy.setColor(Color.GREEN);
         addElement(copy);
         copy.onClick(event -> {
             Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -67,10 +69,9 @@ public class ButtonBoxLayout extends HorizontalLayout {
         });
 
         IconOverlay edit = new IconOverlay(Material2AL.EDIT);
-        edit.addStyle(Styles.ACCENT);
+        edit.setColor(Color.BLUE);
         edit.setTooltip("Edit the message.");
         addElement(edit);
-
         edit.onClick(event -> {
             ChatMessage originalMessage = chat.getMessage(index);
 
@@ -125,7 +126,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
         });
 
         IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
-        delete.addStyle(Styles.DANGER);
+        delete.setColor(Color.RED);
         delete.setTooltip("Delete the message.");
         addElement(delete);
         delete.onClick(event -> {
@@ -138,7 +139,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
         String firstMsg = (character.getFirstMessage() == null || character.getFirstMessage().isEmpty() ? "null" : character.getFirstMessage());
         if (chatMessage.getSender() == Role.ASSISTANT && !firstMsg.equalsIgnoreCase(chatMessage.getContent())) {
             IconOverlay regenerate = new IconOverlay(Material2MZ.REFRESH);
-            regenerate.addStyle(Styles.WARNING);
+            regenerate.setColor(Color.YELLOW);
             regenerate.setTooltip("Regenerate the response.");
             addElement(regenerate);
             regenerate.onClick(_ -> {
