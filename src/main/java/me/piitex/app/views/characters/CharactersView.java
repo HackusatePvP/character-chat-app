@@ -215,9 +215,11 @@ public class CharactersView {
         App.window.addContainer(progressContainer);
 
         App.getThreadPoolManager().submitTask(() -> {
+            CharacterCreator characterCreator = new CharacterCreator(character);
+            Node assemble = characterCreator.assemble();
             Platform.runLater(() -> {
                 App.window.clearContainers();
-                App.window.addContainer(new CharacterCreator(character));
+                App.window.addContainer(characterCreator, assemble);
             });
         });
     }
