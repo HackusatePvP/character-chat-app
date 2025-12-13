@@ -61,12 +61,9 @@ public class FinishCharacterCreatorView extends EmptyContainer {
         ButtonOverlay submit = new ButtonBuilder("submit").setGraphic(buildFinishButton(400)).addStyle(Styles.SUCCESS).addStyle(Styles.BUTTON_OUTLINED).build();
         root.addElement(submit);
         submit.onClick(event -> {
-            System.out.println("Character: " + parent.getCharacter());
-
             if (!validate()) {
                 return;
             }
-            
             Character character;
             if (parent.getCharacter() != null) {
                 // Character is being updated.
