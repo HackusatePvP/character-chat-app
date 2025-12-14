@@ -119,6 +119,10 @@ public class CharacterCreator extends EmptyContainer {
 
         // Character Customization will be displayed first.
         displayContent.addElement(characterCustomizationView);
+
+        // Check validations, if this is a new character all the indicators will be red.
+        // If this is an existing character it will validate each section.
+        revalidate();
     }
 
     private VerticalLayout buildChecklist() {
