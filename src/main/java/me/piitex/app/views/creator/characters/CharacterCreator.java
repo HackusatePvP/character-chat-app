@@ -47,8 +47,8 @@ public class CharacterCreator extends EmptyContainer {
     private CharacterCustomizationView characterCustomizationView;
     private UserCustomizationView userCustomizationView;
     private ChatCustomizationView chatCustomizationView;
-    private List<File> importedChatFiles = new ArrayList<>();
     private Container currentView;
+    private final List<File> importedChatFiles = new ArrayList<>();
 
     // Calculated sizing for panel content
     private final double contentWidth = appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350;
