@@ -28,4 +28,5 @@ module me.piitex.app {
     exports me.piitex.app.backend;
     exports me.piitex.app.backend.server;
     exports me.piitex.app.configuration;
+    exports me.piitex.app.views;
 }
