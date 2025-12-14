@@ -37,6 +37,7 @@ public class CharacterCreator extends EmptyContainer {
     private IconOverlay characterIcon;
     private IconOverlay userIcon;
     private IconOverlay chatIcon;
+    private IconOverlay finishIcon;
     private ButtonOverlay submission;
 
     // Display content holds the configuration tab
@@ -235,10 +236,10 @@ public class CharacterCreator extends EmptyContainer {
         HorizontalLayout root = new HorizontalLayout(width, 0);
         root.setSpacing(20);
 
-        chatIcon = new IconOverlay(Material2AL.CHECK_CIRCLE_OUTLINE);
-        chatIcon.setColor(Color.rgb(50, 50, 50,0.5));
-        chatIcon.setIconSize(26);
-        root.addElement(chatIcon);
+        finishIcon = new IconOverlay(Material2AL.CHECK_CIRCLE_OUTLINE);
+        finishIcon.setColor(Color.rgb(50, 50, 50,0.5));
+        finishIcon.setIconSize(26);
+        root.addElement(finishIcon);
 
         TextOverlay textOverlay = new TextOverlay("Finish Character");
         textOverlay.addStyle(Styles.TITLE_4);
