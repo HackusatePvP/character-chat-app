@@ -250,7 +250,7 @@ public class CharacterCreator extends EmptyContainer {
     public void revalidate() {
         boolean characterFailed = false;
         boolean userFailed = false;
-        if (characterCustomizationView.getCharacterIdInput().getCurrentText().isEmpty()) {
+        if (characterCustomizationView.getCharacterIdInput().isEnabled() && characterCustomizationView.getCharacterIdInput().getTextField().isEditable() && characterCustomizationView.getCharacterIdInput().getCurrentText().isEmpty()) {
             characterFailed = true;
         }
         if (characterCustomizationView.getCharacterDisplayInput().getCurrentText().isEmpty()) {
@@ -272,12 +272,17 @@ public class CharacterCreator extends EmptyContainer {
             getUserIcon().setColor(Color.GREEN);
         }
 
+        // Chat will always be green
+        chatIcon.setColor(Color.GREEN);
+
         if (characterFailed || userFailed) {
             getSubmission().getButton().getStyleClass().removeAll(Styles.SUCCESS);
             getSubmission().getButton().getStyleClass().add(Styles.DANGER);
+            finishIcon.setColor(Color.RED);
         } else {
             getSubmission().getButton().getStyleClass().removeAll(Styles.DANGER);
             getSubmission().getButton().getStyleClass().add(Styles.SUCCESS);
+            finishIcon.setColor(Color.GREEN);
         }
     }
 
