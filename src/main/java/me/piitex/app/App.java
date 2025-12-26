@@ -206,13 +206,6 @@ public class App extends FXLoad {
         logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
         logger.info("Screen Size ({},{})", dimension.width, dimension.height);
 
-
-        // Disable image caching.
-        // Useful for most apps but not this one
-        // Causes issues when changing a user or character image as the path will remain the same.
-        // This is because the pathing for the image doesn't change but the image gets replaced by the new image.
-        ImageLoader.useCache = false;
-
         File logo = new File(getExecutedDirectory(), "logo.png");
         window = new WindowBuilder("Chat App").setIcon(new ImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
