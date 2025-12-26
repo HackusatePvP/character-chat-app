@@ -404,10 +404,16 @@ public class App extends FXLoad {
         //applicationUpdater.checkForUpdates();
 
         App.logger.info("Checking for backend version...");
-        File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
-        if (backendVersionFile != null) {
-            backendUpdater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
 
+        if (settings.getDevice().equals("error")) {
+            App.logger.info("Could not load backend devices. Force checking updates...");
+            settings.setDevice("Auto");
+            backendUpdater = new BackendUpdater("0");
+        } else {
+            File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+            if (backendVersionFile != null) {
+                backendUpdater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+            }
         }
         App.logger.info("Finished updates.");
     }
