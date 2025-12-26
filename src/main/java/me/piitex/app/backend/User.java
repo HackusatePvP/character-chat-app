@@ -1,6 +1,6 @@
 package me.piitex.app.backend;
 
-import com.drew.lang.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.loaders.ImageLoader;

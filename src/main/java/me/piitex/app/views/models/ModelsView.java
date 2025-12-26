@@ -1,7 +1,7 @@
 package me.piitex.app.views.models;
 
 import atlantafx.base.theme.Styles;
-import com.drew.lang.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;

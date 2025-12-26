@@ -1,6 +1,6 @@
 package me.piitex.app.utils;
 
-import com.drew.lang.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;

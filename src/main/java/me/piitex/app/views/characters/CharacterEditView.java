@@ -1,7 +1,7 @@
 package me.piitex.app.views.characters;
 
 import atlantafx.base.theme.Styles;
-import com.drew.lang.annotations.Nullable;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -30,6 +30,7 @@ import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;

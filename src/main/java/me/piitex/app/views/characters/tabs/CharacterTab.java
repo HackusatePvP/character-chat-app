@@ -3,7 +3,7 @@ package me.piitex.app.views.characters.tabs;
 import atlantafx.base.controls.Popover;
 import atlantafx.base.theme.Styles;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.lang.annotations.Nullable;
+
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
@@ -24,8 +24,8 @@ import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.app.backend.Character;
 import org.json.JSONObject;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
