@@ -236,31 +236,6 @@ public class App extends FXLoad {
 
             icon.show();
         }
-
-        // Sub thread as not to block JavaFX from initializing.
-        // Scans models and starts backend server.
-        App.getThreadPoolManager().submitTask(() -> {
-            try {
-                new DeviceProcess(App.getInstance().getSettings().getBackend());
-            } catch (IOException e) {
-                App.logger.error("Could not scan for devices!", e);
-            }
-            Model model = App.getInstance().getSettings().getGlobalModel();
-            if (model == null) {
-                for (Model model1 : App.getModels("exclude")) {
-                    App.logger.info("Loading base model: {}", model1.getFile().getAbsolutePath());
-                    if (model1.getSettings().isDefault()) {
-                        model = model1;
-                        break;
-                    }
-                }
-            }
-
-            if (model != null) {
-                // Run Server.
-                new ServerProcess(model);
-            }
-        });
     }
 
     private void setupDirectories() {
