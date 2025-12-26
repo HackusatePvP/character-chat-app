@@ -146,6 +146,11 @@
             <artifactId>plexus-archiver</artifactId>
             <version>4.10.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>6.9.1</version>
+        </dependency>
     </dependencies>
 
     <build>
