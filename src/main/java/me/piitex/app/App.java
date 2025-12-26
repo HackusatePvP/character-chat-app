@@ -124,6 +124,7 @@ public class App extends FXLoad {
             App.logger.info("Finished pre-initialization.");
             loading = false;
         });
+        threadPoolManager.submitTask(this::loadBackendServer);
     }
 
     @Override
@@ -137,6 +138,14 @@ public class App extends FXLoad {
         // Check for updates first.
         // Will not perform updates when using App.main(); This prevents development builds from being backported.
         getThreadPoolManager().submitTask(() -> {
+
+            try {
+                new DeviceProcess(App.getInstance().getSettings().getBackend());
+            } catch (IOException e) {
+                App.logger.error("Could not scan for devices!", e);
+                settings.setDevice("error");
+            }
+
             if (Main.app || Main.run) {
                 performUpdates();
             } else {
@@ -262,7 +271,7 @@ public class App extends FXLoad {
     }
 
     private void setupDirectories() {
-        App.logger.info("Operating System: {} version: {}", OSUtil.getOS(), OSUtil.getVersion());
+        App.logger.info("Operating System: {}", OSUtil.getOS());
 
         if (getAppDirectory().mkdirs()) {
             logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
@@ -320,6 +329,11 @@ public class App extends FXLoad {
                 stage.close();
                 stage.getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
 
+                // Reset cached nodes
+                for (Character character : App.getInstance().getCharacters().values()) {
+                    character.getChatViewCachedNodes().clear();
+                }
+
                 start(new Stage());
             }
         });
@@ -327,6 +341,25 @@ public class App extends FXLoad {
 
     public boolean isLoading() {
         return loading;
+    }
+
+    public void loadBackendServer() {
+        Model model = App.getInstance().getSettings().getGlobalModel();
+        if (model == null) {
+            for (Model model1 : App.getModels("exclude")) {
+                App.logger.info("Loading base model: {}", model1.getFile().getAbsolutePath());
+                if (model1.getSettings().isDefault()) {
+                    model = model1;
+                    break;
+                }
+            }
+        }
+
+        if (model != null) {
+            // Run Server.
+            new ServerProcess(model);
+        }
+
     }
 
     public void loadCharacters() {
