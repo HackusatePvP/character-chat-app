@@ -114,7 +114,7 @@ public class UserLoreBookTab extends Tab {
         entryKey.setEnabled(false); // Make key read-only
         card.setHeader(entryKey);
 
-        TextAreaOverlay entryValue = new TextAreaOverlay(userEditView.getLoreBook().get(key), 0, 0, 400, 200);
+        TextAreaOverlay entryValue = new TextAreaOverlay(userEditView.getLoreBook().get(key), "", 400, 200);
         entryValue.onInputSetEvent(event -> userEditView.getLoreBook().put(key, event.getInput()));
         card.setBody(entryValue);
 

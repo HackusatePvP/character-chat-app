@@ -121,7 +121,7 @@ public class LorebookTab extends Tab {
         entryKey.setEnabled(false); // Make key read-only
         card.setHeader(entryKey);
 
-        TextAreaOverlay entryValue = new TextAreaOverlay(loreItems.get(key), 0, 0, 400, 200);
+        TextAreaOverlay entryValue = new TextAreaOverlay(loreItems.get(key), "", 400, 200);
         entryValue.onInputSetEvent(event -> {
             loreItems.put(key, event.getInput());
             parentView.warnTokens();
