@@ -1,10 +1,10 @@
-package me.piitex.app.views.chats.components;
+package me.piitex.app.views.chatsdep.components;
 
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Role;
-import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.chatsdep.ChatView;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.VerticalLayout;
 

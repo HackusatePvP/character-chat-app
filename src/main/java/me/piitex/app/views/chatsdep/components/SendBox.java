@@ -1,10 +1,10 @@
-package me.piitex.app.views.chats.components;
+package me.piitex.app.views.chatsdep.components;
 
 import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.chatsdep.ChatView;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.ButtonOverlay;

@@ -1,4 +1,4 @@
-package me.piitex.app.views.chats.components;
+package me.piitex.app.views.chatsdep.components;
 
 import atlantafx.base.controls.Card;
 import atlantafx.base.layout.ModalBox;
@@ -13,7 +13,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.*;
 import me.piitex.app.backend.Character;
 import me.piitex.app.utils.Placeholder;
-import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.chatsdep.ChatView;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.ModalContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -90,7 +90,7 @@ public class ButtonBoxLayout extends HorizontalLayout {
             verticalLayout.addStyle(Styles.BG_INSET);
 
             verticalLayout.addElement(new TextOverlay("Edit Message"));
-            TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(contentForEdit), 0, 0, 400, 300);
+            TextAreaOverlay area = new TextAreaOverlay(Placeholder.retrieveOriginalText(contentForEdit), "", 400, 300);
             verticalLayout.addElement(area);
 
             ButtonOverlay submit = new ButtonBuilder("submit").setText("Submit").build();

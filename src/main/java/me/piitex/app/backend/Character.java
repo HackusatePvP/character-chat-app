@@ -1,9 +1,8 @@
 package me.piitex.app.backend;
 
-import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.ModelSettings;
-import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.chatsdep.ChatView;
 import me.piitex.engine.maps.LimitedHashMap;
 import me.piitex.os.configurations.InfoFile;
 
@@ -15,18 +14,17 @@ public class Character {
     private String displayName = "";
     private String persona = "";
     private String iconPath = "";
+    
     @Nullable
     private User user = null;
 
     private String firstMessage = "";
     private String chatScenario = "";
-
     private Chat lastChat;
 
     private boolean override = false;
     private String model;
     private ModelSettings modelSettings;
-
     private InfoFile infoFile;
 
     private Map<String, String> lorebook = new TreeMap<>();

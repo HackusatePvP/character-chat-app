@@ -1,4 +1,4 @@
-package me.piitex.app.views.chats.components;
+package me.piitex.app.views.chatsdep.components;
 
 import atlantafx.base.theme.Styles;
 import javafx.scene.Node;
@@ -12,7 +12,7 @@ import me.piitex.app.backend.Role;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.ChatUtil;
-import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.chatsdep.ChatView;
 import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -27,8 +27,6 @@ import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
 import java.io.IOException;
-
-import static me.piitex.app.views.Positions.CHAT_VIEW_SELECTION_X;
 
 public class TopControlBox extends HorizontalLayout {
     private final Chat chat;

@@ -1,4 +1,4 @@
-package me.piitex.app.views.chats.components;
+package me.piitex.app.views.chatsdep.components;
 
 import me.piitex.app.backend.ChatMessage;
 import me.piitex.engine.layouts.TitledLayout;
