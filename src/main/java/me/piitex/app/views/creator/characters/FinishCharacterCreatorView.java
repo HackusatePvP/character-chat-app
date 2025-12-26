@@ -89,7 +89,7 @@ public class FinishCharacterCreatorView extends EmptyContainer {
                 App.logger.error("Could not copy new character image!", e);
             }
             character.setIconPath(characterImage.getAbsolutePath());
-            character.setLorebook(compileCharacterLore());
+            character.setLorebook(parent.getCharacterCustomizationView().compileCharacterLore());
 
             User user = new User(infoFile.get("user-display-name"), new InfoFile(new File(character.getUserDirectory(), "user.info"), true));
             user.setDisplayName(infoFile.get("user-display-name"));
@@ -103,7 +103,7 @@ public class FinishCharacterCreatorView extends EmptyContainer {
                 App.logger.error("Could not copy new user image!", e);
             }
             user.setIconPath(userImage.getAbsolutePath());
-            user.setLorebook(compileUserLore());
+            user.setLorebook(parent.getUserCustomizationView().compileUserLore());
             character.setUser(user);
 
             character.setChatScenario(infoFile.getOrDefault("chat-scenario", ""));
@@ -114,64 +114,6 @@ public class FinishCharacterCreatorView extends EmptyContainer {
             App.window.clearContainers();
             App.window.addContainer(new HomeView());
         });
-    }
-
-    private TreeMap<String, String> compileCharacterLore() {
-        TreeMap<String, String> toReturn = new TreeMap<>();
-
-        for (Element element : parent.getCharacterCustomizationView().getLoreLayout().getElements().values()) {
-            // All entires are vertical layouts
-            VerticalLayout root = (VerticalLayout) element;
-
-            // The key is in the first horizontal layout at the first index.
-            HorizontalLayout horizontalLayout = (HorizontalLayout) root.getElements().firstEntry().getValue();
-
-            TextFieldOverlay loreKey = (TextFieldOverlay) horizontalLayout.getElements().firstEntry().getValue();
-            String key = loreKey.getCurrentText();
-            if (key == null || key.isEmpty()) {
-                continue;
-            }
-
-            // The value is the second index of the root
-            RichTextAreaOverlay loreValue = (RichTextAreaOverlay) root.getElements().lastEntry().getValue();
-            String value = loreValue.getCurrentText();
-            if (value == null || value.isEmpty()) {
-                continue;
-            }
-
-            toReturn.put(key, value);
-        }
-
-        return toReturn;
-    }
-
-    private TreeMap<String, String> compileUserLore() {
-        TreeMap<String, String> toReturn = new TreeMap<>();
-
-        for (Element element : parent.getUserCustomizationView().getLoreLayout().getElements().values()) {
-            // All entires are vertical layouts
-            VerticalLayout root = (VerticalLayout) element;
-
-            // The key is in the first horizontal layout at the first index.
-            HorizontalLayout horizontalLayout = (HorizontalLayout) root.getElements().firstEntry().getValue();
-
-            TextFieldOverlay loreKey = (TextFieldOverlay) horizontalLayout.getElements().firstEntry().getValue();
-            String key = loreKey.getCurrentText();
-            if (key == null || key.isEmpty()) {
-                continue;
-            }
-
-            // The value is the second index of the root
-            RichTextAreaOverlay loreValue = (RichTextAreaOverlay) root.getElements().lastEntry().getValue();
-            String value = loreValue.getCurrentText();
-            if (value == null || value.isEmpty()) {
-                continue;
-            }
-
-            toReturn.put(key, value);
-        }
-
-        return toReturn;
     }
 
     private HorizontalLayout buildDisplayBox() {
@@ -203,6 +145,10 @@ public class FinishCharacterCreatorView extends EmptyContainer {
             imageOverlay = User.getUserAvatar("", 256, 256);
         }
         layout.addElement(imageOverlay);
+
+        if (path.length() > 40) {
+            path = "..." + path.substring(path.length() - 40);
+        }
 
         TextOverlay textOverlay = new TextOverlay(path);
         textOverlay.addStyle(Styles.TEXT_SMALL);
