@@ -7,7 +7,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
+import me.piitex.app.backend.Character;
 import me.piitex.app.utils.CharacterCardImporter;
+import me.piitex.app.utils.ImageCardExporter;
+import me.piitex.engine.Element;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
@@ -23,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CharacterCustomizationView extends EmptyContainer {
     private final VerticalLayout root;
@@ -106,7 +110,7 @@ public class CharacterCustomizationView extends EmptyContainer {
 
         characterIdInput = new TextFieldOverlay((infoFile.hasKey("id") ? infoFile.get("id") : ""), "Character Id", 100, 35);
         characterId.setAction(characterIdInput);
-        characterIdInput.setEditable(parent.getCharacter() == null);
+        characterIdInput.setEnabled(parent.getCharacter() == null);
 
         TileContainer characterDisplay = new TileContainer(layout.getWidth(), 100);
         characterDisplay.setMaxSize(characterId.getWidth(), characterId.getHeight());
@@ -128,9 +132,29 @@ public class CharacterCustomizationView extends EmptyContainer {
         });
 
         if (parent.getCharacter() != null) {
+            Character character = parent.getCharacter();
             ButtonOverlay exportCharacter = new ButtonBuilder("exp").setText("Export Character").addStyle(Styles.ACCENT).build();
             exportCharacter.setY(-10);
             layout.addElement(exportCharacter);
+            exportCharacter.onClick(_ -> {
+                FileChooser chooser = new FileChooser();
+                chooser.setInitialFileName(character.getId() + ".png");
+                File file = chooser.showSaveDialog(App.window.getStage());
+                if (file != null) {
+                    String displayName = infoFile.get("display-name");
+                    String persona = infoFile.get("persona");
+                    String iconPath = infoFile.get("icon-path");
+                    character.setDisplayName(displayName);
+                    character.setPersona(persona);
+                    character.setIconPath(iconPath);
+                    character.setLorebook(compileCharacterLore());
+                    try {
+                        ImageCardExporter.exportCharacter(character, file);
+                    } catch (IOException e) {
+                        App.logger.error("Could not export character!", e);
+                    }
+                }
+            });
         } else {
             ButtonOverlay importCharacter = new ButtonBuilder("imp").setText("Import Character").addStyle(Styles.ACCENT).build();
             importCharacter.setY(-10);
@@ -390,5 +414,34 @@ public class CharacterCustomizationView extends EmptyContainer {
 
     public VerticalLayout getLoreLayout() {
         return loreLayout;
+    }
+
+    public TreeMap<String, String> compileCharacterLore() {
+        TreeMap<String, String> toReturn = new TreeMap<>();
+
+        for (Element element : getLoreLayout().getElements().values()) {
+            // All entires are vertical layouts
+            VerticalLayout root = (VerticalLayout) element;
+
+            // The key is in the first horizontal layout at the first index.
+            HorizontalLayout horizontalLayout = (HorizontalLayout) root.getElements().firstEntry().getValue();
+
+            TextFieldOverlay loreKey = (TextFieldOverlay) horizontalLayout.getElements().firstEntry().getValue();
+            String key = loreKey.getCurrentText();
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+
+            // The value is the second index of the root
+            RichTextAreaOverlay loreValue = (RichTextAreaOverlay) root.getElements().lastEntry().getValue();
+            String value = loreValue.getCurrentText();
+            if (value == null || value.isEmpty()) {
+                continue;
+            }
+
+            toReturn.put(key, value);
+        }
+
+        return toReturn;
     }
 }

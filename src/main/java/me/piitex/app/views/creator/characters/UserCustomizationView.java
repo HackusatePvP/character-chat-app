@@ -7,7 +7,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
+import me.piitex.app.backend.User;
+import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.utils.UserCardImporter;
+import me.piitex.engine.Element;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
@@ -23,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class UserCustomizationView extends EmptyContainer  {
     private final VerticalLayout root;
@@ -107,10 +111,31 @@ public class UserCustomizationView extends EmptyContainer  {
             parent.revalidate();
         });
 
-        if (parent.getCharacter() != null) {
+        if (parent.getCharacter() != null && parent.getCharacter().getUser() != null) {
+            User user = parent.getCharacter().getUser();
+
             ButtonOverlay exportUser = new ButtonBuilder("exp").setText("Export User").addStyle(Styles.ACCENT).build();
             exportUser.setY(-10);
             layout.addElement(exportUser);
+            exportUser.onClick(_ -> {
+                FileChooser chooser = new FileChooser();
+                chooser.setInitialFileName(user.getId() + ".png");
+                File file = chooser.showSaveDialog(App.window.getStage());
+                if (file != null) {
+                    String displayName = infoFile.get("user-display-name");
+                    String persona = infoFile.get("user-persona");
+                    String iconPath = infoFile.get("user-icon-path");
+                    user.setDisplayName(displayName);
+                    user.setPersona(persona);
+                    user.setIconPath(iconPath);
+                    user.setLorebook(compileUserLore());
+                    try {
+                        ImageCardExporter.exportUser(user, file);
+                    } catch (IOException e) {
+                        App.logger.error("Could not export user!", e);
+                    }
+                }
+            });
         } else {
             ButtonOverlay importUser = new ButtonBuilder("imp").setText("Import User").addStyle(Styles.ACCENT).build();
             importUser.setY(-10);
@@ -358,5 +383,34 @@ public class UserCustomizationView extends EmptyContainer  {
 
     public VerticalLayout getLoreLayout() {
         return loreLayout;
+    }
+
+    public TreeMap<String, String> compileUserLore() {
+        TreeMap<String, String> toReturn = new TreeMap<>();
+
+        for (Element element : getLoreLayout().getElements().values()) {
+            // All entires are vertical layouts
+            VerticalLayout root = (VerticalLayout) element;
+
+            // The key is in the first horizontal layout at the first index.
+            HorizontalLayout horizontalLayout = (HorizontalLayout) root.getElements().firstEntry().getValue();
+
+            TextFieldOverlay loreKey = (TextFieldOverlay) horizontalLayout.getElements().firstEntry().getValue();
+            String key = loreKey.getCurrentText();
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+
+            // The value is the second index of the root
+            RichTextAreaOverlay loreValue = (RichTextAreaOverlay) root.getElements().lastEntry().getValue();
+            String value = loreValue.getCurrentText();
+            if (value == null || value.isEmpty()) {
+                continue;
+            }
+
+            toReturn.put(key, value);
+        }
+
+        return toReturn;
     }
 }
