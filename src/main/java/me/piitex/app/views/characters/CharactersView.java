@@ -3,7 +3,6 @@ package me.piitex.app.views.characters;
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -41,7 +40,6 @@ public class CharactersView {
 
         VerticalLayout layout = new VerticalLayout(-1, -1);
         layout.setMaxSize(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, layout.getHeight());
-        layout.addStyle(Styles.BG_INSET);
         layout.setSpacing(20);
 
         int imageWidth;
@@ -102,16 +100,12 @@ public class CharactersView {
 
             displayBox.setClickEvent(event -> {
                 if (event.getFxClick().getButton() == MouseButton.SECONDARY) {
-                    if (contextMenu.isShowing()) return;
-                    contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
-                }
-
-                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
-                    // Display progress
-                    App.window.clearContainers();
+//                    if (contextMenu.isShowing()) return;
+//                    contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
 
                     Chat chat = character.getLastChat();
-                    ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+                    //TODO Switch to new chat view.
+                    me.piitex.app.views.chatsdep.ChatView cachedView = character.getChatViewCachedNodes().get(chat);
                     if (chat != null && cachedView != null) {
                         Platform.runLater(() -> {
                             App.logger.info("Using cached chat view...");
@@ -124,7 +118,7 @@ public class CharactersView {
                         App.window.addContainer(progressContainer);
 
                         App.getThreadPoolManager().submitTask(() -> {
-                            ChatView chatView = new ChatView(character, chat);
+                            me.piitex.app.views.chatsdep.ChatView chatView = new me.piitex.app.views.chatsdep.ChatView(character, chat);
                             Node assemble = chatView.assemble();
                             Platform.runLater(() -> {
                                 App.window.clearContainers();
@@ -132,8 +126,14 @@ public class CharactersView {
                             });
                         });
                     }
+                }
 
+                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
+                    // Display progress
+                    App.window.clearContainers();
 
+                    ChatView chatView = new ChatView(character, character.getLastChat());
+                    App.window.addContainer(chatView);
                 }
             });
 
