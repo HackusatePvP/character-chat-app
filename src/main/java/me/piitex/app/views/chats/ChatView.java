@@ -37,7 +37,7 @@ public class ChatView extends EmptyContainer {
         layout.setSpacing(5);
         layout.addStyle(Styles.BG_INSET);
         layout.addElement(new ChatViewSidebar(this));
-        layout.addElement(new ChatPageView(this, layout.getWidth() - layout.getSpacing() - 150, layout.getHeight()));
+        layout.addElement(new ChatPageView(this, layout.getWidth() - layout.getSpacing() - 100, layout.getHeight()));
         addElement(layout);
     }
 

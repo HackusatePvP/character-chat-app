@@ -1,61 +1,87 @@
 package me.piitex.app.views.chats;
 
 import atlantafx.base.theme.Styles;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.text.TextAlignment;
 import me.piitex.app.App;
+import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Role;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.Placeholder;
-import me.piitex.engine.containers.EmptyContainer;
+import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
-import me.piitex.engine.overlays.ImageOverlay;
-import me.piitex.engine.overlays.TextFlowOverlay;
-import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.overlays.*;
 
 import java.io.File;
 
-public class ChatPageView extends EmptyContainer {
+import static me.piitex.app.views.Positions.CHAT_SEND_BOX_HEIGHT;
+import static me.piitex.app.views.Positions.CHAT_SEND_BOX_WIDTH;
+
+public class ChatPageView extends BorderContainer {
     private final ChatView parent;
-    private final VerticalLayout root;
+    private final VerticalLayout chatRoot;
 
     private static final AppSettings APP_SETTINGS = App.getInstance().getAppSettings();
 
     public ChatPageView(ChatView chatView, double width, double height) {
         super(width, height);
         setMaxSize(width, height);
+        addStyle(Styles.BG_INSET);
+
         this.parent = chatView;
+        chatRoot = new VerticalLayout(getWidth() - 20, -1);
+        chatRoot.setMaxSize(chatRoot.getWidth(), chatRoot.getHeight());
+        chatRoot.setAlignment(Pos.TOP_CENTER);
 
-        root = new VerticalLayout(getWidth() - 20, getHeight());
-        root.setMaxSize(root.getWidth(), root.getHeight());
-        root.setAlignment(Pos.TOP_CENTER);
-        root.addStyle(Styles.BG_INSET);
-
-        ScrollContainer container = new ScrollContainer(root, root.getWidth(), APP_SETTINGS.getHeight() - 20);
-        container.setMaxSize(root.getWidth(), root.getHeight());
+        ScrollContainer container = new ScrollContainer(chatRoot, chatRoot.getWidth(), -1);
+        container.setMaxSize(chatRoot.getWidth(), container.getHeight());
         container.setScrollWhenNeeded(false);
         container.setHorizontalScroll(false);
         container.setVerticalScroll(true);
         container.setScrollToBottom(true);
-        addElement(container);
+        setCenter(container);
 
-        init();
+        buildChatBoxes();
+
+        HorizontalLayout bottom = new HorizontalLayout(getWidth(), CHAT_SEND_BOX_HEIGHT);
+        bottom.setAlignment(Pos.CENTER);
+        bottom.setMaxSize(bottom.getWidth(), bottom.getHeight());
+        setBottom(bottom);
+
+        RichTextAreaOverlay send = new RichTextAreaOverlay("", "", CHAT_SEND_BOX_WIDTH - 50, CHAT_SEND_BOX_HEIGHT - 50);
+        send.setMaxSize(send.getWidth(), send.getHeight());
+        send.setBackgroundColor(APP_SETTINGS.getThemeDefaultColor(APP_SETTINGS.getTheme()));
+        send.setBorderColor(APP_SETTINGS.getThemeBorderColor(APP_SETTINGS.getTheme()));
+        send.setTextFill(APP_SETTINGS.getThemeTextColor(APP_SETTINGS.getTheme()));
+        send.addStyle(Styles.BG_DEFAULT);
+        send.addStyle(APP_SETTINGS.getChatTextSize());
+        send.addStyle(Styles.TEXT_ON_EMPHASIS);
+        bottom.addElement(send);
+
+        send.onSubmit(event -> {
+            System.out.println("Submitting response...");
+            generateResponse(send.getCurrentText());
+        });
+        send.onOverlaySubmit(event -> {
+            System.out.println("Submitted!");
+        });
     }
 
-    public void init() {
+    public void buildChatBoxes() {
         // Build chat messages
         for (ChatMessage chatMessage : parent.getChat().getMessages()) {
-            root.addElement(buildMessageBox(chatMessage));
+            chatRoot.addElement(buildMessageBox(chatMessage));
         }
     }
 
     public Layout buildMessageBox(ChatMessage chatMessage) {
-        VerticalLayout layout = new VerticalLayout(root.getWidth(), -1);
+        VerticalLayout layout = new VerticalLayout(chatRoot.getWidth(), -1);
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setAlignment(Pos.TOP_CENTER);
         layout.addStyle(Styles.BG_DEFAULT);
@@ -65,6 +91,10 @@ public class ChatPageView extends EmptyContainer {
         displayBox.setSpacing(50);
         displayBox.setMaxSize(displayBox.getWidth(), displayBox.getHeight());
         layout.addElement(displayBox);
+
+        SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
+        separator.setMaxWidth(displayBox.getWidth() - 20);
+        layout.addElement(separator);
 
         //TODO: Make Avatar circular
         int avatarSize = 128;
@@ -110,12 +140,24 @@ public class ChatPageView extends EmptyContainer {
         }
 
         String content = Placeholder.applyDynamicBBCode(chatMessage.getContent());
-        TextFlowOverlay chatFlow = new TextFlowOverlay(content, root.getWidth() - 40, -1);
+        TextFlowOverlay chatFlow = new TextFlowOverlay(content, chatRoot.getWidth() - 40, -1);
         chatFlow.setTextAlignment(TextAlignment.CENTER);
         chatFlow.addStyle(App.getInstance().getAppSettings().getChatTextSize());
         chatFlow.setMaxWidth(chatFlow.getWidth());
         layout.addElement(chatFlow);
 
         return layout;
+    }
+
+    public void generateResponse(String prompt) {
+
+        Chat chat = parent.getChat();
+        // TODO: Add image url and reasoning
+        ChatMessage userMessage = new ChatMessage(Role.USER, prompt, null, null);
+
+        // Add the user message and render the chat box
+        chat.addLine(userMessage);
+        chatRoot.addElement(buildMessageBox(userMessage));
+
     }
 }

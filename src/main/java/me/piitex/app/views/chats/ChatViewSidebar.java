@@ -33,7 +33,7 @@ public class ChatViewSidebar extends EmptyContainer {
     private static final AppSettings APP_SETTINGS = App.getInstance().getAppSettings();
 
     public ChatViewSidebar(ChatView chatView) {
-        super(250, SIDEBAR_HEIGHT);
+        super(200, SIDEBAR_HEIGHT);
         setMaxSize(getWidth(), getHeight());
         addStyle(Styles.BG_INSET);
         addStyle(Styles.BORDER_DEFAULT);
@@ -73,7 +73,7 @@ public class ChatViewSidebar extends EmptyContainer {
     }
 
     private VerticalLayout buildMiddleControls() {
-        VerticalLayout layout = new VerticalLayout(getWidth(), 400);
+        VerticalLayout layout = new VerticalLayout(getWidth(), 200);
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.addElement(buildCurrentChatSelection(layout));
         return layout;
