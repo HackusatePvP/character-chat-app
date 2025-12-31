@@ -102,7 +102,9 @@ public class FinishCharacterCreatorView extends EmptyContainer {
             } catch (IOException e) {
                 App.logger.error("Could not copy new user image!", e);
             }
-            user.setIconPath(userImage.getAbsolutePath());
+            if (newUserImage.exists()) {
+                user.setIconPath(newUserImage.getAbsolutePath());
+            }
             user.setLorebook(parent.getUserCustomizationView().compileUserLore());
             character.setUser(user);
 
