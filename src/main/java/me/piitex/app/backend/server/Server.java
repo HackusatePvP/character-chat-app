@@ -7,7 +7,7 @@ import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
-import me.piitex.app.views.chats.components.ReasoningLayout;
+import me.piitex.app.views.chatsdep.components.ReasoningLayout;
 import me.piitex.engine.Element;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.TitledLayout;
