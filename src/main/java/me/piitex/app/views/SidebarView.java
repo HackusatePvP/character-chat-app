@@ -11,7 +11,7 @@ import me.piitex.app.updater.BackendUpdater;
 import me.piitex.app.views.creator.CreatorView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
-import me.piitex.engine.containers.EmptyContainer;
+import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
@@ -19,12 +19,12 @@ import org.kordamp.ikonli.coreui.CoreUiBrands;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static me.piitex.app.views.Positions.*;
 
-public class SidebarView extends EmptyContainer {
-    private final VerticalLayout root;
+public class SidebarView extends BorderContainer {
 
     // Testing out consumer. Hopefully it's more efficient than interfaces.
     private Consumer<Boolean> onCollapseStateChange;
@@ -38,26 +38,15 @@ public class SidebarView extends EmptyContainer {
         addStyle(Styles.BG_INSET);
         addStyle(Styles.BORDER_DEFAULT);
 
-        root = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
-        root.setMaxSize(root.getWidth(), root.getHeight());
-        root.setAlignment(Pos.TOP_CENTER);
-        addElement(root);
-
-        init();
-    }
-
-    private void init() {
-        root.addElement(buildTopLayout());
-        root.addElement(buildBottomLayout());
+        setCenter(buildTopLayout());
+        setBottom(buildBottomLayout());
     }
 
     private VerticalLayout buildTopLayout() {
-
-        VerticalLayout top = new VerticalLayout(SIDEBAR_WIDTH, SIDEBAR_HEIGHT - 150);
+        VerticalLayout top = new VerticalLayout(SIDEBAR_WIDTH, -1);
         top.setMaxSize(top.getWidth(), top.getHeight());
         top.setAlignment(Pos.CENTER);
         top.setSpacing(25);
-        root.addElement(top);
 
         ButtonOverlay home = new ButtonBuilder("home").setText("Home").setIcon(new IconOverlay(Material2AL.HOME)).addStyle(Styles.FLAT).build();
         home.addStyle(appSettings.getGlobalTextSize());
