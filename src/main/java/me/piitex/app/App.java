@@ -413,6 +413,8 @@ public class App extends FXLoad {
             File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
             if (backendVersionFile != null) {
                 backendUpdater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+            } else {
+                backendUpdater = new BackendUpdater("0");
             }
         }
         App.logger.info("Finished updates.");
@@ -721,7 +723,7 @@ public class App extends FXLoad {
         }
 
         if (!Main.app && !Main.run) {
-            version = "v1.1.0";
+            version = "Open Sourced";
         }
 
         return version;
