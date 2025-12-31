@@ -51,7 +51,6 @@ public class TOSView extends VerticalLayout {
                 parent.getRoot().removeAllElements();
                 parent.getRoot().addElement(new UpdateView(parent));
             } else {
-                System.out.println("This page would be skipped!");
                 parent.getRoot().removeAllElements();
                 parent.getRoot().addElement(new ConfigureModelView(parent));
             }
