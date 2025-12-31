@@ -1,6 +1,7 @@
 package me.piitex.app.views;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -100,27 +101,34 @@ public class SidebarView extends BorderContainer {
     private VerticalLayout buildBottomLayout() {
         VerticalLayout layout = new VerticalLayout(0, -1);
         layout.setAlignment(Pos.BOTTOM_CENTER);
-        layout.setSpacing(15);
+        layout.setSpacing(5);
 
         SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
         separator.addStyle(Styles.ACCENT);
         layout.addElement(separator);
 
         // An update is available, display it.
-        BackendUpdater updater = App.getInstance().getBackendUpdater();
-        if (updater != null && updater.isUpdateAvailable()) {
-            App.logger.info("Adding update button.");
-            ButtonOverlay update = new ButtonBuilder("update").setText("Updates Available").setIcon(new IconOverlay(Material2MZ.SYSTEM_UPDATE_ALT)).addStyle(Styles.FLAT).build();
-            update.setWidth(rootWidth);
-            update.onClick(event -> {
-                if (!updater.startUpdate()) {
-                    App.logger.error("Could not start backend update!");
-                }
+        // To prevent a race condition, the task will be delayed.
+        App.getThreadPoolManager().submitSchedule(() -> {
+            Platform.runLater(() -> {
+                BackendUpdater updater = App.getInstance().getBackendUpdater();
+                if (updater != null && updater.isUpdateAvailable()) {
+                    App.logger.info("Backend Versions: {},{}", updater.getCurrent(), updater.getLatest());
+                    ButtonOverlay update = new ButtonBuilder("update").setText("Updates Available").setIcon(new IconOverlay(Material2MZ.SYSTEM_UPDATE_ALT)).addStyle(Styles.FLAT).build();
+                    update.setWidth(rootWidth);
+                    update.onClick(event -> {
+                        if (!updater.startUpdate()) {
+                            App.logger.error("Could not start backend update!");
+                        }
 
+                    });
+                    // FIXME: There is a bug with RenEngine which does not properly shuffle the indexes.
+                    layout.addElement(update, 1);
+                }
             });
-            layout.addElement(update);
-            layout.setSpacing(5);
-        }
+
+        }, 3, TimeUnit.SECONDS);
+
 
         layout.addElement(buildHelpLayout());
         layout.addElement(buildVersionLayout());
