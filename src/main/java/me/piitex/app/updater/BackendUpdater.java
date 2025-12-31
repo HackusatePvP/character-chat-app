@@ -1,7 +1,9 @@
 package me.piitex.app.updater;
 
+import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.ServerProcess;
@@ -47,6 +49,7 @@ public class BackendUpdater {
         String release = null;
         try {
             release = gitHubUtil.getLatestReleaseJson().getString("tag_name");
+            App.logger.info("Latest release: {}", release);
         } catch (IOException | URISyntaxException e) {
             App.logger.error("Could not fetch latest tag!", e);
         }
@@ -159,11 +162,27 @@ public class BackendUpdater {
                         @Override
                         public void onDownloadError(DownloadInfo info, Exception e) {
 
+                            Platform.runLater(() -> {
+                                container.removeElement(progressBarOverlay);
+
+                                textOverlay.setText("Download failed!");
+                                textOverlay.setTextFill(Color.RED);
+
+                                ButtonOverlay exit = new ButtonBuilder("ex").setText("Exit").addStyle(Styles.DANGER).build();
+                                exit.setX(50);
+                                exit.setY(50);
+                                exit.onClick(_ -> {
+                                    Platform.exit();
+                                    System.exit(0);
+                                });
+                                container.addElement(exit);
+                            });
+
                         }
 
                         @Override
                         public void onDownloadCancel(DownloadInfo info) {
-
+                            App.logger.error("Download cancelled!");
                         }
                     });
 
@@ -211,12 +230,26 @@ public class BackendUpdater {
 
                         @Override
                         public void onDownloadError(DownloadInfo info, Exception e) {
+                            Platform.runLater(() -> {
+                                container.removeElement(progressBarOverlay);
 
+                                textOverlay.setText("Download failed!");
+                                textOverlay.setTextFill(Color.RED);
+
+                                ButtonOverlay exit = new ButtonBuilder("ex").setText("Exit").addStyle(Styles.DANGER).build();
+                                exit.setX(50);
+                                exit.setY(50);
+                                exit.onClick(_ -> {
+                                    Platform.exit();
+                                    System.exit(0);
+                                });
+                                container.addElement(exit);
+                            });
                         }
 
                         @Override
                         public void onDownloadCancel(DownloadInfo info) {
-
+                            App.logger.error("Download cancelled!");
                         }
                     });
         } catch (IOException | URISyntaxException e) {
@@ -256,12 +289,26 @@ public class BackendUpdater {
 
                         @Override
                         public void onDownloadError(DownloadInfo info, Exception e) {
+                            Platform.runLater(() -> {
+                                container.removeElement(progressBarOverlay);
 
+                                textOverlay.setText("Download failed!");
+                                textOverlay.setTextFill(Color.RED);
+
+                                ButtonOverlay exit = new ButtonBuilder("ex").setText("Exit").addStyle(Styles.DANGER).build();
+                                exit.setX(50);
+                                exit.setY(50);
+                                exit.onClick(_ -> {
+                                    Platform.exit();
+                                    System.exit(0);
+                                });
+                                container.addElement(exit);
+                            });
                         }
 
                         @Override
                         public void onDownloadCancel(DownloadInfo info) {
-
+                            App.logger.error("Download cancelled!");
                         }
                     });
         } catch (IOException | URISyntaxException e) {
@@ -425,5 +472,13 @@ public class BackendUpdater {
         lastDownloadTime.set(currentTime);
 
         return newSmoothedSpeed; // Return the stable, smoothed value
+    }
+
+    public Version getCurrent() {
+        return current;
+    }
+
+    public Version getLatest() {
+        return latest;
     }
 }
