@@ -136,10 +136,14 @@ public class Server {
 
                 // Check for interruption and halts early
                 if (handleInterruption(response)) {
-                    throw new InterruptedException("Response generation was interrupted by user.");
+                    httpResponse.close(CloseMode.IMMEDIATE);
+                    client.close(CloseMode.IMMEDIATE);
+                    break;
                 }
                 if (response.isHalt()) {
                     App.logger.info("Halting response generation...");
+                    httpResponse.close(CloseMode.IMMEDIATE);
+                    client.close(CloseMode.IMMEDIATE);
                     break;
                 }
 
