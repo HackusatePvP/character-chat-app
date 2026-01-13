@@ -257,6 +257,10 @@ public class ServerProcess {
         parameters.add("-c");
         parameters.add(model.getSettings().getContextSize() + "");
 
+        if (model.getSettings().isContextShift()) {
+            parameters.add("--context-shift");
+        }
+
         // Server port and WebUI
         parameters.add("--port");
         parameters.add("8187");
