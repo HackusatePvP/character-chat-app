@@ -113,7 +113,7 @@ public class SidebarView extends BorderContainer {
             Platform.runLater(() -> {
                 BackendUpdater updater = App.getInstance().getBackendUpdater();
                 if (updater != null && updater.isUpdateAvailable()) {
-                    App.logger.info("Backend Versions: {},{}", updater.getCurrent(), updater.getLatest());
+                    App.logger.info("Backend Versions: {},{}", updater.getCurrent().getVersion(), updater.getLatest().getVersion());
                     ButtonOverlay update = new ButtonBuilder("update").setText("Updates Available").setIcon(new IconOverlay(Material2MZ.SYSTEM_UPDATE_ALT)).addStyle(Styles.FLAT).build();
                     update.setWidth(rootWidth);
                     update.onClick(event -> {
