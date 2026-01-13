@@ -233,12 +233,14 @@ public class UserCustomizationView extends EmptyContainer  {
         imageWrapper.setAlignment(Pos.CENTER);
         layout.addElement(imageWrapper);
 
-        ImageLoader imageLoader;
-        if (infoFile.hasKey("user-icon-path")) {
-            imageLoader = new ImageLoader(new File(infoFile.get("user-icon-path")));
-        } else {
-            imageLoader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
+        File image = new File(infoFile.getOrDefault("user-icon-path", new File(App.getExecutedDirectory(), "icons/character.png").getAbsolutePath()));
+
+        if (!image.exists() || image.isDirectory()) {
+            image = new File(App.getExecutedDirectory(), "icons/character.png");
         }
+
+        ImageLoader imageLoader = new ImageLoader(image);
+
         imageLoader.setWidth(imageSize);
         imageLoader.setHeight(imageSize);
 
@@ -270,7 +272,7 @@ public class UserCustomizationView extends EmptyContainer  {
         reset.onClick(_ -> {
             ImageLoader loader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
             userImage.setImage(loader);
-            infoFile.set("user-icon-path", imageLoader.getFile().getAbsolutePath());
+            infoFile.set("user-icon-path", loader.getFile().getAbsolutePath());
         });
 
 
