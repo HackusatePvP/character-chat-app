@@ -2,18 +2,17 @@ package me.piitex.app.views.chats;
 
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
+import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.LoadingView;
 import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.EmptyContainer;
-import me.piitex.engine.containers.ModalContainer;
 import me.piitex.engine.containers.StackContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.Layout;
@@ -21,6 +20,9 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +87,6 @@ public class ChatViewSidebar extends EmptyContainer {
 
         TextFieldOverlay currentChat = new TextFieldOverlay((parent.getChat() != null ? parent.getChatName() : ""), "", layout.getWidth(), container.getHeight());
         container.setMaxSize(container.getWidth(), currentChat.getHeight());
-        currentChat.setEditable(false);
         container.addElement(currentChat);
 
         IconOverlay downloadIcon = new IconOverlay(Material2AL.CLOUD_DOWNLOAD);
@@ -102,6 +103,38 @@ public class ChatViewSidebar extends EmptyContainer {
         renameIcon.setColor(Color.LIGHTGREEN);
         ButtonOverlay renameChat = new ButtonBuilder("rename").addStyle(Styles.FLAT).setIcon(renameIcon).build();
         renameChat.setTooltip("Rename Chat");
+        renameIcon.onClick(_ -> {
+            Character character = parent.getCharacter();
+            Chat chat = parent.getChat();
+
+            String name = (currentChat.getCurrentText().endsWith(".bin") ? currentChat.getCurrentText() : currentChat.getCurrentText() + ".bin");
+
+            if (name.equalsIgnoreCase(chat.getFile().getName())) {
+                currentChat.getTextField().requestFocus();
+                return;
+            }
+
+            // Rename the chat and reload the character.
+            File newChatFile = new File(character.getChatDirectory(), name);
+            try {
+                Files.copy(chat.getFile().toPath(), newChatFile.toPath());
+
+                // Release chat allocations
+                character.getChatViewCachedNodes().remove(chat);
+                character.getChats().remove(chat);
+                Files.delete(chat.getFile().toPath());
+
+                // Re-create chat with new file
+                Chat newChat = new Chat(newChatFile);
+                character.getChats().add(newChat);
+                character.setLastChat(newChat);
+
+                App.window.clearContainers();
+                App.window.addContainer(new ChatView(character, null));
+            } catch (IOException e) {
+                App.logger.error("Could not rename chat!", e);
+            }
+        });
 
         HorizontalLayout buttonLayout = new HorizontalLayout(layout.getWidth(), container.getHeight());
         buttonLayout.setAlignment(Pos.BOTTOM_RIGHT);
@@ -111,6 +144,7 @@ public class ChatViewSidebar extends EmptyContainer {
 
         List<String> chats = new ArrayList<>();
         for (Chat chat : parent.getCharacter().getChats()) {
+            System.out.println("Adding " + chat.getFile().getName() + " to selection");
             chats.add(chat.getFile().getName());
         }
 

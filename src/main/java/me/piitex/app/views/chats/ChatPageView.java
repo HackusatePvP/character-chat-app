@@ -7,9 +7,12 @@ import javafx.scene.text.TextAlignment;
 import me.piitex.app.App;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.ChatMessage;
+import me.piitex.app.backend.Response;
 import me.piitex.app.backend.Role;
+import me.piitex.app.backend.server.Server;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.Placeholder;
+import me.piitex.app.views.chats.components.ControlBarView;
 import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -17,8 +20,10 @@ import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 
 import static me.piitex.app.views.Positions.CHAT_SEND_BOX_HEIGHT;
 import static me.piitex.app.views.Positions.CHAT_SEND_BOX_WIDTH;
@@ -41,6 +46,7 @@ public class ChatPageView extends BorderContainer {
 
         ScrollContainer container = new ScrollContainer(chatRoot, chatRoot.getWidth(), -1);
         container.setMaxSize(chatRoot.getWidth(), container.getHeight());
+        container.setPannable(true);
         container.setScrollWhenNeeded(false);
         container.setHorizontalScroll(false);
         container.setVerticalScroll(true);
@@ -64,12 +70,8 @@ public class ChatPageView extends BorderContainer {
         send.addStyle(Styles.TEXT_ON_EMPHASIS);
         bottom.addElement(send);
 
-        send.onSubmit(event -> {
-            System.out.println("Submitting response...");
-            generateResponse(send.getCurrentText());
-        });
-        send.onOverlaySubmit(event -> {
-            System.out.println("Submitted!");
+        send.onSubmit(_ -> {
+            generateResponse(send.getCurrentText(), false);
         });
     }
 
@@ -80,7 +82,7 @@ public class ChatPageView extends BorderContainer {
         }
     }
 
-    public Layout buildMessageBox(ChatMessage chatMessage) {
+    public VerticalLayout buildMessageBox(ChatMessage chatMessage) {
         VerticalLayout layout = new VerticalLayout(chatRoot.getWidth(), -1);
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setAlignment(Pos.TOP_CENTER);
@@ -93,7 +95,7 @@ public class ChatPageView extends BorderContainer {
         layout.addElement(displayBox);
 
         SeparatorOverlay separator = new SeparatorOverlay(Orientation.HORIZONTAL);
-        separator.setMaxWidth(displayBox.getWidth() - 20);
+        separator.setMaxWidth(displayBox.getWidth() - 100);
         layout.addElement(separator);
 
         //TODO: Make Avatar circular
@@ -146,18 +148,52 @@ public class ChatPageView extends BorderContainer {
         chatFlow.setMaxWidth(chatFlow.getWidth());
         layout.addElement(chatFlow);
 
+        layout.addElement(new ControlBarView(this, layout, chatMessage, layout.getWidth(), 50));
+
         return layout;
     }
 
-    public void generateResponse(String prompt) {
-
+    public void generateResponse(String prompt, boolean update) {
         Chat chat = parent.getChat();
-        // TODO: Add image url and reasoning
-        ChatMessage userMessage = new ChatMessage(Role.USER, prompt, null, null);
+        // TODO: Add image url
 
-        // Add the user message and render the chat box
-        chat.addLine(userMessage);
-        chatRoot.addElement(buildMessageBox(userMessage));
+        ChatMessage charMessage;
+        VerticalLayout currentCharBox;
+        if (!update) {
+            ChatMessage userMessage = new ChatMessage(Role.USER, prompt, null, null);
+            chat.addLine(userMessage);
+            chatRoot.addElement(buildMessageBox(userMessage));
+        } else {
+            chat.removeMessage(chatRoot.getElements().size());
+        }
 
+        charMessage = new ChatMessage(Role.ASSISTANT, "", null, null);
+        chat.addLine(charMessage);
+
+        currentCharBox = buildMessageBox(charMessage);
+        chatRoot.addElement(currentCharBox);
+
+        Response response = new Response(chat.getMessages().size(), prompt, parent.getCharacter(), parent.getCharacter().getUser(), chat);
+
+        VerticalLayout finalCurrentCharBox = currentCharBox;
+        App.getThreadPoolManager().submitTask(() -> {
+            try {
+                String content = Server.generateResponseOAIStream(charMessage, finalCurrentCharBox, null, response);
+                response.setResponse(content);
+                charMessage.setContent(content);
+                chat.update();
+            } catch (IOException | InterruptedException e) {
+                App.logger.error("Could not generate response!", e);
+            }
+        });
+
+    }
+
+    public ChatView getParent() {
+        return parent;
+    }
+
+    public VerticalLayout getChatRoot() {
+        return chatRoot;
     }
 }
