@@ -66,7 +66,7 @@ public class ConfigureModelView extends VerticalLayout {
             handleClick(currentPath);
         });
 
-        layout.setClickEvent(event -> {
+        layout.onClick(event -> {
             handleClick(currentPath);
         });
 

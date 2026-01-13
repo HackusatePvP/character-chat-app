@@ -247,7 +247,7 @@ public class UserCustomizationView extends EmptyContainer  {
         userImage.setFitHeight(imageSize);
         imageWrapper.addElement(userImage);
 
-        imageWrapper.setClickEvent(_ -> {
+        imageWrapper.onClick(_ -> {
             FileChooser chooser = new FileChooser();
             chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Select an image.", "*.png", "*.jpg"));
 

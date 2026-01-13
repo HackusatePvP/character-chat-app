@@ -98,8 +98,8 @@ public class CharactersView {
             contextMenu.getItems().add(copy);
             contextMenu.getItems().add(delete);
 
-            displayBox.setClickEvent(event -> {
-                if (event.getFxClick().getButton() == MouseButton.SECONDARY) {
+            displayBox.onClick(event -> {
+                if (event.getHandler().getButton() == MouseButton.SECONDARY) {
 //                    if (contextMenu.isShowing()) return;
 //                    contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
 
@@ -128,7 +128,7 @@ public class CharactersView {
                     }
                 }
 
-                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
+                if (event.getHandler().getButton() == MouseButton.PRIMARY) {
                     // Display progress
                     App.window.clearContainers();
 
