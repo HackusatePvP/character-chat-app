@@ -35,7 +35,7 @@ public class HomeView extends EmptyContainer {
         }
         root.setSpacing(10);
         addElement(root);
-
+        addStyle(Styles.BG_INSET);
         init();
     }
 
