@@ -78,7 +78,7 @@ public class SetupRunnerView extends VerticalLayout {
     }
 
     private void startRunner() {
-        // This method is called asyncrhonously
+        // This method is called asynchronously
 
         // First download the model. Once the download finish it will call the next section.
         downloadSmallModel();
@@ -133,6 +133,22 @@ public class SetupRunnerView extends VerticalLayout {
         Platform.runLater(() -> {
             progressText.setText("Testing hardware configuration...");
         });
+
+        // Delete model-output if it already exists
+        File modelData = new File(App.getAppDirectory(), "model-output.txt");
+        if (modelData.exists()) {
+            if (modelData.delete()) {
+                App.logger.info("Deleted previous model data.");
+            }
+        }
+
+        // Delete current model configurations
+        for (File file : new File(App.getAppDirectory(), "models/").listFiles()) {
+            if (file.delete()) {
+                App.logger.info("Deleted {}.", file.getName());
+            }
+        }
+
         ServerProcess serverProcess = new ServerProcess(new Model(model));
 
         boolean loading = serverProcess.isLoading();
