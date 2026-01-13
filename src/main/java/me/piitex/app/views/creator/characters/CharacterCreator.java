@@ -7,6 +7,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
 import me.piitex.engine.containers.Container;
@@ -51,7 +52,7 @@ public class CharacterCreator extends EmptyContainer {
     private final List<File> importedChatFiles = new ArrayList<>();
 
     // Calculated sizing for panel content
-    private final double contentWidth = appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 350;
+    private final double contentWidth = appSettings.getWidth() - 300;
     private final double contentHeight = appSettings.getHeight();
 
     /**
@@ -96,14 +97,14 @@ public class CharacterCreator extends EmptyContainer {
         setHeight(appSettings.getHeight());
         addStyle(Styles.BG_INSET);
 
-        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        layout.addStyle(Styles.BG_INSET);
-        layout.addElement(new SidebarView(false));
-        addElement(layout);
+//        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
+//        layout.addStyle(Styles.BG_INSET);
+//        layout.addElement(new SidebarView(false));
+//        addElement(layout);
 
         VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 265, appSettings.getHeight());
         main.setSpacing(20);
-        layout.addElement(main);
+        addElement(main);
 
         displayContent = new HorizontalLayout(appSettings.getWidth(), appSettings.getHeight());
         displayContent.setSpacing(20);
@@ -126,10 +127,17 @@ public class CharacterCreator extends EmptyContainer {
     }
 
     private VerticalLayout buildChecklist() {
-        VerticalLayout root = new VerticalLayout(300, appSettings.getHeight());
+        VerticalLayout root = new VerticalLayout(250, appSettings.getHeight());
         root.setSpacing(40);
         root.addStyle(Styles.BORDER_SUBTLE);
         root.setAlignment(Pos.TOP_CENTER);
+
+        ButtonOverlay homeButton = new ButtonBuilder("home").setText("Home").addStyle(Styles.FLAT).build();
+        root.addElement(homeButton);
+        homeButton.onClick(_ -> {
+            App.window.clearContainers();
+            App.window.addContainer(new HomeView());
+        });
 
         ButtonOverlay characterButton = new ButtonBuilder("cc").setGraphic(buildCharacterButton(root.getWidth())).addStyle(Styles.FLAT).build();
         root.addElement(characterButton);
