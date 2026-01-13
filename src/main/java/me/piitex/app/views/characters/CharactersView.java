@@ -99,17 +99,15 @@ public class CharactersView {
             contextMenu.getItems().add(delete);
 
             displayBox.onClick(event -> {
-                if (event.getHandler().getButton() == MouseButton.SECONDARY) {
-//                    if (contextMenu.isShowing()) return;
-//                    contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
+                App.window.clearContainers();
 
+                if (event.getHandler().getButton() == MouseButton.PRIMARY) {
+                    // Display progress
                     Chat chat = character.getLastChat();
-                    //TODO Switch to new chat view.
-                    me.piitex.app.views.chatsdep.ChatView cachedView = character.getChatViewCachedNodes().get(chat);
+                    ChatView cachedView = character.getChatViewCachedNodes().get(chat);
                     if (chat != null && cachedView != null) {
                         Platform.runLater(() -> {
                             App.logger.info("Using cached chat view...");
-                            cachedView.resetTopControls();
                             App.window.addContainer(cachedView);
                         });
                     } else {
@@ -118,22 +116,14 @@ public class CharactersView {
                         App.window.addContainer(progressContainer);
 
                         App.getThreadPoolManager().submitTask(() -> {
-                            me.piitex.app.views.chatsdep.ChatView chatView = new me.piitex.app.views.chatsdep.ChatView(character, chat);
+                            ChatView chatView = new ChatView(character, chat);
+                            character.getChatViewCachedNodes().put(chat, chatView);
                             Node assemble = chatView.assemble();
                             Platform.runLater(() -> {
-                                App.window.clearContainers();
                                 App.window.addContainer(chatView, assemble);
                             });
                         });
                     }
-                }
-
-                if (event.getHandler().getButton() == MouseButton.PRIMARY) {
-                    // Display progress
-                    App.window.clearContainers();
-
-                    ChatView chatView = new ChatView(character, character.getLastChat());
-                    App.window.addContainer(chatView);
                 }
             });
 

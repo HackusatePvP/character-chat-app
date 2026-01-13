@@ -178,7 +178,7 @@ public class ChatPageView extends BorderContainer {
         VerticalLayout finalCurrentCharBox = currentCharBox;
         App.getThreadPoolManager().submitTask(() -> {
             try {
-                String content = Server.generateResponseOAIStream(charMessage, finalCurrentCharBox, null, response);
+                String content = Server.generateResponseOAIStream(finalCurrentCharBox, response);
                 response.setResponse(content);
                 charMessage.setContent(content);
                 chat.update();

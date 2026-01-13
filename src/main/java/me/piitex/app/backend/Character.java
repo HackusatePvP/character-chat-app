@@ -2,7 +2,7 @@ package me.piitex.app.backend;
 
 import me.piitex.app.App;
 import me.piitex.app.configuration.ModelSettings;
-import me.piitex.app.views.chatsdep.ChatView;
+import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.maps.LimitedHashMap;
 import me.piitex.os.configurations.InfoFile;
 import org.jetbrains.annotations.Nullable;
