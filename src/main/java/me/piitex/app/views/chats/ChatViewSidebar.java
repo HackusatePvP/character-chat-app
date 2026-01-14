@@ -151,7 +151,6 @@ public class ChatViewSidebar extends EmptyContainer {
 
         List<String> chats = new ArrayList<>();
         for (Chat chat : parent.getCharacter().getChats()) {
-            System.out.println("Adding " + chat.getFile().getName() + " to selection");
             chats.add(chat.getFile().getName());
         }
 
