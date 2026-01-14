@@ -72,6 +72,7 @@ public class ChatPageView extends BorderContainer {
 
         send.onSubmit(_ -> {
             generateResponse(send.getCurrentText(), false);
+            send.setCurrentText("");
         });
     }
 
