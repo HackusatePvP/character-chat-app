@@ -78,6 +78,13 @@ public class ChatViewSidebar extends EmptyContainer {
         VerticalLayout layout = new VerticalLayout(getWidth(), 200);
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.addElement(buildCurrentChatSelection(layout));
+
+        ButtonOverlay newChat = new ButtonBuilder("newchat").setText("New Chat").addStyle(Styles.FLAT).build();
+        layout.addElement(newChat);
+        newChat.onClick(_ -> {
+            App.window.clearContainers();
+            App.window.addContainer(new ChatView(parent.getCharacter(), null));
+        });
         return layout;
     }
 

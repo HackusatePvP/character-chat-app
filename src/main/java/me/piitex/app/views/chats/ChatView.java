@@ -24,13 +24,10 @@ public class ChatView extends EmptyContainer {
         super(APP_SETTINGS.getWidth(), APP_SETTINGS.getHeight());
         this.character = character;
         if (chat == null) {
-            if (character.getLastChat() != null) {
-                chat = character.getLastChat();
-            } else {
-                // Create a new chat
-                chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length + ".bin"));
-                character.setLastChat(chat);
-            }
+            // Create a new chat
+            chat = new Chat(new File(character.getChatDirectory(), "untitled-" + character.getChatDirectory().listFiles().length + ".bin"));
+            character.getChats().add(chat);
+            character.setLastChat(chat);
         }
         this.chat = chat;
         init();
