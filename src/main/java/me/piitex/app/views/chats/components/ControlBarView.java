@@ -8,6 +8,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.ChatMessage;
+import me.piitex.app.backend.Role;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.ChatPageView;
 import me.piitex.engine.PopupPosition;
@@ -115,21 +116,22 @@ public class ControlBarView extends HorizontalLayout {
             parent.getChatRoot().removeElement(root);
         });
 
-        IconOverlay regenerate = new IconOverlay(Material2MZ.REFRESH);
-        regenerate.setColor(Color.YELLOW);
-        regenerate.setTooltip("Regenerate the chat text.");
-        addElement(regenerate);
-        regenerate.onClick(_ -> {
-            String userPrompt = "";
+        if (chatMessage.getSender() == Role.ASSISTANT) {
+            IconOverlay regenerate = new IconOverlay(Material2MZ.REFRESH);
+            regenerate.setColor(Color.YELLOW);
+            regenerate.setTooltip("Regenerate the chat text.");
+            addElement(regenerate);
+            regenerate.onClick(_ -> {
+                String userPrompt = "";
 
-            ChatMessage previousMessage = parent.getParent().getChat().getMessage(index - 1);
-            if (previousMessage != null) {
-                userPrompt = previousMessage.getContent();
-            }
+                ChatMessage previousMessage = parent.getParent().getChat().getMessage(index - 1);
+                if (previousMessage != null) {
+                    userPrompt = previousMessage.getContent();
+                }
 
-            parent.getChatRoot().removeElement(index);
-            parent.generateResponse(userPrompt, true);
-        });
-
+                parent.getChatRoot().removeElement(index);
+                parent.generateResponse(userPrompt, true);
+            });
+        }
     }
 }

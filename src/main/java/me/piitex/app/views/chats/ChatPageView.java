@@ -156,7 +156,15 @@ public class ChatPageView extends BorderContainer {
 
     public void generateResponse(String prompt, boolean update) {
         Chat chat = parent.getChat();
-        // TODO: Add image url
+
+        // Remove regenerate button from last message
+        VerticalLayout lastMessageBox = (VerticalLayout) chatRoot.getLastElement();
+        if (lastMessageBox != null) {
+            HorizontalLayout controlBox = (HorizontalLayout) lastMessageBox.getLastElement();
+            if (controlBox != null && controlBox.getElements().size() > 3) {
+                controlBox.removeLastElement();
+            }
+        }
 
         ChatMessage charMessage;
         VerticalLayout currentCharBox;
