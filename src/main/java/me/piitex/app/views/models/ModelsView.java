@@ -30,7 +30,7 @@ public class ModelsView extends EmptyContainer {
     public void init(@Nullable String tab) {
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 15, appSettings.getHeight());
         layout.addStyle(Styles.BG_INSET);
-        layout.addElement(new SidebarView(false));
+        layout.addElement(new SidebarView());
         layout.setSpacing(10);
         addElement(layout);
 

@@ -25,7 +25,7 @@ public class HomeView extends EmptyContainer {
     public HomeView() {
         int height = App.getInstance().getAppSettings().getHeight() - 50;
         super(600, height);
-        this.sidebarView = new SidebarView(false);
+        this.sidebarView = new SidebarView();
         if (App.mobile) {
             root = new HorizontalLayout(600, height);
         } else {

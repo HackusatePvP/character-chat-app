@@ -39,7 +39,7 @@ public class SettingsView {
         root.setSpacing(10);
         container.addElement(root);
 
-        root.addElement(new SidebarView(false));
+        root.addElement(new SidebarView());
 
         layout = new VerticalLayout(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, 0);
         layout.setAlignment(Pos.CENTER);

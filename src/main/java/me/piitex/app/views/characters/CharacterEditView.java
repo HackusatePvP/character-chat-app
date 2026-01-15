@@ -228,7 +228,7 @@ public class CharacterEditView {
         root.addStyle(Styles.BG_INSET);
 
         HorizontalLayout mainLayout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        mainLayout.addElement(new SidebarView(false));
+        mainLayout.addElement(new SidebarView( ));
         root.addElement(mainLayout);
 
         VerticalLayout contentLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());

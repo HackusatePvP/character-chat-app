@@ -32,7 +32,7 @@ public class CreatorView extends EmptyContainer {
     public void init() {
         HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
         layout.addStyle(Styles.BG_INSET);
-        layout.addElement(new SidebarView(false));
+        layout.addElement(new SidebarView());
         addElement(layout);
 
         VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 265, appSettings.getHeight());
