@@ -123,8 +123,10 @@ public class Character {
         if (getChatDirectory() == null || !getChatDirectory().exists()) return;
         for (File file : getChatDirectory().listFiles()) {
             if (file.isDirectory()) continue;
-            Chat chat = new Chat(file);
-            chats.add(chat);
+            App.getThreadPoolManager().submitTask(() -> {
+                Chat chat = new Chat(file);
+                chats.add(chat);
+            });
         }
     }
 
