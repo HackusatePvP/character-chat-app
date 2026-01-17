@@ -398,7 +398,7 @@ public class App extends FXLoad {
             App.logger.error("Failed to fetch download size.", e);
         }
 
-        // Microsoft, the multi trillion dollar company that can't handle more than 50 API requests.
+        // Microslop, the multi trillion dollar company that can't handle more than 50 API requests.
         App.logger.info("Checking for application updates...");
         ApplicationUpdater applicationUpdater = new ApplicationUpdater(getVersion());
         //applicationUpdater.checkForUpdates();
@@ -504,16 +504,16 @@ public class App extends FXLoad {
     }
 
     public static File getAppDirectory() {
-        // If Main.app passes this is being executed by jpackage executable.
-        // If Main.run passes this is being executed by the jar file.
-        // When Main.run does not pass, it being executed by the IDE.
-        // For testing within the IDE, use App.main() as your entry point
-        // For standard installation, run will pass.
         return new File(OSPathing.getAppDataDirectory(), "chat-app/");
 
     }
 
     public static File getExecutedDirectory() {
+        // If Main.app passes this is being executed by jpackage executable.
+        // If Main.run passes this is being executed by the jar file.
+        // When Main.run does not pass, it being executed by the IDE.
+        // For testing within the IDE, use App.main() as your entry point
+        // For standard installation, run will pass.
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
         }
@@ -647,7 +647,7 @@ public class App extends FXLoad {
 
     public static Set<String> getModelNames(String filter) {
         Set<String> toReturn = new TreeSet<>();
-        if (filter.equalsIgnoreCase("exlude")) {
+        if (filter.equalsIgnoreCase("exclude")) {
             for (Model model : getInstance().getModels().values()) {
                 toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
             }
