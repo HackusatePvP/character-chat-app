@@ -13,6 +13,7 @@ import me.piitex.app.backend.server.Server;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.components.ControlBarView;
+import me.piitex.app.views.chats.components.GlobalControlBar;
 import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -31,7 +32,7 @@ import static me.piitex.app.views.Positions.CHAT_SEND_BOX_WIDTH;
 public class ChatPageView extends BorderContainer {
     private final ChatView parent;
     private final VerticalLayout chatRoot;
-
+    private RichTextAreaOverlay sendTextBox;
     private static final AppSettings APP_SETTINGS = App.getInstance().getAppSettings();
 
     public ChatPageView(ChatView chatView, double width, double height) {
@@ -55,24 +56,34 @@ public class ChatPageView extends BorderContainer {
 
         buildChatBoxes();
 
-        HorizontalLayout bottom = new HorizontalLayout(getWidth(), CHAT_SEND_BOX_HEIGHT);
-        bottom.setAlignment(Pos.CENTER);
+        VerticalLayout bottom = new VerticalLayout(getWidth(), -1);
         bottom.setMaxSize(bottom.getWidth(), bottom.getHeight());
+        bottom.setAlignment(Pos.BOTTOM_CENTER);
+        bottom.setSpacing(0);
         setBottom(bottom);
 
-        RichTextAreaOverlay send = new RichTextAreaOverlay("", "", CHAT_SEND_BOX_WIDTH - 50, CHAT_SEND_BOX_HEIGHT - 50);
-        send.setMaxSize(send.getWidth(), send.getHeight());
-        send.setBackgroundColor(APP_SETTINGS.getThemeDefaultColor(APP_SETTINGS.getTheme()));
-        send.setBorderColor(APP_SETTINGS.getThemeBorderColor(APP_SETTINGS.getTheme()));
-        send.setTextFill(APP_SETTINGS.getThemeTextColor(APP_SETTINGS.getTheme()));
-        send.addStyle(Styles.BG_DEFAULT);
-        send.addStyle(APP_SETTINGS.getChatTextSize());
-        send.addStyle(Styles.TEXT_ON_EMPHASIS);
-        bottom.addElement(send);
+        bottom.addElement(new GlobalControlBar(this, 100, -1));
 
-        send.onSubmit(_ -> {
-            generateResponse(send.getCurrentText(), false);
-            send.setCurrentText("");
+        // Horizontal layout to add text box and send button
+        // TODO: Add send button
+        HorizontalLayout sendLayout = new HorizontalLayout(getWidth(), -1);
+        sendLayout.setAlignment(Pos.CENTER);
+        sendLayout.setMaxSize(sendLayout.getWidth(), sendLayout.getHeight());
+        bottom.addElement(sendLayout);
+
+        sendTextBox = new RichTextAreaOverlay("", "", CHAT_SEND_BOX_WIDTH - 50, CHAT_SEND_BOX_HEIGHT - 50);
+        sendTextBox.setMaxSize(sendTextBox.getWidth(), sendTextBox.getHeight());
+        sendTextBox.setBackgroundColor(APP_SETTINGS.getThemeDefaultColor(APP_SETTINGS.getTheme()));
+        sendTextBox.setBorderColor(APP_SETTINGS.getThemeBorderColor(APP_SETTINGS.getTheme()));
+        sendTextBox.setTextFill(APP_SETTINGS.getThemeTextColor(APP_SETTINGS.getTheme()));
+        sendTextBox.addStyle(Styles.BG_DEFAULT);
+        sendTextBox.addStyle(APP_SETTINGS.getChatTextSize());
+        sendTextBox.addStyle(Styles.TEXT_ON_EMPHASIS);
+        sendLayout.addElement(sendTextBox);
+
+        sendTextBox.onSubmit(_ -> {
+            generateResponse(sendTextBox.getCurrentText(), false);
+            sendTextBox.setCurrentText("");
         });
     }
 
@@ -206,5 +217,9 @@ public class ChatPageView extends BorderContainer {
 
     public VerticalLayout getChatRoot() {
         return chatRoot;
+    }
+
+    public RichTextAreaOverlay getSendTextBox() {
+        return sendTextBox;
     }
 }
