@@ -21,19 +21,17 @@ import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static me.piitex.app.views.Positions.*;
 
 public class SidebarView extends BorderContainer {
 
     // Testing out consumer. Hopefully it's more efficient than interfaces.
-    private Consumer<Boolean> onCollapseStateChange;
     double rootWidth = SIDEBAR_WIDTH - 30;
 
     private static final AppSettings appSettings = App.getInstance().getAppSettings();
 
-    public SidebarView(boolean collapse) {
+    public SidebarView() {
         super(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
         setMaxSize(SIDEBAR_WIDTH, SIDEBAR_HEIGHT);
         addStyle(Styles.BG_INSET);
@@ -181,36 +179,6 @@ public class SidebarView extends BorderContainer {
         layout.addElement(version);
 
         return layout;
-    }
-
-    public void setOnCollapseStateChange(Consumer<Boolean> onCollapseStateChange) {
-        this.onCollapseStateChange = onCollapseStateChange;
-    }
-
-    private ButtonOverlay buildExpand() {
-        ButtonOverlay buttonOverlay = new ButtonBuilder("expand").setIcon(new IconOverlay(Material2AL.KEYBOARD_ARROW_RIGHT)).build();
-        buttonOverlay.setWidth(32);
-        buttonOverlay.setHeight(32);
-
-        buttonOverlay.onClick(event1 -> {
-            // Re-assemble sidebar.
-            removeAllElements();
-            setWidth(SIDEBAR_WIDTH);
-            setHeight(SIDEBAR_HEIGHT);
-            setMaxSize(50, SIDEBAR_HEIGHT);
-            build();
-
-            if (onCollapseStateChange != null) {
-                onCollapseStateChange.accept(false);
-            }
-        });
-
-        if (onCollapseStateChange != null) {
-            onCollapseStateChange.accept(true);
-        }
-
-
-        return buttonOverlay;
     }
 }
 
