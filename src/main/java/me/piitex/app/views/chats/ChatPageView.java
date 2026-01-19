@@ -1,8 +1,10 @@
 package me.piitex.app.views.chats;
 
 import atlantafx.base.theme.Styles;
+import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import me.piitex.app.App;
 import me.piitex.app.backend.Chat;
@@ -17,11 +19,10 @@ import me.piitex.app.views.chats.components.GlobalControlBar;
 import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
-import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
-import org.jetbrains.annotations.Nullable;
+import org.kordamp.ikonli.material2.Material2MZ;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class ChatPageView extends BorderContainer {
     private final ChatView parent;
     private final VerticalLayout chatRoot;
     private RichTextAreaOverlay sendTextBox;
+    private GlobalControlBar controlBox;
     private static final AppSettings APP_SETTINGS = App.getInstance().getAppSettings();
 
     public ChatPageView(ChatView chatView, double width, double height) {
@@ -62,7 +64,8 @@ public class ChatPageView extends BorderContainer {
         bottom.setSpacing(0);
         setBottom(bottom);
 
-        bottom.addElement(new GlobalControlBar(this, 100, -1));
+        controlBox = new GlobalControlBar(this, 100, -1);
+        bottom.addElement(controlBox);
 
         // Horizontal layout to add text box and send button
         // TODO: Add send button
@@ -194,8 +197,18 @@ public class ChatPageView extends BorderContainer {
 
         currentCharBox = buildMessageBox(charMessage);
         chatRoot.addElement(currentCharBox);
-
         Response response = new Response(chat.getMessages().size(), prompt, parent.getCharacter(), parent.getCharacter().getUser(), chat);
+
+        // Add halt button to global controls box
+        IconOverlay stop = new IconOverlay(Material2MZ.STOP_CIRCLE);
+        stop.setIconSize(18);
+        stop.setColor(Color.RED);
+        HorizontalLayout controlLayout = (HorizontalLayout) controlBox.getElementAt(0);
+        controlLayout.addElement(stop);
+        stop.onClick(_ -> {
+            response.setHalt(true);
+            controlLayout.removeElement(stop);
+        });
 
         VerticalLayout finalCurrentCharBox = currentCharBox;
         App.getThreadPoolManager().submitTask(() -> {
@@ -204,6 +217,13 @@ public class ChatPageView extends BorderContainer {
                 response.setResponse(content);
                 charMessage.setContent(content);
                 chat.update();
+
+                // Remove stop button if present
+                Platform.runLater(() -> {
+                    if (controlLayout.containsElement(stop)) {
+                        controlLayout.removeElement(stop);
+                    }
+                });
             } catch (IOException | InterruptedException e) {
                 App.logger.error("Could not generate response!", e);
             }

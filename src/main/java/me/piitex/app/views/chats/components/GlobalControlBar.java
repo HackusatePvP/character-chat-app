@@ -22,7 +22,6 @@ public class GlobalControlBar extends EmptyContainer {
         super(width, height);
         this.parent = parent;
         setMaxSize(getWidth(), getHeight());
-        addStyle(Styles.BG_DEFAULT);
         init();
     }
 
@@ -30,12 +29,13 @@ public class GlobalControlBar extends EmptyContainer {
         HorizontalLayout root = new HorizontalLayout(getWidth(), getHeight());
         root.setMaxSize(getWidth(), getHeight());
         root.setAlignment(Pos.CENTER);
+        root.setSpacing(10);
         addElement(root);
 
         IconOverlay undo = new IconOverlay(Material2MZ.UNDO);
         undo.setTooltip("Undo the previous prompt.");
         undo.setIconSize(18);
-        undo.setColor(Color.RED);
+        undo.setColor(Color.WHITE);
         root.addElement(undo);
         undo.onClick(_ -> {
             // Remove the last two messages
