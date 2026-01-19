@@ -115,6 +115,7 @@ public class SetupModelView extends VerticalLayout {
 
                         // Start the server
                         App.reloadModelList();
+                        App.getInstance().getSettings().setGlobalModel(outputFile.getName());
                         new ServerProcess(App.getModelsByName(outputFile.getName()).getFirst());
                     }
 
