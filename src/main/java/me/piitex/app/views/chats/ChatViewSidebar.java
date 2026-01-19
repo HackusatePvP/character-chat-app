@@ -162,21 +162,24 @@ public class ChatViewSidebar extends EmptyContainer {
         chatSelection.onItemSelect(event -> {
             Chat chat = parent.getCharacter().getChat(event.getNewValue());
             if (chat != null) {
+                parent.getCharacter().setLastChat(chat);
+
                 App.window.clearContainers();
                 EmptyContainer progressContainer = new EmptyContainer(APP_SETTINGS.getWidth(), APP_SETTINGS.getHeight());
                 progressContainer.addElement(new LoadingView("Loading chat...", progressContainer.getWidth(), progressContainer.getHeight()));
                 App.window.addContainer(progressContainer);
-            }
 
-            App.getThreadPoolManager().submitTask(() -> {
-                ChatView chatView = new ChatView(parent.getCharacter(), chat);
-                Node assemble = chatView.assemble();
-                Platform.runLater(() -> {
-                    App.window.clearContainers();
-                    App.window.addContainer(chatView, assemble);
+                App.getThreadPoolManager().submitTask(() -> {
+                    ChatView chatView = new ChatView(parent.getCharacter(), chat);
+                    Node assemble = chatView.assemble();
+                    Platform.runLater(() -> {
+                        App.window.clearContainers();
+                        App.window.addContainer(chatView, assemble);
+                    });
                 });
-            });
+            }
         });
+
 
         return container;
     }

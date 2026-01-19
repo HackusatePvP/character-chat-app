@@ -111,6 +111,7 @@ public class CharactersView {
                             App.window.addContainer(cachedView);
                         });
                     } else {
+                        App.logger.info("Loading: {}", (chat == null) ? "New Chat" : chat.getFile().getName());
                         EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
                         progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
                         App.window.addContainer(progressContainer);

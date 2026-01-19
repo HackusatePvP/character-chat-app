@@ -21,7 +21,6 @@ public class Character {
 
     private String firstMessage = "";
     private String chatScenario = "";
-    private Chat lastChat;
 
     private boolean override = false;
     private String model;
@@ -90,10 +89,6 @@ public class Character {
         }
         if (infoFile.hasKey("dialogue")) {
             this.exampleDialogue = infoFile.getStringMap("dialogue");
-        }
-        if (infoFile.hasKey("last-chat")) {
-            String last = infoFile.get("last-chat");
-            this.lastChat = chats.stream().filter(chat -> chat.getFile().getName().equalsIgnoreCase(last)).findAny().orElse(null);
         }
         if (infoFile.hasKey("disclaimer")) {
             this.shownDisclaimer = infoFile.getBoolean("disclaimer");
@@ -221,11 +216,10 @@ public class Character {
     }
 
     public Chat getLastChat() {
-        return lastChat;
+        return chats.stream().filter(chat -> chat.getFile().getName().equalsIgnoreCase(infoFile.get("last-chat"))).findAny().orElse(null);
     }
 
     public void setLastChat(Chat lastChat) {
-        this.lastChat = lastChat;
         infoFile.set("last-chat", lastChat.getFile().getName());
     }
 
