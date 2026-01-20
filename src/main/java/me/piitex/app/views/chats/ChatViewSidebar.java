@@ -137,7 +137,7 @@ public class ChatViewSidebar extends EmptyContainer {
                 character.setLastChat(newChat);
 
                 App.window.clearContainers();
-                App.window.addContainer(new ChatView(character, null));
+                App.window.addContainer(new ChatView(character, newChat));
             } catch (IOException e) {
                 App.logger.error("Could not rename chat!", e);
             }
@@ -180,6 +180,9 @@ public class ChatViewSidebar extends EmptyContainer {
             }
         });
 
+        container.onClick(_ -> {
+            currentChat.getTextField().requestFocus();
+        });
 
         return container;
     }
