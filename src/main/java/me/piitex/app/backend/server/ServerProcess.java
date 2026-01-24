@@ -148,7 +148,7 @@ public class ServerProcess {
         parameters.add(model.getFile().getAbsolutePath());
         if (!settings.getDevice().equalsIgnoreCase("auto")) {
             App.logger.debug("Setting device...");
-            parameters.add("-dev");
+            parameters.add("--device");
             parameters.add(settings.getFormattedDevice().trim());
         }
 
