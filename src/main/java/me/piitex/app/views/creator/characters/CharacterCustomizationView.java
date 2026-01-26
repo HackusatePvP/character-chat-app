@@ -327,7 +327,6 @@ public class CharacterCustomizationView extends EmptyContainer {
 
         addEntry.onClick(_ -> {
             loreLayout.addElement(buildLoreEntry("", ""), 0);
-            scrollContainer.getScrollPane().setVvalue(scrollContainer.getScrollPane().getVmax());
         });
 
         if (infoFile.hasKey("lore")) {
