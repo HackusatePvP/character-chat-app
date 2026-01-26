@@ -58,9 +58,9 @@ public class ChatPageView extends BorderContainer {
 
         buildChatBoxes();
 
-        VerticalLayout bottom = new VerticalLayout(getWidth(), -1);
+        VerticalLayout bottom = new VerticalLayout(getWidth(), 150);
         bottom.setMaxSize(bottom.getWidth(), bottom.getHeight());
-        bottom.setAlignment(Pos.BOTTOM_CENTER);
+        bottom.setAlignment(Pos.CENTER);
         bottom.setSpacing(0);
         setBottom(bottom);
 
@@ -69,7 +69,7 @@ public class ChatPageView extends BorderContainer {
 
         // Horizontal layout to add text box and send button
         // TODO: Add send button
-        HorizontalLayout sendLayout = new HorizontalLayout(getWidth(), -1);
+        HorizontalLayout sendLayout = new HorizontalLayout(getWidth(), bottom.getHeight() - 50);
         sendLayout.setAlignment(Pos.CENTER);
         sendLayout.setMaxSize(sendLayout.getWidth(), sendLayout.getHeight());
         bottom.addElement(sendLayout);
