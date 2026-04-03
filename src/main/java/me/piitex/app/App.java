@@ -312,6 +312,11 @@ public class App extends FXLoad {
     }
 
     public void loadBackendServer() {
+        if (App.getInstance().getSettings().isRemoteMode()) {
+            logger.info("Remote mode enabled. Skipping local backend server startup.");
+            return;
+        }
+
         Model model = App.getInstance().getSettings().getGlobalModel();
         if (model == null) {
             for (Model model1 : App.getModels("exclude")) {

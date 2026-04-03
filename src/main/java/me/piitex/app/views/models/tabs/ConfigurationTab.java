@@ -63,6 +63,8 @@ public class ConfigurationTab extends Tab {
         //       When enabled it allows the user to remotely connect to an endpoint.
         //       Not sure how control of the server would work.
         layout.addElement(buildServerZone());
+        layout.addElement(buildHostTile());
+        layout.addElement(buildRemoteModeTile());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
         layout.addElement(buildRunningModel());
@@ -73,6 +75,66 @@ public class ConfigurationTab extends Tab {
         layout.addElement(buildFlashAttention());
 
         Platform.runLater(this::handleServerLoad);
+    }
+
+    public TileContainer buildHostTile() {
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth(), 180);
+        container.setTitle("Set device as host.");
+        container.setDescription("Allows other devices to connect to this devices backend server.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        configLayout.setSpacing(10);
+        configLayout.setAlignment(Pos.CENTER_RIGHT);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isHost());
+        switchOverlay.onToggle(event -> settings.setHost(event.getNewValue()));
+
+        configLayout.addElements(switchOverlay);
+        container.setAction(configLayout);
+
+        return container;
+    }
+
+    public TileContainer buildRemoteModeTile() {
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth(), 180);
+        container.setTitle("Remote Server Mode");
+        container.setDescription("Setup a remote connection to use a different device to run models.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        configLayout.setSpacing(10);
+        configLayout.setAlignment(Pos.CENTER_RIGHT);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isRemoteMode());
+        TextFieldOverlay urlInput = new TextFieldOverlay(settings.getRemoteUrl(), 0, 0, 400, 40);
+        urlInput.setHintText("Remote URL (e.g., http://1.1.1.1:8187)");
+
+        TextFieldOverlay keyInput = new TextFieldOverlay(settings.getApiKey(), 0, 0, 400, 40);
+        keyInput.setHintText("API Key (Optional)");
+
+        switchOverlay.onToggle(event -> {
+            settings.setRemoteMode(event.getNewValue());
+        });
+        urlInput.onInputSetEvent(event -> {
+            System.out.println("URL: " + event.getInput());
+            settings.setRemoteUrl(event.getInput());
+        });
+        keyInput.onInputSetEvent(event -> {
+            System.out.println("API Key: " + event.getInput());
+            settings.setApiKey(event.getInput());
+        });
+
+        configLayout.addElements(switchOverlay, urlInput, keyInput);
+        container.setAction(configLayout);
+
+        return container;
     }
 
     public TileContainer buildModelPathTile() {
@@ -458,6 +520,21 @@ public class ConfigurationTab extends Tab {
     }
 
     private void startServer(Model model) {
+        if (settings.isRemoteMode()) {
+            Platform.runLater(() -> {
+                MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "Connected to remote server at " + settings.getRemoteUrl());
+                started.addStyle(Styles.SUCCESS);
+                started.addStyle(Styles.BG_DEFAULT);
+                App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                runningModel.setCurrentText("Remote Node Active");
+
+                start.setEnabled(true);
+                reload.setEnabled(true);
+                stop.setEnabled(true);
+            });
+            return;
+        }
+
         App.getThreadPoolManager().submitTask(() -> {
             ServerProcess process = new ServerProcess(model);
             Platform.runLater(() -> {

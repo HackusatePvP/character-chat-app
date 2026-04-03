@@ -113,10 +113,13 @@ public class SetupModelView extends VerticalLayout {
                             addElement(next);
                         });
 
-                        // Start the server
                         App.reloadModelList();
                         App.getInstance().getSettings().setGlobalModel(outputFile.getName());
-                        new ServerProcess(App.getModelsByName(outputFile.getName()).getFirst());
+
+                        // Only start the local server if we are not in remote mode
+                        if (!App.getInstance().getSettings().isRemoteMode()) {
+                            new ServerProcess(App.getModelsByName(outputFile.getName()).getFirst());
+                        }
                     }
 
                     @Override

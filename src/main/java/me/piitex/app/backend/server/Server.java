@@ -36,7 +36,11 @@ public class Server {
     private static final String baseUrl = "http://localhost:8187";
 
     public static String getHealth() throws JSONException {
-        HttpGet get = new HttpGet(baseUrl + "/health");
+        HttpGet get = new HttpGet(getBaseUrl() + "/health");
+
+        if (App.getInstance().getSettings().isRemoteMode() && !App.getInstance().getSettings().getApiKey().isEmpty()) {
+            get.setHeader("Authorization", "Bearer " + App.getInstance().getSettings().getApiKey());
+        }
 
         JSONObject object;
         try (CloseableHttpClient client = HttpClients.createDefault();
@@ -55,7 +59,7 @@ public class Server {
         return object.getString("status");
     }
 
-    public static String generateResponseOAIStream(VerticalLayout chatMessageBox, Response response) throws JSONException, IOException, InterruptedException {
+    public static String generateResponseOAIStream(VerticalLayout chatMessageBox, Response response) throws JSONException, IOException, InterruptedException, ParseException {
         App.logger.info("Collecting response from server...");
 
         // Prepare request
@@ -80,7 +84,11 @@ public class Server {
      * Prepares the HttpPost object with all necessary OAI settings and messages.
      */
     private static HttpPost prepareOAIStreamRequest(Response response) throws JSONException {
-        HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
+        HttpPost post = new HttpPost(getBaseUrl() + "/v1/chat/completions");
+        if (App.getInstance().getSettings().isRemoteMode() && !App.getInstance().getSettings().getApiKey().isEmpty()) {
+            post.setHeader("Authorization", "Bearer " + App.getInstance().getSettings().getApiKey());
+        }
+
         ModelSettings settings = response.getCharacter().getModelSettings();
         JSONObject toPost = new JSONObject();
 
@@ -122,41 +130,52 @@ public class Server {
      * Executes the HTTP request and processes the incoming streaming response line by line.
      */
     private static void executeAndProcessStream(CloseableHttpClient client, HttpPost post, VerticalLayout chatMessageBox, Response response,
-                                                StringBuilder appender) throws IOException, InterruptedException, JSONException {
+                                                StringBuilder appender) throws IOException, InterruptedException, JSONException, ParseException {
 
-        try (CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext());
-             Scanner scanner = new Scanner(httpResponse.getEntity().getContent())) {
+        try (CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext())) {
 
-            boolean stopGenerating;
-            while (scanner.hasNextLine()) {
-                response.setResponse(appender.toString());
+            // Check if the server rejected the request before attempting to parse a stream
+            if (httpResponse.getCode() != 200) {
+                String errorBody = EntityUtils.toString(httpResponse.getEntity());
+                App.logger.error("Remote server rejected request. HTTP {}: {}", httpResponse.getCode(), errorBody);
 
-                if (handleInterruption(response)) {
-                    httpResponse.close(CloseMode.IMMEDIATE);
-                    client.close(CloseMode.IMMEDIATE);
-                    break;
-                }
-                if (response.isHalt()) {
-                    App.logger.info("Halting response generation...");
-                    httpResponse.close(CloseMode.IMMEDIATE);
-                    client.close(CloseMode.IMMEDIATE);
-                    break;
-                }
+                // Optional: Print the error into the chat UI so you don't have to check the console
+                updateUIOnStream("Network Error: HTTP " + httpResponse.getCode(), chatMessageBox, response);
+                return;
+            }
 
-                String content = scanner.nextLine().replaceFirst("data: ", "");
+            try (Scanner scanner = new Scanner(httpResponse.getEntity().getContent())) {
+                boolean stopGenerating;
+                while (scanner.hasNextLine()) {
+                    response.setResponse(appender.toString());
 
-                if (content.startsWith("error")) {
-                    App.logger.error("Error occurred: {}", content);
-                    break;
-                }
+                    if (handleInterruption(response)) {
+                        httpResponse.close(CloseMode.IMMEDIATE);
+                        client.close(CloseMode.IMMEDIATE);
+                        break;
+                    }
+                    if (response.isHalt()) {
+                        App.logger.info("Halting response generation...");
+                        httpResponse.close(CloseMode.IMMEDIATE);
+                        client.close(CloseMode.IMMEDIATE);
+                        break;
+                    }
 
-                if (content.isEmpty()) continue;
+                    String content = scanner.nextLine().replaceFirst("data: ", "");
 
-                // Process the JSON chunk
-                stopGenerating = processStreamChunk(content, appender, chatMessageBox, response);
+                    if (content.startsWith("error")) {
+                        App.logger.error("Error occurred: {}", content);
+                        break;
+                    }
 
-                if (stopGenerating) {
-                    break;
+                    if (content.isEmpty()) continue;
+
+                    // Process the JSON chunk
+                    stopGenerating = processStreamChunk(content, appender, chatMessageBox, response);
+
+                    if (stopGenerating) {
+                        break;
+                    }
                 }
             }
         }
@@ -394,7 +413,11 @@ public class Server {
      */
     public static int tokenize(String string) throws JSONException {
         // "content": "Content"
-        HttpPost post = new HttpPost(baseUrl + "/tokenize");
+        HttpPost post = new HttpPost(getBaseUrl() + "/tokenize");
+        if (App.getInstance().getSettings().isRemoteMode() && !App.getInstance().getSettings().getApiKey().isEmpty()) {
+            post.setHeader("Authorization", "Bearer " + App.getInstance().getSettings().getApiKey());
+        }
+
         JSONObject toPost = new JSONObject();
         toPost.put("content", string);
         post.setEntity(new StringEntity(toPost.toString(), ContentType.APPLICATION_JSON));
@@ -414,5 +437,13 @@ public class Server {
         }
         JSONArray array = object.getJSONArray("tokens");
         return array.length();
+    }
+
+    private static String getBaseUrl() {
+        ServerSettings settings = App.getInstance().getSettings();
+        if (settings.isRemoteMode()) {
+            return settings.getRemoteUrl();
+        }
+        return "http://localhost:8187";
     }
 }

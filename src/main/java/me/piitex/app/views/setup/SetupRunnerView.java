@@ -78,7 +78,14 @@ public class SetupRunnerView extends VerticalLayout {
     }
 
     private void startRunner() {
-        // This method is called asynchronously
+        // Skip hardware testing if connecting to a remote node
+        if (settings.isRemoteMode()) {
+            Platform.runLater(() -> {
+                parent.getRoot().removeAllElements();
+                parent.getRoot().addElement(new ConfigureBackendView(parent));
+            });
+            return;
+        }
 
         // First download the model. Once the download finish it will call the next section.
         downloadSmallModel();

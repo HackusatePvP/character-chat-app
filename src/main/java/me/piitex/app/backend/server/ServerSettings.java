@@ -25,6 +25,10 @@ public class ServerSettings {
     private LinkedList<String> devices = new LinkedList<>();
     private boolean astrixEnabled = true;
     private boolean flashAttention = false;
+    private boolean host = false;
+    private boolean remoteMode = false;
+    private String remoteUrl = "http:/localhost:8187";
+    private String apiKey = "";
 
     public ServerSettings() {
         infoFile = new InfoFile(new File(App.getAppDirectory(), "settings.info"), false);
@@ -91,6 +95,29 @@ public class ServerSettings {
             this.flashAttention = infoFile.getBoolean("flash-attention");
         } else {
             infoFile.set("flash-attention", false);
+        }
+        if (infoFile.hasKey("remote-mode")) {
+            remoteMode = infoFile.getBoolean("remote-mode");
+        } else {
+            infoFile.set("remote-mode", false + "");
+        }
+
+        if (infoFile.hasKey("remote-url")) {
+            remoteUrl = infoFile.get("remote-url");
+        } else {
+            infoFile.set("remote-url", remoteUrl);
+        }
+
+        if (infoFile.hasKey("api-key")) {
+            apiKey = infoFile.get("api-key");
+        } else {
+            infoFile.set("api-key", apiKey);
+        }
+
+        if (infoFile.hasKey("host")) {
+            host = infoFile.getBoolean("host");
+        } else {
+            infoFile.set("host", host);
         }
     }
 
@@ -248,6 +275,42 @@ public class ServerSettings {
     public void setFlashAttention(boolean flashAttention) {
         this.flashAttention = flashAttention;
         infoFile.set("flash-attention", flashAttention);
+    }
+
+    public boolean isHost() {
+        return host;
+    }
+
+    public void setHost(boolean host) {
+        this.host = host;
+        infoFile.set("host", host);
+    }
+
+    public String getRemoteUrl() {
+        return remoteUrl;
+    }
+
+    public void setRemoteUrl(String remoteUrl) {
+        this.remoteUrl = remoteUrl;
+        infoFile.set("remote-url", remoteUrl);
+    }
+
+    public boolean isRemoteMode() {
+        return remoteMode;
+    }
+
+    public void setRemoteMode(boolean remoteMode) {
+        this.remoteMode = remoteMode;
+        infoFile.set("remote-mode", remoteMode);
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+        infoFile.set("api-key", apiKey);
     }
 
     public InfoFile getInfoFile() {

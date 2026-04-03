@@ -266,6 +266,12 @@ public class ServerProcess {
         parameters.add("8187");
         parameters.add("--no-webui");
 
+        if (settings.isHost()) {
+            App.logger.info("Server is listening on 0.0.0.0");
+            parameters.add("--host");
+            parameters.add("0.0.0.0");
+        }
+
         return parameters;
     }
 
