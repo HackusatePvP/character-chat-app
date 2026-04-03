@@ -287,7 +287,7 @@ public class Character {
         return chatViewCachedNodes;
     }
 
-    public void copy(Character character) {
+    public void copyFrom(Character character) {
         setDisplayName(character.getDisplayName());
         setPersona(character.getPersona());
         setUser(character.getUser());

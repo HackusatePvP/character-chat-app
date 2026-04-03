@@ -308,7 +308,7 @@ public class CharacterEditView {
                     App.getInstance().getCharacters().put(characterId, currentCharacterInstance);
                 } else if (duplicate) {
                     currentCharacterInstance = new Character(characterId);
-                    currentCharacterInstance.copy(character);
+                    currentCharacterInstance.copyFrom(character);
                     App.getInstance().getCharacters().put(characterId, currentCharacterInstance);
                 } else {
                     currentCharacterInstance = character;
