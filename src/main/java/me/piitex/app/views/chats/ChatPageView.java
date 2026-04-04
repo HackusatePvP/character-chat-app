@@ -224,7 +224,7 @@ public class ChatPageView extends BorderContainer {
                         controlLayout.removeElement(stop);
                     }
                 });
-            } catch (IOException | InterruptedException e) {
+            } catch (Exception e) {
                 App.logger.error("Could not generate response!", e);
             }
         });
