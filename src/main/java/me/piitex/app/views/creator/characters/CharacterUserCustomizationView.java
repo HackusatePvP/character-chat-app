@@ -24,11 +24,9 @@ import org.kordamp.ikonli.material2.Material2AL;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
-public class UserCustomizationView extends EmptyContainer  {
+public class CharacterUserCustomizationView extends EmptyContainer  {
     private final VerticalLayout root;
     private final InfoFile infoFile;
     private final CharacterCreator parent;
@@ -39,7 +37,7 @@ public class UserCustomizationView extends EmptyContainer  {
     private VerticalLayout loreLayout;
     private final LinkedHashMap<Integer, String> tempLore = new LinkedHashMap<>();
 
-    public UserCustomizationView(CharacterCreator parent, InfoFile infoFile, double width, double height) {
+    public CharacterUserCustomizationView(CharacterCreator parent, InfoFile infoFile, double width, double height) {
         super(width, height);
         addStyle(Styles.BG_DEFAULT);
         this.parent = parent;
@@ -90,6 +88,25 @@ public class UserCustomizationView extends EmptyContainer  {
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setAlignment(Pos.TOP_CENTER);
         layout.addStyle(Styles.BORDER_DEFAULT);
+
+        // Selection box for existing user templates
+        List<String> users = new ArrayList<>();
+        App.getInstance().getUserTemplates().forEach((s, _) -> users.add(s));
+        ChoiceBoxOverlay userTemplates = new ChoiceBoxOverlay(users);
+        userTemplates.setDefaultItem("User Templates");
+        userTemplates.onItemSelect(event -> {
+            userTemplates.setEnabled(false);
+            if (event.getNewValue() == null || event.getNewValue().isEmpty() || event.getNewValue().isBlank() || event.getNewValue().equals(event.getOldValue())) return;
+            System.out.println("New Item: " + event.getNewValue());
+            User user = App.getInstance().getUser(event.getNewValue());
+            userDisplayInput.setCurrentText(user.getDisplayName());
+            userPersonaInput.setCurrentText(user.getPersona());
+            userImage.setImage(new ImageLoader(new File(user.getIconPath())));
+            loreLayout.removeAllElements();
+            user.getLorebook().forEach((s, s2) -> loreLayout.addElement(buildLoreEntry(s, s2)));
+            userTemplates.setEnabled(true);
+        });
+        layout.addElement(userTemplates);
 
         TextOverlay disclaimer = new TextOverlay("These fields are required.");
         disclaimer.addStyle(Styles.TEXT_ITALIC);

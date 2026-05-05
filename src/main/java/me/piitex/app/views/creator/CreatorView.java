@@ -9,6 +9,8 @@ import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.creator.characters.CharacterCreator;
+import me.piitex.app.views.creator.users.UserCreator;
+import me.piitex.app.views.users.UsersView;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -21,7 +23,6 @@ public class CreatorView extends EmptyContainer {
 
     public CreatorView() {
         // Two buttons that will guide through either the character or user view.
-
         super(800, 600);
         setWidth(appSettings.getWidth());
         setHeight(appSettings.getHeight());
@@ -100,7 +101,11 @@ public class CreatorView extends EmptyContainer {
         ButtonOverlay button = new ButtonBuilder("uc").setGraphic(buildUserCreator()).build();
         button.addStyle(Styles.BUTTON_OUTLINED);
         button.addStyle(Styles.ACCENT);
+        button.onClick(event -> {
+            App.window.clearContainers();
+            App.window.addContainer(new UserCreator(null));
 
+        });
         return button;
     }
 
@@ -126,6 +131,7 @@ public class CreatorView extends EmptyContainer {
         root.getPane().addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
             textOverlay.setText("User");
         });
+
 
         return root;
     }

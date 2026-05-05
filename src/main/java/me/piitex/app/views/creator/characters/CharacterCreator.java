@@ -8,8 +8,6 @@ import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.HomeView;
-import me.piitex.app.views.Positions;
-import me.piitex.app.views.SidebarView;
 import me.piitex.engine.containers.Container;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -46,7 +44,7 @@ public class CharacterCreator extends EmptyContainer {
 
     // Cache all current displays to quickly naviagte between them
     private CharacterCustomizationView characterCustomizationView;
-    private UserCustomizationView userCustomizationView;
+    private CharacterUserCustomizationView userCustomizationView;
     private ChatCustomizationView chatCustomizationView;
     private Container currentView;
     private final List<File> importedChatFiles = new ArrayList<>();
@@ -111,7 +109,7 @@ public class CharacterCreator extends EmptyContainer {
         main.addElement(displayContent);
 
         characterCustomizationView = new CharacterCustomizationView(this, infoFile, contentWidth, contentHeight);
-        userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
+        userCustomizationView = new CharacterUserCustomizationView(this, infoFile, contentWidth, contentHeight);
         chatCustomizationView = new ChatCustomizationView(this, infoFile, contentWidth, contentHeight);
 
         currentView = characterCustomizationView;
@@ -335,7 +333,7 @@ public class CharacterCreator extends EmptyContainer {
         return characterCustomizationView;
     }
 
-    public UserCustomizationView getUserCustomizationView() {
+    public CharacterUserCustomizationView getUserCustomizationView() {
         return userCustomizationView;
     }
 
