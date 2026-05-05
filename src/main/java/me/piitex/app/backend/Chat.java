@@ -4,9 +4,7 @@ import me.piitex.app.App;
 import me.piitex.os.configurations.FileCrypter;
 
 import javax.crypto.IllegalBlockSizeException;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,8 +13,6 @@ public class Chat {
     private final File file;
     private Response response;
     private final LinkedList<ChatMessage> messages = new LinkedList<>();
-    private final boolean dev = false;
-
 
     public Chat(File file) {
         this.file = file;
@@ -33,42 +29,59 @@ public class Chat {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to create chat file: " + file.getAbsolutePath(), e);
             }
-        } else if (file.length() > 0 && !dev) {
-            File out = new File(file.getParent(), file.getName() + "out.dat"); // Temporary decrypted file
-            try {
-                FileCrypter.decryptFile(file, out);
-                AtomicInteger count = new AtomicInteger();
-                Files.readAllLines(out.toPath()).forEach(rawLine -> {
-                    ChatMessage msg = parseLineToChatMessage(rawLine);
-                    if (msg != null) {
-                        count.getAndIncrement();
-                        messages.add(msg);
-                    }
-                });
-                App.logger.debug("Loaded {} messages", count);
-            } catch (IOException | IllegalBlockSizeException e) {
-                App.logger.error("Error decrypting or reading chat file: {}", file.getAbsolutePath(), e);
-            } finally {
-                if (out.exists()) {
-                    try {
-                        Files.delete(out.toPath());
-                    } catch (IOException e) {
-                        App.logger.error("Failed to delete decrypted chat file!", e);
-                    }
+            return;
+        }
+
+        if (file.length() == 0) return;
+
+        File targetFile = file;
+        File out = new File(file.getParent(), file.getName() + "out.dat"); // Temporary decrypted file
+
+        try {
+            FileCrypter.decryptFile(file, out);
+            targetFile = out;
+        } catch (IllegalBlockSizeException | IOException e) {
+            App.logger.error("Error decrypting chat file: {}", file.getAbsolutePath(), e);
+            return; // Stop loading if decryption fails
+        }
+
+
+        // Read the binary data
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(targetFile))) {
+            int messageCount = dis.readInt(); // Read how many messages are in the file
+            AtomicInteger count = new AtomicInteger();
+
+            for (int i = 0; i < messageCount; i++) {
+                String roleName = dis.readUTF();
+                Role sender = Role.valueOf(roleName.toUpperCase());
+                String content = dis.readUTF();
+
+                // Check for image
+                String imageUrl = null;
+                if (dis.readBoolean()) {
+                    imageUrl = dis.readUTF();
                 }
+
+                // Check for reasoning
+                String reasoning = null;
+                if (dis.readBoolean()) {
+                    reasoning = dis.readUTF();
+                }
+
+                messages.add(new ChatMessage(sender, content, imageUrl, reasoning));
+                count.getAndIncrement();
             }
-        } else {
+            App.logger.debug("Loaded {} messages", count);
+
+        } catch (java.io.EOFException e) {
+            App.logger.warn("Reached unexpected end of file while reading chat data.");
+        } catch (IOException | IllegalArgumentException e) {
+            App.logger.error("Error reading binary chat file: {}", targetFile.getAbsolutePath(), e);
+        } finally {
             try {
-                if (file.length() > 0) {
-                    Files.readAllLines(file.toPath()).forEach(rawLine -> {
-                        ChatMessage msg = parseLineToChatMessage(rawLine);
-                        if (msg != null) {
-                            messages.add(msg);
-                        }
-                    });
-                }
+                Files.delete(out.toPath());
             } catch (IOException e) {
-                App.logger.error("Error reading chat file in dev mode: {}", file.getAbsolutePath(), e);
+                App.logger.error("Failed to delete decrypted chat file!", e);
             }
         }
     }
@@ -208,29 +221,44 @@ public class Chat {
     }
 
     public void update() {
-        File tempIn = new File(file.getParent(), "temp_in.dat");
-        if (dev) {
-            tempIn = file;
-        }
-        try (FileWriter writer = new FileWriter(tempIn)) {
+        File targetFile = new File(file.getParent(), "temp_in.dat");
+
+        // Write the binary data
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(targetFile))) {
+            dos.writeInt(messages.size()); // Write the total number of messages first
+
             for (ChatMessage msg : messages) {
-                writer.write(chatMessageToRawLine(msg) + "\n");
+                dos.writeUTF(msg.getSender().name()); // Write role (e.g., "USER" or "ASSISTANT")
+                dos.writeUTF(msg.getContent());       // Write content (newlines natively supported!)
+
+                // Write image data
+                boolean hasImage = msg.hasImage();
+                dos.writeBoolean(hasImage);
+                if (hasImage) {
+                    dos.writeUTF(msg.getImageUrl());
+                }
+
+                // Write reasoning data
+                boolean hasReasoning = msg.getReasoning() != null && !msg.getReasoning().isBlank();
+                dos.writeBoolean(hasReasoning);
+                if (hasReasoning) {
+                    dos.writeUTF(msg.getReasoning());
+                }
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error writing chat data to temporary file: " + tempIn.getAbsolutePath(), e);
-        } finally {
-            if (!dev) {
-                FileCrypter.encryptFile(tempIn, file);
-            }
-            if (tempIn.exists() && !dev) {
-                try {
-                    Files.delete(tempIn.toPath());
-                } catch (IOException e) {
-                    App.logger.error("Could not delete temporary chat file during encryption!", e);
-                }
+            throw new RuntimeException("Error writing binary chat data to temporary file: " + targetFile.getAbsolutePath(), e);
+        }
+
+        FileCrypter.encryptFile(targetFile, file);
+        if (targetFile.exists()) {
+            try {
+                Files.delete(targetFile.toPath());
+            } catch (IOException e) {
+                App.logger.error("Could not delete temporary chat file during encryption!", e);
             }
         }
     }
+
     public Response getResponse() {
         return response;
     }
