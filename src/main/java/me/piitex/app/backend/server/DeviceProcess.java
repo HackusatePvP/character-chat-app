@@ -21,6 +21,8 @@ public class DeviceProcess {
         String[] parameters;
 
         File backendDirectory = new File(App.getBackendDirectory(), backend + "/");
+        App.logger.info("Backend Location: {}", backendDirectory.getAbsolutePath());
+
         if (OSUtil.getOS().contains("Windows")) {
             server = new File(backendDirectory, "llama-server.exe");
             parameters = new String[] {
@@ -40,7 +42,9 @@ public class DeviceProcess {
 
         }
         ProcessBuilder builder = new ProcessBuilder(parameters);
+        builder.directory(backendDirectory);
         builder.redirectOutput(new File(App.getAppDirectory(), "devices.txt"));
+        builder.redirectError(new File(App.getAppDirectory(), "device_errors.txt"));
 
         process = builder.start();
         try {
