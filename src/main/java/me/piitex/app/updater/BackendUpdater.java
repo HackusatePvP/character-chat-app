@@ -2,7 +2,9 @@ package me.piitex.app.updater;
 
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
@@ -10,7 +12,9 @@ import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.containers.Container;
+import me.piitex.engine.containers.DownloadContainer;
 import me.piitex.engine.containers.EmptyContainer;
+import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
@@ -40,6 +44,7 @@ public class BackendUpdater {
 
     public BackendUpdater(String currentVersion) {
         this.currentVersion = currentVersion;
+        App.logger.info("Current Version: {}", currentVersion);
 
         gitHubUtil = new GitHubUtil("https://api.github.com/repos/ggml-org/llama.cpp/");
         fetchLatestRelease();
@@ -59,7 +64,7 @@ public class BackendUpdater {
         }
     }
 
-    public boolean isUpdateAvailable() {
+    public synchronized boolean isUpdateAvailable() {
         if (current != null && latest != null) {
             return current.compareTo(latest) < 0;
         }
@@ -77,50 +82,45 @@ public class BackendUpdater {
     }
 
     public void buildAndDisplayUpdateWindow(GitHubUtil gitHubUtil) {
-        window = new WindowBuilder("Update").setDimensions(400, 150).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
-        container = new EmptyContainer(400, 150);
+        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+        container = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(container);
+        window.getStage().setOnHidden(windowEvent -> {
+            App.shutdown();
+        });
+
+        VerticalLayout main = new VerticalLayout(container.getWidth(), container.getHeight());
+        main.setMaxSize(container.getWidth(), container.getHeight());
+        main.setAlignment(Pos.TOP_CENTER);
+        main.setY(20);
+        container.addElement(main);
 
         TextOverlay textOverlay = new TextOverlay("LLamaCPP updates available. Click 'Update' to start.");
-        textOverlay.setY(20);
-        textOverlay.setX(10);
-        container.addElement(textOverlay);
+        main.addElement(textOverlay);
 
         ButtonOverlay buttonOverlay = new ButtonBuilder("update").setText("Update").build();
-        container.addElement(buttonOverlay);
-        buttonOverlay.setX(150);
-        buttonOverlay.setY(70);
+        main.addElement(buttonOverlay);
 
         buttonOverlay.onClick(_ -> {
             App.window.close(false);
             App.getInstance().getCharacters().clear();
             App.getInstance().getUserTemplates().clear();
             App.reloadModelList();
+
             if (ServerProcess.getCurrentServer() != null) {
                 ServerProcess serverProcess = ServerProcess.getCurrentServer();
                 serverProcess.stop();
             }
 
             container.removeAllElements();
-            TextOverlay updateInfo = new TextOverlay("Preparing for installation...");
-            updateInfo.setY(20);
-            updateInfo.setX(10);
-            container.addElement(updateInfo);
 
-            ProgressBarOverlay progressBarOverlay = new ProgressBarOverlay();
-            progressBarOverlay.setX(150);
-            progressBarOverlay.setY(70);
-            container.addElement(progressBarOverlay);
             if (OSUtil.getOS().contains("Windows")) {
-                App.getThreadPoolManager().submitTask(() -> {
-                    downloadCudaBackend(gitHubUtil, updateInfo, progressBarOverlay);
-                });
+                downloadCudaBackendNew(gitHubUtil);
             } else {
-                App.getThreadPoolManager().submitTask(() -> {
-                    downloadVulkan(gitHubUtil, null, updateInfo, progressBarOverlay);
-                });
+
             }
         });
+
         App.window.getStage().getScene().getRoot().setDisable(true);
         window.getStage().setAlwaysOnTop(true);
         window.render();
@@ -130,196 +130,173 @@ public class BackendUpdater {
         });
     }
 
-    public void downloadCudaBackend(GitHubUtil gitHubUtil, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
+    public void downloadCudaBackendNew(GitHubUtil gitHubUtil) {
+        container.removeAllElements();
 
         try {
-            gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
-                            "llama-[a-zA-Z0-9]+-bin-win-cuda-12\\.4-x64\\.zip").getInt("id"),
-                    new File(App.getBackendDirectory(), "cuda.zip"),
-                    new DownloadListener() {
-                        @Override
-                        public void onDownloadStart(DownloadInfo info) {
-                            Platform.runLater(() -> {
-                                progressBarOverlay.getProgressBar().progressProperty().set(0);
-                                textOverlay.setText("Downloading Cuda backend...");
-                            });
-                        }
 
-                        @Override
-                        public void onDownloadProgress(DownloadInfo info) {
-                            Platform.runLater(() -> {
-                                // Update UI
-                                progressBarOverlay.getProgressBar().progressProperty().set(info.getDownloadProgress());
-                            });
-                        }
+            FileDownloader downloader = new FileDownloader(true);
+            File output = new File(App.getBackendDirectory(), "cuda.zip");
+            DownloadInfo downloadInfo = gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
+                    "llama-[a-zA-Z0-9]+-bin-win-cuda-12\\.4-x64\\.zip").getInt("id"), output);
 
-                        @Override
-                        public void onDownloadComplete(DownloadInfo info, File outputFile) {
-                            App.logger.info("Download for Cuda completed!");
-                            downloadVulkan(gitHubUtil, outputFile, textOverlay, progressBarOverlay);
-                        }
+            DownloadContainer downloadContainer = new DownloadContainer(container.getWidth(), container.getHeight(), "Downloading Cuda backend...", downloadInfo, downloader); // Callback will be handled by the container.
 
-                        @Override
-                        public void onDownloadError(DownloadInfo info, Exception e) {
+            container.addElement(downloadContainer);
 
-                            Platform.runLater(() -> {
-                                container.removeElement(progressBarOverlay);
+            downloadContainer.onDownloadComplete(downloadInfo1 -> {
+                Platform.runLater(() -> {
+                    App.logger.info("Finished downloading '{}'", downloadInfo1.getFileName());
+                    downloadContainer.getMessage().setText("Download completed!");
+                });
+                downloader.shutdown();
+                downloadVulkanBackendNew(gitHubUtil, output);
+            });
 
-                                textOverlay.setText("Download failed!");
-                                textOverlay.setTextFill(Color.RED);
+            downloadContainer.onDownloadError(_ -> {
+                Platform.runLater(() -> {
+                    downloadContainer.getMessage().setText("Error: Download failed! Please restart the application and check your internet connection.");
+                });
+            });
 
-                                ButtonOverlay exit = new ButtonBuilder("ex").setText("Exit").addStyle(Styles.DANGER).build();
-                                exit.setX(50);
-                                exit.setY(50);
-                                exit.onClick(_ -> {
-                                    Platform.exit();
-                                    System.exit(0);
-                                });
-                                container.addElement(exit);
-                            });
+            downloadContainer.onDownloadCancelled(_ -> {
+                // Not cancellable.
+            });
 
-                        }
-
-                        @Override
-                        public void onDownloadCancel(DownloadInfo info) {
-                            App.logger.error("Download cancelled!");
-                        }
-                    });
-
+            // Call download asynchronously.
+            App.getThreadPoolManager().submitTask(() -> {
+                App.logger.info("Starting download for cuda backend...");
+                downloadContainer.startDownload();
+            });
 
         } catch (IOException | URISyntaxException e) {
-            App.logger.error("Unable to download cuda release!", e);
+            throw new RuntimeException(e);
         }
     }
 
-    public void downloadVulkan(GitHubUtil gitHubUtil, File cudaZip, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
+    public void downloadVulkanBackendNew(GitHubUtil gitHubUtil, File cudaZip) {
         try {
-            //llama-b7087-bin-win-vulkan-x64.zip
+
+            FileDownloader downloader = new FileDownloader(true);
+
             String os = OSUtil.getOS().contains("Windows") ? "win" : "ubuntu";
             String extension = OSUtil.getOS().contains("Windows") ? "zip" : "tar.gz";
             JSONObject releaseAsset = gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
                     "llama-[a-zA-Z0-9]+-bin-" + os + "-vulkan-x64\\." + extension);
-            gitHubUtil.downloadAsset(releaseAsset.getInt("id"),
-                    new File(App.getBackendDirectory(), releaseAsset.getString("name")),
-                    new DownloadListener() {
-                        @Override
-                        public void onDownloadStart(DownloadInfo info) {
-                            Platform.runLater(() -> {
-                                String fileName = info.getFileName();
-                                progressBarOverlay.getProgressBar().progressProperty().set(0);
-                                textOverlay.setText("Downloading Vulkan backend...");
-                            });
-                        }
 
-                        @Override
-                        public void onDownloadProgress(DownloadInfo info) {
-                            Platform.runLater(() -> {
-                                // Update UI
-                                progressBarOverlay.getProgressBar().progressProperty().set(info.getDownloadProgress());
-                            });
-                        }
+            File output = new File(App.getBackendDirectory(), "vulkan.zip");
+            DownloadInfo downloadInfo = gitHubUtil.downloadAsset(releaseAsset.getInt("id"), output);
 
-                        @Override
-                        public void onDownloadComplete(DownloadInfo info, File outputFile) {
-                            if (OSUtil.getOS().contains("Windows")) {
-                                downloadHip(gitHubUtil, cudaZip, outputFile, textOverlay, progressBarOverlay);
-                            } else {
-                                prepareInstallation(gitHubUtil, null, outputFile, null, textOverlay, progressBarOverlay);
-                            }
-                        }
+            Platform.runLater(() -> {
+                container.removeAllElements();
 
-                        @Override
-                        public void onDownloadError(DownloadInfo info, Exception e) {
-                            Platform.runLater(() -> {
-                                container.removeElement(progressBarOverlay);
+                DownloadContainer downloadContainer = new DownloadContainer(container.getWidth(), container.getHeight(), "Downloading Vulkan backend...", downloadInfo, downloader); // Callback will be handled by the container.
+                container.addElement(downloadContainer);
 
-                                textOverlay.setText("Download failed!");
-                                textOverlay.setTextFill(Color.RED);
+                downloadContainer.onDownloadComplete(downloadInfo1 -> {
+                    Platform.runLater(() -> {
+                        App.logger.info("Finished downloading '{}'", downloadInfo1.getFileName());
+                        downloadContainer.getMessage().setText("Download completed!");
 
-                                ButtonOverlay exit = new ButtonBuilder("ex").setText("Exit").addStyle(Styles.DANGER).build();
-                                exit.setX(50);
-                                exit.setY(50);
-                                exit.onClick(_ -> {
-                                    Platform.exit();
-                                    System.exit(0);
-                                });
-                                container.addElement(exit);
-                            });
-                        }
-
-                        @Override
-                        public void onDownloadCancel(DownloadInfo info) {
-                            App.logger.error("Download cancelled!");
-                        }
+                        downloader.shutdown();
                     });
+
+                    downloadHipNew(gitHubUtil, cudaZip, output);
+                });
+
+                downloadContainer.onDownloadError(_ -> {
+                    Platform.runLater(() -> {
+                        downloadContainer.getMessage().setText("Error: Download failed! Please restart the application and check your internet connection.");
+                    });
+                });
+
+                downloadContainer.onDownloadCancelled(_ -> {
+                    // Not cancellable.
+                });
+
+                // Call download asynchronously.
+                App.getThreadPoolManager().submitTask(() -> {
+                    App.logger.info("Starting download for cuda backend...");
+                    downloadContainer.startDownload();
+                });
+            });
+
+
         } catch (IOException | URISyntaxException e) {
-            App.logger.error("Unable to download vulkan release!", e);
+            throw new RuntimeException(e);
         }
     }
 
-    public void downloadHip(GitHubUtil gitHubUtil, File cudaZip, File vulkanZip, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
+    public void downloadHipNew(GitHubUtil gitHubUtil, File cudaZip, File vulkanZip) {
         try {
-            gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
-                            "llama-[a-zA-Z0-9]+-bin-win-hip-radeon-x64\\.zip").getInt("id"),
-                    new File(App.getBackendDirectory(), "hip.zip"),
-                    new DownloadListener() {
-                        @Override
-                        public void onDownloadStart(DownloadInfo info) {
-                            Platform.runLater(() -> {
-                                progressBarOverlay.getProgressBar().progressProperty().set(0);
-                                textOverlay.setText("Downloading HIP backend...");
-                            });
-                        }
+            App.logger.info("Starting HIP download...");
+            FileDownloader downloader = new FileDownloader(true);
 
-                        @Override
-                        public void onDownloadProgress(DownloadInfo info) {
-                            Platform.runLater(() -> {
-                                // Update UI
-                                progressBarOverlay.getProgressBar().progressProperty().set(info.getDownloadProgress());
-                            });
-                        }
+            File output = new File(App.getBackendDirectory(), "hip.zip");
 
-                        @Override
-                        public void onDownloadComplete(DownloadInfo info, File outputFile) {
-                            // Delay for io operations.
-                            App.getThreadPoolManager().submitSchedule(() -> {
-                                prepareInstallation(gitHubUtil, cudaZip, vulkanZip, outputFile, textOverlay, progressBarOverlay);
-                            }, 1L, TimeUnit.SECONDS);
-                        }
+            DownloadInfo downloadInfo = gitHubUtil.downloadAsset(gitHubUtil.getReleaseAsset(gitHubUtil.getLatestReleaseID(),
+                            "llama-[a-zA-Z0-9]+-bin-win-hip-radeon-x64\\.zip").getInt("id"), output);
 
-                        @Override
-                        public void onDownloadError(DownloadInfo info, Exception e) {
-                            Platform.runLater(() -> {
-                                container.removeElement(progressBarOverlay);
+            Platform.runLater(() -> {
+                container.removeAllElements();
 
-                                textOverlay.setText("Download failed!");
-                                textOverlay.setTextFill(Color.RED);
+                DownloadContainer downloadContainer = new DownloadContainer(container.getWidth(), container.getHeight(), "Downloading HIP backend...", downloadInfo, downloader); // Callback will be handled by the container.
+                container.addElement(downloadContainer);
 
-                                ButtonOverlay exit = new ButtonBuilder("ex").setText("Exit").addStyle(Styles.DANGER).build();
-                                exit.setX(50);
-                                exit.setY(50);
-                                exit.onClick(_ -> {
-                                    Platform.exit();
-                                    System.exit(0);
-                                });
-                                container.addElement(exit);
-                            });
-                        }
-
-                        @Override
-                        public void onDownloadCancel(DownloadInfo info) {
-                            App.logger.error("Download cancelled!");
-                        }
+                downloadContainer.onDownloadComplete(downloadInfo1 -> {
+                    Platform.runLater(() -> {
+                        App.logger.info("Finished downloading '{}'", downloadInfo1.getFileName());
+                        downloadContainer.getMessage().setText("Download completed!");
                     });
+
+                    downloader.shutdown();
+
+                    App.getThreadPoolManager().submitSchedule(() -> {
+                        prepareInstallation(gitHubUtil, cudaZip, vulkanZip, output);
+                    }, 1L, TimeUnit.SECONDS);
+                });
+
+                downloadContainer.onDownloadError(_ -> {
+                    Platform.runLater(() -> {
+                        downloadContainer.getMessage().setText("Error: Download failed! Please restart the application and check your internet connection.");
+                    });
+                });
+
+                downloadContainer.onDownloadCancelled(_ -> {
+                    // Not cancellable.
+                });
+
+                // Call download asynchronously.
+                App.getThreadPoolManager().submitTask(() -> {
+                    App.logger.info("Starting download for cuda backend...");
+                    downloadContainer.startDownload();
+                });
+            });
+
+
         } catch (IOException | URISyntaxException e) {
-            App.logger.error("Unable to download hip release!", e);
+            throw new RuntimeException(e);
         }
     }
 
-    public void prepareInstallation(GitHubUtil gitHubUtil, File cudaZip, File vulkanZip, File hipZip, TextOverlay textOverlay, ProgressBarOverlay progressBarOverlay) {
+    public void prepareInstallation(GitHubUtil gitHubUtil, File cudaZip, File vulkanZip, File hipZip) {
         Platform.runLater(() -> {
-            textOverlay.setText("Deleting old files...");
-            progressBarOverlay.getProgressBar().setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            Platform.runLater(() -> {
+                container.removeAllElements();
+                VerticalLayout main = new VerticalLayout(container.getWidth(), container.getHeight());
+                main.setAlignment(Pos.CENTER);
+                main.setY(20);
+                container.addElement(main);
+
+                TextOverlay textOverlay = new TextOverlay("Deleting old files...");
+                main.addElement(textOverlay);
+
+                ProgressBarOverlay progressBarOverlay = new ProgressBarOverlay();
+                progressBarOverlay.getProgressBar().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+                main.addElement(progressBarOverlay);
+
+
+            });
         });
 
         if (ServerProcess.getCurrentServer() != null) {
@@ -356,8 +333,18 @@ public class BackendUpdater {
         }
 
         Platform.runLater(() -> {
-            textOverlay.setText("Extracting files...");
-            progressBarOverlay.getProgressBar().setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            container.removeAllElements();
+            VerticalLayout main = new VerticalLayout(container.getWidth(), container.getHeight());
+            main.setAlignment(Pos.CENTER);
+            main.setY(20);
+            container.addElement(main);
+
+            TextOverlay textOverlay = new TextOverlay("Extracting files...");
+            main.addElement(textOverlay);
+
+            ProgressBarOverlay progressBarOverlay = new ProgressBarOverlay();
+            progressBarOverlay.getProgressBar().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+            main.addElement(progressBarOverlay);
         });
         try {
             App.logger.info("Unzipping backend files...");
@@ -383,9 +370,6 @@ public class BackendUpdater {
             }
 
             App.logger.info("Finished unzipping!");
-            Platform.runLater(() -> {
-                textOverlay.setText("Cleaning up files...");
-            });
 
             for (File file : App.getBackendDirectory().listFiles()) {
                 if (file.isFile()) {
@@ -426,17 +410,22 @@ public class BackendUpdater {
             }
 
             Platform.runLater(() -> {
-                textOverlay.setText("Update completed. Please re-launch the application.");
-                container.removeElement(progressBarOverlay);
-                ButtonOverlay buttonOverlay = new ButtonBuilder("close").setText("Close").build();
-                buttonOverlay.setX(150);
-                buttonOverlay.setY(70);
-                buttonOverlay.onClick(_ -> {
-                    window.close(false);
+                container.removeAllElements();
+                VerticalLayout main = new VerticalLayout(container.getWidth(), container.getHeight());
+                main.setAlignment(Pos.CENTER);
+                main.setY(20);
+                container.addElement(main);
+
+                TextOverlay textOverlay = new TextOverlay("Download completed. Please restart the application.");
+                main.addElement(textOverlay);
+
+                ButtonOverlay restart = new ButtonBuilder("Restart").setText("Restart").addStyle(Styles.BUTTON_OUTLINED).addStyle(Styles.SUCCESS).build();
+                main.addElement(restart);
+                restart.onClick(_ -> {
+                    window.close(true);
                     Platform.exit();
                     System.exit(0);
                 });
-                container.addElement(buttonOverlay);
             });
 
 
