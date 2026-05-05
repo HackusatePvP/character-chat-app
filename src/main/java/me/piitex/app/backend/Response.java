@@ -67,34 +67,25 @@ public class Response {
             maxTokens = 4096; // Default to standard 4k
         }
 
+        StringBuilder combinedSystemPrompt = new StringBuilder();
         ModelSettings settings = character.getModelSettings();
-        JSONObject modelInstructions = new JSONObject();
-        modelInstructions.put("role", "system");
-        modelInstructions.put("content", format(settings.getModelInstructions(), character, user));
-        messages.put(modelInstructions);
+
+        // 2. Append Model Instructions
+        combinedSystemPrompt.append(format(settings.getModelInstructions(), character, user)).append("\n\n");
         tokens += Server.tokenize(settings.getModelInstructions());
 
         if (!character.getPersona().isEmpty()) {
-            JSONObject characterPersona = new JSONObject();
-            characterPersona.put("role", "system");
-            characterPersona.put("content", format(character.getPersona(), character, user));
-            messages.put(characterPersona);
+            combinedSystemPrompt.append(format(character.getPersona(), character, user)).append("\n\n");
             tokens += Server.tokenize(character.getPersona());
         }
 
         if (!user.getPersona().isEmpty()) {
-            JSONObject userPersona = new JSONObject();
-            userPersona.put("role", "system");
-            userPersona.put("content", format(user.getPersona(), character, user));
-            messages.put(userPersona);
+            combinedSystemPrompt.append(format(user.getPersona(), character, user)).append("\n\n");
             tokens += Server.tokenize(user.getPersona());
         }
 
         if (!character.getChatScenario().isEmpty()) {
-            JSONObject chatScenario = new JSONObject();
-            chatScenario.put("role", "system");
-            chatScenario.put("content", format(character.getChatScenario(), character, user));
-            messages.put(chatScenario);
+            combinedSystemPrompt.append(format(character.getChatScenario(), character, user)).append("\n\n");
             tokens += Server.tokenize(character.getChatScenario());
         }
 
@@ -102,8 +93,7 @@ public class Response {
         List<String> loreItems = new ArrayList<>(character.getLorebook().keySet());
         loreItems.addAll(user.getLorebook().keySet());
 
-
-        LinkedList<ChatMessage> chatMessages = chat.getMessages(); // Now returns ChatMessage objects
+        LinkedList<ChatMessage> chatMessages = chat.getMessages();
         Collections.reverse(chatMessages);
 
         LinkedList<ChatMessage> chatContext = new LinkedList<>();
@@ -114,11 +104,6 @@ public class Response {
                 tokens += Server.tokenize(s.getReasoning());
             }
             if (tokens < maxTokens) {
-                // Process lore with each chat message
-                // Lore works with "keys" which are words.
-                // If the "word" is typed add the lore value if it's not already processed.
-                // This is poorly optimized as it has multiple nested loops.
-                // It does run async but not really a good fix.
                 for (String input : s.getContent().split(" ")) {
                     input = input.trim();
                     if (input.isEmpty()) continue;
@@ -129,7 +114,6 @@ public class Response {
                             lore = user.getLorebook().get(loreEntry);
                         }
                         lore = lore.trim();
-
                         String[] loreKeys = loreEntry.split(",");
 
                         boolean process = false;
@@ -140,19 +124,12 @@ public class Response {
                                 break;
                             }
                         }
-                        if (process) {
-                            if (!processedLores.contains(loreEntry)) {
-                                processedLores.add(loreEntry);
-                                JSONObject loreItem = new JSONObject();
-                                try {
-                                    loreItem.put("role", "system");
-                                    loreItem.put("content", format(lore, character, user));
-                                    messages.put(loreItem);
-                                    tokens += Server.tokenize(lore);
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
+
+                        if (process && !processedLores.contains(loreEntry)) {
+                            processedLores.add(loreEntry);
+                            // Append Lore to the combined system prompt
+                            combinedSystemPrompt.append(format(lore, character, user)).append("\n\n");
+                            tokens += Server.tokenize(lore);
                         }
                     }
                 }
@@ -162,27 +139,33 @@ public class Response {
             }
         }
 
-        StringBuilder appender = new StringBuilder();
+        StringBuilder exampleAppender = new StringBuilder();
         character.getExampleDialogue().forEach((s, s2) -> {
             if (s2.startsWith("{character}:")) {
                 s2 = s2.replace("{character}:", "Assistant:");
                 s2 = format(s2, character, user);
-                appender.append(s2).append("\n");
+                exampleAppender.append(s2).append("\n");
             }
             if (s2.startsWith("{user}:")) {
                 s2 = s2.replace("{user}:", "User:");
                 s2 = format(s2, character, user);
-                appender.append(s2).append("\n");
+                exampleAppender.append(s2).append("\n");
             }
         });
 
-        JSONObject exampleDialogue = new JSONObject();
-        exampleDialogue.put("role", "system");
-        exampleDialogue.put("content", "Use the following format when responding.\n\n" + appender.toString().trim());
+        if (!exampleAppender.isEmpty()) {
+            combinedSystemPrompt.append("Use the following format when responding.\n\n")
+                    .append(exampleAppender.toString().trim());
+        }
+
+        JSONObject systemMessage = new JSONObject();
+        systemMessage.put("role", "system");
+        systemMessage.put("content", combinedSystemPrompt.toString().trim());
+        messages.put(systemMessage);
 
         Collections.reverse(chatContext);
-
         int index = 0;
+
         for (ChatMessage currentChatMessage : chatContext) {
             JSONObject chatMessageContext = new JSONObject();
             chatMessageContext.put("role", currentChatMessage.getSender().name().toLowerCase());
@@ -190,18 +173,13 @@ public class Response {
 
             JSONObject textPart = new JSONObject();
             textPart.put("type", "text");
-            if (currentChatMessage.getReasoning() != null && !currentChatMessage.getReasoning() .isEmpty()) {
+            if (currentChatMessage.getReasoning() != null && !currentChatMessage.getReasoning().isEmpty()) {
                 String reason = "<think> " + currentChatMessage.getReasoning()  + " </think> ";
                 textPart.put("text", format(reason + currentChatMessage.getContent(), character, user));
             } else {
                 textPart.put("text", format(currentChatMessage.getContent(), character, user));
             }
             contentArray.put(textPart);
-
-            //TODO: Add images to the chat data. That way each message can have an image as context.
-            // This would take up significant token size. I believe in the near future, per message image is possible.
-            // For now it will only use the last image uploaded.
-            // Only add images for open ai context.
 
             if (image != null && index == chat.getMessages().size() - 1) {
                 if (image.exists() && image.isFile()) {
