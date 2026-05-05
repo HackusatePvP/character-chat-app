@@ -66,7 +66,7 @@ public class GlobalControlBar extends EmptyContainer {
                 // There is only one message.
                 // If it is a user copy the contents
                 ChatMessage previous = chat.getMessage(chat.getMessages().size() - 1);
-                if (previous.getSender() == Role.USER) {
+                if (previous != null && previous.getSender() == Role.USER) {
                     String copy = previous.getContent();
                     Clipboard clipboard = Clipboard.getSystemClipboard();
                     ClipboardContent clipboardContent = new ClipboardContent();
@@ -77,7 +77,9 @@ public class GlobalControlBar extends EmptyContainer {
                     parent.getSendTextBox().setCurrentText(copy);
                 }
                 chat.removeMessage(chat.getMessages().size() - 1);
-                parent.getChatRoot().removeLastElement();
+                if (!parent.getChatRoot().getElements().isEmpty()) {
+                    parent.getChatRoot().removeLastElement();
+                }
             }
 
 
