@@ -114,7 +114,7 @@ public class ConfigurationTab extends Tab {
 
         ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isRemoteMode());
         TextFieldOverlay urlInput = new TextFieldOverlay(settings.getRemoteUrl(), 0, 0, 400, 40);
-        urlInput.setHintText("Remote URL (e.g., http://1.1.1.1:8187)");
+        urlInput.setHintText("Remote URL (e.g., http://192.168.1.2:8187)");
 
         TextFieldOverlay keyInput = new TextFieldOverlay(settings.getApiKey(), 0, 0, 400, 40);
         keyInput.setHintText("API Key (Optional)");
@@ -145,7 +145,7 @@ public class ConfigurationTab extends Tab {
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
-        container.addElement(actionButton(container));
+        container.setAction(actionButton(container));
 
         return container;
     }
