@@ -19,16 +19,7 @@ public class Placeholder {
             return bbCodeText;
         }
 
-        Pattern bbCodePattern = Pattern.compile("\\[color=[a-zA-Z]+\\]|\\[/color\\]");
-
-        Matcher matcher = bbCodePattern.matcher(bbCodeText);
-        StringBuilder sb = new StringBuilder();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, "");
-        }
-        matcher.appendTail(sb);
-
-        return sb.toString();
+        return bbCodeText.replaceAll("\\[/?color(?:=[^\\]]+)?\\]", "");
     }
 
     /**
