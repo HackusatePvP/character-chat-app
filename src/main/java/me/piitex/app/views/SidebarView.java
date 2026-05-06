@@ -12,6 +12,7 @@ import me.piitex.app.updater.BackendUpdater;
 import me.piitex.app.views.creator.CreatorView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
+import me.piitex.app.views.users.UserTemplateView;
 import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -81,6 +82,20 @@ public class SidebarView extends BorderContainer {
 
         });
 
+        ButtonOverlay users = new ButtonBuilder("users").setText("User Templates").setIcon(new IconOverlay(Material2AL.ACCOUNT_CIRCLE)).addStyle(Styles.FLAT).build();
+        users.addStyle(appSettings.getGlobalTextSize());
+        users.setWidth(rootWidth);
+        users.setAlignment(Pos.BASELINE_LEFT);
+        top.addElement(users);
+        users.onClick(event -> {
+            App.window.getStage().getScene().setCursor(Cursor.WAIT);
+
+            App.window.clearContainers();
+            App.window.addContainer(new UserTemplateView());
+            App.window.getStage().getScene().setCursor(Cursor.DEFAULT);
+
+        });
+
         ButtonOverlay create = new ButtonBuilder("create").setText("Create").setIcon(new IconOverlay(Material2AL.EDIT)).addStyle(Styles.FLAT).build();
         create.addStyle(appSettings.getGlobalTextSize());
         create.setWidth(rootWidth);
@@ -120,8 +135,7 @@ public class SidebarView extends BorderContainer {
                         }
 
                     });
-                    // FIXME: There is a bug with RenEngine which does not properly shuffle the indexes.
-                    layout.addElement(update, 1);
+                    layout.addElement(update, 2);
                 }
             });
 

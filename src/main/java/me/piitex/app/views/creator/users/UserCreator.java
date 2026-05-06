@@ -32,6 +32,7 @@ public class UserCreator extends EmptyContainer {
 
     private UserCustomizationView userCustomizationView;
     private UserLoreCustomizationView userLoreCustomizationView;
+    private UserFinishView userFinishView;
 
     private HorizontalLayout displayContent;
     private Container currentView;
@@ -76,6 +77,7 @@ public class UserCreator extends EmptyContainer {
         userCustomizationView = new UserCustomizationView(this, infoFile, contentWidth, contentHeight);
         // Lore customization
         userLoreCustomizationView = new UserLoreCustomizationView(this, infoFile, contentWidth, contentHeight);
+        userFinishView = new UserFinishView(this, infoFile, contentWidth, contentHeight);
 
         currentView = userCustomizationView;
 
@@ -121,7 +123,7 @@ public class UserCreator extends EmptyContainer {
         root.addElement(finishButton);
         finishButton.onClick(_ -> {
             displayContent.removeElement(displayContent.getElements().lastKey());
-            displayContent.addElement(new UserFinishView(this, infoFile, contentWidth, contentHeight));
+            displayContent.addElement(userFinishView);
             currentView = userCustomizationView;
         });
 
@@ -131,14 +133,14 @@ public class UserCreator extends EmptyContainer {
                 if (currentView == userCustomizationView) {
                     // View user
                     displayContent.removeElement(displayContent.getElements().lastKey());
-                    displayContent.addElement(userCustomizationView);
-                    currentView = userCustomizationView;
+                    displayContent.addElement(userLoreCustomizationView);
+                    currentView = userLoreCustomizationView;
 
                     // Lore is next
                 } else if (currentView == userLoreCustomizationView) {
                     // View chat
                     displayContent.removeElement(displayContent.getElements().lastKey());
-                    displayContent.addElement(userLoreCustomizationView);
+                    displayContent.addElement(userFinishView);
                     currentView = userLoreCustomizationView;
                 }
             });

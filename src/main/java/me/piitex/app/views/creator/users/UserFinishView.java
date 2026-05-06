@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
-import me.piitex.app.views.HomeView;
+import me.piitex.app.views.users.UserTemplateView;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -91,7 +91,7 @@ public class UserFinishView extends EmptyContainer {
             App.getInstance().getUserTemplates().putIfAbsent(user.getId(), user);
 
             App.window.clearContainers();
-            App.window.addContainer(new HomeView());
+            App.window.addContainer(new UserTemplateView());
         });
     }
 
