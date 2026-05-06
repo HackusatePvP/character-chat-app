@@ -123,11 +123,9 @@ public class ConfigurationTab extends Tab {
             settings.setRemoteMode(event.getNewValue());
         });
         urlInput.onInputSetEvent(event -> {
-            System.out.println("URL: " + event.getInput());
             settings.setRemoteUrl(event.getInput());
         });
         keyInput.onInputSetEvent(event -> {
-            System.out.println("API Key: " + event.getInput());
             settings.setApiKey(event.getInput());
         });
 

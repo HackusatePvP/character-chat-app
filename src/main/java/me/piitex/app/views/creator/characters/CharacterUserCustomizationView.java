@@ -97,7 +97,6 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
         userTemplates.onItemSelect(event -> {
             userTemplates.setEnabled(false);
             if (event.getNewValue() == null || event.getNewValue().isEmpty() || event.getNewValue().isBlank() || event.getNewValue().equals(event.getOldValue())) return;
-            System.out.println("New Item: " + event.getNewValue());
             User user = App.getInstance().getUser(event.getNewValue());
             userDisplayInput.setCurrentText(user.getDisplayName());
             userPersonaInput.setCurrentText(user.getPersona());
