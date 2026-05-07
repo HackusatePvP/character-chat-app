@@ -141,21 +141,6 @@ public class SetupRunnerView extends VerticalLayout {
             progressText.setText("Testing hardware configuration...");
         });
 
-        // Delete model-output if it already exists
-        File modelData = new File(App.getAppDirectory(), "model-output.txt");
-        if (modelData.exists()) {
-            if (modelData.delete()) {
-                App.logger.info("Deleted previous model data.");
-            }
-        }
-
-        // Delete current model configurations
-        for (File file : new File(App.getAppDirectory(), "models/").listFiles()) {
-            if (file.delete()) {
-                App.logger.info("Deleted {}.", file.getName());
-            }
-        }
-
         ServerProcess serverProcess = new ServerProcess(new Model(model));
 
         boolean loading = serverProcess.isLoading();
@@ -188,7 +173,7 @@ public class SetupRunnerView extends VerticalLayout {
             } catch (IOException e) {
                 App.logger.error("Could not delete testing model!", e);
             }
-        }, 100, TimeUnit.MILLISECONDS);
+        }, 1L, TimeUnit.SECONDS);
 
         App.getThreadPoolManager().submitSchedule(() -> {
             // Configure backend.
@@ -196,6 +181,6 @@ public class SetupRunnerView extends VerticalLayout {
                 parent.getRoot().removeAllElements();
                 parent.getRoot().addElement(new ConfigureBackendView(parent));
             });
-        }, 2L, TimeUnit.SECONDS);
+        }, 1L, TimeUnit.SECONDS);
     }
 }

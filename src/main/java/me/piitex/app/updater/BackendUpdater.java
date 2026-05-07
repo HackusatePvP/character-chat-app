@@ -390,7 +390,7 @@ public class BackendUpdater {
 
             // Verify that all files are in the base directory. Not sub-directories.
             File[] vulkanFiles = vulkanDir.listFiles();
-            if (vulkanFiles.length == 1 && vulkanFiles[0].isDirectory()) {
+            if (vulkanFiles != null && vulkanFiles.length == 1 && vulkanFiles[0].isDirectory()) {
                 File parentDir = vulkanFiles[0];
                 for (File file : parentDir.listFiles()) {
                     Path sourcePath = file.toPath();
@@ -419,7 +419,7 @@ public class BackendUpdater {
                 TextOverlay textOverlay = new TextOverlay("Download completed. Please restart the application.");
                 main.addElement(textOverlay);
 
-                ButtonOverlay restart = new ButtonBuilder("Restart").setText("Restart").addStyle(Styles.BUTTON_OUTLINED).addStyle(Styles.SUCCESS).build();
+                ButtonOverlay restart = new ButtonBuilder("Restart").setText("Exit").addStyle(Styles.BUTTON_OUTLINED).addStyle(Styles.DANGER).build();
                 main.addElement(restart);
                 restart.onClick(_ -> {
                     window.close(true);

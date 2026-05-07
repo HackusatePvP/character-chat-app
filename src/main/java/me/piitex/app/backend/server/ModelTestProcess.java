@@ -171,6 +171,10 @@ public class ModelTestProcess {
     protected void processOutput() {
         App.logger.info("Processing model data...");
         File output = new File(App.getAppDirectory(), "model-output.txt");
+        if (!output.exists()) {
+            App.logger.error("Process output was not created!");
+            return;
+        }
         double totalModelVramMiB = 0.0;
         double kvCacheSizeMiB = 0.0;
         double computeBufferMiB = 0.0;
@@ -188,9 +192,25 @@ public class ModelTestProcess {
                     App.logger.info("Total Model Layers: {}", line);
                     model.getSettings().setTotalLayers(Integer.parseInt(line));
                 }
-                if (line.startsWith("llama_model_load_from_file_impl:")) {
-                    line = line.split("-")[1].trim().split(" ")[0];
-                    App.getInstance().getAppSettings().setTotalGpuVram(Double.parseDouble(line));
+                if (line.contains("common_memory_breakdown_print:") && line.contains("|") && line.contains("=")) {
+                    String[] parts = line.split("\\|");
+
+                    // Ensure we have enough columns and avoid parsing the CPU "Host" RAM
+                    if (parts.length > 2) {
+                        String devicePart = parts[1].toLowerCase();
+                        String totalPart = parts[2];
+
+                        if (!devicePart.contains("host") && totalPart.contains("=")) {
+                            String totalVramStr = totalPart.split("=")[0].trim();
+                            try {
+                                double totalVram = Double.parseDouble(totalVramStr);
+                                if (totalVram > 0) {
+                                    App.getInstance().getAppSettings().setTotalGpuVram(totalVram);
+                                    App.logger.info("Found GPU VRAM: {} MiB", totalVram);
+                                }
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
                 }
                 if (!line.contains("CPU_Mapped") && line.contains("model buffer size =") && totalModelVramMiB == 0.0) {
                     String valueWithUnit = line.split("=")[1].trim();
