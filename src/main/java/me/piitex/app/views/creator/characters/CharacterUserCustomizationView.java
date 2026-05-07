@@ -92,11 +92,17 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
         // Selection box for existing user templates
         List<String> users = new ArrayList<>();
         App.getInstance().getUserTemplates().forEach((s, _) -> users.add(s));
+        if (users.isEmpty()) users.add("None");
         ChoiceBoxOverlay userTemplates = new ChoiceBoxOverlay(users);
+        userTemplates.setWidth(200);
         userTemplates.setDefaultItem("User Templates");
         userTemplates.onItemSelect(event -> {
             userTemplates.setEnabled(false);
-            if (event.getNewValue() == null || event.getNewValue().isEmpty() || event.getNewValue().isBlank() || event.getNewValue().equals(event.getOldValue())) return;
+            if (event.getNewValue() == null || event.getNewValue().equals("None") || event.getNewValue().isEmpty() || event.getNewValue().isBlank() || event.getNewValue().equals(event.getOldValue())) {
+                userTemplates.setEnabled(true);
+                userTemplates.getChoiceBox().getSelectionModel().clearSelection();
+                return;
+            }
             User user = App.getInstance().getUser(event.getNewValue());
             userDisplayInput.setCurrentText(user.getDisplayName());
             userPersonaInput.setCurrentText(user.getPersona());
