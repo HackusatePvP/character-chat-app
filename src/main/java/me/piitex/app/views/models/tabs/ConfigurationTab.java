@@ -171,6 +171,7 @@ public class ConfigurationTab extends Tab {
             if (file == null) return;
             App.logger.info("Updating model path to '{}'", file.getAbsolutePath());
             settings.setModelPath(file.getAbsolutePath());
+            App.reloadModelList();
 
             // Updates button tooltip
             container.setAction(actionButton(container));
