@@ -159,22 +159,24 @@ public class UserCustomizationView extends EmptyContainer {
                 if (file != null && file.exists() && file.isFile()) {
                     try {
                         JSONObject object = UserCardImporter.getImageMetaData(file);
-                        String id = UserCardImporter.getUserDisplay(object);
-                        String displayName = UserCardImporter.getUserDisplay(object);
-                        String persona = UserCardImporter.getUserPersona(object);
-                        Map<String, String> loreItems = UserCardImporter.getLoreItems(object);
-                        infoFile.set("id", id);
-                        infoFile.set("display-name", displayName);
-                        infoFile.set("persona", persona);
-                        infoFile.set("icon-path", file.getAbsolutePath());
-                        tempLore.clear();
-                        userIdInput.setCurrentText(id);
-                        userDisplayInput.setCurrentText(displayName);
-                        userPersonaInput.setCurrentText(persona);
-                        userImage.setImage(new ImageLoader(file));
+                        if (object != null) {
+                            String id = UserCardImporter.getUserDisplay(object);
+                            String displayName = UserCardImporter.getUserDisplay(object);
+                            String persona = UserCardImporter.getUserPersona(object);
+                            Map<String, String> loreItems = UserCardImporter.getLoreItems(object);
+                            infoFile.set("id", id);
+                            infoFile.set("display-name", displayName);
+                            infoFile.set("persona", persona);
+                            infoFile.set("icon-path", file.getAbsolutePath());
+                            tempLore.clear();
+                            userIdInput.setCurrentText(id);
+                            userDisplayInput.setCurrentText(displayName);
+                            userPersonaInput.setCurrentText(persona);
+                            userImage.setImage(new ImageLoader(file));
 
-                        parent.getUserLoreCustomizationView().getLoreLayout().removeAllElements();
-                        loreItems.forEach((s, s2) -> parent.getUserLoreCustomizationView().getLoreLayout().addElement(parent.getUserLoreCustomizationView().buildLoreEntry(s, s2)));
+                            parent.getUserLoreCustomizationView().getLoreLayout().removeAllElements();
+                            loreItems.forEach((s, s2) -> parent.getUserLoreCustomizationView().getLoreLayout().addElement(parent.getUserLoreCustomizationView().buildLoreEntry(s, s2)));
+                        }
                     } catch (ImageProcessingException | IOException e) {
                         App.logger.error("Could not process user card!", e);
                     }
