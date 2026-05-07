@@ -65,7 +65,7 @@ public class App extends FXLoad {
 
     public static Window window;
 
-    // Doesn't support natively ran mobile, but can at least make it viewable with remote connection.
+    // Doesn't support native mobile, but can at least make it viewable with remote connection.
     public static boolean mobile = false;
 
     public static final Logger logger = LogManager.getLogger(App.class);
@@ -174,8 +174,8 @@ public class App extends FXLoad {
         int height = dimension.height;
 
         // For testing, remove later.
-        //width = 600;
-        //height = 1200;
+        // width = 600;
+        // height = 1200;
         if (width < 900) {
             logger.info("Using mobile layouts...");
             // Set mobile view
@@ -521,8 +521,11 @@ public class App extends FXLoad {
         // For standard installation, run will pass.
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
+        } else if (Main.run) {
+            return new File(System.getProperty("user.dir") + "/");
+        } else {
+            return new File(OSPathing.getAppDataDirectory(), "chat-app/");
         }
-        return new File(OSPathing.getAppDataDirectory(), "chat-app/");
     }
 
     public static FileDownloader getFileDownloader() {
@@ -530,7 +533,12 @@ public class App extends FXLoad {
     }
 
     public static File getBackendDirectory() {
-        return new File(getAppDirectory(), "/backend/");
+
+        if (Main.run) {
+            return new File(System.getProperty("user.dir") + "/backend/");
+        } else {
+            return new File(getAppDirectory(), "/backend/");
+        }
     }
 
     public static File getModelsDirectory() {
