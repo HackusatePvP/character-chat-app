@@ -44,6 +44,12 @@ public class ModelTestProcess {
 
         File server;
         File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/");
+
+        if (!backendDirectory.exists()) {
+            App.logger.warn("Backend not installed.");
+            return;
+        }
+
         if (OSUtil.getOS().contains("Windows")) {
             server = new File(backendDirectory, "llama-completion.exe");
         } else {

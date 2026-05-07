@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DeviceProcess {
-    private final Process process;
+    private Process process;
 
     public DeviceProcess(String backend) throws IOException {
         App.logger.info("Scanning devices for {} backend.", backend);
@@ -21,6 +21,10 @@ public class DeviceProcess {
         String[] parameters;
 
         File backendDirectory = new File(App.getBackendDirectory(), backend + "/");
+        if (!backendDirectory.exists()) {
+            App.logger.warn("Backend not installed.");
+            return;
+        }
         App.logger.info("Backend Location: {}", backendDirectory.getAbsolutePath());
 
         if (OSUtil.getOS().contains("Windows")) {
