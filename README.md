@@ -5,8 +5,6 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
 
 **Important:** You'll need a mid-range gaming GPU with 8GB VRAM or more!
 
-<img alt="Home" height="700" src="images/Home.png" width="1200"/>
-
 ## ✨ Features
 * **Role-Play Focused:** Optimized for engaging and immersive character interactions.
 * **Character Management:** Create and manage character templates, supporting imports from popular character card formats (SillyTavern, Backyard AI).
@@ -17,7 +15,6 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
     * **No Data Collection:** Your data stays on your machine.
     * **Encrypted Data:** Sensitive information (chats, characters, users) is encrypted locally.
 * **Advanced Model Features:** Support for Qwen3 Think Mode and Jinja templating.
-* **Reasoning Support:** Think tags are separated into its own collapsable view.
 
 ## 💻 Compatibility
 Windows 10+ or Linux x64. GPU drivers are needed. Tested and validated: 
