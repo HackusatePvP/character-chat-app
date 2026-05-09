@@ -82,7 +82,7 @@ public class LLamaBackendUpdater {
     }
 
     public void buildAndDisplayUpdateWindow(GitHubUtil gitHubUtil) {
-        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new ImageLoader(new File(App.getExecutedDirectory(), "logo.png"))).build();
         container = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(container);
         window.getStage().setOnHidden(windowEvent -> {
