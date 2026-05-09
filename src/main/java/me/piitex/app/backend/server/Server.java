@@ -76,7 +76,6 @@ public class Server {
             response.setGenerating(false);
         }
 
-        // Cleanup processes
         return postProcessResponse(responseAppender.toString(), response);
     }
 
@@ -138,8 +137,6 @@ public class Server {
             if (httpResponse.getCode() != 200) {
                 String errorBody = EntityUtils.toString(httpResponse.getEntity());
                 App.logger.error("Remote server rejected request. HTTP {}: {}", httpResponse.getCode(), errorBody);
-
-                // Optional: Print the error into the chat UI so you don't have to check the console
                 updateUIOnStream("Network Error: HTTP " + httpResponse.getCode(), chatMessageBox, response);
                 return;
             }

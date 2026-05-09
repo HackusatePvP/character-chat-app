@@ -9,7 +9,6 @@ import me.piitex.app.App;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
-import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 
@@ -27,7 +26,6 @@ public class ConfigureBackendView extends VerticalLayout {
         setHeight(appSettings.getHeight());
         addStyle(Styles.BG_DEFAULT);
         setAlignment(Pos.CENTER);
-
 
         init();
     }

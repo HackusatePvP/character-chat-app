@@ -17,8 +17,6 @@ import me.piitex.os.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 public class ApplicationUpdater {
     private String currentVersion;
@@ -91,10 +89,6 @@ public class ApplicationUpdater {
             progressBarOverlay.setX(150);
             progressBarOverlay.setY(70);
             container.addElement(progressBarOverlay);
-
-            // Start download
-
-
         });
         App.window.getStage().getScene().getRoot().setDisable(true);
         window.getStage().setAlwaysOnTop(true);
@@ -121,12 +115,10 @@ public class ApplicationUpdater {
                     @Override
                     public void onDownloadComplete(DownloadInfo info, File outputFile) {
                         App.logger.info("Update completed! Shutting down...");
+
+                        // Call the file to be moved after the runtime shuts down.
+
                         Platform.exit();
-                        try {
-                            Files.copy(outputFile.toPath(), new File(App.getExecutedDirectory(), "character-chat-app.jar").toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
                         System.exit(1);
                     }
 
@@ -142,7 +134,7 @@ public class ApplicationUpdater {
 
                 });
             } catch (IOException | URISyntaxException e) {
-                throw new RuntimeException(e);
+                // TOOD: Display error window
             }
         });
     }
