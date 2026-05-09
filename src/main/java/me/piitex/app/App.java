@@ -73,7 +73,7 @@ public class App extends FXLoad {
     private volatile boolean loading = true;
     private volatile boolean error = false;
 
-    private LLamaBackendUpdater LLamaBackendUpdater;
+    private LLamaBackendUpdater lLamaBackendUpdater;
 
     // Used for testing with the IDE!
     public static void main(String[] args) {
@@ -413,13 +413,13 @@ public class App extends FXLoad {
         if (settings.getDevice().equals("error")) {
             App.logger.info("Could not load backend devices. Force checking updates...");
             settings.setDevice("Auto");
-            LLamaBackendUpdater = new LLamaBackendUpdater("0");
+            lLamaBackendUpdater = new LLamaBackendUpdater("0");
         } else {
             File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
             if (backendVersionFile != null) {
-                LLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+                lLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
             } else {
-                LLamaBackendUpdater = new LLamaBackendUpdater("0");
+                lLamaBackendUpdater = new LLamaBackendUpdater("0");
             }
         }
         App.logger.info("Finished updates.");
@@ -581,7 +581,7 @@ public class App extends FXLoad {
     }
 
     public LLamaBackendUpdater getBackendUpdater() {
-        return LLamaBackendUpdater;
+        return lLamaBackendUpdater;
     }
 
     public static void reloadModelList() {

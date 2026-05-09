@@ -64,8 +64,10 @@ public class LLamaBackendUpdater {
 
     public synchronized boolean isUpdateAvailable() {
         if (current != null && latest != null) {
+            System.out.println("Not null");
             return current.compareTo(latest) < 0;
         }
+        System.out.println("False");
         return false;
     }
 

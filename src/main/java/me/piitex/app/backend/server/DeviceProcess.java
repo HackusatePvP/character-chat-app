@@ -63,7 +63,9 @@ public class DeviceProcess {
     public void handleOutput() {
         try {
             LinkedList<String> lines = new LinkedList<>(Files.readAllLines(new File(App.getAppDirectory(), "devices.txt").toPath()));
-            lines.removeFirst();
+            if (!lines.isEmpty()) {
+                lines.removeFirst();
+            }
             App.getInstance().getSettings().setDevices(lines);
             App.logger.info("Devices: {}", List.of(lines));
         } catch (IOException e) {

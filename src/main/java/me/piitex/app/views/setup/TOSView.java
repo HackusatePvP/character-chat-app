@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.text.TextFlow;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -47,7 +48,9 @@ public class TOSView extends VerticalLayout {
         ButtonOverlay accept = new ButtonBuilder("accept").setText("I accept.").addStyle(Styles.BUTTON_OUTLINED).addStyle(Styles.SUCCESS).build();
         choiceBox.addElement(accept);
         accept.onClick(event -> {
-            if (App.getInstance().getBackendUpdater().isUpdateAvailable()) {
+            LLamaBackendUpdater updater = App.getInstance().getBackendUpdater();
+
+            if (updater != null && updater.isUpdateAvailable()) {
                 parent.getRoot().removeAllElements();
                 parent.getRoot().addElement(new UpdateView(parent));
             } else {
