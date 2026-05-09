@@ -7,7 +7,6 @@ import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.utils.Placeholder;
-import me.piitex.app.views.chats.components.ReasoningLayout;
 import me.piitex.engine.Element;
 import me.piitex.engine.containers.CardContainer;
 import me.piitex.engine.layouts.TitledLayout;
@@ -23,6 +22,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.io.CloseMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,13 +32,15 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static me.piitex.app.views.Positions.*;
-
 public class Server {
     private static final String baseUrl = "http://localhost:8187";
 
     public static String getHealth() throws JSONException {
-        HttpGet get = new HttpGet(baseUrl + "/health");
+        HttpGet get = new HttpGet(getBaseUrl() + "/health");
+
+        if (App.getInstance().getSettings().isRemoteMode() && !App.getInstance().getSettings().getApiKey().isEmpty()) {
+            get.setHeader("Authorization", "Bearer " + App.getInstance().getSettings().getApiKey());
+        }
 
         JSONObject object;
         try (CloseableHttpClient client = HttpClients.createDefault();
@@ -57,8 +59,7 @@ public class Server {
         return object.getString("status");
     }
 
-    public static String generateResponseOAIStream(ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) throws JSONException, IOException, InterruptedException {
-
+    public static String generateResponseOAIStream(VerticalLayout chatMessageBox, Response response) throws JSONException, IOException, InterruptedException, ParseException {
         App.logger.info("Collecting response from server...");
 
         // Prepare request
@@ -69,13 +70,12 @@ public class Server {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             response.setGenerating(true);
             // Execute and process stream
-            executeAndProcessStream(client, post, chatMessage, chatMessageBox, card, response, responseAppender);
+            executeAndProcessStream(client, post, chatMessageBox, response, responseAppender);
         } finally {
             // Set the response status to generating
             response.setGenerating(false);
         }
 
-        // Cleanup processes
         return postProcessResponse(responseAppender.toString(), response);
     }
 
@@ -83,7 +83,11 @@ public class Server {
      * Prepares the HttpPost object with all necessary OAI settings and messages.
      */
     private static HttpPost prepareOAIStreamRequest(Response response) throws JSONException {
-        HttpPost post = new HttpPost(baseUrl + "/v1/chat/completions");
+        HttpPost post = new HttpPost(getBaseUrl() + "/v1/chat/completions");
+        if (App.getInstance().getSettings().isRemoteMode() && !App.getInstance().getSettings().getApiKey().isEmpty()) {
+            post.setHeader("Authorization", "Bearer " + App.getInstance().getSettings().getApiKey());
+        }
+
         ModelSettings settings = response.getCharacter().getModelSettings();
         JSONObject toPost = new JSONObject();
 
@@ -124,39 +128,51 @@ public class Server {
     /**
      * Executes the HTTP request and processes the incoming streaming response line by line.
      */
-    private static void executeAndProcessStream(CloseableHttpClient client, HttpPost post, ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response,
-            StringBuilder appender) throws IOException, InterruptedException, JSONException {
+    private static void executeAndProcessStream(CloseableHttpClient client, HttpPost post, VerticalLayout chatMessageBox, Response response,
+                                                StringBuilder appender) throws IOException, InterruptedException, JSONException, ParseException {
 
-        try (CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext());
-             Scanner scanner = new Scanner(httpResponse.getEntity().getContent())) {
+        try (CloseableHttpResponse httpResponse = client.execute(post, new HttpClientContext())) {
 
-            boolean stopGenerating;
-            while (scanner.hasNextLine()) {
-                response.setResponse(appender.toString());
+            // Check if the server rejected the request before attempting to parse a stream
+            if (httpResponse.getCode() != 200) {
+                String errorBody = EntityUtils.toString(httpResponse.getEntity());
+                App.logger.error("Remote server rejected request. HTTP {}: {}", httpResponse.getCode(), errorBody);
+                updateUIOnStream("Network Error: HTTP " + httpResponse.getCode(), chatMessageBox, response);
+                return;
+            }
 
-                // Check for interruption and halts early
-                if (handleInterruption(response)) {
-                    throw new InterruptedException("Response generation was interrupted by user.");
-                }
-                if (response.isHalt()) {
-                    App.logger.info("Halting response generation...");
-                    break;
-                }
+            try (Scanner scanner = new Scanner(httpResponse.getEntity().getContent())) {
+                boolean stopGenerating;
+                while (scanner.hasNextLine()) {
+                    response.setResponse(appender.toString());
 
-                String content = scanner.nextLine().replaceFirst("data: ", "");
+                    if (handleInterruption(response)) {
+                        httpResponse.close(CloseMode.IMMEDIATE);
+                        client.close(CloseMode.IMMEDIATE);
+                        break;
+                    }
+                    if (response.isHalt()) {
+                        App.logger.info("Halting response generation...");
+                        httpResponse.close(CloseMode.IMMEDIATE);
+                        client.close(CloseMode.IMMEDIATE);
+                        break;
+                    }
 
-                if (content.startsWith("error")) {
-                    App.logger.error("Error occurred: {}", content);
-                    break;
-                }
+                    String content = scanner.nextLine().replaceFirst("data: ", "");
 
-                if (content.isEmpty()) continue;
+                    if (content.startsWith("error")) {
+                        App.logger.error("Error occurred: {}", content);
+                        break;
+                    }
 
-                // Process the JSON chunk
-                stopGenerating = processStreamChunk(content, appender, chatMessage, chatMessageBox, card, response);
+                    if (content.isEmpty()) continue;
 
-                if (stopGenerating) {
-                    break;
+                    // Process the JSON chunk
+                    stopGenerating = processStreamChunk(content, appender, chatMessageBox, response);
+
+                    if (stopGenerating) {
+                        break;
+                    }
                 }
             }
         }
@@ -181,7 +197,7 @@ public class Server {
      * Parses a single stream chunk and updates the response and UI.
      * @return true if a 'stop' reason was received.
      */
-    private static boolean processStreamChunk(String content, StringBuilder appender, ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) throws JSONException {
+    private static boolean processStreamChunk(String content, StringBuilder appender, VerticalLayout chatMessageBox, Response response) throws JSONException {
 
         JSONObject receive = new JSONObject(content);
         if (!receive.has("choices")) {
@@ -205,7 +221,7 @@ public class Server {
             appender.append(line);
 
             // Perform UI actions to notify the user of response progress
-            updateUIOnStream(appender.toString(), chatMessage, chatMessageBox, card, response);
+            updateUIOnStream(appender.toString(), chatMessageBox, response);
         }
         return false; // Continue generation
     }
@@ -213,7 +229,7 @@ public class Server {
     /**
      * Executes UI updates on the JavaFX Platform thread.
      */
-    private static void updateUIOnStream(String currentResponse, ChatMessage chatMessage, VerticalLayout chatMessageBox, CardContainer card, Response response) {
+    private static void updateUIOnStream(String currentResponse, VerticalLayout chatMessageBox, Response response) {
 
         Platform.runLater(() -> {
             String updated = currentResponse;
@@ -221,12 +237,23 @@ public class Server {
             // Format placeholders and BBCode
             updated = formatResponseText(updated, response);
 
-            // Handle 'Think' tags for the reasoning layout
-            if (updated.toLowerCase().startsWith("<think>") && !updated.toLowerCase().contains("</think>")) {
-                handleThinkTagStart(updated, chatMessage, chatMessageBox, response);
-            } else {
-                // Handle 'Think' tag cleanup and final display
-                handleThinkTagCleanupAndDisplay(updated, chatMessageBox, card, response);
+            // Final display of the response in the main chat card
+            boolean caught = false;
+            try {
+                // Check if the current BBCode is valid before attempting to render
+                BBCodeParser.createFormattedText(updated);
+            } catch (IllegalStateException ignored) {
+                caught = true; // BBCode error (e.g., unclosed tag)
+            } finally {
+                if (!caught) {
+                    TextFlowOverlay textFlowOverlay = (TextFlowOverlay) chatMessageBox.getElementAt(2);
+                    if (textFlowOverlay != null) {
+                        textFlowOverlay.setText(updated); // Update the main response card
+                    } else {
+                        textFlowOverlay = new TextFlowOverlay(updated, -1, -1);
+                        chatMessageBox.addElement(textFlowOverlay, 2);
+                    }
+                }
             }
         });
     }
@@ -256,37 +283,37 @@ public class Server {
         // Check to see if the think view already exists.
         Element element = chatMessageBox.getElementAt(0);
 
-        TitledLayout thinkCard;
-        if (element instanceof CardContainer cardContainer) {
-            // If the first element is the main chat card, insert the think card above it.
-            thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_HEIGHT);
-            chatMessageBox.addElement(thinkCard, 0);
-
-            // Set card body to 'thinking' (This targets the main response card, not the think card)
-            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
-            textFlowOverlay.setText("Thinking...");
-        } else {
-            // Assume the first element is the existing TitledLayout (think card)
-            thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
-            thinkCard.setMaxSize(0, -1);
-
-            CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1); // Main response card is now at index 1
-            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
-            textFlowOverlay.setText("Thinking...");
-        }
-
-        // Update the content of the think card
-        if (thinkCard.getElements().isEmpty()) {
-            TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, CHAT_BOX_IMAGE_WIDTH, -1);
-            thinkCard.addElement(textFlowOverlay);
-        }
-
-        if (thinkCard.getElementAt(0) instanceof TextFlowOverlay textFlowOverlay) {
-            if (textFlowOverlay.getText() == null || textFlowOverlay.getText().isEmpty()) {
-                thinkCard.setExpanded(true); // Auto-expand if content starts
-            }
-            textFlowOverlay.setText(updated);
-        }
+//        TitledLayout thinkCard;
+//        if (element instanceof CardContainer cardContainer) {
+//            // If the first element is the main chat card, insert the think card above it.
+//            thinkCard = new ReasoningLayout(chatMessage, CHAT_BOX_IMAGE_WIDTH, CHAT_BOX_HEIGHT);
+//            chatMessageBox.addElement(thinkCard, 0);
+//
+//            // Set card body to 'thinking' (This targets the main response card, not the think card)
+//            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
+//            textFlowOverlay.setText("Thinking...");
+//        } else {
+//            // Assume the first element is the existing TitledLayout (think card)
+//            thinkCard = (TitledLayout) chatMessageBox.getElementAt(0);
+//            thinkCard.setMaxSize(0, -1);
+//
+//            CardContainer cardContainer = (CardContainer) chatMessageBox.getElementAt(1); // Main response card is now at index 1
+//            TextFlowOverlay textFlowOverlay = (TextFlowOverlay) cardContainer.getBody();
+//            textFlowOverlay.setText("Thinking...");
+//        }
+//
+//        // Update the content of the think card
+//        if (thinkCard.getElements().isEmpty()) {
+//            TextFlowOverlay textFlowOverlay = new TextFlowOverlay(updated, CHAT_BOX_IMAGE_WIDTH, -1);
+//            thinkCard.addElement(textFlowOverlay);
+//        }
+//
+//        if (thinkCard.getElementAt(0) instanceof TextFlowOverlay textFlowOverlay) {
+//            if (textFlowOverlay.getText() == null || textFlowOverlay.getText().isEmpty()) {
+//                thinkCard.setExpanded(true); // Auto-expand if content starts
+//            }
+//            textFlowOverlay.setText(updated);
+//        }
     }
 
     /**
@@ -383,7 +410,11 @@ public class Server {
      */
     public static int tokenize(String string) throws JSONException {
         // "content": "Content"
-        HttpPost post = new HttpPost(baseUrl + "/tokenize");
+        HttpPost post = new HttpPost(getBaseUrl() + "/tokenize");
+        if (App.getInstance().getSettings().isRemoteMode() && !App.getInstance().getSettings().getApiKey().isEmpty()) {
+            post.setHeader("Authorization", "Bearer " + App.getInstance().getSettings().getApiKey());
+        }
+
         JSONObject toPost = new JSONObject();
         toPost.put("content", string);
         post.setEntity(new StringEntity(toPost.toString(), ContentType.APPLICATION_JSON));
@@ -403,5 +434,13 @@ public class Server {
         }
         JSONArray array = object.getJSONArray("tokens");
         return array.length();
+    }
+
+    private static String getBaseUrl() {
+        ServerSettings settings = App.getInstance().getSettings();
+        if (settings.isRemoteMode()) {
+            return settings.getRemoteUrl();
+        }
+        return "http://localhost:8187";
     }
 }

@@ -1,11 +1,11 @@
 package me.piitex.app.backend;
 
-import com.drew.lang.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.ModelSettings;
 import me.piitex.app.views.chats.ChatView;
 import me.piitex.engine.maps.LimitedHashMap;
 import me.piitex.os.configurations.InfoFile;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
@@ -15,18 +15,16 @@ public class Character {
     private String displayName = "";
     private String persona = "";
     private String iconPath = "";
+    
     @Nullable
     private User user = null;
 
     private String firstMessage = "";
     private String chatScenario = "";
 
-    private Chat lastChat;
-
     private boolean override = false;
     private String model;
     private ModelSettings modelSettings;
-
     private InfoFile infoFile;
 
     private Map<String, String> lorebook = new TreeMap<>();
@@ -92,10 +90,6 @@ public class Character {
         if (infoFile.hasKey("dialogue")) {
             this.exampleDialogue = infoFile.getStringMap("dialogue");
         }
-        if (infoFile.hasKey("last-chat")) {
-            String last = infoFile.get("last-chat");
-            this.lastChat = chats.stream().filter(chat -> chat.getFile().getName().equalsIgnoreCase(last)).findAny().orElse(null);
-        }
         if (infoFile.hasKey("disclaimer")) {
             this.shownDisclaimer = infoFile.getBoolean("disclaimer");
         } else {
@@ -124,8 +118,10 @@ public class Character {
         if (getChatDirectory() == null || !getChatDirectory().exists()) return;
         for (File file : getChatDirectory().listFiles()) {
             if (file.isDirectory()) continue;
-            Chat chat = new Chat(file);
-            chats.add(chat);
+            App.getThreadPoolManager().submitTask(() -> {
+                Chat chat = new Chat(file);
+                chats.add(chat);
+            });
         }
     }
 
@@ -220,11 +216,10 @@ public class Character {
     }
 
     public Chat getLastChat() {
-        return lastChat;
+        return chats.stream().filter(chat -> chat.getFile().getName().equalsIgnoreCase(infoFile.get("last-chat"))).findAny().orElse(null);
     }
 
     public void setLastChat(Chat lastChat) {
-        this.lastChat = lastChat;
         infoFile.set("last-chat", lastChat.getFile().getName());
     }
 
@@ -292,7 +287,7 @@ public class Character {
         return chatViewCachedNodes;
     }
 
-    public void copy(Character character) {
+    public void copyFrom(Character character) {
         setDisplayName(character.getDisplayName());
         setPersona(character.getPersona());
         setUser(character.getUser());

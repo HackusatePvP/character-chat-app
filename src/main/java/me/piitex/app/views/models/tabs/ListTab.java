@@ -18,7 +18,6 @@ import me.piitex.engine.layouts.Layout;
 import me.piitex.engine.layouts.TitledLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -41,13 +40,12 @@ public class ListTab extends Tab {
         // Build the list view for the models.
         VerticalLayout layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
-        layout.setX(20);
 
-        scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
-        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer = new ScrollContainer(layout, 0, 0, MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
-        scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setScrollWhenNeeded(false);
         addElement(scrollContainer); // Adds the scroll container
 
         buildModelCards(layout); // Adds the models to the view
@@ -57,7 +55,7 @@ public class ListTab extends Tab {
 
         boolean def = false;
 
-        for (Model model : App.getModels("exclude").values()) {
+        for (Model model : App.getModels("exclude")) {
             if (model.getSettings().isDefault()) {
                 if (!def) {
                     def = true;
@@ -76,7 +74,7 @@ public class ListTab extends Tab {
             TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 100, -1);
             root.setMaxSize(root.getWidth(), -1);
             root.addStyle(Styles.DENSE);
-            root.setSpacing(30);
+            root.setSpacing(50);
             root.setAlignment(Pos.TOP_CENTER);
             root.addStyle(Tweaks.ALT_ICON);
             root.setExpanded(model.getSettings().isDefault());
@@ -86,7 +84,7 @@ public class ListTab extends Tab {
             body.setSpacing(10);
             root.addElement(body);
 
-            TextOverlay folder = new TextOverlay(new FontIcon(Material2AL.FOLDER));
+            IconOverlay folder = new IconOverlay(Material2AL.FOLDER);
             folder.setY(15);
             folder.setTooltip("Open file location.");
             body.addElement(folder);
@@ -98,7 +96,7 @@ public class ListTab extends Tab {
                 }
             });
 
-            InputFieldOverlay location = new InputFieldOverlay(model.getFile().getAbsolutePath(), 0, 0, 500, 50);
+            TextFieldOverlay location = new TextFieldOverlay(model.getFile().getAbsolutePath(), 0, 0, 500, 50);
             location.setEnabled(false);
             body.addElement(location);
 
@@ -113,7 +111,7 @@ public class ListTab extends Tab {
                 // Also, re-render the view
 
                 // Reloop models and disable any defaults
-                for (Model m : App.getModels("exclude").values()) {
+                for (Model m : App.getModels("exclude")) {
                     if (m == model) continue;
                     if (m.getSettings().isDefault()) {
                         m.getSettings().setDefault(false);
@@ -130,7 +128,7 @@ public class ListTab extends Tab {
             subFooter.setSpacing(40);
             footer.addElement(subFooter);
 
-            TextOverlay settings = new TextOverlay(new FontIcon(Material2MZ.SETTINGS));
+            IconOverlay settings = new IconOverlay(Material2MZ.SETTINGS);
             settings.setTooltip("Go to model settings.");
             subFooter.addElement(settings);
             settings.addStyle(Styles.ACCENT);
@@ -140,7 +138,7 @@ public class ListTab extends Tab {
                 App.window.addContainer(new ModelEditView(model.getSettings()));
             });
 
-            TextOverlay delete = new TextOverlay(new FontIcon(Material2AL.DELETE_FOREVER));
+            IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
             delete.setTooltip("Delete the model.");
             delete.addStyle(Styles.DANGER);
             subFooter.addElement(delete);

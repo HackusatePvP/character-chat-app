@@ -12,7 +12,6 @@ import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.util.Map;
@@ -22,7 +21,7 @@ public class LorebookTab extends Tab {
     private final AppSettings appSettings;
     private final CharacterEditView parentView;
 
-    private InputFieldOverlay addKeyInput;
+    private TextFieldOverlay addKeyInput;
     private TextAreaOverlay addValueInput;
     private ScrollContainer scrollLoreContainer;
     private final Map<String, String> loreItems;
@@ -44,7 +43,7 @@ public class LorebookTab extends Tab {
         rootLayout.setAlignment(Pos.TOP_CENTER);
         this.addElement(rootLayout);
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
         rootLayout.addElement(info);
 
@@ -56,7 +55,7 @@ public class LorebookTab extends Tab {
         CardContainer addContainer = new CardContainer(0, 0, 400, 400);
         addContainer.setMaxSize(400, 400);
 
-        addKeyInput = new InputFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
+        addKeyInput = new TextFieldOverlay("", "Separate multiple keys with a comma (,)", 0, 0, 200, 50);
         addContainer.setHeader(addKeyInput);
 
         addValueInput = new TextAreaOverlay("", "Enter the lore info", 0, 0, 400, 200);
@@ -118,11 +117,11 @@ public class LorebookTab extends Tab {
     private CardContainer buildLoreEntry(String key, VerticalLayout scrollContainer) {
         CardContainer card = new CardContainer(0, 0, 400, 300);
 
-        InputFieldOverlay entryKey = new InputFieldOverlay(key, 0, 0, 400, 50);
+        TextFieldOverlay entryKey = new TextFieldOverlay(key, 0, 0, 400, 50);
         entryKey.setEnabled(false); // Make key read-only
         card.setHeader(entryKey);
 
-        TextAreaOverlay entryValue = new TextAreaOverlay(loreItems.get(key), 0, 0, 400, 200);
+        TextAreaOverlay entryValue = new TextAreaOverlay(loreItems.get(key), "", 400, 200);
         entryValue.onInputSetEvent(event -> {
             loreItems.put(key, event.getInput());
             parentView.warnTokens();

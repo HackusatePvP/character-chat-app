@@ -7,6 +7,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.overlays.MessageOverlay;
+import me.piitex.os.OSUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +25,6 @@ public class ServerProcess {
 
     private boolean error = false;
     private volatile boolean loading = false;
-
     private final List<ServerLoadingListener> listeners = new CopyOnWriteArrayList<>();
 
 
@@ -49,13 +49,25 @@ public class ServerProcess {
         }
         App.logger.info("Loading {}", model.getFile().getAbsolutePath());
 
+        if (model.getSettings().isChange() || model.getSettings().getTotalLayers() == 0) {
+            App.logger.info("Gathering model data...");
+            new ModelTestProcess(model);
+        }
+
         loading = true;
 
         // Fetch server/model settings.
         ServerSettings settings = App.getInstance().getSettings();
 
-        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend() + "/");
-        File server = new File(backendDirectory, "llama-server.exe");
+        File server;
+        File backendDirectory = new File(App.getBackendDirectory(), settings.getBackend().toLowerCase() + "/");
+        
+        if (OSUtil.getOS().contains("Windows")) {
+            server = new File(backendDirectory, "llama-server.exe");
+        } else {
+            server = new File(backendDirectory, "llama-server");
+            server.setExecutable(true, true);
+        }
         List<String> parameters = getParameters(server, settings);
         App.logger.debug("Server Parameters: {}", parameters);
 
@@ -67,7 +79,7 @@ public class ServerProcess {
         environmentVariables.put("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM", "1"); // Should fix BSOD with vulkan
 
         // The server output will be errors even though it's not errors. This is how Java works
-        builder.redirectError(new File(App.getDataDirectory(), "server.txt"));
+        builder.redirectError(new File(App.getAppDirectory(), "server.txt"));
 
         process = null;
         try {
@@ -136,7 +148,7 @@ public class ServerProcess {
         parameters.add(model.getFile().getAbsolutePath());
         if (!settings.getDevice().equalsIgnoreCase("auto")) {
             App.logger.debug("Setting device...");
-            parameters.add("-dev");
+            parameters.add("--device");
             parameters.add(settings.getFormattedDevice().trim());
         }
 
@@ -160,16 +172,58 @@ public class ServerProcess {
             }
         }
 
-        // GPU layers
-        parameters.add("-ngl");
+        // GPU layers have been refactored to GPU usage.
+        // The usage is a percentage of the total layers (model.getGpuLayers());
+        double TOTAL_AVAILABLE_VRAM_MIB = App.getInstance().getAppSettings().getTotalGpuVram();
 
-        if (settings.getBackend().equalsIgnoreCase("vulkan")) {
-            if (model.getGpuLayers() > 0 && settings.getGpuLayers() > model.getGpuLayers()) {
-                settings.setGpuLayers(model.getGpuLayers());
-            }
+        double KV_CACHE = model.getSettings().getKvCacheSize();
+        double COMPUTED_BUFFER_SIZE = model.getSettings().getComputeBufferSize();
+        double FIXED_OVERHEAD_MIB = KV_CACHE + COMPUTED_BUFFER_SIZE;
+
+        if (FIXED_OVERHEAD_MIB <= 0.0) {
+            // Fallback check
+            FIXED_OVERHEAD_MIB = 4246.00;
         }
 
-        parameters.add(settings.getGpuLayers() + "");
+        final double VRAM_PER_LAYER_MIB = model.getSettings().getDataPerLayer();
+        double VRAM_ALLOCATION = settings.getGpuUsage();
+
+        // Calculate the total vram allowed by the percentage.
+        double VRAM_ALLOC_BUDGET = TOTAL_AVAILABLE_VRAM_MIB * (VRAM_ALLOCATION / 100.0);
+
+        // Calculate the max by subtracting the required FIXED OVERHEAD.
+        double LAYER_ALLOC_BUDGET = VRAM_ALLOC_BUDGET - FIXED_OVERHEAD_MIB;
+
+        // Ensure nothing is negative.
+        if (LAYER_ALLOC_BUDGET < 0) {
+            App.logger.warn("Total VRAM Budget ({}) is less than Fixed Overhead ({}). Setting Layer Budget to 0.", VRAM_ALLOC_BUDGET, FIXED_OVERHEAD_MIB);
+            LAYER_ALLOC_BUDGET = 0;
+        }
+
+        int TOTAL_MODEL_LAYERS = model.getSettings().getTotalLayers();
+
+        int layers;
+        // Calculate the number of layers that fit into the budget
+        if (VRAM_PER_LAYER_MIB > 0.0) {
+            layers = (int) Math.floor(LAYER_ALLOC_BUDGET / VRAM_PER_LAYER_MIB);
+        } else {
+            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to 0.");
+            layers = 0;
+        }
+
+        // Cap the offloaded layers
+        layers = Math.min(layers, TOTAL_MODEL_LAYERS);
+
+        parameters.add("-ngl");
+        App.logger.info("Using VRAM utilization of '{}%' (Total VRAM Budget: {} MiB, Layers VRAM Usage: {} MiB) to load '{}'/'{}' layers)",
+                String.format("%d", (long) VRAM_ALLOCATION),
+                (int) VRAM_ALLOC_BUDGET,
+                (int) (layers * VRAM_PER_LAYER_MIB),
+                layers,
+                TOTAL_MODEL_LAYERS);
+
+        String num = Integer.toString(layers);
+        parameters.add(num);
 
         // Memory swapping
         if (settings.isMemoryLock()) {
@@ -203,19 +257,28 @@ public class ServerProcess {
         parameters.add("-c");
         parameters.add(model.getSettings().getContextSize() + "");
 
+        if (model.getSettings().isContextShift()) {
+            parameters.add("--context-shift");
+        }
+
         // Server port and WebUI
         parameters.add("--port");
         parameters.add("8187");
         parameters.add("--no-webui");
+
+        if (settings.isHost()) {
+            App.logger.info("Server is listening on 0.0.0.0");
+            parameters.add("--host");
+            parameters.add("0.0.0.0");
+        }
 
         return parameters;
     }
 
     protected void waitForServer() {
         App.logger.info("Checking server state...");
-        File output = new File(App.getDataDirectory(), "server.txt");
+        File output = new File(App.getAppDirectory(), "server.txt");
         boolean started = false;
-
         while (!started) {
             try {
                 Thread.sleep(100); // Wait for 100 milliseconds before checking the file again
@@ -232,6 +295,11 @@ public class ServerProcess {
                             App.logger.info("Backend server stated!");
                             started = true;
                             break;
+                        }
+                        if (line.startsWith("print_info: n_layer") && model.getSettings().getTotalLayers() == 0) {
+                            line = line.split("=")[1].trim();
+                            App.logger.info("Total Model Layers: {}", line);
+                            model.getSettings().setTotalLayers(Integer.parseInt(line));
                         }
                     }
                 }

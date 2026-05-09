@@ -65,7 +65,7 @@ public class UserEditView extends EmptyContainer {
         root.setMaxSize(root.getWidth(), root.getHeight());
         addElement(root);
 
-        SidebarView sidebarView = new SidebarView(false);
+        SidebarView sidebarView = new SidebarView();
         root.addElement(sidebarView);
 
         VerticalLayout mainPage = new VerticalLayout(appSettings.getWidth() - 200, 0);

@@ -1,11 +1,12 @@
 package me.piitex.app.configuration;
 
-import com.drew.lang.annotations.Nullable;
 import me.piitex.os.configurations.InfoFile;
+import org.jetbrains.annotations.Nullable;
 
 public class ModelSettings {
     private String modelInstructions = "Text transcript of a never-ending conversation between {user} and {character}. In the transcript, write everything {character}'s reply from a third person perspective with dialogue written in quotations. Assuming any action of {user} is strictly forbidden. You are {character}. Write {character}'s reply only.";
     private int contextSize = 4096; // 4096 is a good baseline. Most modern models can go way higher (32k)
+    private boolean contextShift = true; // Def: True, CCA manages context tokens automatically. This will be a safeguard to prevent errors.
     private double temperature = 0.8; // min 0
     private double topP = 1; // min 0
     private double minP = 0.1; // min 0.05
@@ -28,6 +29,11 @@ public class ModelSettings {
     private String reasoningTemplate = "disabled";
     private boolean useDefault;
     private boolean jinja = false;
+    private int totalLayers = 0;
+    private double dataPerLayer;
+    private double kvCacheSize;
+    private double computeBufferSize; // This is compute buffer size.
+    private boolean change = false; // Flags if the model settings have been changed.
 
     @Nullable
     private InfoFile infoFile;
@@ -47,6 +53,11 @@ public class ModelSettings {
             contextSize = infoFile.getInteger("tokens");
         } else {
             infoFile.set("tokens", contextSize);
+        }
+        if (infoFile.hasKey("context-shift")) {
+            this.contextShift = infoFile.getBoolean("context-shift");
+        } else {
+            infoFile.set("context-shift", contextShift);
         }
         if (infoFile.hasKey("temperature")) {
             this.temperature = infoFile.getDouble("temperature");
@@ -158,6 +169,21 @@ public class ModelSettings {
         } else {
             infoFile.set("mm-proj", mmProj);
         }
+        if (infoFile.hasKey("total-layers")) {
+            this.totalLayers = infoFile.getInteger("total-layers");
+        }
+        if (infoFile.hasKey("kv-cache")) {
+            this.kvCacheSize = infoFile.getDouble("kv-cache");
+        }
+        if (infoFile.hasKey("compute-buffer-size")) {
+            this.computeBufferSize = infoFile.getDouble("compute-buffer-size");
+        }
+        if (infoFile.hasKey("data-per-layer")) {
+            this.dataPerLayer = infoFile.getDouble("data-per-layer");
+        }
+        if (infoFile.hasKey("change")) {
+            this.change = infoFile.getBoolean("change");
+        }
     }
 
     public String getModelInstructions() {
@@ -178,6 +204,15 @@ public class ModelSettings {
     public void setContextSize(int contextSize) {
         this.contextSize = contextSize;
         infoFile.set("tokens", contextSize);
+    }
+
+    public boolean isContextShift() {
+        return contextShift;
+    }
+
+    public void setContextShift(boolean contextShift) {
+        this.contextShift = contextShift;
+        infoFile.set("context-shift", contextShift);
     }
 
     public double getTemperature() {
@@ -392,6 +427,51 @@ public class ModelSettings {
     public void setMmProj(String mmProj) {
         this.mmProj = mmProj;
         infoFile.set("mm-proj", mmProj);
+    }
+
+    public int getTotalLayers() {
+        return totalLayers;
+    }
+
+    public void setTotalLayers(int totalLayers) {
+        this.totalLayers = totalLayers;
+        infoFile.set("total-layers", totalLayers);
+    }
+
+    public double getDataPerLayer() {
+        return dataPerLayer;
+    }
+
+    public void setDataPerLayer(double dataPerLayer) {
+        this.dataPerLayer = dataPerLayer;
+        infoFile.set("data-per-layer", dataPerLayer);
+    }
+
+    public double getKvCacheSize() {
+        return kvCacheSize;
+    }
+
+    public void setKvCacheSize(double kvCacheSize) {
+        this.kvCacheSize = kvCacheSize;
+        infoFile.set("kv-cache", kvCacheSize);
+    }
+
+    public double getComputeBufferSize() {
+        return computeBufferSize;
+    }
+
+    public void setComputeBufferSize(double computeBufferSize) {
+        this.computeBufferSize = computeBufferSize;
+        infoFile.set("compute-buffer-size", computeBufferSize);
+    }
+
+    public boolean isChange() {
+        return change;
+    }
+
+    public void setChange(boolean change) {
+        this.change = change;
+        infoFile.set("change", change);
     }
 
     @Nullable

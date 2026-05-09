@@ -3,7 +3,7 @@ package me.piitex.app.views.characters.tabs;
 import atlantafx.base.controls.Popover;
 import atlantafx.base.theme.Styles;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.lang.annotations.Nullable;
+
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
@@ -24,8 +24,8 @@ import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.app.backend.Character;
 import org.json.JSONObject;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +36,8 @@ public class CharacterTab extends Tab {
     private final CharacterEditView parentView;
 
     private RichTextAreaOverlay charDescription;
-    private InputFieldOverlay charIdInput;
-    private InputFieldOverlay charDisplayName;
+    private TextFieldOverlay charIdInput;
+    private TextFieldOverlay charDisplayName;
     private ImageOverlay image;
 
     public CharacterTab(AppSettings appSettings, @Nullable Character character, @Nullable User user, boolean duplicate, CharacterEditView parentView) {
@@ -150,7 +150,7 @@ public class CharacterTab extends Tab {
         root.setMaxSize(250, 200);
         root.setSpacing(10);
 
-        charIdInput = new InputFieldOverlay(parentView.getCharacterId(), 0, 0, 200, 50);
+        charIdInput = new TextFieldOverlay(parentView.getCharacterId(), 0, 0, 200, 50);
         if (character != null && !duplicate) {
             charIdInput.setEnabled(false);
             charIdInput.setEditable(false);
@@ -161,7 +161,7 @@ public class CharacterTab extends Tab {
         });
         root.addElement(charIdInput);
 
-        charDisplayName = new InputFieldOverlay(parentView.getCharacterDisplay(), 0, 0, 200, 50);
+        charDisplayName = new TextFieldOverlay(parentView.getCharacterDisplay(), 0, 0, 200, 50);
         charDisplayName.setHintText("Display Name");
         charDisplayName.onInputSetEvent(event -> {
             parentView.setCharacterDisplay(event.getInput());
@@ -231,9 +231,10 @@ public class CharacterTab extends Tab {
         exportCard.setWidth(200);
         exportCard.setHeight(50);
 
-        FileChooserOverlay exportSelector = new FileChooserOverlay(App.window, exportCard);
+        FileSaveOverlay exportSelector = new FileSaveOverlay(App.window, exportCard);
         exportSelector.setText("Export character card as.");
         exportSelector.setFileExtensions(new String[]{"*.png"});
+        exportSelector.setDefaultFileName(charIdInput.getCurrentText() + ".png");
         root.addElement(exportSelector);
         exportSelector.onFileSelect(event -> {
             File file = event.getDirectory();
@@ -284,20 +285,20 @@ public class CharacterTab extends Tab {
         HorizontalLayout dialogueBox = new HorizontalLayout(800, -1);
         dialogueBox.setSpacing(50);
 
-        InputFieldOverlay add = new InputFieldOverlay((value != null ? value : ""), "{character}: Example dialogue for {character}", 0, 0, 500, 50);
+        TextFieldOverlay add = new TextFieldOverlay((value != null ? value : ""), "{character}: Example dialogue for {character}", 0, 0, 500, 50);
         dialogueBox.addElement(add);
 
         if (value != null) {
             add.setEnabled(false);
 
-            ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new FontIcon(Material2AL.DELETE)).build();
+            ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new IconOverlay(Material2AL.DELETE)).build();
             delete.addStyle(Styles.DANGER);
             delete.onClick(event1 -> {
                 root.removeElement(dialogueBox);
             });
             dialogueBox.addElement(delete);
         } else {
-            ButtonOverlay insert = new ButtonBuilder("insert").setIcon(new FontIcon(Material2AL.ADD)).build();
+            ButtonOverlay insert = new ButtonBuilder("insert").setIcon(new IconOverlay(Material2AL.ADD)).build();
             dialogueBox.addElement(insert);
 
             insert.onClick(event -> {
@@ -310,7 +311,7 @@ public class CharacterTab extends Tab {
                 add.setEnabled(false);
                 dialogueBox.removeElement(insert);
 
-                ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new FontIcon(Material2AL.DELETE)).build();
+                ButtonOverlay delete = new ButtonBuilder("delete").setIcon(new IconOverlay(Material2AL.DELETE)).build();
                 delete.addStyle(Styles.DANGER);
                 delete.onClick(event1 -> {
                     root.removeElement(dialogueBox);
@@ -327,11 +328,11 @@ public class CharacterTab extends Tab {
         return dialogueBox;
     }
 
-    public InputFieldOverlay getCharIdInput() {
+    public TextFieldOverlay getCharIdInput() {
         return charIdInput;
     }
 
-    public InputFieldOverlay getCharDisplayName() {
+    public TextFieldOverlay getCharDisplayName() {
         return charDisplayName;
     }
 

@@ -1,9 +1,10 @@
 package me.piitex.app.views.models;
 
 import atlantafx.base.theme.Styles;
-import com.drew.lang.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.Positions;
 import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.models.tabs.ConfigurationTab;
 import me.piitex.app.views.models.tabs.DownloadTab;
@@ -27,15 +28,17 @@ public class ModelsView extends EmptyContainer {
     }
 
     public void init(@Nullable String tab) {
-        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        layout.addElement(new SidebarView(false));
+        HorizontalLayout layout = new HorizontalLayout(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 15, appSettings.getHeight());
+        layout.addStyle(Styles.BG_INSET);
+        layout.addElement(new SidebarView());
+        layout.setSpacing(10);
         addElement(layout);
 
-        VerticalLayout main = new VerticalLayout(appSettings.getWidth() - 265, appSettings.getHeight());
+        VerticalLayout main = new VerticalLayout(layout.getWidth(), appSettings.getHeight());
         layout.addElement(main);
 
         // Add the views
-        tabsContainer = new TabsContainer(0, 0, appSettings.getWidth() - 265, appSettings.getHeight());
+        tabsContainer = new TabsContainer(0, 0, layout.getWidth(), appSettings.getHeight());
         main.addElement(tabsContainer);
 
         buildTabs(tab);

@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
@@ -21,7 +22,6 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class UsersView extends EmptyContainer {
         root.setMaxSize(root.getWidth(), root.getHeight());
         addElement(root);
 
-        SidebarView sidebarView = new SidebarView(false);
+        SidebarView sidebarView = new SidebarView();
         root.addElement(sidebarView);
 
         mainPage = new VerticalLayout(appSettings.getWidth() - 200, 0);
@@ -129,30 +129,24 @@ public class UsersView extends EmptyContainer {
             root.setAlignment(Pos.BASELINE_CENTER);
         }
 
-        FontIcon editIcon = new FontIcon(Material2AL.EDIT);
-        editIcon.setIconSize(16);
-        TextOverlay edit = new TextOverlay(editIcon);
+        IconOverlay edit = new IconOverlay(Material2AL.EDIT);
         edit.setTooltip("Edit the user");
-        edit.addStyle(Styles.ACCENT);
+        edit.setColor(Color.GREEN);
         edit.onClick(event -> {
             editUser(user);
         });
         root.addElement(edit);
 
-        FontIcon duplicateIcon = new FontIcon(Material2AL.FILE_COPY);
-        duplicateIcon.setIconSize(16);
-        TextOverlay duplicate = new TextOverlay(duplicateIcon);
+        IconOverlay duplicate = new IconOverlay(Material2AL.FILE_COPY);
         duplicate.setTooltip("Duplicate the user.");
-        duplicate.addStyle(Styles.WARNING);
+        duplicate.setColor(Color.YELLOW);
         duplicate.onClick(event -> {
             duplicateUser(user);
         });
         root.addElement(duplicate);
 
-        FontIcon deleteIcon = new FontIcon(Material2AL.DELETE_FOREVER);
-        TextOverlay delete = new TextOverlay(deleteIcon);
-
-        delete.addStyle(Styles.DANGER);
+        IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
+        delete.setColor(Color.RED);
         delete.setTooltip("Delete the user.");
         delete.onClick(event -> {
             deleteUser(base, card, user, event.getHandler().getSceneX(), event.getHandler().getSceneY());

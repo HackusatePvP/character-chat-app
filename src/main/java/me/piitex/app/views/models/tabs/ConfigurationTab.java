@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
+import javafx.util.StringConverter;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
@@ -21,6 +22,7 @@ import me.piitex.engine.containers.tabs.TabsContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
+import me.piitex.os.OSUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,29 +36,35 @@ public class ConfigurationTab extends Tab {
     private final TabsContainer tabsContainer;
     private final AppSettings appSettings;
     private final VerticalLayout layout;
-    private InputFieldOverlay runningModel;
+    private TextFieldOverlay runningModel;
     private ButtonOverlay start, stop, reload;
 
     private final ServerSettings settings = App.getInstance().getSettings();
 
     public ConfigurationTab(TabsContainer tabsContainer) {
         super("Settings");
+        setPrefSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_LAYOUT_HEIGHT);
+        setMaxSize(getWidth(), getHeight());
         this.tabsContainer = tabsContainer;
         appSettings = App.getInstance().getAppSettings();
 
         // Build the list view for the models.
         layout = new VerticalLayout(MODEL_CONFIGURATION_LAYOUT_WIDTH, 0);
         layout.setSpacing(MODEL_CONFIGURATION_LAYOUT_SPACING);
-        layout.setX(20);
 
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
-        scrollContainer.setMaxSize(MODEL_CONFIGURATION_SCROLL_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 0, MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
+        scrollContainer.setMaxSize(MODEL_CONFIGURATION_LAYOUT_WIDTH, MODEL_CONFIGURATION_SCROLL_HEIGHT);
         scrollContainer.setVerticalScroll(true);
-        scrollContainer.setScrollWhenNeeded(true);
         scrollContainer.setHorizontalScroll(false);
+        scrollContainer.setScrollWhenNeeded(false);
         addElement(scrollContainer); // Adds the scroll container
 
+        // TODO: Allow remote server routing.
+        //       When enabled it allows the user to remotely connect to an endpoint.
+        //       Not sure how control of the server would work.
         layout.addElement(buildServerZone());
+        layout.addElement(buildHostTile());
+        layout.addElement(buildRemoteModeTile());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
         layout.addElement(buildRunningModel());
@@ -69,6 +77,64 @@ public class ConfigurationTab extends Tab {
         Platform.runLater(this::handleServerLoad);
     }
 
+    public TileContainer buildHostTile() {
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth(), 180);
+        container.setTitle("Set device as host.");
+        container.setDescription("Allows other devices to connect to this devices backend server.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        configLayout.setSpacing(10);
+        configLayout.setAlignment(Pos.CENTER_RIGHT);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isHost());
+        switchOverlay.onToggle(event -> settings.setHost(event.getNewValue()));
+
+        configLayout.addElements(switchOverlay);
+        container.setAction(configLayout);
+
+        return container;
+    }
+
+    public TileContainer buildRemoteModeTile() {
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth(), 180);
+        container.setTitle("Remote Server Mode");
+        container.setDescription("Setup a remote connection to use a different device to run models.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        configLayout.setSpacing(10);
+        configLayout.setAlignment(Pos.CENTER_RIGHT);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(settings.isRemoteMode());
+        TextFieldOverlay urlInput = new TextFieldOverlay(settings.getRemoteUrl(), 0, 0, 400, 40);
+        urlInput.setHintText("Remote URL (e.g., http://192.168.1.2:8187)");
+
+        TextFieldOverlay keyInput = new TextFieldOverlay(settings.getApiKey(), 0, 0, 400, 40);
+        keyInput.setHintText("API Key (Optional)");
+
+        switchOverlay.onToggle(event -> {
+            settings.setRemoteMode(event.getNewValue());
+        });
+        urlInput.onInputSetEvent(event -> {
+            settings.setRemoteUrl(event.getInput());
+        });
+        keyInput.onInputSetEvent(event -> {
+            settings.setApiKey(event.getInput());
+        });
+
+        configLayout.addElements(switchOverlay, urlInput, keyInput);
+        container.setAction(configLayout);
+
+        return container;
+    }
+
     public TileContainer buildModelPathTile() {
         TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
@@ -77,7 +143,7 @@ public class ConfigurationTab extends Tab {
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
-        container.addElement(actionButton(container));
+        container.setAction(actionButton(container));
 
         return container;
     }
@@ -88,14 +154,24 @@ public class ConfigurationTab extends Tab {
         container.setAction(button);
         button.onClick(event -> {
             DirectoryChooser chooser = new DirectoryChooser();
-            File currentPath = new File(settings.getModelPath());
-            if (currentPath.exists() && currentPath.isDirectory()) {
-                chooser.setInitialDirectory(currentPath);
+            if (OSUtil.getOS().contains("Linux") || OSUtil.getOS().contains("Ubuntu")) {
+                File media = new File("/media/");
+                if (media.exists() && media.isDirectory()) {
+                    chooser.setInitialDirectory(media);
+                } else {
+                    chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+                }
+            } else {
+                File currentPath = new File(settings.getModelPath());
+                if (currentPath.exists() && currentPath.isDirectory()) {
+                    chooser.setInitialDirectory(currentPath);
+                }
             }
             File file = chooser.showDialog(App.window.getStage());
             if (file == null) return;
             App.logger.info("Updating model path to '{}'", file.getAbsolutePath());
             settings.setModelPath(file.getAbsolutePath());
+            App.reloadModelList();
 
             // Updates button tooltip
             container.setAction(actionButton(container));
@@ -152,17 +228,42 @@ public class ConfigurationTab extends Tab {
     public TileContainer buildGpuLayers() {
         TileContainer container = new TileContainer(0, -1);
         container.setMaxSize(layout.getWidth(), 100);
-        container.setTitle("GPU Layers");
-        container.setDescription("The amount of layers to store in VRam, the higher the better generation speed. Can cause server errors if you run out of VRam.");
+        container.setTitle("GPU Usage");
+        container.setDescription("Percentage of total VRAM to use. Recommended to keep below 80%.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, 200, settings.getGpuLayers());
-        input.onValueChange(event -> {
-            settings.setGpuLayers((int) event.getNewValue());
+        VerticalLayout action = new VerticalLayout(200, 100);
+        action.setAlignment(Pos.CENTER);
+
+        SliderOverlay input = new SliderOverlay(0, 100, settings.getGpuUsage());
+        input.getSlider().setShowTickLabels(true);
+        input.getSlider().setShowTickMarks(true);
+        input.getSlider().setMinorTickCount(4);
+        input.getSlider().getStyleClass().add(Styles.LARGE);
+        input.getSlider().setLabelFormatter(new StringConverter<>() {
+            @Override
+            public String toString(Double value) {
+                return String.format("%.0f%%", value);
+            }
+
+            @Override
+            public Double fromString(String string) {
+                return 0.0;
+            }
         });
-        container.setAction(input);
+        action.addElement(input);
+        long currentValue = (long) (appSettings.getTotalGpuVram() * (input.getSlider().getValue() / 100));
+        TextOverlay textOverlay = new TextOverlay(String.format("%d", (long) input.getSlider().getValue()) + "%: " + String.format("%d", currentValue) + "MiB");
+        action.addElement(textOverlay);
+        container.setAction(action);
+
+        input.onSliderMove(event -> {
+            settings.setGpuUsage(event.getNewValue());
+            long value = (long) (appSettings.getTotalGpuVram() * (event.getNewValue() / 100));
+            textOverlay.setText(String.format("%d", (long) input.getSlider().getValue()) + "%: " + String.format("%d", value) + "MiB");
+        });
 
         return container;
     }
@@ -218,7 +319,7 @@ public class ConfigurationTab extends Tab {
         }
         String input = (model != null ? model.getFile().getAbsolutePath() : "null");
 
-        runningModel = new InputFieldOverlay(input, 0, 0, 400, 50);
+        runningModel = new TextFieldOverlay(input, 0, 0, 400, 50);
         runningModel.setEnabled(false);
 
         container.setAction(runningModel);
@@ -297,7 +398,8 @@ public class ConfigurationTab extends Tab {
             Model model = (settings.getGlobalModel() != null ? settings.getGlobalModel() : ServerProcess.getCurrentServer().getModel());
             if (model == null) {
                 // Lastly, look for the default model.
-                model = App.getModels("exlude").values().stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
+                App.logger.info("Falling back to default model.");
+                model = App.getModels("exclude").stream().filter(model1 -> model1.getSettings().isDefault()).findFirst().orElse(null);
             }
 
             if (model == null) {
@@ -305,7 +407,14 @@ public class ConfigurationTab extends Tab {
                 error.addStyle(Styles.DANGER);
                 error.addStyle(Styles.BG_DEFAULT);
                 App.window.renderPopup(error, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                return;
             }
+
+            if (model.getFile().setExecutable(true)) {
+                App.logger.info("Updated file permission for model: {}", model.getFile().getAbsolutePath());
+            }
+
+            App.logger.info("Calculated model layers: {}", model.getSettings().getTotalLayers());
 
             start.setEnabled(false);
             reload.setEnabled(false);
@@ -410,6 +519,21 @@ public class ConfigurationTab extends Tab {
     }
 
     private void startServer(Model model) {
+        if (settings.isRemoteMode()) {
+            Platform.runLater(() -> {
+                MessageOverlay started = new MessageOverlay(0, 0, 600, 100,"Success", "Connected to remote server at " + settings.getRemoteUrl());
+                started.addStyle(Styles.SUCCESS);
+                started.addStyle(Styles.BG_DEFAULT);
+                App.window.renderPopup(started, PopupPosition.BOTTOM_CENTER, 600, 100, false);
+                runningModel.setCurrentText("Remote Node Active");
+
+                start.setEnabled(true);
+                reload.setEnabled(true);
+                stop.setEnabled(true);
+            });
+            return;
+        }
+
         App.getThreadPoolManager().submitTask(() -> {
             ServerProcess process = new ServerProcess(model);
             Platform.runLater(() -> {

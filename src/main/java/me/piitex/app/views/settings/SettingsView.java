@@ -3,7 +3,7 @@ package me.piitex.app.views.settings;
 import atlantafx.base.theme.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.layout.Pane;
+import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
@@ -24,29 +24,33 @@ public class SettingsView {
     private final Container container;
 
     private final AppSettings appSettings = App.getInstance().getAppSettings();
+    private VerticalLayout layout;
 
     public SettingsView() {
-        container = new EmptyContainer(appSettings.getWidth() - 300, 0);
+        container = new EmptyContainer(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 15, 0);
+        container.setMaxSize(container.getWidth(), 0);
         container.addStyle(Styles.BG_INSET);
         build();
     }
 
     public void build() {
         HorizontalLayout root = new HorizontalLayout(0, 0);
-        root.setSpacing(35);
+        root.addStyle(Styles.BG_DEFAULT);
+        root.setSpacing(10);
         container.addElement(root);
 
-        root.addElement(new SidebarView(false));
+        root.addElement(new SidebarView());
 
-        VerticalLayout layout = new VerticalLayout(0, 0);
-        layout.setOffsetX(20);
+        layout = new VerticalLayout(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, 0);
+        layout.setAlignment(Pos.CENTER);
+        layout.addStyle(Styles.BG_INSET);
         layout.setSpacing(20);
 
-        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 20, appSettings.getWidth() - 250, appSettings.getHeight() - 100);
-        scrollContainer.setMaxSize(appSettings.getWidth() - 250, appSettings.getHeight() - 100);
+        ScrollContainer scrollContainer = new ScrollContainer(layout, 0, 0, appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, appSettings.getHeight() - 50);
+        scrollContainer.setMaxSize(scrollContainer.getWidth(), scrollContainer.getHeight());
 
         scrollContainer.setVerticalScroll(true);
-        scrollContainer.setScrollWhenNeeded(true);
+        scrollContainer.setScrollWhenNeeded(false);
         scrollContainer.setHorizontalScroll(false);
         root.addElement(scrollContainer);
 
@@ -61,8 +65,8 @@ public class SettingsView {
     }
 
     public TileContainer buildWindowScaling() {
-        TileContainer tileContainer = new TileContainer(0, 0, appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(0, 0, layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
@@ -83,8 +87,8 @@ public class SettingsView {
     }
 
     public TileContainer buildResolution() {
-        TileContainer tileContainer = new TileContainer(0, 0, appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(0, 0, layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
@@ -127,8 +131,8 @@ public class SettingsView {
     }
 
     public TileContainer buildChatSize() {
-        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
@@ -180,8 +184,8 @@ public class SettingsView {
     }
 
     public TileContainer buildGlobalChatSize() {
-        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
@@ -236,8 +240,8 @@ public class SettingsView {
     }
 
     public TileContainer buildTheme() {
-        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());
@@ -271,8 +275,8 @@ public class SettingsView {
     }
 
     public TileContainer buildGeneralText() {
-        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle("color-fg-default");
@@ -312,8 +316,8 @@ public class SettingsView {
 
 
     public TileContainer buildQuotesColor() {
-        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle("color-fg-default");
@@ -352,8 +356,8 @@ public class SettingsView {
     }
 
     public TileContainer buildAstrixColor() {
-        TileContainer tileContainer = new TileContainer(appSettings.getWidth() - 300, 120);
-        tileContainer.setMaxSize(appSettings.getWidth() - 300, 120);
+        TileContainer tileContainer = new TileContainer(layout.getWidth() - 20, 120);
+        tileContainer.setMaxSize(tileContainer.getWidth(), 120);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
         tileContainer.addStyle(Styles.BG_DEFAULT);
         tileContainer.addStyle(appSettings.getGlobalTextSize());

@@ -1,6 +1,6 @@
 package me.piitex.app.backend;
 
-import com.drew.lang.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.loaders.ImageLoader;
@@ -132,8 +132,8 @@ public class User {
 
     public static ImageOverlay getUserAvatar(String iconPath, double width, double height) {
         File file = new File(iconPath);
-        if (!file.exists()) {
-            file = new File(App.getAppDirectory(), "icons/avatar.png");
+        if (!file.exists() || iconPath.isEmpty()) {
+            file = new File(App.getExecutedDirectory(), "icons/character.png");
         }
 
         if (!file.exists()) {

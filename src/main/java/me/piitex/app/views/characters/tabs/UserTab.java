@@ -32,7 +32,7 @@ public class UserTab extends Tab {
     private final InfoFile infoFile;
     private final CharacterEditView parentView;
 
-    private InputFieldOverlay userDisplayNameInput;
+    private TextFieldOverlay userDisplayNameInput;
     private RichTextAreaOverlay userDescription;
 
     private ImageOverlay image;
@@ -157,7 +157,7 @@ public class UserTab extends Tab {
         ChoiceBoxOverlay templates = new ChoiceBoxOverlay(users, 200, 50);
         root.addElement(templates);
 
-        userDisplayNameInput = new InputFieldOverlay(parentView.getUserDisplay(), 0, 0, 200, 50);
+        userDisplayNameInput = new TextFieldOverlay(parentView.getUserDisplay(), 0, 0, 200, 50);
         userDisplayNameInput.setEnabled(true);
         userDisplayNameInput.setHintText("Display Name");
         userDisplayNameInput.onInputSetEvent(event -> {
@@ -275,7 +275,7 @@ public class UserTab extends Tab {
         return root;
     }
 
-    public InputFieldOverlay getUserDisplayNameInput() {
+    public TextFieldOverlay getUserDisplayNameInput() {
         return userDisplayNameInput;
     }
 
