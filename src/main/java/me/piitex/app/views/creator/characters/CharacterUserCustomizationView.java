@@ -104,12 +104,17 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
                 return;
             }
             User user = App.getInstance().getUser(event.getNewValue());
+            Map<String, String> loreItems = user.getLorebook();
+            infoFile.set("user-display-name", user.getDisplayName());
+            infoFile.set("user-persona", user.getPersona());
+            infoFile.set("user-lorebook", loreItems);
+            infoFile.set("user-icon-path", user.getIconPath());
+            tempLore.clear();
             userDisplayInput.setCurrentText(user.getDisplayName());
             userPersonaInput.setCurrentText(user.getPersona());
             userImage.setImage(new ImageLoader(new File(user.getIconPath())));
             loreLayout.removeAllElements();
-            user.getLorebook().forEach((s, s2) -> loreLayout.addElement(buildLoreEntry(s, s2)));
-            userTemplates.setEnabled(true);
+            loreItems.forEach((s, s2) -> loreLayout.addElement(buildLoreEntry(s, s2)));
         });
         layout.addElement(userTemplates);
 

@@ -10,11 +10,11 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.User;
 import me.piitex.app.views.HomeView;
-import me.piitex.engine.Element;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.configurations.InfoFile;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 public class FinishCharacterCreatorView extends EmptyContainer {
     private final VerticalLayout root;
@@ -55,6 +56,7 @@ public class FinishCharacterCreatorView extends EmptyContainer {
     private void init() {
         if (infoFile == null) {
             App.logger.error("Could not initialize chat data!", new RuntimeException());
+            return;
         }
 
         root.addElement(buildDisplayBox());
@@ -97,11 +99,18 @@ public class FinishCharacterCreatorView extends EmptyContainer {
 
             File userImage = new File(character.getCharacterDirectory(), "user/user.png");
             File newUserImage = new File(infoFile.get("user-icon-path"));
-            try {
-                Files.copy(newUserImage.toPath(), userImage.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                App.logger.error("Could not copy new user image!", e);
+
+            if (!newUserImage.getAbsolutePath().equals(userImage.getAbsolutePath())) {
+                App.getThreadPoolManager().submitSchedule(() -> {
+                    try {
+                        Files.copy(newUserImage.toPath(), userImage.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        ImageLoader.clearCache();
+                    } catch (IOException e) {
+                        App.logger.error("Could not copy new user image!", e);
+                    }
+                }, 1L, TimeUnit.SECONDS);
             }
+
             if (newUserImage.exists()) {
                 user.setIconPath(userImage.getAbsolutePath());
             }
