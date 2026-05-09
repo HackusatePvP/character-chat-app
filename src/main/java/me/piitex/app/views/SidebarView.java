@@ -8,7 +8,7 @@ import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.updater.BackendUpdater;
+import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.creator.CreatorView;
 import me.piitex.app.views.models.ModelsView;
 import me.piitex.app.views.settings.SettingsView;
@@ -124,7 +124,7 @@ public class SidebarView extends BorderContainer {
         // To prevent a race condition, the task will be delayed.
         App.getThreadPoolManager().submitSchedule(() -> {
             Platform.runLater(() -> {
-                BackendUpdater updater = App.getInstance().getBackendUpdater();
+                LLamaBackendUpdater updater = App.getInstance().getBackendUpdater();
                 if (updater != null && updater.isUpdateAvailable()) {
                     App.logger.info("Backend Versions: {},{}", updater.getCurrent().getVersion(), updater.getLatest().getVersion());
                     ButtonOverlay update = new ButtonBuilder("update").setText("Updates Available").setIcon(new IconOverlay(Material2MZ.SYSTEM_UPDATE_ALT)).addStyle(Styles.FLAT).build();

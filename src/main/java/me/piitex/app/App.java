@@ -16,7 +16,7 @@ import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.updater.ApplicationUpdater;
-import me.piitex.app.updater.BackendUpdater;
+import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
@@ -73,7 +73,7 @@ public class App extends FXLoad {
     private volatile boolean loading = true;
     private volatile boolean error = false;
 
-    private BackendUpdater backendUpdater;
+    private LLamaBackendUpdater LLamaBackendUpdater;
 
     // Used for testing with the IDE!
     public static void main(String[] args) {
@@ -413,13 +413,13 @@ public class App extends FXLoad {
         if (settings.getDevice().equals("error")) {
             App.logger.info("Could not load backend devices. Force checking updates...");
             settings.setDevice("Auto");
-            backendUpdater = new BackendUpdater("0");
+            LLamaBackendUpdater = new LLamaBackendUpdater("0");
         } else {
             File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
             if (backendVersionFile != null) {
-                backendUpdater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+                LLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
             } else {
-                backendUpdater = new BackendUpdater("0");
+                LLamaBackendUpdater = new LLamaBackendUpdater("0");
             }
         }
         App.logger.info("Finished updates.");
@@ -580,8 +580,8 @@ public class App extends FXLoad {
         return mmprojModels;
     }
 
-    public BackendUpdater getBackendUpdater() {
-        return backendUpdater;
+    public LLamaBackendUpdater getBackendUpdater() {
+        return LLamaBackendUpdater;
     }
 
     public static void reloadModelList() {

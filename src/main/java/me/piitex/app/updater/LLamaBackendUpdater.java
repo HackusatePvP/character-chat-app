@@ -3,9 +3,7 @@ package me.piitex.app.updater;
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.ServerProcess;
@@ -34,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BackendUpdater {
+public class LLamaBackendUpdater {
     private final String currentVersion;
     private Window window;
     private Container container;
@@ -42,7 +40,7 @@ public class BackendUpdater {
     private final GitHubUtil gitHubUtil;
     private Version current, latest;
 
-    public BackendUpdater(String currentVersion) {
+    public LLamaBackendUpdater(String currentVersion) {
         this.currentVersion = currentVersion;
         App.logger.info("Current Version: {}", currentVersion);
 
