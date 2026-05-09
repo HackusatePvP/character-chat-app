@@ -9,23 +9,14 @@ import java.io.File;
 public class Model {
     private final File file;
     private final ModelSettings settings;
-    private int gpuLayers;
 
     public Model(File file) {
         this.file = file;
-        this.settings = new ModelSettings(new InfoFile(new File(App.getDataDirectory(), "models/" + file.getName().split("\\.")[0] + ".info"), false));
+        this.settings = new ModelSettings(new InfoFile(new File(App.getAppDirectory(), "models/" + file.getName().split("\\.")[0] + ".info"), false));
     }
 
     public ModelSettings getSettings() {
         return settings;
-    }
-
-    public int getGpuLayers() {
-        return gpuLayers;
-    }
-
-    public void setGpuLayers(int gpuLayers) {
-        this.gpuLayers = gpuLayers;
     }
 
     public File getFile() {

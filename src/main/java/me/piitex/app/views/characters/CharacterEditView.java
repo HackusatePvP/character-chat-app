@@ -1,7 +1,7 @@
 package me.piitex.app.views.characters;
 
 import atlantafx.base.theme.Styles;
-import com.drew.lang.annotations.Nullable;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -30,6 +30,7 @@ import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.MessageOverlay;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -227,7 +228,7 @@ public class CharacterEditView {
         root.addStyle(Styles.BG_INSET);
 
         HorizontalLayout mainLayout = new HorizontalLayout(appSettings.getWidth() - 100, appSettings.getHeight());
-        mainLayout.addElement(new SidebarView(false));
+        mainLayout.addElement(new SidebarView( ));
         root.addElement(mainLayout);
 
         VerticalLayout contentLayout = new VerticalLayout(appSettings.getWidth() - 300, appSettings.getHeight());
@@ -307,7 +308,7 @@ public class CharacterEditView {
                     App.getInstance().getCharacters().put(characterId, currentCharacterInstance);
                 } else if (duplicate) {
                     currentCharacterInstance = new Character(characterId);
-                    currentCharacterInstance.copy(character);
+                    currentCharacterInstance.copyFrom(character);
                     App.getInstance().getCharacters().put(characterId, currentCharacterInstance);
                 } else {
                     currentCharacterInstance = character;
@@ -341,10 +342,9 @@ public class CharacterEditView {
 
                     if (userIconPath != null && userIconPath.exists()) {
                         File output = new File(character.getUserDirectory(), userIconPath.getName());
-                        if (!userIconPath.toPath().equals(output.toPath())) {
-                            Files.copy(userIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            characterSpecificUser.setIconPath(output.getAbsolutePath());
-                        }
+                        Files.copy(userIconPath.toPath(), output.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        characterSpecificUser.setIconPath(output.getAbsolutePath());
+
                     }
 
                     character.setUser(characterSpecificUser);

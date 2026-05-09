@@ -5,8 +5,6 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
 
 **Important:** You'll need a mid-range gaming GPU with 8GB VRAM or more!
 
-<img alt="Home" height="700" src="images/Home.png" width="1200"/>
-
 ## ✨ Features
 * **Role-Play Focused:** Optimized for engaging and immersive character interactions.
 * **Character Management:** Create and manage character templates, supporting imports from popular character card formats (SillyTavern, Backyard AI).
@@ -17,10 +15,12 @@ Unlike many existing solutions, this project prioritizes a fully offline and loc
     * **No Data Collection:** Your data stays on your machine.
     * **Encrypted Data:** Sensitive information (chats, characters, users) is encrypted locally.
 * **Advanced Model Features:** Support for Qwen3 Think Mode and Jinja templating.
-* **Reasoning Support:** Think tags are separated into its own collapsable view.
 
 ## 💻 Compatibility
-Only works with Windows 10/11. Linux and Mac are being explored.
+Windows 10+ or Linux x64. GPU drivers are needed. Tested and validated: 
+* Windows 11 (with gpu drivers)
+* Ubuntu 24.04 (with gpu drivers)
+* archlinux (with gpu drivers)
 
 ## Code Stack
 * [JavaFX](https://openjfx.io) The GUI library.
@@ -36,7 +36,10 @@ Vulkan works right out of the box. No installations needed apart from basic grap
 
 Q: What's the difference between the backends?
 
-A: Cuda and HIP typically provide better performance, but you will have to install necessary drivers. Vulkan works for most GPUs without the need of third party installations. Cuda requires an Nvidia card. HIP requires an AMD card.
+A: Cuda and HIP typically provide slightly better performance, but you will have to install necessary drivers. Vulkan works for most GPUs without the need of third party installations. Cuda requires an Nvidia card. HIP requires an AMD card.
+
+## Cuda
+Cuda is difficult to install correctly. You must use the cuda version that `llama.cpp` supports.
 
 ## Download / Installation
 There are two ways to download and install the application. All downloads are located in [releases](https://github.com/HackusatePvP/character-chat-app/releases).

@@ -3,18 +3,22 @@ package me.piitex.app.views.characters;
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.views.LoadingView;
+import me.piitex.app.views.Positions;
 import me.piitex.app.views.chats.ChatView;
+import me.piitex.app.views.creator.characters.CharacterCreator;
 import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
@@ -22,9 +26,9 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -32,9 +36,10 @@ public class CharactersView {
     private final ScrollContainer root;
 
     public CharactersView() {
-        VerticalLayout layout = new VerticalLayout(0, -1);
         AppSettings appSettings = App.getInstance().getAppSettings();
-        layout.setMaxSize(appSettings.getWidth() - 265, 0);
+
+        VerticalLayout layout = new VerticalLayout(-1, -1);
+        layout.setMaxSize(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, layout.getHeight());
         layout.setSpacing(20);
 
         int imageWidth;
@@ -50,8 +55,8 @@ public class CharactersView {
             cardHeight = 250;
             layout.setSpacing(70);
         } else {
-            root = new ScrollContainer(layout, 10, 10, layout.getMaxWidth(), -1);
-            root.setMaxSize(root.getWidth(), appSettings.getHeight() - 100);
+            root = new ScrollContainer(layout, 0, 0, layout.getMaxWidth(), appSettings.getHeight() - 50);
+            root.setMaxSize(root.getWidth(), root.getHeight());
             imageWidth = 256;
             imageHeight = 256;
             cardWidth = 280;
@@ -65,7 +70,6 @@ public class CharactersView {
         FlowLayout base = new FlowLayout(root.getWidth(), -1);
         base.setVerticalSpacing(20);
         base.setHorizontalSpacing(20);
-        base.addStyle(Styles.BORDER_DEFAULT);
 
         layout.addElement(base);
         for (Character character : App.getInstance().getCharacters().values()) {
@@ -94,40 +98,33 @@ public class CharactersView {
             contextMenu.getItems().add(copy);
             contextMenu.getItems().add(delete);
 
-            displayBox.setClickEvent(event -> {
-                if (event.getFxClick().getButton() == MouseButton.SECONDARY) {
-                    if (contextMenu.isShowing()) return;
-                    contextMenu.show(displayBox.getPane(), Side.BOTTOM, 60, 0);
-                }
+            displayBox.onClick(event -> {
+                App.window.clearContainers();
 
-                if (event.getFxClick().getButton() == MouseButton.PRIMARY) {
+                if (event.getHandler().getButton() == MouseButton.PRIMARY) {
                     // Display progress
-                    App.window.clearContainers();
-
                     Chat chat = character.getLastChat();
                     ChatView cachedView = character.getChatViewCachedNodes().get(chat);
                     if (chat != null && cachedView != null) {
                         Platform.runLater(() -> {
                             App.logger.info("Using cached chat view...");
-                            cachedView.resetTopControls();
                             App.window.addContainer(cachedView);
                         });
                     } else {
+                        App.logger.info("Loading: {}", (chat == null) ? "New Chat" : chat.getFile().getName());
                         EmptyContainer progressContainer = new EmptyContainer(appSettings.getWidth(), appSettings.getHeight());
                         progressContainer.addElement(new LoadingView("Loading chat...", appSettings.getWidth(), appSettings.getHeight()));
                         App.window.addContainer(progressContainer);
 
                         App.getThreadPoolManager().submitTask(() -> {
                             ChatView chatView = new ChatView(character, chat);
+                            character.getChatViewCachedNodes().put(chat, chatView);
                             Node assemble = chatView.assemble();
                             Platform.runLater(() -> {
-                                App.window.clearContainers();
                                 App.window.addContainer(chatView, assemble);
                             });
                         });
                     }
-
-
                 }
             });
 
@@ -157,31 +154,48 @@ public class CharactersView {
             root.setAlignment(Pos.BASELINE_CENTER);
         }
 
-        FontIcon editIcon = new FontIcon(Material2AL.EDIT);
-        editIcon.setIconSize(16);
-        TextOverlay edit = new TextOverlay(editIcon);
+        IconOverlay edit = new IconOverlay(Material2AL.EDIT);
         edit.setTooltip("Edit the character");
-        edit.addStyle(Styles.ACCENT);
+        edit.setColor(Color.GREEN);
         edit.onClick(_ -> editCharacter(character));
         root.addElement(edit);
 
-        FontIcon duplicateIcon = new FontIcon(Material2AL.FILE_COPY);
-        duplicateIcon.setIconSize(16);
-        TextOverlay duplicate = new TextOverlay(duplicateIcon);
+        IconOverlay duplicate = new IconOverlay(Material2AL.FILE_COPY);
+        duplicate.setColor(Color.YELLOW);
         duplicate.setTooltip("Duplicate the character.");
-        duplicate.addStyle(Styles.WARNING);
         duplicate.onClick(_ -> duplicateCharacter(character));
         root.addElement(duplicate);
 
-        FontIcon deleteIcon = new FontIcon(Material2AL.DELETE_FOREVER);
-        TextOverlay delete = new TextOverlay(deleteIcon);
-
-        delete.addStyle(Styles.DANGER);
+        IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
+        delete.setColor(Color.RED);
         delete.setTooltip("Delete the character.");
         delete.onClick(event -> {
             deleteCharacter(base, card, character, event.getHandler().getSceneX(), event.getHandler().getSceneY());
         });
         root.addElement(delete);
+
+        IconOverlay export = new IconOverlay(Material2AL.CLOUD_DOWNLOAD);
+        export.setIconSize(16);
+        export.setColor(Color.BLUE);
+        export.setTooltip("Export the character.");
+        export.onClick(_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Save character card as.", "*.png"));
+            chooser.setInitialFileName(character.getId() + ".png");
+
+            File file = chooser.showSaveDialog(App.window.getStage());
+            if (file != null) {
+                try {
+                    ImageCardExporter.exportCharacter(character, file);
+                } catch (IOException e) {
+                    App.logger.error("Could not save character card!", e);
+                }
+            } else {
+                App.logger.error("Could not locate character file!");
+            }
+        });
+        root.addElement(export);
+
         return root;
     }
 
@@ -192,11 +206,11 @@ public class CharactersView {
         App.window.addContainer(progressContainer);
 
         App.getThreadPoolManager().submitTask(() -> {
-            Container container = new CharacterEditView(character, false).getRoot();
-            Node assemble = container.assemble();
+            CharacterCreator characterCreator = new CharacterCreator(character);
+            Node assemble = characterCreator.assemble();
             Platform.runLater(() -> {
                 App.window.clearContainers();
-                App.window.addContainer(container, assemble);
+                App.window.addContainer(characterCreator, assemble);
             });
         });
     }
@@ -217,14 +231,12 @@ public class CharactersView {
         progressContainer.addElement(new LoadingView("Loading character data...", progressContainer.getWidth(), progressContainer.getHeight()));
         App.window.addContainer(progressContainer);
 
-        Character duplicated = new Character(newId, null);
         App.getThreadPoolManager().submitTask(() -> {
-            duplicated.copy(character);
-            CharacterEditView editView = new CharacterEditView(duplicated, true);
-            Node assemble = editView.getRoot().assemble();
+            CharacterCreator characterCreator = new CharacterCreator(character, character.getUser());
+            Node assemble = characterCreator.assemble();
             Platform.runLater(() -> {
                 App.window.clearContainers();
-                App.window.addContainer(editView.getRoot(), assemble);
+                App.window.addContainer(characterCreator, assemble);
             });
         });
     }

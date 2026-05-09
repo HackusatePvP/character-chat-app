@@ -17,11 +17,13 @@ public class AppSettings {
     private String quoteColor;
     private String astrixColor;
     private boolean windowScaling = false;
+    private double totalGpuVram;
+    private boolean setup = false;
 
     private final InfoFile infoFile;
 
     public AppSettings() {
-        this.infoFile = new InfoFile(new File(App.getDataDirectory(), "app.info"), false);
+        this.infoFile = new InfoFile(new File(App.getAppDirectory(), "app.info"), false);
 
         if (infoFile.hasKey("width")) {
             this.width = infoFile.getInteger("width");
@@ -59,6 +61,12 @@ public class AppSettings {
         if (infoFile.hasKey("window-scaling")) {
             this.windowScaling = infoFile.getBoolean("window-scaling");
         }
+        if (infoFile.hasKey("total-vram")) {
+            this.totalGpuVram = infoFile.getDouble("total-vram");
+        }
+        if (infoFile.hasKey("setup")) {
+            this.setup = infoFile.getBoolean("setup");
+        }
     }
 
     public int getWidth() {
@@ -77,6 +85,15 @@ public class AppSettings {
     public void setHeight(int height) {
         this.height = height;
         infoFile.set("height", height);
+    }
+
+    public double getTotalGpuVram() {
+        return totalGpuVram;
+    }
+
+    public void setTotalGpuVram(double totalGpuVram) {
+        this.totalGpuVram = totalGpuVram;
+        infoFile.set("total-vram", totalGpuVram);
     }
 
     public InfoFile getInfoFile() {
@@ -155,10 +172,19 @@ public class AppSettings {
         infoFile.set("window-scaling", windowScaling);
     }
 
+    public boolean isSetup() {
+        return setup;
+    }
+
+    public void setSetup(boolean setup) {
+        this.setup = setup;
+        infoFile.set("setup", setup);
+    }
+
     /*
-      Utility functions for getting theme coloring.
-      Needed for RichTextFX components and BBCode
-    */
+              Utility functions for getting theme coloring.
+              Needed for RichTextFX components and BBCode
+            */
     public Theme getStyleTheme(String name) {
         if (name.equalsIgnoreCase("primer light")) {
             return new PrimerLight();

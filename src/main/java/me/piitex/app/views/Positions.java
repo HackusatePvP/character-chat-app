@@ -43,7 +43,6 @@ public class Positions {
         Model Tabs positions
     ############################
     */
-    public static double MODEL_CONFIGURATION_SCROLL_WIDTH;
     public static double MODEL_CONFIGURATION_SCROLL_HEIGHT;
     public static double MODEL_CONFIGURATION_LAYOUT_WIDTH;
     public static double MODEL_CONFIGURATION_LAYOUT_HEIGHT;
@@ -67,7 +66,7 @@ public class Positions {
         CHAT_VIEW_SCROLL_WIDTH = window.getWidth() - 225;
         CHAT_VIEW_SCROLL_HEIGHT = window.getHeight() - 280;
         CHAT_VIEW_SELECTION_X = window.getWidth() / 2;
-        CHAT_VIEW_SELECTION_WIDTH = 100;
+        CHAT_VIEW_SELECTION_WIDTH = 200;
         CHAT_VIEW_SELECTION_HEIGHT = 50;
         CHAT_BOX_WIDTH = CHAT_VIEW_SCROLL_WIDTH - 10;
         CHAT_BOX_HEIGHT = -1;
@@ -83,9 +82,8 @@ public class Positions {
         SIDEBAR_WIDTH_COLLAPSE = 50;
         SIDEBAR_HEIGHT = (int) window.getHeight();
 
-        MODEL_CONFIGURATION_SCROLL_WIDTH = window.getWidth() - 265;
-        MODEL_CONFIGURATION_SCROLL_HEIGHT = window.getHeight() - 200;
-        MODEL_CONFIGURATION_LAYOUT_WIDTH = MODEL_CONFIGURATION_SCROLL_WIDTH - 20;
+        MODEL_CONFIGURATION_SCROLL_HEIGHT = window.getHeight() - 100;
+        MODEL_CONFIGURATION_LAYOUT_WIDTH = window.getWidth() - SIDEBAR_WIDTH - 25; // -25 to account for spacing
         MODEL_CONFIGURATION_LAYOUT_HEIGHT = -1;
         MODEL_CONFIGURATION_LAYOUT_SPACING = 10;
     }

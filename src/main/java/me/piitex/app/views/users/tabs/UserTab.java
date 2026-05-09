@@ -24,8 +24,8 @@ import java.io.IOException;
 public class UserTab extends Tab {
     private final UserEditView userEditView;
 
-    private InputFieldOverlay userIdInput;
-    private InputFieldOverlay userDisplayNameInput;
+    private TextFieldOverlay userIdInput;
+    private TextFieldOverlay userDisplayNameInput;
     private RichTextAreaOverlay userDescription;
 
     private ImageOverlay image;
@@ -137,7 +137,7 @@ public class UserTab extends Tab {
         root.setMaxSize(250, 200);
         root.setSpacing(10);
 
-        userIdInput = new InputFieldOverlay(userEditView.getUserId(), 0, 0, 200, 50);
+        userIdInput = new TextFieldOverlay(userEditView.getUserId(), 0, 0, 200, 50);
         userIdInput.setEnabled(true);
         userIdInput.setHintText("Unique Identifier");
         userIdInput.onInputSetEvent(event -> {
@@ -148,7 +148,7 @@ public class UserTab extends Tab {
         }
         root.addElement(userIdInput);
 
-        userDisplayNameInput = new InputFieldOverlay(userEditView.getUserDisplay(), 0, 0, 200, 50);
+        userDisplayNameInput = new TextFieldOverlay(userEditView.getUserDisplay(), 0, 0, 200, 50);
         userDisplayNameInput.setEnabled(true);
         userDisplayNameInput.setHintText("Display Name");
         userDisplayNameInput.onInputSetEvent(event -> {
@@ -194,11 +194,11 @@ public class UserTab extends Tab {
         return root;
     }
 
-    public InputFieldOverlay getUserIdInput() {
+    public TextFieldOverlay getUserIdInput() {
         return userIdInput;
     }
 
-    public InputFieldOverlay getUserDisplayNameInput() {
+    public TextFieldOverlay getUserDisplayNameInput() {
         return userDisplayNameInput;
     }
 

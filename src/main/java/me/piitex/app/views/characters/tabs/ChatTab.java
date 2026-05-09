@@ -11,7 +11,6 @@ import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2AL;
 
 
@@ -43,7 +42,7 @@ public class ChatTab extends Tab {
         layout.setAlignment(Pos.TOP_CENTER);
         this.addElement(layout);
 
-        TextOverlay info = new TextOverlay(new FontIcon(Material2AL.INFO));
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
         info.setTooltip("Use the following placeholders; {char}, {{char}}, {chara}, {{chara}}, {character}, {{character}}, {user}, {{user}}, {usr}, {{usr}}");
         layout.addElement(info);
 

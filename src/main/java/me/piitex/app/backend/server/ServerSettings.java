@@ -2,6 +2,8 @@ package me.piitex.app.backend.server;
 
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.os.OSPathing;
+import me.piitex.os.OSUtil;
 import me.piitex.os.configurations.InfoFile;
 
 import java.io.File;
@@ -11,7 +13,7 @@ public class ServerSettings {
     private final InfoFile infoFile;
     private String backend = "Vulkan";
     private String device = "Auto";
-    private int gpuLayers = 10;
+    private double gpuUsage = 10;
     private boolean memoryLock = false;
     private String chatTemplate = "default";
     private String reasoningTemplate = "none";
@@ -23,9 +25,13 @@ public class ServerSettings {
     private LinkedList<String> devices = new LinkedList<>();
     private boolean astrixEnabled = true;
     private boolean flashAttention = false;
+    private boolean host = false;
+    private boolean remoteMode = false;
+    private String remoteUrl = "http:/localhost:8187";
+    private String apiKey = "";
 
     public ServerSettings() {
-        infoFile = new InfoFile(new File(App.getDataDirectory(), "settings.info"), false);
+        infoFile = new InfoFile(new File(App.getAppDirectory(), "settings.info"), false);
 
         if (infoFile.hasKey("backend")) {
             backend = infoFile.get("backend");
@@ -37,10 +43,10 @@ public class ServerSettings {
         } else {
             infoFile.set("device", device);
         }
-        if (infoFile.hasKey("gpu-layers")) {
-            gpuLayers = infoFile.getInteger("gpu-layers");
+        if (infoFile.hasKey("gpu-usage")) {
+            gpuUsage = infoFile.getDouble("gpu-usage");
         } else {
-            infoFile.set("gpu-layers", gpuLayers + "");
+            infoFile.set("gpu-usage", gpuUsage + "");
         }
         if (infoFile.hasKey("memory-lock")) {
             memoryLock = infoFile.getBoolean("memory-lock");
@@ -90,6 +96,29 @@ public class ServerSettings {
         } else {
             infoFile.set("flash-attention", false);
         }
+        if (infoFile.hasKey("remote-mode")) {
+            remoteMode = infoFile.getBoolean("remote-mode");
+        } else {
+            infoFile.set("remote-mode", false + "");
+        }
+
+        if (infoFile.hasKey("remote-url")) {
+            remoteUrl = infoFile.get("remote-url");
+        } else {
+            infoFile.set("remote-url", remoteUrl);
+        }
+
+        if (infoFile.hasKey("api-key")) {
+            apiKey = infoFile.get("api-key");
+        } else {
+            infoFile.set("api-key", apiKey);
+        }
+
+        if (infoFile.hasKey("host")) {
+            host = infoFile.getBoolean("host");
+        } else {
+            infoFile.set("host", host);
+        }
     }
 
     public String getBackend() {
@@ -118,13 +147,13 @@ public class ServerSettings {
         infoFile.set("device", device);
     }
 
-    public int getGpuLayers() {
-        return gpuLayers;
+    public double getGpuUsage() {
+        return gpuUsage;
     }
 
-    public void setGpuLayers(int gpuLayers) {
-        this.gpuLayers = gpuLayers;
-        infoFile.set("gpu-layers", gpuLayers + "");
+    public void setGpuUsage(double gpuUsage) {
+        this.gpuUsage = gpuUsage;
+        infoFile.set("gpu-usage", gpuUsage + "");
     }
 
     public boolean isMemoryLock() {
@@ -173,7 +202,11 @@ public class ServerSettings {
     }
 
     public String getModelPath() {
-        modelPath = modelPath.replace("%APPDATA%", System.getenv("APPDATA"));
+        if (OSUtil.getOS().contains("Windows")) {
+            modelPath = modelPath.replace("%APPDATA%", System.getenv("APPDATA"));
+        } else {
+            modelPath = modelPath.replace("%APPDATA%", OSPathing.getAppDataDirectory().getAbsolutePath());
+        }
         return modelPath;
     }
 
@@ -242,6 +275,42 @@ public class ServerSettings {
     public void setFlashAttention(boolean flashAttention) {
         this.flashAttention = flashAttention;
         infoFile.set("flash-attention", flashAttention);
+    }
+
+    public boolean isHost() {
+        return host;
+    }
+
+    public void setHost(boolean host) {
+        this.host = host;
+        infoFile.set("host", host);
+    }
+
+    public String getRemoteUrl() {
+        return remoteUrl;
+    }
+
+    public void setRemoteUrl(String remoteUrl) {
+        this.remoteUrl = remoteUrl;
+        infoFile.set("remote-url", remoteUrl);
+    }
+
+    public boolean isRemoteMode() {
+        return remoteMode;
+    }
+
+    public void setRemoteMode(boolean remoteMode) {
+        this.remoteMode = remoteMode;
+        infoFile.set("remote-mode", remoteMode);
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+        infoFile.set("api-key", apiKey);
     }
 
     public InfoFile getInfoFile() {

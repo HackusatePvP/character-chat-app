@@ -15,10 +15,13 @@ import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.updater.BackendUpdater;
+import me.piitex.app.updater.ApplicationUpdater;
+import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
+import me.piitex.os.OSPathing;
+import me.piitex.os.OSUtil;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.Window;
 import me.piitex.engine.containers.EmptyContainer;
@@ -29,6 +32,7 @@ import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.os.FileDownloader;
 import me.piitex.os.ProcessUtil;
+import me.piitex.os.configurations.MasterKeyManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 
@@ -60,7 +65,7 @@ public class App extends FXLoad {
 
     public static Window window;
 
-    // Doesn't support natively ran mobile, but can at least make it viewable with remote connection.
+    // Doesn't support native mobile, but can at least make it viewable with remote connection.
     public static boolean mobile = false;
 
     public static final Logger logger = LogManager.getLogger(App.class);
@@ -68,8 +73,15 @@ public class App extends FXLoad {
     private volatile boolean loading = true;
     private volatile boolean error = false;
 
+    private LLamaBackendUpdater LLamaBackendUpdater;
+
     // Used for testing with the IDE!
-    static void main() {
+    public static void main(String[] args) {
+        logger.info("Initializing IDE run configuration...");
+        if (Arrays.asList(args).contains("--force-updates")) {
+            logger.info("Forcing app/backend updates.");
+            Main.forceUpdate = true;
+        }
         new App();
         Application.launch(App.class);
     }
@@ -79,45 +91,79 @@ public class App extends FXLoad {
         logger.info("Initializing application...");
         instance = this;
         setupDirectories();
+        MasterKeyManager.getPersistentPassKey(); // Generates a new master key if one doesn't exist.
 
         settings = new ServerSettings();
         appSettings = new AppSettings();
 
-        long currentPid = ProcessHandle.current().pid();
-        if (settings.getInfoFile().hasKey("main-pid")) {
-            String pid = settings.getInfoFile().get("main-pid");
-            if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
-                logger.error("Process already running! '{}'", pid);
-                error = true;
-                Platform.runLater(() -> {
-                    buildErrorWindow("Process is already running!").render();
-                });
-                return;
-            }
-        }
 
-        settings.getInfoFile().set("main-pid", currentPid);
+        if (ProcessUtil.isValidOS()) {
+            long currentPid = ProcessHandle.current().pid();
+            if (settings.getInfoFile().hasKey("main-pid")) {
+                String pid = settings.getInfoFile().get("main-pid");
+                if (ProcessUtil.isProcessRunning(Long.parseLong(pid))) {
+                    logger.error("Process already running! '{}'", pid);
+                    error = true;
+                    Platform.runLater(() -> {
+                        buildErrorWindow("Process is already running!").render();
+                    });
+                    return;
+                }
+            }
+
+            settings.getInfoFile().set("main-pid", currentPid);
+        }
 
         threadPoolManager = new ThreadPoolManager();
         threadPoolManager.submitTask(() -> {
             loading = true;
-            if (Main.run || Main.app) {
-                performUpdates();
-            }
+            App.logger.info("Looking for model to load '{}'", getModelsDirectory().getAbsolutePath());
+            reloadModelList();
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Finished pre-initialization.");
             loading = false;
         });
+        threadPoolManager.submitTask(this::loadBackendServer);
     }
 
     @Override
     public void initialization(Stage initialStage) {
         // Error will pass if another instance is running,
         if (error) return;
-
+        App.logger.info("Loading app from '{}'", getAppDirectory().getAbsolutePath());
         AppSettings appSettings = App.getInstance().getAppSettings();
         Application.setUserAgentStylesheet(appSettings.getStyleTheme(appSettings.getTheme()).getUserAgentStylesheet());
+
+        // Check for updates first.
+        // Will not perform updates when using App.main(); This prevents development builds from being backported.
+        getThreadPoolManager().submitTask(() -> {
+
+            try {
+                new DeviceProcess(App.getInstance().getSettings().getBackend());
+            } catch (IOException e) {
+                App.logger.error("Could not scan for devices!", e);
+                settings.setDevice("error");
+            }
+
+            if (Main.app || Main.run) {
+                performUpdates();
+            } else {
+                if (Main.forceUpdate) {
+                    App.logger.info("Force checking updates...");
+                    performUpdates();
+                } else if (OSUtil.getOS().contains("Windows")) {
+                    if (!new File(getBackendDirectory(), "vulkan/").exists() || !new File(getBackendDirectory(), "cuda/").exists() || !new File(getBackendDirectory(), "hip/").exists()) {
+                        App.logger.info("Windows updates available.");
+                        performUpdates();
+                    }
+                } else if (OSUtil.getOS().contains("Linux")) {
+                    if (!new File(getBackendDirectory(), "vulkan/").exists()) {
+                        performUpdates();
+                    }
+                }
+            }
+        });
 
         int setWidth = appSettings.getWidth();
         int setHeight = appSettings.getHeight();
@@ -128,8 +174,8 @@ public class App extends FXLoad {
         int height = dimension.height;
 
         // For testing, remove later.
-        //width = 600;
-        //height = 1200;
+        // width = 600;
+        // height = 1200;
         if (width < 900) {
             logger.info("Using mobile layouts...");
             // Set mobile view
@@ -160,20 +206,14 @@ public class App extends FXLoad {
         logger.info("Setting initial dimensions ({},{})", setWidth, setHeight);
         logger.info("Screen Size ({},{})", dimension.width, dimension.height);
 
-
-        // Disable image caching.
-        // Useful for most apps but not this one
-        // Causes issues when changing a user or character image as the path will remain the same.
-        // This is because the pathing for the image doesn't change but the image gets replaced by the new image.
-        ImageLoader.useCache = false;
-
-        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
+        File logo = new File(getExecutedDirectory(), "logo.png");
+        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
         // Initialize global positions. Needed for the rendering process.
         Positions.initialize();
 
         Stage stage = window.getStage();
-        stage.setOnCloseRequest(windowEvent -> App.shutdown());
+        stage.setOnCloseRequest(_ -> App.shutdown());
 
         // Debug hot keys.
         setStageInput(window);
@@ -184,53 +224,29 @@ public class App extends FXLoad {
         HomeView homeView = new HomeView();
         window.addContainer(homeView);
 
-        FXTrayIcon icon = new FXTrayIcon(window.getStage(), new File(App.getAppDirectory(), "logo.png"), 128, 128);
-        icon.addExitItem("Exit", e -> App.shutdown());
-        icon.setOnAction(event -> {
-            App.logger.info("Handling tray action");
-            stage.show();
-            stage.toFront();
-            stage.setIconified(false);
-        });
+        if (OSUtil.getOS().contains("Windows")) {
+            FXTrayIcon icon = new FXTrayIcon(window.getStage(), logo, 128, 128);
+            icon.addExitItem("Exit", e -> App.shutdown());
+            icon.setOnAction(_ -> {
+                App.logger.info("Handling tray action");
+                stage.show();
+                stage.toFront();
+                stage.setIconified(false);
+            });
 
-        icon.show();
-
-        // Sub thread as not to block JavaFX from initializing.
-        App.getThreadPoolManager().submitTask(() -> {
-            try {
-                new DeviceProcess(App.getInstance().getSettings().getBackend());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            App.logger.info("Looking for model to load...");
-            reloadModelList();
-            Model model = App.getInstance().getSettings().getGlobalModel();
-            if (model == null) {
-                for (Model model1 : App.getModels("exclude")) {
-                    if (model1.getSettings().isDefault()) {
-                        model = model1;
-                        break;
-                    }
-                }
-            }
-
-            if (model != null) {
-                // Run Test process.
-                // Run Server.
-                new ModelTestProcess(model);
-                new ServerProcess(model);
-            }
-        });
+            icon.show();
+        }
     }
 
     private void setupDirectories() {
+        App.logger.info("Operating System: {}", OSUtil.getOS());
+
         if (getAppDirectory().mkdirs()) {
             logger.info("Created app directory: {}", getAppDirectory().getAbsolutePath());
         }
 
-        if (getDataDirectory().mkdirs()) {
-            logger.info("Created data directory: {}", getDataDirectory().getAbsolutePath());
+        if (getAppDirectory().mkdirs()) {
+            logger.info("Created data directory: {}", getAppDirectory().getAbsolutePath());
         }
 
         if (getBackendDirectory().mkdirs()) {
@@ -281,6 +297,11 @@ public class App extends FXLoad {
                 stage.close();
                 stage.getScene().setRoot(new Pane()); // Needed to release the WindowBuilder pane.
 
+                // Reset cached nodes
+                for (Character character : App.getInstance().getCharacters().values()) {
+                    character.getChatViewCachedNodes().clear();
+                }
+
                 start(new Stage());
             }
         });
@@ -288,6 +309,30 @@ public class App extends FXLoad {
 
     public boolean isLoading() {
         return loading;
+    }
+
+    public void loadBackendServer() {
+        if (App.getInstance().getSettings().isRemoteMode()) {
+            logger.info("Remote mode enabled. Skipping local backend server startup.");
+            return;
+        }
+
+        Model model = App.getInstance().getSettings().getGlobalModel();
+        if (model == null) {
+            for (Model model1 : App.getModels("exclude")) {
+                App.logger.info("Loading base model: {}", model1.getFile().getAbsolutePath());
+                if (model1.getSettings().isDefault()) {
+                    model = model1;
+                    break;
+                }
+            }
+        }
+
+        if (model != null) {
+            // Run Server.
+            new ServerProcess(model);
+        }
+
     }
 
     public void loadCharacters() {
@@ -298,6 +343,7 @@ public class App extends FXLoad {
             return;
         }
         for (File file : files) {
+            logger.info("Loading character '{}'...", file.getName());
             if (file.isDirectory()) {
                 String id = file.getName();
                 // Check if info file exists
@@ -305,6 +351,8 @@ public class App extends FXLoad {
                 if (info.exists()) {
                     InfoFile infoFile = new InfoFile(info, true);
                     characters.put(id, new Character(id, infoFile));
+                } else {
+                    logger.error("Character file does not exist for '{}'", file.getName());
                 }
             }
         }
@@ -352,18 +400,27 @@ public class App extends FXLoad {
             logger.info("Model list updated.");
             downloader.shutdown();
         } catch (IOException e) {
-            App.logger.error("Failed to fetch download size.");
+            App.logger.error("Failed to fetch download size.", e);
         }
 
-        // Microsoft, the multi trillion dollar company that can't handle more than 50 API requests.
+        // Microslop, the multi trillion dollar company that can't handle more than 50 API requests.
+        App.logger.info("Checking for application updates...");
+        ApplicationUpdater applicationUpdater = new ApplicationUpdater(getVersion());
+        //applicationUpdater.checkForUpdates();
+
         App.logger.info("Checking for backend version...");
-        File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
-        if (backendVersionFile != null) {
-            BackendUpdater updater = new BackendUpdater(backendVersionFile.getName().split(".txt")[0]);
-            App.logger.info("Looking for updates...");
-            updater.checkForUpdates();
+
+        if (settings.getDevice().equals("error")) {
+            App.logger.info("Could not load backend devices. Force checking updates...");
+            settings.setDevice("Auto");
+            LLamaBackendUpdater = new LLamaBackendUpdater("0");
         } else {
-            App.logger.error("Update file not found!");
+            File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+            if (backendVersionFile != null) {
+                LLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
+            } else {
+                LLamaBackendUpdater = new LLamaBackendUpdater("0");
+            }
         }
         App.logger.info("Finished updates.");
     }
@@ -411,7 +468,8 @@ public class App extends FXLoad {
         }
 
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+        File logo = new File(getExecutedDirectory(), "logo.png");
+        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(logo)).build();
 
         EmptyContainer emptyContainer = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(emptyContainer);
@@ -451,6 +509,11 @@ public class App extends FXLoad {
     }
 
     public static File getAppDirectory() {
+        return new File(OSPathing.getAppDataDirectory(), "chat-app/");
+
+    }
+
+    public static File getExecutedDirectory() {
         // If Main.app passes this is being executed by jpackage executable.
         // If Main.run passes this is being executed by the jar file.
         // When Main.run does not pass, it being executed by the IDE.
@@ -459,9 +522,9 @@ public class App extends FXLoad {
         if (Main.app) {
             return new File(System.getProperty("user.dir") + "/app/");
         } else if (Main.run) {
-            return new File(System.getProperty("user.dir"));
+            return new File(System.getProperty("user.dir") + "/");
         } else {
-            return new File(System.getenv("APPDATA") + "/chat-app/");
+            return new File(OSPathing.getAppDataDirectory(), "chat-app/");
         }
     }
 
@@ -469,28 +532,35 @@ public class App extends FXLoad {
         return fileDownloader;
     }
 
-    public static File getDataDirectory() {
-        return new File(System.getenv("APPDATA") + "/chat-app/");
-    }
-
     public static File getBackendDirectory() {
-        return new File(getDataDirectory(), "/backend/");
+
+        if (Main.run) {
+            return new File(System.getProperty("user.dir") + "/backend/");
+        } else {
+            return new File(getAppDirectory(), "/backend/");
+        }
     }
 
     public static File getModelsDirectory() {
-        return new File(getDataDirectory(), "models/");
+        if (getInstance().getSettings() != null) {
+            File file = new File(getInstance().getSettings().getModelPath());
+            if (file.exists()) {
+                return file;
+            }
+        }
+        return new File(getAppDirectory(), "models/");
     }
 
     public static File getCharactersDirectory() {
-        return new File(getDataDirectory(), "characters/");
+        return new File(getAppDirectory(), "characters/");
     }
 
     public static File getUsersDirectory() {
-        return new File(getDataDirectory(), "users/");
+        return new File(getAppDirectory(), "users/");
     }
 
     public static File getImagesDirectory() {
-        return new File(getDataDirectory(), "images/");
+        return new File(getAppDirectory(), "images/");
     }
 
     public static Model getDefaultModel() {
@@ -510,14 +580,16 @@ public class App extends FXLoad {
         return mmprojModels;
     }
 
+    public LLamaBackendUpdater getBackendUpdater() {
+        return LLamaBackendUpdater;
+    }
+
     public static void reloadModelList() {
         getInstance().getModels().clear();
         getInstance().getMmprojModels().clear();
         getInstance().getModels().putAll(loadModels("exclude"));
         getInstance().getMmprojModels().putAll(loadModels("mmproj"));
-
     }
-
 
     private static TreeMap<String, Model> loadModels(String filterType) {
         TreeMap<String, Model> models = new TreeMap<>();
@@ -526,7 +598,7 @@ public class App extends FXLoad {
             return models;
         }
 
-        String path = App.getInstance().getSettings().getModelPath().replace("%APPDATA%", System.getenv("APPDATA"));
+        String path = App.getInstance().getSettings().getModelPath().replace("%APPDATA%", OSPathing.getAppDataDirectory().getAbsolutePath());
         File modelPath = new File(path);
 
         if (!modelPath.exists()) {
@@ -588,7 +660,7 @@ public class App extends FXLoad {
 
     public static Set<String> getModelNames(String filter) {
         Set<String> toReturn = new TreeSet<>();
-        if (filter.equalsIgnoreCase("exlude")) {
+        if (filter.equalsIgnoreCase("exclude")) {
             for (Model model : getInstance().getModels().values()) {
                 toReturn.add(new File(model.getFile().getParent()).getName() + "/" + model.getFile().getName());
             }
@@ -630,5 +702,43 @@ public class App extends FXLoad {
         }
         Platform.exit();
         System.exit(0);
+    }
+
+    public String getVersion() {
+        String version = null;
+
+        // try to load from maven properties first
+        try {
+            Properties p = new Properties();
+            InputStream is = getClass().getResourceAsStream("/META-INF/maven/me.piitex.app/character-chat-app/pom.properties");
+            if (is != null) {
+                p.load(is);
+                version = p.getProperty("version", "");
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+
+        // fallback to using Java API
+        if (version == null) {
+            Package aPackage = getClass().getPackage();
+            if (aPackage != null) {
+                version = aPackage.getImplementationVersion();
+                if (version == null) {
+                    version = aPackage.getSpecificationVersion();
+                }
+            }
+        }
+
+        if (version == null) {
+            // we could not compute the version so use a blank
+            version = "";
+        }
+
+        if (!Main.app && !Main.run) {
+            version = "Open Sourced";
+        }
+
+        return version;
     }
 }
