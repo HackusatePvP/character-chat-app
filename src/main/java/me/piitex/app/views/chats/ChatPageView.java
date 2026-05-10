@@ -114,7 +114,7 @@ public class ChatPageView extends BorderContainer {
         layout.addElement(separator);
 
         //TODO: Make Avatar circular
-        int avatarSize = 128;
+        int avatarSize = 196;
         if (chatMessage.getSender() == Role.ASSISTANT) {
             displayBox.setAlignment(Pos.CENTER_RIGHT);
 
@@ -126,6 +126,7 @@ public class ChatPageView extends BorderContainer {
             ImageLoader imageLoader = new ImageLoader(new File(iconPath));
             imageLoader.setWidth(avatarSize);
             imageLoader.setHeight(avatarSize);
+            imageLoader.setSmoothing(true);
             ImageOverlay avatar = new ImageOverlay(imageLoader);
             avatar.setFitWidth(avatarSize);
             avatar.setFitHeight(avatarSize);
@@ -146,6 +147,7 @@ public class ChatPageView extends BorderContainer {
             ImageLoader imageLoader = new ImageLoader(new File(iconPath));
             imageLoader.setWidth(avatarSize);
             imageLoader.setHeight(avatarSize);
+            imageLoader.setSmoothing(true);
             ImageOverlay avatar = new ImageOverlay(imageLoader);
             avatar.setFitWidth(avatarSize);
             avatar.setFitHeight(avatarSize);
