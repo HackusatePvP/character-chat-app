@@ -4,6 +4,7 @@ import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.configuration.AppSettings;
@@ -74,7 +75,7 @@ public class ListTab extends Tab {
             TitledLayout root = new TitledLayout(model.getFile().getName() + " (" + formattedFileSize + "GB)", scrollContainer.getWidth() - 100, -1);
             root.setMaxSize(root.getWidth(), -1);
             root.addStyle(Styles.DENSE);
-            root.setSpacing(50);
+            root.setSpacing(25);
             root.setAlignment(Pos.TOP_CENTER);
             root.addStyle(Tweaks.ALT_ICON);
             root.setExpanded(model.getSettings().isDefault());
@@ -100,37 +101,16 @@ public class ListTab extends Tab {
             location.setEnabled(false);
             body.addElement(location);
 
-            HorizontalLayout footer = new HorizontalLayout(800, 50);
+            HorizontalLayout footer = new HorizontalLayout(400, 50);
+            footer.setAlignment(Pos.CENTER_LEFT);
             root.addElement(footer);
-
-            CheckBoxOverlay defaultModel = new CheckBoxOverlay(model.getSettings().isDefault(),"Set as default");
-            footer.addElement(defaultModel);
-            defaultModel.onSet(event -> {
-                // If set to true scan all models and set default to false
-                // Then set this one to true
-                // Also, re-render the view
-
-                // Reloop models and disable any defaults
-                for (Model m : App.getModels("exclude")) {
-                    if (m == model) continue;
-                    if (m.getSettings().isDefault()) {
-                        m.getSettings().setDefault(false);
-                    }
-                }
-                model.getSettings().setDefault(event.getNewValue());
-
-                tabsContainer.replaceTab(tabsContainer.getTabs().get("List"), new ListTab(tabsContainer));
-                tabsContainer.setSelectedTab("List");
-            });
-
-            HorizontalLayout subFooter = new HorizontalLayout(400, 50);
-            subFooter.setX(20);
-            subFooter.setSpacing(40);
-            footer.addElement(subFooter);
+            footer.setSpacing(30);
 
             IconOverlay settings = new IconOverlay(Material2MZ.SETTINGS);
+            settings.setIconSize(18);
+            settings.setColor(Color.BLUE);
             settings.setTooltip("Go to model settings.");
-            subFooter.addElement(settings);
+            footer.addElement(settings);
             settings.addStyle(Styles.ACCENT);
             settings.addStyle(Styles.LARGE);
             settings.onClick(event -> {
@@ -139,9 +119,11 @@ public class ListTab extends Tab {
             });
 
             IconOverlay delete = new IconOverlay(Material2AL.DELETE_FOREVER);
+            delete.setIconSize(18);
+            delete.setColor(Color.RED);
             delete.setTooltip("Delete the model.");
             delete.addStyle(Styles.DANGER);
-            subFooter.addElement(delete);
+            footer.addElement(delete);
             delete.onClick(event -> {
                 // Confirm the model deletion.
 
