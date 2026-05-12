@@ -14,7 +14,7 @@ import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.configurations.InfoFile;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 public class FinishCharacterCreatorView extends EmptyContainer {

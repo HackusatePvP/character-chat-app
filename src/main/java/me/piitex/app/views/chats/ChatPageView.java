@@ -20,7 +20,8 @@ import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -123,7 +124,7 @@ public class ChatPageView extends BorderContainer {
                 iconPath = new File(App.getExecutedDirectory(), "icons/charater.png").getAbsolutePath();
             }
 
-            ImageLoader imageLoader = new ImageLoader(new File(iconPath));
+            ImageLoader imageLoader = new BaseImageLoader(new File(iconPath));
             imageLoader.setWidth(avatarSize);
             imageLoader.setHeight(avatarSize);
             imageLoader.setSmoothing(true);
@@ -144,7 +145,7 @@ public class ChatPageView extends BorderContainer {
                 iconPath = new File(App.getExecutedDirectory(), "icons/charater.png").getAbsolutePath();
             }
 
-            ImageLoader imageLoader = new ImageLoader(new File(iconPath));
+            ImageLoader imageLoader = new BaseImageLoader(new File(iconPath));
             imageLoader.setWidth(avatarSize);
             imageLoader.setHeight(avatarSize);
             imageLoader.setSmoothing(true);

@@ -23,7 +23,7 @@ import me.piitex.engine.containers.*;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -269,7 +269,7 @@ public class CharactersView {
             App.getThreadPoolManager().submitSchedule(() -> {
                 try {
                     App.logger.info("Removing image from cache '{}'", character.getIconPath());
-                    ImageLoader.imageCache.remove(character.getIconPath()); // Clear image from cache.
+                    ImageLoader.clearCache();
                     App.logger.info("Deleting Character: {}", character.getId());
                     FileUtils.deleteDirectory(character.getCharacterDirectory());
                 } catch (IOException e) {

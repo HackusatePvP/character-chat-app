@@ -13,7 +13,7 @@ import me.piitex.engine.containers.Container;
 import me.piitex.engine.containers.DownloadContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.ProgressBarOverlay;
@@ -81,7 +81,7 @@ public class LLamaBackendUpdater {
     }
 
     public void buildAndDisplayUpdateWindow(GitHubUtil gitHubUtil) {
-        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new ImageLoader(new File(App.getExecutedDirectory(), "logo.png"))).build();
+        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new BaseImageLoader(new File(App.getExecutedDirectory(), "logo.png"))).build();
         container = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(container);
         window.getStage().setOnHidden(windowEvent -> {

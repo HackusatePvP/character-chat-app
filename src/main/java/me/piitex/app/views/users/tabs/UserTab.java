@@ -14,7 +14,8 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.json.JSONObject;
 
@@ -92,7 +93,7 @@ public class UserTab extends Tab {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
-        ImageLoader loader = new ImageLoader(currentIconPath);
+        ImageLoader loader = new BaseImageLoader(currentIconPath);
         loader.setWidth(256);
         loader.setHeight(256);
 
@@ -120,7 +121,7 @@ public class UserTab extends Tab {
                 appSettings.setImagesPath(selectedFile.getParent());
                 userEditView.setUserIconPath(selectedFile.getAbsoluteFile());
 
-                ImageLoader imageLoader = new ImageLoader(selectedFile);
+                ImageLoader imageLoader = new BaseImageLoader(selectedFile);
                 imageLoader.setWidth(256);
                 imageLoader.setHeight(256);
 
@@ -179,7 +180,7 @@ public class UserTab extends Tab {
                 userEditView.getUserLoreBookTab().buildLorebookTabContent();
 
                 userEditView.setUserIconPath(file);
-                image.setImage(new ImageLoader(file));
+                image.setImage(new BaseImageLoader(file));
             } catch (ImageProcessingException | IOException e) {
                 App.logger.error("Error importing character card: ", e);
                 Platform.runLater(() -> {

@@ -13,7 +13,8 @@ import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.configurations.InfoFile;
 import org.json.JSONObject;
@@ -172,7 +173,7 @@ public class UserCustomizationView extends EmptyContainer {
                             userIdInput.setCurrentText(id);
                             userDisplayInput.setCurrentText(displayName);
                             userPersonaInput.setCurrentText(persona);
-                            userImage.setImage(new ImageLoader(file));
+                            userImage.setImage(new BaseImageLoader(file));
 
                             parent.getUserLoreCustomizationView().getLoreLayout().removeAllElements();
                             loreItems.forEach((s, s2) -> parent.getUserLoreCustomizationView().getLoreLayout().addElement(parent.getUserLoreCustomizationView().buildLoreEntry(s, s2)));
@@ -253,9 +254,9 @@ public class UserCustomizationView extends EmptyContainer {
 
         ImageLoader imageLoader;
         if (infoFile.hasKey("icon-path")) {
-            imageLoader = new ImageLoader(new File(infoFile.get("icon-path")));
+            imageLoader = new BaseImageLoader(new File(infoFile.get("icon-path")));
         } else {
-            imageLoader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
+            imageLoader = new BaseImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
         }
         imageLoader.setWidth(imageSize);
         imageLoader.setHeight(imageSize);
@@ -273,7 +274,7 @@ public class UserCustomizationView extends EmptyContainer {
             if (file != null && file.isFile() && file.exists()) {
 
                 App.logger.info("Updating image to '{}'", file.getAbsoluteFile());
-                ImageLoader newImage = new ImageLoader(file);
+                ImageLoader newImage = new BaseImageLoader(file);
                 newImage.setWidth(imageSize);
                 newImage.setHeight(imageSize);
                 userImage.setImage(newImage);
@@ -286,7 +287,7 @@ public class UserCustomizationView extends EmptyContainer {
         ButtonOverlay reset = new ButtonBuilder("rst").setText("Reset Image").addStyle(Styles.FLAT).build();
         layout.addElement(reset);
         reset.onClick(_ -> {
-            ImageLoader loader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
+            ImageLoader loader = new BaseImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
             userImage.setImage(loader);
             infoFile.set("icon-path", imageLoader.getFile().getAbsolutePath());
         });

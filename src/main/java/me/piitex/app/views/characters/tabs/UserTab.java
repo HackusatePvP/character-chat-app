@@ -10,6 +10,8 @@ import me.piitex.app.backend.User;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.ImageCardExporter;
 import me.piitex.app.utils.UserCardImporter;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.app.views.characters.CharacterEditView;
 import me.piitex.engine.containers.CardContainer;
@@ -17,7 +19,6 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.json.JSONObject;
 
@@ -103,7 +104,7 @@ public class UserTab extends Tab {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
-        ImageLoader loader = new ImageLoader(currentIconPath);
+        ImageLoader loader = new BaseImageLoader(currentIconPath);
         loader.setWidth(256);
         loader.setHeight(256);
 
@@ -133,7 +134,7 @@ public class UserTab extends Tab {
 
                 parentView.updateInfoData();
 
-                ImageLoader imageLoader = new ImageLoader(selectedFile);
+                ImageLoader imageLoader = new BaseImageLoader(selectedFile);
                 imageLoader.setWidth(256);
                 imageLoader.setHeight(256);
 
@@ -189,7 +190,7 @@ public class UserTab extends Tab {
 
                 if (template.getIconPath() != null && !template.getIconPath().isEmpty()) {
                     parentView.setUserIconPath(new File(template.getIconPath()));
-                    image.setImage(new ImageLoader(parentView.getUserIconPath()));
+                    image.setImage(new BaseImageLoader(parentView.getUserIconPath()));
                 }
 
                 if (parentView.getUser() != null) {
@@ -228,7 +229,7 @@ public class UserTab extends Tab {
 
                 parentView.setUserIconPath(file);
                 parentView.getInfoFile().set("icon-path-user", file.getAbsolutePath());
-                image.setImage(new ImageLoader(file));
+                image.setImage(new BaseImageLoader(file));
 
                 parentView.updateInfoData();
 

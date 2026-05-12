@@ -7,7 +7,7 @@ import me.piitex.engine.Window;
 import me.piitex.engine.WindowBuilder;
 import me.piitex.engine.containers.Container;
 import me.piitex.engine.containers.EmptyContainer;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
 import me.piitex.engine.overlays.ProgressBarOverlay;
@@ -55,7 +55,7 @@ public class ApplicationUpdater {
     }
 
     public void buildAndDisplayUpdateWindow(GitHubUtil gitHubUtil) {
-        window = new WindowBuilder("Update").setDimensions(400, 150).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+        window = new WindowBuilder("Update").setDimensions(400, 150).setIcon(new BaseImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
         container = new EmptyContainer(400, 150);
         window.addContainer(container);
 

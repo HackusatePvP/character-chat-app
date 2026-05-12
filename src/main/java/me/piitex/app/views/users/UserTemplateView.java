@@ -23,7 +23,7 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -281,7 +281,7 @@ public class UserTemplateView extends EmptyContainer {
             App.getThreadPoolManager().submitSchedule(() -> {
                 try {
                     App.logger.info("Removing image from cache '{}'", user.getIconPath());
-                    ImageLoader.imageCache.remove(user.getIconPath()); // Clear image from cache.
+                    ImageLoader.clearCache();
                     App.logger.info("Deleting User: {}", user.getId());
                     FileUtils.deleteDirectory(user.getUserDirectory());
                 } catch (IOException e) {

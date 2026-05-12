@@ -20,13 +20,13 @@ import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
+import me.piitex.engine.loaders.image.BaseImageLoader;
 import me.piitex.os.OSPathing;
 import me.piitex.os.OSUtil;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.Window;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.fxloader.FXLoad;
-import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.AlertOverlay;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
@@ -207,7 +207,7 @@ public class App extends FXLoad {
         logger.info("Screen Size ({},{})", dimension.width, dimension.height);
 
         File logo = new File(getExecutedDirectory(), "logo.png");
-        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
+        window = new WindowBuilder("Chat App").setIcon(new BaseImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
         // Initialize global positions. Needed for the rendering process.
         Positions.initialize();
@@ -469,7 +469,7 @@ public class App extends FXLoad {
 
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         File logo = new File(getExecutedDirectory(), "logo.png");
-        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(logo)).build();
+        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new BaseImageLoader(logo)).build();
 
         EmptyContainer emptyContainer = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(emptyContainer);

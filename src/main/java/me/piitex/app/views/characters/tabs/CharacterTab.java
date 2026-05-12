@@ -20,7 +20,8 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.tabs.Tab;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.app.backend.Character;
 import org.json.JSONObject;
@@ -104,7 +105,7 @@ public class CharacterTab extends Tab {
             currentIconPath = new File(App.getAppDirectory(), "icons/character.png");
         }
 
-        ImageLoader loader = new ImageLoader(currentIconPath);
+        ImageLoader loader = new BaseImageLoader(currentIconPath);
         loader.setWidth(256);
         loader.setHeight(256);
 
@@ -134,7 +135,7 @@ public class CharacterTab extends Tab {
 
                 parentView.updateInfoData();
 
-                ImageLoader imageLoader = new ImageLoader(selectedFile);
+                ImageLoader imageLoader = new BaseImageLoader(selectedFile);
                 imageLoader.setWidth(256);
                 imageLoader.setHeight(256);
 
@@ -207,7 +208,7 @@ public class CharacterTab extends Tab {
 
                 parentView.setCharacterIconPath(file);
                 parentView.getInfoFile().set("icon-path", file.getAbsolutePath());
-                image.setImage(new ImageLoader(file));
+                image.setImage(new BaseImageLoader(file));
 
                 parentView.updateInfoData();
 
