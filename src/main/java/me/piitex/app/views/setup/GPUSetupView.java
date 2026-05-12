@@ -63,6 +63,12 @@ public class GPUSetupView extends VerticalLayout {
         backendBox.addElement(backendSelection);
         backendSelection.onItemSelect(event -> {
             settings.setBackend(event.getNewValue());
+
+            try {
+                new DeviceProcess(event.getNewValue());
+            } catch (IOException e) {
+                App.logger.error("Could not load devices for '" + event.getNewValue() + "'!", e);
+            }
         });
 
         VerticalLayout gpuBox = new VerticalLayout(-1, -1);

@@ -8,6 +8,10 @@ import me.piitex.app.backend.Model;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.os.OSUtil;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GraphicsCard;
+import oshi.hardware.HardwareAbstractionLayer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -175,6 +179,21 @@ public class ServerProcess {
         // GPU layers have been refactored to GPU usage.
         // The usage is a percentage of the total layers (model.getGpuLayers());
         double TOTAL_AVAILABLE_VRAM_MIB = App.getInstance().getAppSettings().getTotalGpuVram();
+
+        if (TOTAL_AVAILABLE_VRAM_MIB <= 0) {
+            App.logger.warn("VRAM is set to 0. Attempting to fetch VRAM...");
+            // Fallback to Oshi
+            SystemInfo systemInfo = new SystemInfo();
+            HardwareAbstractionLayer hardwareAbstractionLayer = systemInfo.getHardware();
+            GraphicsCard graphicsCard = hardwareAbstractionLayer.getGraphicsCards().getFirst();
+            if (graphicsCard != null) {
+                TOTAL_AVAILABLE_VRAM_MIB = graphicsCard.getVRam() / (1024.0 * 1024.0);
+                App.getInstance().getAppSettings().setTotalGpuVram(TOTAL_AVAILABLE_VRAM_MIB);
+            } else {
+                App.logger.error("Could not find dedicated GPU. Using global memory pool...");
+                TOTAL_AVAILABLE_VRAM_MIB = systemInfo.getHardware().getMemory().getTotal() / (1024.0 * 1024.0);
+            }
+        }
 
         double KV_CACHE = model.getSettings().getKvCacheSize();
         double COMPUTED_BUFFER_SIZE = model.getSettings().getComputeBufferSize();

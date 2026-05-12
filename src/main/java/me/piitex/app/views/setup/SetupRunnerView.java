@@ -92,6 +92,12 @@ public class SetupRunnerView extends VerticalLayout {
     }
 
     private void downloadSmallModel() {
+        File model = new File(App.getModelsDirectory(), "gemma-3-270m-it-UD-IQ2_M.gguf");
+        if (model.exists()) {
+            startLLama(model);
+            return;
+        }
+
         FileDownloader fileDownloader = new FileDownloader();
         fileDownloader.addDownloadListener(new DownloadListener() {
             @Override
