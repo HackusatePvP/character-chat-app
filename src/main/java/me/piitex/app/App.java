@@ -41,6 +41,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 
@@ -399,7 +400,7 @@ public class App extends FXLoad {
 
             logger.info("Model list updated.");
             downloader.shutdown();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             App.logger.error("Failed to fetch download size.", e);
         }
 
