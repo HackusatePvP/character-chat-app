@@ -261,6 +261,11 @@ public class ServerProcess {
             parameters.add(model.getSettings().getReasoningTemplate());
         }
 
+        if (model.getSettings().isForceDisableReasoning()) {
+            App.logger.info("Force disable reasoning....");
+            parameters.add("--no-prefill-assistant");
+        }
+
         if (!model.getSettings().getChatTemplate().equalsIgnoreCase("default")) {
             App.logger.debug("Setting chat template...");
             parameters.add("--chat-template");

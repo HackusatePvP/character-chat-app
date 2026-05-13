@@ -43,6 +43,7 @@ public class ModelEditView extends EmptyContainer {
     private String mmProj = "None / Disabled";
     private String chatTemplate = "default";
     private String reasoningTemplate = "disabled";
+    private boolean forceDisableReasoning = false;
     private boolean jinja = false;
 
     public ModelEditView(ModelSettings settings) {
@@ -91,6 +92,7 @@ public class ModelEditView extends EmptyContainer {
         layout.addElement(buildDryPenaltyToken());
         layout.addElement(buildChatTemplates());
         layout.addElement(buildReasoningTemplate());
+        layout.addElement(buildForceReasoning());
         layout.addElement(buildJinjaTemplate());
 
         page.addElement(buildSubmitBox());
@@ -687,6 +689,28 @@ public class ModelEditView extends EmptyContainer {
         return tileContainer;
     }
 
+    private TileContainer buildForceReasoning() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Force Disable Reasoning");
+        tileContainer.setDescription("Forcefully disables reasoning.");
+
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
+        info.setTooltip("Only enable if the reasoning is incompatible with llama.cpp.");
+        tileContainer.setGraphic(info);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(forceDisableReasoning);
+        switchOverlay.onToggle(event -> {
+            this.forceDisableReasoning = event.getNewValue();
+        });
+        tileContainer.setAction(switchOverlay);
+
+        return tileContainer;
+    }
+
     private TileContainer buildJinjaTemplate() {
         TileContainer tileContainer = new TileContainer(0, 0);
         tileContainer.addStyle(Styles.BORDER_DEFAULT);
@@ -751,6 +775,7 @@ public class ModelEditView extends EmptyContainer {
             settings.setMmProj(mmProj);
             settings.setChatTemplate(chatTemplate);
             settings.setReasoningTemplate(reasoningTemplate);
+            settings.setForceDisableReasoning(forceDisableReasoning);
             settings.setJinja(jinja);
             settings.setChange(true);
 

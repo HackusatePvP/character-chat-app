@@ -29,6 +29,7 @@ public class ModelSettings {
     private String reasoningTemplate = "disabled";
     private boolean useDefault;
     private boolean jinja = false;
+    private boolean forceDisableReasoning = false;
     private int totalLayers = 0;
     private double dataPerLayer;
     private double kvCacheSize;
@@ -183,6 +184,9 @@ public class ModelSettings {
         }
         if (infoFile.hasKey("change")) {
             this.change = infoFile.getBoolean("change");
+        }
+        if (infoFile.hasKey("force-disable-reason")) {
+            this.forceDisableReasoning = infoFile.getBoolean("force-disable-reason");
         }
     }
 
@@ -472,6 +476,15 @@ public class ModelSettings {
     public void setChange(boolean change) {
         this.change = change;
         infoFile.set("change", change);
+    }
+
+    public boolean isForceDisableReasoning() {
+        return forceDisableReasoning;
+    }
+
+    public void setForceDisableReasoning(boolean forceDisableReasoning) {
+        this.forceDisableReasoning = forceDisableReasoning;
+        infoFile.set("force-disable-reason", forceDisableReasoning);
     }
 
     @Nullable
