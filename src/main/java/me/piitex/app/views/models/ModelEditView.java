@@ -121,6 +121,7 @@ public class ModelEditView extends EmptyContainer {
         this.dryPenaltyTokens = settings.getDryPenaltyTokens();
         this.chatTemplate = settings.getChatTemplate();
         this.reasoningTemplate = settings.getReasoningTemplate();
+        this.forceDisableReasoning = settings.isForceDisableReasoning();
         this.jinja = settings.isJinja();
     }
 
