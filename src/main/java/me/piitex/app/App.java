@@ -485,15 +485,19 @@ public class App extends FXLoad {
         emptyContainer.addElement(kill);
         kill.onClick(event -> {
             App.logger.info("Killing old process.");
-            if (ProcessUtil.killProcess(Long.parseLong(settings.getInfoFile().get("main-pid")))) {
-                App.logger.info("Old process was destroyed gracefully.");
-                Platform.exit();
-                System.exit(0);
-            } else {
-                App.logger.info("Forcefully killing old process.");
-                ProcessUtil.terminateProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
-            }
-
+            Optional<ProcessHandle> handle =  ProcessUtil.getRunningProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
+            handle.ifPresent(processHandle -> {
+              if (processHandle.info().toString().contains("java.exe") || processHandle.info().toString().contains("javaw.exe") || processHandle.info().toString().contains("CCA.exe")) {
+                  if (ProcessUtil.killProcess(Long.parseLong(settings.getInfoFile().get("main-pid")))) {
+                      App.logger.info("Old process was destroyed gracefully.");
+                      Platform.exit();
+                      System.exit(0);
+                  } else {
+                      App.logger.info("Forcefully killing old process.");
+                      ProcessUtil.terminateProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
+                  }
+              }
+            });
             appSettings.getInfoFile().set("main-pid", "");
         });
 
