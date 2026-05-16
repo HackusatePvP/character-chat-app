@@ -5,10 +5,12 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.Character;
 import me.piitex.app.backend.Chat;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.utils.ChatUtil;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.LoadingView;
 import me.piitex.engine.containers.BorderContainer;
@@ -20,6 +22,7 @@ import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.material2.Material2AL;
 
+import javax.crypto.IllegalBlockSizeException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +34,7 @@ import static me.piitex.app.views.Positions.SIDEBAR_HEIGHT;
 public class ChatViewSidebar extends EmptyContainer {
     private final ChatView parent;
     private final VerticalLayout root;
+    private ChoiceBoxOverlay chatSelection;
 
     private static final AppSettings APP_SETTINGS = App.getInstance().getAppSettings();
 
@@ -100,16 +104,70 @@ public class ChatViewSidebar extends EmptyContainer {
         downloadIcon.setColor(Color.LIGHTBLUE);
         ButtonOverlay downloadChat = new ButtonBuilder("download").addStyle(Styles.FLAT).setIcon(downloadIcon).build();
         downloadChat.setTooltip("Download Chat");
+        downloadIcon.onClick(_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save Chat File");
+            chooser.setInitialFileName(currentChat.getCurrentText() + ".dat");
+            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Chat Message", ".dat"));
+            File file = chooser.showSaveDialog(App.window.getStage());
+
+            if (file.isDirectory()) return;
+            if (!file.getParentFile().exists()) return;
+
+            // Now save the data inside the file.
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                App.logger.error("Could not create chat file!", e);
+            }
+
+            try {
+                ChatUtil.exportChat(parent.getChat(), file);
+            } catch (IOException e) {
+                App.logger.error("Could not export chat file!", e);
+            }
+        });
 
         IconOverlay importIcon = new IconOverlay(Material2AL.IMPORT_EXPORT);
         importIcon.setColor(Color.LIGHTYELLOW);
         ButtonOverlay importChat = new ButtonBuilder("import").addStyle(Styles.FLAT).setIcon(importIcon).build();
         importChat.setTooltip("Import Chat");
+        importChat.onClick(_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save Chat File");
+            chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Chat Message", ".dat"));
+
+            File file = chooser.showOpenDialog(App.window.getStage());
+            if (!file.exists() || file.isDirectory()) return;
+
+            try {
+                ChatUtil.importChat(parent.getCharacter(), file);
+                App.logger.info("Imported Chat: '{}'", file.getAbsolutePath());
+
+                Chat chat = parent.getCharacter().getChat("import-" + file.getName());
+                parent.getCharacter().setLastChat(chat);
+                App.window.clearContainers();
+                EmptyContainer progressContainer = new EmptyContainer(APP_SETTINGS.getWidth(), APP_SETTINGS.getHeight());
+                progressContainer.addElement(new LoadingView("Loading chat...", progressContainer.getWidth(), progressContainer.getHeight()));
+                App.window.addContainer(progressContainer);
+
+                App.getThreadPoolManager().submitTask(() -> {
+                    ChatView chatView = new ChatView(parent.getCharacter(), chat);
+                    Node assemble = chatView.assemble();
+                    Platform.runLater(() -> {
+                        App.window.clearContainers();
+                        App.window.addContainer(chatView, assemble);
+                    });
+                });
+            } catch (IOException | IllegalBlockSizeException e) {
+                App.logger.error("Could not import chat file!", e);
+            }
+        });
 
         IconOverlay renameIcon = new IconOverlay(Material2AL.EDIT);
         renameIcon.setColor(Color.LIGHTGREEN);
         ButtonOverlay renameChat = new ButtonBuilder("rename").addStyle(Styles.FLAT).setIcon(renameIcon).build();
-        renameChat.setTooltip("Rename Chat");
+        renameChat.setTooltip("Enter the new name in the text box. Press this button to apply.");
         renameIcon.onClick(_ -> {
             Character character = parent.getCharacter();
             Chat chat = parent.getChat();
@@ -154,7 +212,7 @@ public class ChatViewSidebar extends EmptyContainer {
             chats.add(chat.getFile().getName());
         }
 
-        ChoiceBoxOverlay chatSelection = new ChoiceBoxOverlay(chats);
+        chatSelection = new ChoiceBoxOverlay(chats);
         chatSelection.setWidth(layout.getWidth());
         chatSelection.setDefaultItem(parent.getChat().getFile().getName());
         layout.addElement(chatSelection);
