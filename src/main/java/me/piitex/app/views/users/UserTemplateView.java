@@ -60,21 +60,34 @@ public class UserTemplateView extends EmptyContainer {
         root.addElement(sidebarView);
         root.setSpacing(35);
 
-        if (App.getInstance().isLoading()) {
-            root.addElement(new LoadingView("Loading data...", root.getWidth(), 650));
-            App.getThreadPoolManager().submitSchedule(() -> {
-                boolean loading = App.getInstance().isLoading();
-                while (loading) {
-                    loading = App.getInstance().isLoading();
-                    if (!loading) break;
-                }
-                Platform.runLater(() -> {
-                    root.removeElement(1);
-                    buildUsers();
-                });
-            }, 1, TimeUnit.SECONDS);
+        if (!App.getInstance().getUserTemplates().isEmpty()) {
+            if (App.getInstance().isLoading()) {
+                root.addElement(new LoadingView("Loading data...", root.getWidth(), 650));
+                App.getThreadPoolManager().submitSchedule(() -> {
+                    boolean loading = App.getInstance().isLoading();
+                    while (loading) {
+                        loading = App.getInstance().isLoading();
+                        if (!loading) break;
+                    }
+                    Platform.runLater(() -> {
+                        root.removeElement(1);
+                        buildUsers();
+                    });
+                }, 1, TimeUnit.SECONDS);
+            } else {
+                buildUsers();
+            }
         } else {
-            buildUsers();
+            VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, -1);
+            layout.setMaxSize(layout.getWidth(), layout.getHeight());
+            layout.setSpacing(20);
+            layout.setAlignment(Pos.CENTER);
+            layout.addStyle(Styles.BORDER_DEFAULT);
+            root.addElement(layout);
+
+            TextOverlay body = new TextOverlay("Create your first user in the creator page.");
+            body.setFont(new FontLoader(Font.getDefault(), 24));
+            layout.addElement(body);
         }
     }
 
