@@ -186,13 +186,16 @@ public class ServerProcess {
             SystemInfo systemInfo = new SystemInfo();
             HardwareAbstractionLayer hardwareAbstractionLayer = systemInfo.getHardware();
             GraphicsCard graphicsCard = hardwareAbstractionLayer.getGraphicsCards().getFirst();
-            if (graphicsCard != null) {
+            if (graphicsCard != null && graphicsCard.getVRam() > 0) {
+                App.logger.info("Using GPU memory...");
                 TOTAL_AVAILABLE_VRAM_MIB = graphicsCard.getVRam() / (1024.0 * 1024.0);
-                App.getInstance().getAppSettings().setTotalGpuVram(TOTAL_AVAILABLE_VRAM_MIB);
             } else {
                 App.logger.error("Could not find dedicated GPU. Using global memory pool...");
                 TOTAL_AVAILABLE_VRAM_MIB = systemInfo.getHardware().getMemory().getTotal() / (1024.0 * 1024.0);
+                App.logger.info("VRAM: {} MiB", TOTAL_AVAILABLE_VRAM_MIB);
             }
+
+            App.getInstance().getAppSettings().setTotalGpuVram(TOTAL_AVAILABLE_VRAM_MIB);
         }
 
         double KV_CACHE = model.getSettings().getKvCacheSize();
