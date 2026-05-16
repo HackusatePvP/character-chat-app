@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
@@ -23,6 +24,7 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
+import me.piitex.engine.loaders.FontLoader;
 import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
@@ -265,7 +267,7 @@ public class UserTemplateView extends EmptyContainer {
 
             // Cleanup image usage
             VerticalLayout verticalLayout = (VerticalLayout) card.getBody();
-            ImageOverlay imageOverlay = (ImageOverlay) verticalLayout.getElementAt(1);
+            ImageOverlay imageOverlay = (ImageOverlay) verticalLayout.getElementAt(0);
 
             // When setting to null the engine will dispose of the image and the JVM will call gc.
             imageOverlay.setImage(null);
@@ -279,6 +281,7 @@ public class UserTemplateView extends EmptyContainer {
                     ImageLoader.clearCache();
                     App.logger.info("Deleting User: {}", user.getId());
                     FileUtils.deleteDirectory(user.getUserDirectory());
+                    App.getInstance().getUserTemplates().remove(user.getId());
                 } catch (IOException e) {
                     App.logger.error("Could not delete directory!", e);
                 }
