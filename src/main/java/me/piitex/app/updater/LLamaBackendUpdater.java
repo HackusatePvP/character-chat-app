@@ -66,7 +66,6 @@ public class LLamaBackendUpdater {
         if (current != null && latest != null) {
             return current.compareTo(latest) < 0;
         }
-        System.out.println("False");
         return false;
     }
 
