@@ -102,7 +102,7 @@ public class UserTemplateView extends EmptyContainer {
             imageWidth = 256;
             imageHeight = 256;
             cardWidth = 280;
-            cardHeight = 380;
+            cardHeight = 350;
         }
         body.setScrollWhenNeeded(false);
         body.setHorizontalScroll(false);
@@ -119,16 +119,11 @@ public class UserTemplateView extends EmptyContainer {
             CardContainer card = new CardContainer(0,0, cardWidth, cardHeight);
             card.setMaxSize(cardWidth, cardHeight);
 
-            VerticalLayout displayBox = new VerticalLayout(0, 330);
+            VerticalLayout displayBox = new VerticalLayout(0, cardHeight - 50);
             displayBox.setSpacing(15);
             displayBox.setAlignment(Pos.TOP_CENTER);
 
-            TextOverlay helper = new TextOverlay("Click to chat");
-            helper.setUnderline(true);
-            displayBox.addElement(helper);
-
             ContextMenu contextMenu = new ContextMenu();
-
             MenuItem edit = new MenuItem("Edit");
             edit.setOnAction(_ -> editUser(user));
             MenuItem copy = new MenuItem("Copy");
