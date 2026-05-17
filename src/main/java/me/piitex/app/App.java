@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class App extends FXLoad {
     private ServerSettings settings;
@@ -71,6 +72,7 @@ public class App extends FXLoad {
 
     public static final Logger logger = LogManager.getLogger(App.class);
 
+    private final ConcurrentLinkedQueue<String> characterLoadQueue = new ConcurrentLinkedQueue<>();
     private volatile boolean loading = true;
     private volatile boolean error = false;
 
@@ -123,7 +125,6 @@ public class App extends FXLoad {
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Finished pre-initialization.");
-            loading = false;
         });
         threadPoolManager.submitTask(this::loadBackendServer);
     }
@@ -344,18 +345,27 @@ public class App extends FXLoad {
             return;
         }
         for (File file : files) {
-            logger.info("Loading character '{}'...", file.getName());
             if (file.isDirectory()) {
-                String id = file.getName();
-                // Check if info file exists
-                File info = new File(file, "character.info");
-                if (info.exists()) {
-                    InfoFile infoFile = new InfoFile(info, true);
-                    characters.put(id, new Character(id, infoFile));
-                } else {
-                    logger.error("Character file does not exist for '{}'", file.getName());
-                }
+                App.getThreadPoolManager().submitTask(() -> {
+                    characterLoadQueue.add(file.getName());
+                    logger.info("Loading character '{}'...", file.getName());
+                    String id = file.getName();
+                    // Check if info file exists
+                    File info = new File(file, "character.info");
+                    if (info.exists()) {
+                        InfoFile infoFile = new InfoFile(info, true);
+                        characters.put(id, new Character(id, infoFile));
+                    } else {
+                        logger.error("Character file does not exist for '{}'", file.getName());
+                    }
+
+                    characterLoadQueue.remove(file.getName());
+                });
             }
+        }
+
+        while (loading) {
+            loading = !characterLoadQueue.isEmpty();
         }
     }
 
