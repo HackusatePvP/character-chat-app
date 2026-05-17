@@ -129,7 +129,7 @@ public class App extends FXLoad {
     }
 
     @Override
-    public void initialization(Stage initialStage) {
+    public void initialization() {
         // Error will pass if another instance is running,
         if (error) return;
         App.logger.info("Loading app from '{}'", getAppDirectory().getAbsolutePath());

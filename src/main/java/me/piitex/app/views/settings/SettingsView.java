@@ -79,7 +79,7 @@ public class SettingsView {
             App.window.clear();
             App.window.close(false);
             appSettings.setWindowScaling(event.getNewValue());
-            App.getInstance().initialization(App.window.getStage());
+            App.getInstance().initialization();
         });
         tileContainer.setAction(toggleSwitchOverlay);
 
@@ -175,7 +175,7 @@ public class SettingsView {
             App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
             App.window.clear();
             App.window.close(false);
-            App.getInstance().initialization(App.window.getStage());
+            App.getInstance().initialization();
         });
 
         tileContainer.setAction(selection);
@@ -230,7 +230,7 @@ public class SettingsView {
             App.getInstance().getCharacters().values().forEach(character -> character.getChatViewCachedNodes().clear());
             App.window.clear();
             App.window.close(false);
-            App.getInstance().initialization(App.window.getStage());
+            App.getInstance().initialization();
 
         });
 
