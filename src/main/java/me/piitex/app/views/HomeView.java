@@ -49,8 +49,8 @@ public class HomeView extends EmptyContainer {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
-                    if (!loading) break;
                 }
+
                 Platform.runLater(() -> {
                     root.removeElement(1);
                     buildBody();
