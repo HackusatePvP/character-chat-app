@@ -15,7 +15,6 @@ import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.backend.server.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.updater.ApplicationUpdater;
 import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
@@ -344,6 +343,7 @@ public class App extends FXLoad {
             logger.error("Could not initialize characters directory. Program may lack permission to access file system.");
             return;
         }
+
         for (File file : files) {
             if (file.isDirectory()) {
                 App.getThreadPoolManager().submitTask(() -> {
@@ -414,19 +414,13 @@ public class App extends FXLoad {
             App.logger.error("Failed to fetch download size.", e);
         }
 
-        // Microslop, the multi trillion dollar company that can't handle more than 50 API requests.
-        App.logger.info("Checking for application updates...");
-        ApplicationUpdater applicationUpdater = new ApplicationUpdater(getVersion());
-        //applicationUpdater.checkForUpdates();
-
         App.logger.info("Checking for backend version...");
-
         if (settings.getDevice().equals("error")) {
             App.logger.info("Could not load backend devices. Force checking updates...");
             settings.setDevice("Auto");
             lLamaBackendUpdater = new LLamaBackendUpdater("0");
         } else {
-            File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+            File backendVersionFile = Arrays.stream(Objects.requireNonNull(getBackendDirectory().listFiles())).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
             if (backendVersionFile != null) {
                 lLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
             } else {
