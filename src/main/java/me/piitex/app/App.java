@@ -44,6 +44,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 
 public class App extends FXLoad {
     private ServerSettings settings;
@@ -344,9 +345,11 @@ public class App extends FXLoad {
             return;
         }
 
+        Collection<Future<?>> tasks = new HashSet<>();
+
         for (File file : files) {
             if (file.isDirectory()) {
-                App.getThreadPoolManager().submitTask(() -> {
+                tasks.add(App.getThreadPoolManager().submitTask(() -> {
                     characterLoadQueue.add(file.getName());
                     logger.info("Loading character '{}'...", file.getName());
                     String id = file.getName();
@@ -360,13 +363,25 @@ public class App extends FXLoad {
                     }
 
                     characterLoadQueue.remove(file.getName());
-                });
+                }));
             }
         }
 
-        while (loading) {
-            loading = !characterLoadQueue.isEmpty();
-        }
+        int total = tasks.size();
+        Collection<Future<?>> completed;
+        do {
+            completed = new HashSet<>();
+            for (Future<?> task : tasks) {
+                if (task.isDone()) {
+                    completed.add(task);
+                }
+            }
+
+            if (completed.size() == total) {
+                loading = false;
+            }
+        } while (loading);
+
     }
 
     public void loadUserTemplates() {
@@ -424,6 +439,7 @@ public class App extends FXLoad {
             if (backendVersionFile != null) {
                 lLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
             } else {
+                App.logger.info("No update file found.");
                 lLamaBackendUpdater = new LLamaBackendUpdater("0");
             }
         }
