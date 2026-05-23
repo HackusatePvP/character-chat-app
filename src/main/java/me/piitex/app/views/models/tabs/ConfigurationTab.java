@@ -11,6 +11,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.views.HomeView;
 import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -23,11 +24,15 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.OSUtil;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static me.piitex.app.views.Positions.*;
@@ -63,6 +68,7 @@ public class ConfigurationTab extends Tab {
         //       When enabled it allows the user to remotely connect to an endpoint.
         //       Not sure how control of the server would work.
         layout.addElement(buildServerZone());
+        layout.addElement(buildBackendReset());
         layout.addElement(buildHostTile());
         layout.addElement(buildRemoteModeTile());
         layout.addElement(buildBackend());
@@ -75,6 +81,57 @@ public class ConfigurationTab extends Tab {
         layout.addElement(buildFlashAttention());
 
         Platform.runLater(this::handleServerLoad);
+    }
+
+    public TileContainer buildBackendReset() {
+        TileContainer container = new TileContainer(0, -1);
+        container.setMaxSize(layout.getWidth(), 180);
+        container.setTitle("Reset backend files.");
+        container.setDescription("Deletes all backend files and prompts a re-installation.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        configLayout.setSpacing(10);
+        configLayout.setAlignment(Pos.CENTER_RIGHT);
+
+        ButtonOverlay reset = new ButtonOverlay(new ButtonBuilder("reset").setText("Reset").addStyle(Styles.DANGER).addStyle(Styles.BUTTON_OUTLINED));
+        reset.onClick(_ -> {
+            if (ServerProcess.getCurrentServer() == null) return;
+            ServerProcess.getCurrentServer().stop();
+            File backendDir = App.getBackendDirectory();
+            for (File dir : backendDir.listFiles()) {
+                if (dir.isDirectory()) {
+                    App.logger.info("Deleted '{}'", dir.getAbsolutePath());
+                    try {
+                        FileUtils.deleteDirectory(dir);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            File backendVersionFile = Arrays.stream(Objects.requireNonNull(backendDir.listFiles())).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+            if (backendVersionFile != null) {
+                try {
+                    FileUtils.delete(backendVersionFile);
+                    App.logger.info("Deleted backend version file...");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            App.getInstance().performUpdates();
+
+            App.window.clearContainers();
+            App.window.addContainer(new HomeView());
+        });
+        configLayout.addElement(reset);
+
+        container.setAction(configLayout);
+
+        return container;
     }
 
     public TileContainer buildHostTile() {
@@ -328,8 +385,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public CardContainer buildServerZone() {
-        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 200);
-        card.setMaxSize(layout.getWidth(), 200);
+        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 250);
+        card.setMaxSize(card.getWidth(), card.getHeight());
 
         TextOverlay text = new TextOverlay("Server Zone");
         text.addStyle(Styles.TITLE_3);
@@ -341,10 +398,15 @@ public class ConfigurationTab extends Tab {
         desc.addStyle(appSettings.getGlobalTextSize());
         card.setBody(desc);
 
+        VerticalLayout wrapper = new VerticalLayout(0, 0);
+        wrapper.setSpacing(10);
+        card.setFooter(wrapper);
+
         HorizontalLayout layout = new HorizontalLayout(0, 0);
         layout.setSpacing(20);
         layout.setAlignment(Pos.CENTER);
-        card.setFooter(layout);
+        wrapper.addElement(layout);
+
 
         start = new ButtonBuilder("start").setText("Start").build();
         start.setEnabled(true);
