@@ -21,7 +21,6 @@ public class Main {
         if (Arrays.asList(args).contains("--force-updates")) {
             forceUpdate = true;
         }
-        new App();
         Application.launch(App.class);
     }
 }
