@@ -318,7 +318,7 @@ public class ServerProcess {
                             process.destroy();
                             break;
                         }
-                        if (line.contains("starting the main loop") || line.contains("main: model loaded")) {
+                        if (line.contains("starting the main loop") || line.contains("model loaded")) {
                             App.logger.info("Backend server stated!");
                             started = true;
                             break;
