@@ -14,7 +14,7 @@ public class Positions {
     */
     public static int SIDEBAR_WIDTH;
     public static int SIDEBAR_WIDTH_COLLAPSE;
-    public static int SIDEBAR_HEIGHT;
+    public static double SIDEBAR_HEIGHT;
 
     /*
     ###########################
@@ -80,7 +80,7 @@ public class Positions {
 
         SIDEBAR_WIDTH = 200;
         SIDEBAR_WIDTH_COLLAPSE = 50;
-        SIDEBAR_HEIGHT = (int) window.getHeight();
+        SIDEBAR_HEIGHT = window.getAdjustedHeight();
 
         MODEL_CONFIGURATION_SCROLL_HEIGHT = window.getHeight() - 100;
         MODEL_CONFIGURATION_LAYOUT_WIDTH = window.getWidth() - SIDEBAR_WIDTH - 25; // -25 to account for spacing

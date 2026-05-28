@@ -4,6 +4,7 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.util.StringConverter;
@@ -28,7 +29,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,15 +84,15 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildBackendReset() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 180);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Reset backend files.");
         container.setDescription("Deletes all backend files and prompts a re-installation.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        VerticalLayout configLayout = new VerticalLayout(400, container.getHeight());
         configLayout.setSpacing(10);
         configLayout.setAlignment(Pos.CENTER_RIGHT);
 
@@ -135,15 +135,15 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildHostTile() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 180);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Set device as host.");
         container.setDescription("Allows other devices to connect to this devices backend server.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        VerticalLayout configLayout = new VerticalLayout(400, container.getHeight());
         configLayout.setSpacing(10);
         configLayout.setAlignment(Pos.CENTER_RIGHT);
 
@@ -157,15 +157,15 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildRemoteModeTile() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 180);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Remote Server Mode");
         container.setDescription("Setup a remote connection to use a different device to run models.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        VerticalLayout configLayout = new VerticalLayout(400, container.getHeight());
         configLayout.setSpacing(10);
         configLayout.setAlignment(Pos.CENTER_RIGHT);
 
@@ -193,8 +193,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildModelPathTile() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Model Path");
         container.setDescription("Select the folder for your models.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -243,8 +243,8 @@ public class ConfigurationTab extends Tab {
 
 
     public TileContainer buildCurrentModel() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Model Selection");
         container.setDescription("Select a model to use. Will require a \"reload\".");
         container.addStyle(Styles.BG_DEFAULT);
@@ -283,15 +283,15 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildGpuLayers() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("GPU Usage");
         container.setDescription("Percentage of total VRAM to use. Recommended to keep below 80%.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout action = new VerticalLayout(200, 100);
+        VerticalLayout action = new VerticalLayout(200, container.getHeight());
         action.setAlignment(Pos.CENTER);
 
         SliderOverlay input = new SliderOverlay(0, 100, settings.getGpuUsage());
@@ -326,8 +326,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildMemoryLock() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Memory Lock");
         container.setDescription("Locks model in RAM. Can improve generation times. Disables model swapping.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -344,8 +344,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildFlashAttention() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Flash Attention");
         container.setDescription("Toggles flash attention. Designed to speed up training and inference while reducing memory usage. In some rare cases it can greatly reduce quality.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -362,8 +362,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildRunningModel() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Current Model");
         container.setDescription("The current running model that is loaded. Will be null if no model is active.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -385,7 +385,7 @@ public class ConfigurationTab extends Tab {
     }
 
     public CardContainer buildServerZone() {
-        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 250);
+        CardContainer card = new CardContainer(0, 0, layout.getWidth(), -1);
         card.setMaxSize(card.getWidth(), card.getHeight());
 
         TextOverlay text = new TextOverlay("Server Zone");
@@ -398,14 +398,12 @@ public class ConfigurationTab extends Tab {
         desc.addStyle(appSettings.getGlobalTextSize());
         card.setBody(desc);
 
-        VerticalLayout wrapper = new VerticalLayout(0, 0);
-        wrapper.setSpacing(10);
-        card.setFooter(wrapper);
 
-        HorizontalLayout layout = new HorizontalLayout(0, 0);
+        HorizontalLayout layout = new HorizontalLayout(-1, 80);
+        layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setSpacing(20);
-        layout.setAlignment(Pos.CENTER);
-        wrapper.addElement(layout);
+        layout.setAlignment(Pos.BOTTOM_CENTER);
+        card.setFooter(layout);
 
 
         start = new ButtonBuilder("start").setText("Start").build();
