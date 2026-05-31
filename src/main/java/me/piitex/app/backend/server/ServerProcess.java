@@ -5,11 +5,11 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.os.OSUtil;
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
 import oshi.hardware.GraphicsCard;
 import oshi.hardware.HardwareAbstractionLayer;
 

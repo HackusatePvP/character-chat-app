@@ -6,7 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.text.TextAlignment;
 import javafx.util.StringConverter;
 import me.piitex.app.App;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.layouts.VerticalLayout;

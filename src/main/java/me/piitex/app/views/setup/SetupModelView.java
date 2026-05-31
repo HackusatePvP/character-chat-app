@@ -7,7 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.text.TextAlignment;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.app.views.creator.characters.CharacterCreator;
@@ -18,7 +18,6 @@ import me.piitex.os.DownloadListener;
 import me.piitex.os.FileDownloader;
 import me.piitex.os.OSUtil;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 

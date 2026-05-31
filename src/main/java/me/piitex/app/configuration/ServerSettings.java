@@ -1,4 +1,4 @@
-package me.piitex.app.backend.server;
+package me.piitex.app.configuration;
 
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;

@@ -5,7 +5,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.DeviceProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.layouts.VerticalLayout;
