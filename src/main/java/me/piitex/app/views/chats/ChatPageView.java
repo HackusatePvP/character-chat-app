@@ -175,6 +175,8 @@ public class ChatPageView extends BorderContainer {
     public void generateResponse(String prompt, boolean update) {
         Chat chat = parent.getChat();
 
+        if (ServerProcess.getCurrentServer() == null) return;
+
         // Remove regenerate button from last message
         if (!chatRoot.getElements().isEmpty()) {
             VerticalLayout lastMessageBox = (VerticalLayout) chatRoot.getLastElement();
