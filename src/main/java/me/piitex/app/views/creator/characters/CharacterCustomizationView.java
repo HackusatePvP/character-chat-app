@@ -57,7 +57,7 @@ public class CharacterCustomizationView extends EmptyContainer {
         root.setAlignment(Pos.CENTER);
         addProperties("progress", "Character");
 
-        scrollContainer = new ScrollContainer(root, width - 5, height - 40);
+        scrollContainer = new ScrollContainer(root, width - 15, height - 40);
         scrollContainer.setMaxSize(scrollContainer.getWidth(), scrollContainer.getHeight());
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setScrollWhenNeeded(false);
