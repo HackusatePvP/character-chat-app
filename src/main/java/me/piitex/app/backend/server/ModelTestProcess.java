@@ -137,6 +137,8 @@ public class ModelTestProcess {
 
         parameters.add("-no-cnv");
         parameters.add("--no-warmup");
+        parameters.add("-lv");
+        parameters.add("4");
 
         return parameters;
     }
@@ -189,6 +191,7 @@ public class ModelTestProcess {
         try (Scanner scanner = new Scanner(new FileInputStream(output))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
+                line = line.substring(15);
                 if (line.contains("cleaning up before exit...") || line.contains("failed to load model") || line.contains("error while handling") || line.startsWith("error:") || line.startsWith("ROCm error:")) {
                     App.logger.error("ERROR: Could not start backend server.");
                     error = true;

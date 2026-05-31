@@ -300,6 +300,8 @@ public class ServerProcess {
         parameters.add("--port");
         parameters.add("8187");
         parameters.add("--no-webui");
+        parameters.add("-lv");
+        parameters.add("4");
 
         if (settings.isHost()) {
             App.logger.info("Server is listening on 0.0.0.0");
@@ -319,7 +321,7 @@ public class ServerProcess {
                 Thread.sleep(100); // Wait for 100 milliseconds before checking the file again
                 try (Scanner scanner = new Scanner(new FileInputStream(output))) {
                     while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
+                        String line = scanner.nextLine().substring(15);
                         if (line.contains("cleaning up before exit...") || line.contains("failed to load model") || line.contains("error while handling") || line.startsWith("error:") || line.startsWith("ROCm error:")) {
                             App.logger.error("ERROR: Could not start backend server.");
                             error = true;
