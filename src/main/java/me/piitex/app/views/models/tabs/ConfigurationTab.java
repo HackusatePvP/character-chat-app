@@ -64,18 +64,15 @@ public class ConfigurationTab extends Tab {
         scrollContainer.setScrollWhenNeeded(false);
         addElement(scrollContainer); // Adds the scroll container
 
-        // TODO: Allow remote server routing.
-        //       When enabled it allows the user to remotely connect to an endpoint.
-        //       Not sure how control of the server would work.
         layout.addElement(buildServerZone());
         layout.addElement(buildBackendReset());
         layout.addElement(buildHostTile());
         layout.addElement(buildRemoteModeTile());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
+        layout.addElement(buildCurrentModel());
         layout.addElement(buildRunningModel());
         layout.addElement(buildModelPathTile());
-        layout.addElement(buildCurrentModel());
         layout.addElement(buildGpuLayers());
         layout.addElement(buildMemoryLock());
         layout.addElement(buildFlashAttention());
@@ -487,7 +484,7 @@ public class ConfigurationTab extends Tab {
 
         });
 
-        stop.onClick(event -> {
+        stop.onClick(_ -> {
             if (ServerProcess.getCurrentServer() == null) {
                 return;
             }
@@ -566,13 +563,11 @@ public class ConfigurationTab extends Tab {
                 Platform.runLater(() -> {
                     if (App.window.getCurrentPopup() != null) { // Check if popup still exists
                         App.window.removeContainer(App.window.getCurrentPopup());
-
-                        start.getNode().setDisable(false);
-                        stop.getNode().setDisable(false);
-                        reload.getNode().setDisable(false);
+                        start.setEnabled(true);
+                        stop.setEnabled(true);
+                        reload.setEnabled(true);
                     }
                 });
-                // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
                 serverProcess.removeServerLoadingListener(this);
             }
         });
