@@ -21,7 +21,7 @@ public class ChatView extends EmptyContainer {
     private static final AppSettings APP_SETTINGS = App.getInstance().getAppSettings();
 
     public ChatView(@NotNull Character character, @Nullable Chat chat) {
-        super(APP_SETTINGS.getWidth(), APP_SETTINGS.getHeight());
+        super(APP_SETTINGS.getWidth(), App.window.getDrawHeight());
         this.character = character;
         if (chat == null) {
             // Create a new chat
@@ -34,7 +34,7 @@ public class ChatView extends EmptyContainer {
     }
     
     public void init() {
-        layout = new HorizontalLayout(APP_SETTINGS.getWidth() - 100, APP_SETTINGS.getHeight());
+        layout = new HorizontalLayout(getWidth() - 100, getHeight());
         layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setSpacing(5);
         layout.addStyle(Styles.BG_INSET);

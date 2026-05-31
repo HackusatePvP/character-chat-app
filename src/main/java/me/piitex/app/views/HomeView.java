@@ -23,7 +23,7 @@ public class HomeView extends EmptyContainer {
     private final SidebarView sidebarView;
 
     public HomeView() {
-        int height = App.getInstance().getAppSettings().getHeight() - 50;
+        double height = App.window.getDrawHeight();
         super(600, height);
         this.sidebarView = new SidebarView();
         if (App.mobile) {

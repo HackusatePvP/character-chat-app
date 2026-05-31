@@ -80,7 +80,7 @@ public class Positions {
 
         SIDEBAR_WIDTH = 200;
         SIDEBAR_WIDTH_COLLAPSE = 50;
-        SIDEBAR_HEIGHT = window.getAdjustedHeight();
+        SIDEBAR_HEIGHT = window.getDrawHeight();
 
         MODEL_CONFIGURATION_SCROLL_HEIGHT = window.getHeight() - 100;
         MODEL_CONFIGURATION_LAYOUT_WIDTH = window.getWidth() - SIDEBAR_WIDTH - 25; // -25 to account for spacing
