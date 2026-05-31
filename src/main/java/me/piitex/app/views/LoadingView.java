@@ -1,6 +1,5 @@
 package me.piitex.app.views;
 
-import atlantafx.base.theme.Styles;
 import javafx.geometry.Pos;
 
 import me.piitex.engine.layouts.VerticalLayout;

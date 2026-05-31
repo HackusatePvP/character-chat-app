@@ -13,7 +13,7 @@ import me.piitex.app.backend.Model;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.HomeView;
