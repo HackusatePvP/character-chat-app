@@ -42,7 +42,9 @@ public class ModelEditView extends EmptyContainer {
     private int dryPenaltyTokens = -1;
     private String mmProj = "None / Disabled";
     private String chatTemplate = "default";
-    private String reasoningTemplate = "disabled";
+    private String reasoningTemplate = "auto";
+    private int reasoningBudget = 1;
+    private boolean reasoning = false;
     private boolean forceDisableReasoning = false;
     private boolean jinja = false;
 
@@ -91,6 +93,8 @@ public class ModelEditView extends EmptyContainer {
         layout.addElement(buildDryAllowedLength());
         layout.addElement(buildDryPenaltyToken());
         layout.addElement(buildChatTemplates());
+        layout.addElement(buildReasoningEnable());
+        layout.addElement(buildReasoningBudget());
         layout.addElement(buildReasoningTemplate());
         layout.addElement(buildForceReasoning());
         layout.addElement(buildJinjaTemplate());
@@ -121,6 +125,8 @@ public class ModelEditView extends EmptyContainer {
         this.dryPenaltyTokens = settings.getDryPenaltyTokens();
         this.chatTemplate = settings.getChatTemplate();
         this.reasoningTemplate = settings.getReasoningTemplate();
+        this.reasoning = settings.isReasoning();
+        this.reasoningBudget = settings.getReasoningBudget();
         this.forceDisableReasoning = settings.isForceDisableReasoning();
         this.jinja = settings.isJinja();
     }
@@ -679,6 +685,7 @@ public class ModelEditView extends EmptyContainer {
         items.add("deepseek");
         items.add("none");
         items.add("disabled");
+        items.add("auto");
 
         ComboBoxOverlay selection = new ComboBoxOverlay(items, 400, 50);
         selection.setDefaultItem(reasoningTemplate);
@@ -686,6 +693,50 @@ public class ModelEditView extends EmptyContainer {
             this.reasoningTemplate = event.getNewValue();
         });
         tileContainer.setAction(selection);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildReasoningEnable() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Enable Reasoning");
+        tileContainer.setDescription("Enables thinking mode.");
+
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
+        info.setTooltip("Only enable if the model is capable of reasoning.");
+        tileContainer.setGraphic(info);
+
+        ToggleSwitchOverlay switchOverlay = new ToggleSwitchOverlay(reasoning);
+        switchOverlay.onToggle(event -> {
+            this.reasoning = event.getNewValue();
+        });
+        tileContainer.setAction(switchOverlay);
+
+        return tileContainer;
+    }
+
+    private TileContainer buildReasoningBudget() {
+        TileContainer tileContainer = new TileContainer(0, 0);
+        tileContainer.addStyle(Styles.BORDER_DEFAULT);
+        tileContainer.addStyle(Styles.BG_DEFAULT);
+        tileContainer.addStyle(appSettings.getGlobalTextSize());
+        tileContainer.setMaxSize(appSettings.getWidth() - 300, 150);
+        tileContainer.setTitle("Reasoning Budget");
+        tileContainer.setDescription("Set the maximum tokens allowed for reasoning.");
+
+        IconOverlay info = new IconOverlay(Material2AL.INFO);
+        info.setTooltip("Default is -1 which disables the limit.");
+        tileContainer.setGraphic(info);
+
+        SpinnerNumberOverlay input = new SpinnerNumberOverlay(-1, Double.MAX_VALUE, reasoningBudget);
+        input.onValueChange(event -> {
+            this.reasoningBudget = event.getNewValue().intValue();
+        });
+        tileContainer.setAction(input);
 
         return tileContainer;
     }
@@ -776,6 +827,8 @@ public class ModelEditView extends EmptyContainer {
             settings.setMmProj(mmProj);
             settings.setChatTemplate(chatTemplate);
             settings.setReasoningTemplate(reasoningTemplate);
+            settings.setReasoning(reasoning);
+            settings.setReasoningBudget(reasoningBudget);
             settings.setForceDisableReasoning(forceDisableReasoning);
             settings.setJinja(jinja);
             settings.setChange(true);

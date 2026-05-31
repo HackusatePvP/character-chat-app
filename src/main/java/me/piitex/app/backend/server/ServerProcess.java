@@ -267,6 +267,14 @@ public class ServerProcess {
         if (model.getSettings().isForceDisableReasoning()) {
             App.logger.info("Force disable reasoning....");
             parameters.add("--no-prefill-assistant");
+            parameters.add("-rea");
+            parameters.add("off");
+        } else {
+            if (model.getSettings().isReasoning()) {
+                App.logger.info("Enabling thinking mode....");
+                parameters.add("-rea");
+                parameters.add("on");
+            }
         }
 
         if (!model.getSettings().getChatTemplate().equalsIgnoreCase("default")) {
