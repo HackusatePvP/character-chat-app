@@ -5,9 +5,13 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.overlays.MessageOverlay;
 import me.piitex.os.OSUtil;
+import oshi.SystemInfo;
+import oshi.hardware.GraphicsCard;
+import oshi.hardware.HardwareAbstractionLayer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -176,6 +180,24 @@ public class ServerProcess {
         // The usage is a percentage of the total layers (model.getGpuLayers());
         double TOTAL_AVAILABLE_VRAM_MIB = App.getInstance().getAppSettings().getTotalGpuVram();
 
+        if (TOTAL_AVAILABLE_VRAM_MIB <= 0) {
+            App.logger.warn("VRAM is set to 0. Attempting to fetch VRAM...");
+            // Fallback to Oshi
+            SystemInfo systemInfo = new SystemInfo();
+            HardwareAbstractionLayer hardwareAbstractionLayer = systemInfo.getHardware();
+            GraphicsCard graphicsCard = hardwareAbstractionLayer.getGraphicsCards().getFirst();
+            if (graphicsCard != null && graphicsCard.getVRam() > 0) {
+                App.logger.info("Using GPU memory...");
+                TOTAL_AVAILABLE_VRAM_MIB = graphicsCard.getVRam() / (1024.0 * 1024.0);
+            } else {
+                App.logger.error("Could not find dedicated GPU. Using global memory pool...");
+                TOTAL_AVAILABLE_VRAM_MIB = systemInfo.getHardware().getMemory().getTotal() / (1024.0 * 1024.0);
+                App.logger.info("VRAM: {} MiB", TOTAL_AVAILABLE_VRAM_MIB);
+            }
+
+            App.getInstance().getAppSettings().setTotalGpuVram(TOTAL_AVAILABLE_VRAM_MIB);
+        }
+
         double KV_CACHE = model.getSettings().getKvCacheSize();
         double COMPUTED_BUFFER_SIZE = model.getSettings().getComputeBufferSize();
         double FIXED_OVERHEAD_MIB = KV_CACHE + COMPUTED_BUFFER_SIZE;
@@ -207,8 +229,8 @@ public class ServerProcess {
         if (VRAM_PER_LAYER_MIB > 0.0) {
             layers = (int) Math.floor(LAYER_ALLOC_BUDGET / VRAM_PER_LAYER_MIB);
         } else {
-            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to 0.");
-            layers = 0;
+            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to {}.", model.getSettings().getTotalLayers());
+            layers = model.getSettings().getTotalLayers();
         }
 
         // Cap the offloaded layers
@@ -242,6 +264,19 @@ public class ServerProcess {
             parameters.add(model.getSettings().getReasoningTemplate());
         }
 
+        if (model.getSettings().isForceDisableReasoning()) {
+            App.logger.info("Force disable reasoning....");
+            parameters.add("--no-prefill-assistant");
+            parameters.add("-rea");
+            parameters.add("off");
+        } else {
+            if (model.getSettings().isReasoning()) {
+                App.logger.info("Enabling thinking mode....");
+                parameters.add("-rea");
+                parameters.add("on");
+            }
+        }
+
         if (!model.getSettings().getChatTemplate().equalsIgnoreCase("default")) {
             App.logger.debug("Setting chat template...");
             parameters.add("--chat-template");
@@ -265,6 +300,8 @@ public class ServerProcess {
         parameters.add("--port");
         parameters.add("8187");
         parameters.add("--no-webui");
+        parameters.add("-lv");
+        parameters.add("4");
 
         if (settings.isHost()) {
             App.logger.info("Server is listening on 0.0.0.0");
@@ -291,7 +328,7 @@ public class ServerProcess {
                             process.destroy();
                             break;
                         }
-                        if (line.contains("starting the main loop")) {
+                        if (line.contains("starting the main loop") || line.contains("model loaded") || line.contains("server is listening on")) {
                             App.logger.info("Backend server stated!");
                             started = true;
                             break;

@@ -16,7 +16,8 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.configurations.InfoFile;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ public class CharacterCustomizationView extends EmptyContainer {
         root.setAlignment(Pos.CENTER);
         addProperties("progress", "Character");
 
-        scrollContainer = new ScrollContainer(root, width - 5, height - 40);
+        scrollContainer = new ScrollContainer(root, width - 15, height - 40);
         scrollContainer.setMaxSize(scrollContainer.getWidth(), scrollContainer.getHeight());
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setScrollWhenNeeded(false);
@@ -178,7 +179,7 @@ public class CharacterCustomizationView extends EmptyContainer {
                         characterIdInput.setCurrentText(id);
                         characterDisplayInput.setCurrentText(displayName);
                         characterPersonaInput.setCurrentText(persona);
-                        characterImage.setImage(new ImageLoader(file));
+                        characterImage.setImage(new BaseImageLoader(file));
                         loreLayout.removeAllElements();
                         loreItems.forEach((s, s2) -> loreLayout.addElement(buildLoreEntry(s, s2)));
                     } catch (ImageProcessingException | IOException e) {
@@ -257,9 +258,9 @@ public class CharacterCustomizationView extends EmptyContainer {
 
         ImageLoader imageLoader;
         if (infoFile.hasKey("icon-path")) {
-            imageLoader = new ImageLoader(new File(infoFile.get("icon-path")));
+            imageLoader = new BaseImageLoader(new File(infoFile.get("icon-path")));
         } else {
-            imageLoader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
+            imageLoader = new BaseImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
         }
         imageLoader.setWidth(imageSize);
         imageLoader.setHeight(imageSize);
@@ -277,7 +278,7 @@ public class CharacterCustomizationView extends EmptyContainer {
             if (file != null && file.isFile() && file.exists()) {
 
                 App.logger.info("Updating image to '{}'", file.getAbsoluteFile());
-                ImageLoader newImage = new ImageLoader(file);
+                ImageLoader newImage = new BaseImageLoader(file);
                 newImage.setWidth(imageSize);
                 newImage.setHeight(imageSize);
                 characterImage.setImage(newImage);
@@ -290,7 +291,7 @@ public class CharacterCustomizationView extends EmptyContainer {
         ButtonOverlay reset = new ButtonBuilder("rst").setText("Reset Image").addStyle(Styles.FLAT).build();
         layout.addElement(reset);
         reset.onClick(_ -> {
-            ImageLoader loader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
+            ImageLoader loader = new BaseImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
             characterImage.setImage(loader);
             infoFile.set("icon-path", imageLoader.getFile().getAbsolutePath());
         });

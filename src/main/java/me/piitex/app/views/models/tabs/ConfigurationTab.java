@@ -11,6 +11,8 @@ import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.*;
 import me.piitex.app.configuration.AppSettings;
+import me.piitex.app.configuration.ServerSettings;
+import me.piitex.app.views.HomeView;
 import me.piitex.engine.Element;
 import me.piitex.engine.PopupPosition;
 import me.piitex.engine.containers.CardContainer;
@@ -23,11 +25,14 @@ import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.OSUtil;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static me.piitex.app.views.Positions.*;
@@ -59,17 +64,15 @@ public class ConfigurationTab extends Tab {
         scrollContainer.setScrollWhenNeeded(false);
         addElement(scrollContainer); // Adds the scroll container
 
-        // TODO: Allow remote server routing.
-        //       When enabled it allows the user to remotely connect to an endpoint.
-        //       Not sure how control of the server would work.
         layout.addElement(buildServerZone());
+        layout.addElement(buildBackendReset());
         layout.addElement(buildHostTile());
         layout.addElement(buildRemoteModeTile());
         layout.addElement(buildBackend());
         layout.addElement(buildGpuDevice());
+        layout.addElement(buildCurrentModel());
         layout.addElement(buildRunningModel());
         layout.addElement(buildModelPathTile());
-        layout.addElement(buildCurrentModel());
         layout.addElement(buildGpuLayers());
         layout.addElement(buildMemoryLock());
         layout.addElement(buildFlashAttention());
@@ -77,16 +80,67 @@ public class ConfigurationTab extends Tab {
         Platform.runLater(this::handleServerLoad);
     }
 
+    public TileContainer buildBackendReset() {
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
+        container.setTitle("Reset backend files.");
+        container.setDescription("Deletes all backend files and prompts a re-installation.");
+        container.addStyle(Styles.BG_DEFAULT);
+        container.addStyle(Styles.BORDER_DEFAULT);
+        container.addStyle(appSettings.getGlobalTextSize());
+
+        VerticalLayout configLayout = new VerticalLayout(400, container.getHeight());
+        configLayout.setSpacing(10);
+        configLayout.setAlignment(Pos.CENTER_RIGHT);
+
+        ButtonOverlay reset = new ButtonOverlay(new ButtonBuilder("reset").setText("Reset").addStyle(Styles.DANGER).addStyle(Styles.BUTTON_OUTLINED));
+        reset.onClick(_ -> {
+            if (ServerProcess.getCurrentServer() == null) return;
+            ServerProcess.getCurrentServer().stop();
+            File backendDir = App.getBackendDirectory();
+            for (File dir : backendDir.listFiles()) {
+                if (dir.isDirectory()) {
+                    App.logger.info("Deleted '{}'", dir.getAbsolutePath());
+                    try {
+                        FileUtils.deleteDirectory(dir);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            File backendVersionFile = Arrays.stream(Objects.requireNonNull(backendDir.listFiles())).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+            if (backendVersionFile != null) {
+                try {
+                    FileUtils.delete(backendVersionFile);
+                    App.logger.info("Deleted backend version file...");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            App.getInstance().performUpdates();
+
+            App.window.clearContainers();
+            App.window.addContainer(new HomeView());
+        });
+        configLayout.addElement(reset);
+
+        container.setAction(configLayout);
+
+        return container;
+    }
+
     public TileContainer buildHostTile() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 180);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Set device as host.");
         container.setDescription("Allows other devices to connect to this devices backend server.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        VerticalLayout configLayout = new VerticalLayout(400, container.getHeight());
         configLayout.setSpacing(10);
         configLayout.setAlignment(Pos.CENTER_RIGHT);
 
@@ -100,15 +154,15 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildRemoteModeTile() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 180);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Remote Server Mode");
         container.setDescription("Setup a remote connection to use a different device to run models.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout configLayout = new VerticalLayout(400, 150);
+        VerticalLayout configLayout = new VerticalLayout(400, container.getHeight());
         configLayout.setSpacing(10);
         configLayout.setAlignment(Pos.CENTER_RIGHT);
 
@@ -136,8 +190,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildModelPathTile() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Model Path");
         container.setDescription("Select the folder for your models.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -186,8 +240,8 @@ public class ConfigurationTab extends Tab {
 
 
     public TileContainer buildCurrentModel() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Model Selection");
         container.setDescription("Select a model to use. Will require a \"reload\".");
         container.addStyle(Styles.BG_DEFAULT);
@@ -226,15 +280,15 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildGpuLayers() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("GPU Usage");
         container.setDescription("Percentage of total VRAM to use. Recommended to keep below 80%.");
         container.addStyle(Styles.BG_DEFAULT);
         container.addStyle(Styles.BORDER_DEFAULT);
         container.addStyle(appSettings.getGlobalTextSize());
 
-        VerticalLayout action = new VerticalLayout(200, 100);
+        VerticalLayout action = new VerticalLayout(200, container.getHeight());
         action.setAlignment(Pos.CENTER);
 
         SliderOverlay input = new SliderOverlay(0, 100, settings.getGpuUsage());
@@ -269,8 +323,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildMemoryLock() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Memory Lock");
         container.setDescription("Locks model in RAM. Can improve generation times. Disables model swapping.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -287,8 +341,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildFlashAttention() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Flash Attention");
         container.setDescription("Toggles flash attention. Designed to speed up training and inference while reducing memory usage. In some rare cases it can greatly reduce quality.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -305,8 +359,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public TileContainer buildRunningModel() {
-        TileContainer container = new TileContainer(0, -1);
-        container.setMaxSize(layout.getWidth(), 100);
+        TileContainer container = new TileContainer(layout.getWidth(), -1);
+        container.setMaxSize(container.getWidth(), container.getHeight());
         container.setTitle("Current Model");
         container.setDescription("The current running model that is loaded. Will be null if no model is active.");
         container.addStyle(Styles.BG_DEFAULT);
@@ -328,8 +382,8 @@ public class ConfigurationTab extends Tab {
     }
 
     public CardContainer buildServerZone() {
-        CardContainer card = new CardContainer(0, 0, layout.getWidth(), 200);
-        card.setMaxSize(layout.getWidth(), 200);
+        CardContainer card = new CardContainer(0, 0, layout.getWidth(), -1);
+        card.setMaxSize(card.getWidth(), card.getHeight());
 
         TextOverlay text = new TextOverlay("Server Zone");
         text.addStyle(Styles.TITLE_3);
@@ -341,10 +395,13 @@ public class ConfigurationTab extends Tab {
         desc.addStyle(appSettings.getGlobalTextSize());
         card.setBody(desc);
 
-        HorizontalLayout layout = new HorizontalLayout(0, 0);
+
+        HorizontalLayout layout = new HorizontalLayout(-1, 80);
+        layout.setMaxSize(layout.getWidth(), layout.getHeight());
         layout.setSpacing(20);
-        layout.setAlignment(Pos.CENTER);
+        layout.setAlignment(Pos.BOTTOM_CENTER);
         card.setFooter(layout);
+
 
         start = new ButtonBuilder("start").setText("Start").build();
         start.setEnabled(true);
@@ -427,7 +484,7 @@ public class ConfigurationTab extends Tab {
 
         });
 
-        stop.onClick(event -> {
+        stop.onClick(_ -> {
             if (ServerProcess.getCurrentServer() == null) {
                 return;
             }
@@ -506,13 +563,11 @@ public class ConfigurationTab extends Tab {
                 Platform.runLater(() -> {
                     if (App.window.getCurrentPopup() != null) { // Check if popup still exists
                         App.window.removeContainer(App.window.getCurrentPopup());
-
-                        start.getNode().setDisable(false);
-                        stop.getNode().setDisable(false);
-                        reload.getNode().setDisable(false);
+                        start.setEnabled(true);
+                        stop.setEnabled(true);
+                        reload.setEnabled(true);
                     }
                 });
-                // Crucial: Remove the listener if it's a one-time event, to prevent memory leaks
                 serverProcess.removeServerLoadingListener(this);
             }
         });

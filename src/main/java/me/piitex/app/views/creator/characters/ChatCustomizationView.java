@@ -31,7 +31,7 @@ public class ChatCustomizationView extends EmptyContainer  {
         root.setSpacing(50);
         addProperties("progress", "User");
 
-        ScrollContainer scrollContainer = new ScrollContainer(root, width, height);
+        ScrollContainer scrollContainer = new ScrollContainer(root, width - 15, height - 40);
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setScrollWhenNeeded(false);
         scrollContainer.setMaxSize(width, height);

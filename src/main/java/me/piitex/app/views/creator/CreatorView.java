@@ -10,7 +10,6 @@ import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.SidebarView;
 import me.piitex.app.views.creator.characters.CharacterCreator;
 import me.piitex.app.views.creator.users.UserCreator;
-import me.piitex.app.views.users.UsersView;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;

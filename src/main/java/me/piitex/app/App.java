@@ -13,20 +13,19 @@ import me.piitex.app.backend.Model;
 import me.piitex.app.backend.User;
 import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
-import me.piitex.app.updater.ApplicationUpdater;
 import me.piitex.app.updater.LLamaBackendUpdater;
 import me.piitex.app.views.HomeView;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.WindowBuilder;
+import me.piitex.engine.loaders.image.BaseImageLoader;
 import me.piitex.os.OSPathing;
 import me.piitex.os.OSUtil;
 import me.piitex.os.configurations.InfoFile;
 import me.piitex.engine.Window;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.fxloader.FXLoad;
-import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.AlertOverlay;
 import me.piitex.engine.overlays.ButtonBuilder;
 import me.piitex.engine.overlays.ButtonOverlay;
@@ -41,8 +40,11 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
 
 public class App extends FXLoad {
     private ServerSettings settings;
@@ -70,6 +72,7 @@ public class App extends FXLoad {
 
     public static final Logger logger = LogManager.getLogger(App.class);
 
+    private final ConcurrentLinkedQueue<String> characterLoadQueue = new ConcurrentLinkedQueue<>();
     private volatile boolean loading = true;
     private volatile boolean error = false;
 
@@ -122,13 +125,12 @@ public class App extends FXLoad {
             loadUserTemplates();
             loadCharacters();
             App.logger.info("Finished pre-initialization.");
-            loading = false;
         });
         threadPoolManager.submitTask(this::loadBackendServer);
     }
 
     @Override
-    public void initialization(Stage initialStage) {
+    public void initialization() {
         // Error will pass if another instance is running,
         if (error) return;
         App.logger.info("Loading app from '{}'", getAppDirectory().getAbsolutePath());
@@ -207,7 +209,7 @@ public class App extends FXLoad {
         logger.info("Screen Size ({},{})", dimension.width, dimension.height);
 
         File logo = new File(getExecutedDirectory(), "logo.png");
-        window = new WindowBuilder("Chat App").setIcon(new ImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
+        window = new WindowBuilder("Chat App").setIcon(new BaseImageLoader(logo)).setScale((appSettings.isWindowScaling()) && !mobile).setAntiAliasing(false).setDimensions(setWidth, setHeight).build();
 
         // Initialize global positions. Needed for the rendering process.
         Positions.initialize();
@@ -342,20 +344,44 @@ public class App extends FXLoad {
             logger.error("Could not initialize characters directory. Program may lack permission to access file system.");
             return;
         }
+
+        Collection<Future<?>> tasks = new HashSet<>();
+
         for (File file : files) {
-            logger.info("Loading character '{}'...", file.getName());
             if (file.isDirectory()) {
-                String id = file.getName();
-                // Check if info file exists
-                File info = new File(file, "character.info");
-                if (info.exists()) {
-                    InfoFile infoFile = new InfoFile(info, true);
-                    characters.put(id, new Character(id, infoFile));
-                } else {
-                    logger.error("Character file does not exist for '{}'", file.getName());
-                }
+                tasks.add(App.getThreadPoolManager().submitTask(() -> {
+                    characterLoadQueue.add(file.getName());
+                    logger.info("Loading character '{}'...", file.getName());
+                    String id = file.getName();
+                    // Check if info file exists
+                    File info = new File(file, "character.info");
+                    if (info.exists()) {
+                        InfoFile infoFile = new InfoFile(info, true);
+                        characters.put(id, new Character(id, infoFile));
+                    } else {
+                        logger.error("Character file does not exist for '{}'", file.getName());
+                    }
+
+                    characterLoadQueue.remove(file.getName());
+                }));
             }
         }
+
+        int total = tasks.size();
+        Collection<Future<?>> completed;
+        do {
+            completed = new HashSet<>();
+            for (Future<?> task : tasks) {
+                if (task.isDone()) {
+                    completed.add(task);
+                }
+            }
+
+            if (completed.size() == total) {
+                loading = false;
+            }
+        } while (loading);
+
     }
 
     public void loadUserTemplates() {
@@ -399,26 +425,21 @@ public class App extends FXLoad {
 
             logger.info("Model list updated.");
             downloader.shutdown();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             App.logger.error("Failed to fetch download size.", e);
         }
 
-        // Microslop, the multi trillion dollar company that can't handle more than 50 API requests.
-        App.logger.info("Checking for application updates...");
-        ApplicationUpdater applicationUpdater = new ApplicationUpdater(getVersion());
-        //applicationUpdater.checkForUpdates();
-
         App.logger.info("Checking for backend version...");
-
         if (settings.getDevice().equals("error")) {
             App.logger.info("Could not load backend devices. Force checking updates...");
             settings.setDevice("Auto");
             lLamaBackendUpdater = new LLamaBackendUpdater("0");
         } else {
-            File backendVersionFile = Arrays.stream(getBackendDirectory().listFiles()).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
+            File backendVersionFile = Arrays.stream(Objects.requireNonNull(getBackendDirectory().listFiles())).filter(file -> file.getName().endsWith(".txt")).findAny().orElse(null);
             if (backendVersionFile != null) {
                 lLamaBackendUpdater = new LLamaBackendUpdater(backendVersionFile.getName().split(".txt")[0]);
             } else {
+                App.logger.info("No update file found.");
                 lLamaBackendUpdater = new LLamaBackendUpdater("0");
             }
         }
@@ -469,7 +490,7 @@ public class App extends FXLoad {
 
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         File logo = new File(getExecutedDirectory(), "logo.png");
-        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new ImageLoader(logo)).build();
+        window = new WindowBuilder("Error").setDimensions(400, 150).setIcon(new BaseImageLoader(logo)).build();
 
         EmptyContainer emptyContainer = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(emptyContainer);
@@ -484,15 +505,19 @@ public class App extends FXLoad {
         emptyContainer.addElement(kill);
         kill.onClick(event -> {
             App.logger.info("Killing old process.");
-            if (ProcessUtil.killProcess(Long.parseLong(settings.getInfoFile().get("main-pid")))) {
-                App.logger.info("Old process was destroyed gracefully.");
-                Platform.exit();
-                System.exit(0);
-            } else {
-                App.logger.info("Forcefully killing old process.");
-                ProcessUtil.terminateProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
-            }
-
+            Optional<ProcessHandle> handle =  ProcessUtil.getRunningProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
+            handle.ifPresent(processHandle -> {
+              if (processHandle.info().toString().contains("java.exe") || processHandle.info().toString().contains("javaw.exe") || processHandle.info().toString().contains("CCA.exe")) {
+                  if (ProcessUtil.killProcess(Long.parseLong(settings.getInfoFile().get("main-pid")))) {
+                      App.logger.info("Old process was destroyed gracefully.");
+                      Platform.exit();
+                      System.exit(0);
+                  } else {
+                      App.logger.info("Forcefully killing old process.");
+                      ProcessUtil.terminateProcess(Long.parseLong(settings.getInfoFile().get("main-pid")));
+                  }
+              }
+            });
             appSettings.getInfoFile().set("main-pid", "");
         });
 

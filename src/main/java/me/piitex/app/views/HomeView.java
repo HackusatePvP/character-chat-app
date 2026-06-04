@@ -23,7 +23,7 @@ public class HomeView extends EmptyContainer {
     private final SidebarView sidebarView;
 
     public HomeView() {
-        int height = App.getInstance().getAppSettings().getHeight() - 50;
+        double height = App.window.getDrawHeight();
         super(600, height);
         this.sidebarView = new SidebarView();
         if (App.mobile) {
@@ -49,8 +49,8 @@ public class HomeView extends EmptyContainer {
                 boolean loading = App.getInstance().isLoading();
                 while (loading) {
                     loading = App.getInstance().isLoading();
-                    if (!loading) break;
                 }
+
                 Platform.runLater(() -> {
                     root.removeElement(1);
                     buildBody();

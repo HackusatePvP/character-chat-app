@@ -195,28 +195,3 @@ public class SidebarView extends BorderContainer {
         return layout;
     }
 }
-
-//        ButtonOverlay users = new ButtonBuilder("users").setText("User Templates").setIcon(new FontIcon(Material2MZ.MEMORY)).build();
-//        users.addStyle(appSettings.getGlobalTextSize());
-//        users.setWidth(rootWidth);
-//        users.setAlignment(Pos.BASELINE_LEFT);
-//        addElement(users);
-//        users.onClick(event -> {
-//            MessageOverlay warning = new MessageOverlay("Development", "User templates are still in development.");
-//            warning.addStyle(Styles.WARNING);
-//            App.window.renderPopup(warning, PopupPosition.BOTTOM_CENTER, 400, 100, true);
-//
-//            App.window.clearContainers();
-//            App.window.addContainer(new UsersView());
-//        });
-//
-//        ButtonOverlay characters = new ButtonBuilder("characters").setText("New Character").setIcon(new FontIcon(Material2MZ.PERSON)).build();
-//        characters.addStyle(appSettings.getGlobalTextSize());
-//        characters.setWidth(rootWidth);
-//        addElement(characters);
-//        characters.setAlignment(Pos.BASELINE_LEFT);
-//        characters.onClick(event -> {
-//            App.window.clearContainers();
-//            App.window.addContainer(new CharacterEditView(null).getRoot());
-//        });
-

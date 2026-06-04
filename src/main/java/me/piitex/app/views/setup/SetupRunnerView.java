@@ -2,16 +2,14 @@ package me.piitex.app.views.setup;
 
 import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.paint.Color;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
-import me.piitex.app.backend.server.DeviceProcess;
 import me.piitex.app.backend.server.ServerProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -92,6 +90,12 @@ public class SetupRunnerView extends VerticalLayout {
     }
 
     private void downloadSmallModel() {
+        File model = new File(App.getModelsDirectory(), "gemma-3-270m-it-UD-IQ2_M.gguf");
+        if (model.exists()) {
+            startLLama(model);
+            return;
+        }
+
         FileDownloader fileDownloader = new FileDownloader();
         fileDownloader.addDownloadListener(new DownloadListener() {
             @Override

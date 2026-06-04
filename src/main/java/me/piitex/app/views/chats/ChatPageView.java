@@ -12,6 +12,7 @@ import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
 import me.piitex.app.backend.Role;
 import me.piitex.app.backend.server.Server;
+import me.piitex.app.backend.server.ServerProcess;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.app.views.chats.components.ControlBarView;
@@ -20,7 +21,8 @@ import me.piitex.engine.containers.BorderContainer;
 import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.kordamp.ikonli.material2.Material2MZ;
 
@@ -114,7 +116,7 @@ public class ChatPageView extends BorderContainer {
         layout.addElement(separator);
 
         //TODO: Make Avatar circular
-        int avatarSize = 128;
+        int avatarSize = 196;
         if (chatMessage.getSender() == Role.ASSISTANT) {
             displayBox.setAlignment(Pos.CENTER_RIGHT);
 
@@ -123,9 +125,10 @@ public class ChatPageView extends BorderContainer {
                 iconPath = new File(App.getExecutedDirectory(), "icons/charater.png").getAbsolutePath();
             }
 
-            ImageLoader imageLoader = new ImageLoader(new File(iconPath));
+            ImageLoader imageLoader = new BaseImageLoader(new File(iconPath));
             imageLoader.setWidth(avatarSize);
             imageLoader.setHeight(avatarSize);
+            imageLoader.setSmoothing(true);
             ImageOverlay avatar = new ImageOverlay(imageLoader);
             avatar.setFitWidth(avatarSize);
             avatar.setFitHeight(avatarSize);
@@ -143,9 +146,10 @@ public class ChatPageView extends BorderContainer {
                 iconPath = new File(App.getExecutedDirectory(), "icons/charater.png").getAbsolutePath();
             }
 
-            ImageLoader imageLoader = new ImageLoader(new File(iconPath));
+            ImageLoader imageLoader = new BaseImageLoader(new File(iconPath));
             imageLoader.setWidth(avatarSize);
             imageLoader.setHeight(avatarSize);
+            imageLoader.setSmoothing(true);
             ImageOverlay avatar = new ImageOverlay(imageLoader);
             avatar.setFitWidth(avatarSize);
             avatar.setFitHeight(avatarSize);
@@ -170,6 +174,8 @@ public class ChatPageView extends BorderContainer {
 
     public void generateResponse(String prompt, boolean update) {
         Chat chat = parent.getChat();
+
+        if (ServerProcess.getCurrentServer() == null) return;
 
         // Remove regenerate button from last message
         if (!chatRoot.getElements().isEmpty()) {

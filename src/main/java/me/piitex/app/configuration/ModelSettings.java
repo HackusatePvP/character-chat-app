@@ -26,9 +26,12 @@ public class ModelSettings {
     private int dryPenaltyTokens = -1;
     private String mmProj = "None / Disabled";
     private String chatTemplate = "default";
-    private String reasoningTemplate = "disabled";
+    private String reasoningTemplate = "auto";
     private boolean useDefault;
     private boolean jinja = false;
+    private boolean reasoning = false;
+    private int reasoningBudget = -1;
+    private boolean forceDisableReasoning = false;
     private int totalLayers = 0;
     private double dataPerLayer;
     private double kvCacheSize;
@@ -183,6 +186,15 @@ public class ModelSettings {
         }
         if (infoFile.hasKey("change")) {
             this.change = infoFile.getBoolean("change");
+        }
+        if (infoFile.hasKey("force-disable-reason")) {
+            this.forceDisableReasoning = infoFile.getBoolean("force-disable-reason");
+        }
+        if (infoFile.hasKey("reasoning")) {
+            this.reasoning = infoFile.getBoolean("reasoning");
+        }
+        if (infoFile.hasKey("reasoning-budget")) {
+            this.reasoningBudget = infoFile.getInteger("reasoning-budget");
         }
     }
 
@@ -472,6 +484,33 @@ public class ModelSettings {
     public void setChange(boolean change) {
         this.change = change;
         infoFile.set("change", change);
+    }
+
+    public int getReasoningBudget() {
+        return reasoningBudget;
+    }
+
+    public boolean isReasoning() {
+        return reasoning;
+    }
+
+    public void setReasoning(boolean reasoning) {
+        this.reasoning = reasoning;
+        infoFile.set("reasoning", reasoning);
+    }
+
+    public void setReasoningBudget(int reasoningBudget) {
+        this.reasoningBudget = reasoningBudget;
+        infoFile.set("reasoning-budget", reasoningBudget);
+    }
+
+    public boolean isForceDisableReasoning() {
+        return forceDisableReasoning;
+    }
+
+    public void setForceDisableReasoning(boolean forceDisableReasoning) {
+        this.forceDisableReasoning = forceDisableReasoning;
+        infoFile.set("force-disable-reason", forceDisableReasoning);
     }
 
     @Nullable

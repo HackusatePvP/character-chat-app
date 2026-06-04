@@ -6,6 +6,7 @@ import me.piitex.app.App;
 import me.piitex.app.backend.ChatMessage;
 import me.piitex.app.backend.Response;
 import me.piitex.app.configuration.ModelSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.utils.Placeholder;
 import me.piitex.engine.Element;
 import me.piitex.engine.containers.CardContainer;
@@ -106,6 +107,14 @@ public class Server {
      */
     private static void addModelSettingsToJSON(JSONObject toPost, ModelSettings settings) throws JSONException {
         toPost.put("stream", true);
+
+        if (settings.isReasoning()) {
+            JSONObject chatTemplateKwargs = new JSONObject();
+            chatTemplateKwargs.put("enable_thinking", true);
+            chatTemplateKwargs.put("thinking", true);
+            toPost.put("chat_template_kwargs", chatTemplateKwargs);
+        }
+
         toPost.put("temperature", settings.getTemperature());
         toPost.put("dynatemp_range", settings.getDynamicTempRage());
         toPost.put("dynatemp_exponent", settings.getDynamicExponent());
@@ -215,8 +224,9 @@ public class Server {
             }
 
             JSONObject delta = arrayObject.getJSONObject("delta");
+
             String line = delta.optString("content", "");
-            if (line.equalsIgnoreCase("null")) continue;
+            if (line.isEmpty() || line.equalsIgnoreCase("null")) continue;
 
             appender.append(line);
 

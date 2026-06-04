@@ -30,6 +30,7 @@ import org.kordamp.ikonli.material2.Material2MZ;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -233,7 +234,7 @@ public class DownloadTab extends Tab {
                 long fileSize = 0;
                 try {
                     fileSize = downloader.getRemoteFileSize(url);
-                } catch (IOException e) {
+                } catch (IOException | URISyntaxException e) {
                     App.logger.warn("Failed to fetch download size. Connection could not be established: '{}'", url);
                 }
                 String fileName = url.substring(url.lastIndexOf('/') + 1);
@@ -315,7 +316,7 @@ public class DownloadTab extends Tab {
         DownloadInfo existingInfo = downloader.getDownloadInfo(url);
         RingProgressIndicator progressIndicator = new RingProgressIndicator(0, false);
 
-        IconOverlay stopButton = createStopButton(url, destinationFile, downloadIcon, tileLayout, fileInfoRef);
+        IconOverlay stopButton = createStopButton(url, destinationFile, existingInfo, fileInfoRef);
 
         TextField downloadSpeed = new TextField("");
         downloadSpeed.setMaxWidth(100);
@@ -411,7 +412,7 @@ public class DownloadTab extends Tab {
         }
     }
 
-    private IconOverlay createStopButton(String url, File fileToDelete, ButtonOverlay downloadIcon, HorizontalLayout tileLayout, AtomicReference<FileInfo> fileInfoRef) {
+    private IconOverlay createStopButton(String url, File fileToDelete, DownloadInfo info, AtomicReference<FileInfo> fileInfoRef) {
         IconOverlay stop = new IconOverlay(Material2MZ.STOP_CIRCLE);
         stop.setColor(Color.RED);
         stop.onClick(event -> {

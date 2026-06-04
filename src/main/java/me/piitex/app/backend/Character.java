@@ -118,10 +118,8 @@ public class Character {
         if (getChatDirectory() == null || !getChatDirectory().exists()) return;
         for (File file : getChatDirectory().listFiles()) {
             if (file.isDirectory()) continue;
-            App.getThreadPoolManager().submitTask(() -> {
-                Chat chat = new Chat(file);
-                chats.add(chat);
-            });
+            Chat chat = new Chat(file);
+            chats.add(chat);
         }
     }
 

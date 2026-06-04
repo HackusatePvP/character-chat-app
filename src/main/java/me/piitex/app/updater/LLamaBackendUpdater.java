@@ -4,6 +4,8 @@ import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import me.piitex.app.App;
 import me.piitex.app.backend.Model;
 import me.piitex.app.backend.server.ServerProcess;
@@ -13,11 +15,8 @@ import me.piitex.engine.containers.Container;
 import me.piitex.engine.containers.DownloadContainer;
 import me.piitex.engine.containers.EmptyContainer;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
-import me.piitex.engine.overlays.ButtonBuilder;
-import me.piitex.engine.overlays.ButtonOverlay;
-import me.piitex.engine.overlays.ProgressBarOverlay;
-import me.piitex.engine.overlays.TextOverlay;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.overlays.*;
 import me.piitex.os.*;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -64,10 +63,8 @@ public class LLamaBackendUpdater {
 
     public synchronized boolean isUpdateAvailable() {
         if (current != null && latest != null) {
-            System.out.println("Not null");
             return current.compareTo(latest) < 0;
         }
-        System.out.println("False");
         return false;
     }
 
@@ -82,7 +79,7 @@ public class LLamaBackendUpdater {
     }
 
     public void buildAndDisplayUpdateWindow(GitHubUtil gitHubUtil) {
-        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new ImageLoader(new File(App.getAppDirectory(), "logo.png"))).build();
+        window = new WindowBuilder("Update").setDimensions(450, 200).setIcon(new BaseImageLoader(new File(App.getExecutedDirectory(), "logo.png"))).build();
         container = new EmptyContainer(window.getWidth(), window.getHeight());
         window.addContainer(container);
         window.getStage().setOnHidden(windowEvent -> {
@@ -115,9 +112,21 @@ public class LLamaBackendUpdater {
             container.removeAllElements();
 
             if (OSUtil.getOS().contains("Windows")) {
-                downloadCudaBackendNew(gitHubUtil);
-            } else {
+                try {
+                    downloadCudaBackendNew(gitHubUtil);
+                } catch (Exception ignored) {
+                    VerticalLayout errorBox = new VerticalLayout(container.getWidth() - 20, container.getHeight() - 20);
+                    errorBox.setMaxSize(errorBox.getWidth(), errorBox.getHeight());
+                    container.addElement(errorBox);
 
+                    TextFlowOverlay error = new TextFlowOverlay("Error occurred while fetching update. Please try updating at a later point.", errorBox.getWidth(), errorBox.getHeight());
+                    error.setTextAlignment(TextAlignment.CENTER);
+                    error.setMaxSize(error.getWidth(), error.getHeight());
+                    error.setTextFillColor(Color.RED);
+                    errorBox.addElement(error);
+                }
+            } else {
+                downloadVulkanBackendNew(gitHubUtil, null);
             }
         });
 

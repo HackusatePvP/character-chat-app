@@ -1,9 +1,10 @@
 package me.piitex.app.backend;
 
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import org.jetbrains.annotations.Nullable;
 import me.piitex.app.App;
 import me.piitex.os.configurations.InfoFile;
-import me.piitex.engine.loaders.ImageLoader;
 import me.piitex.engine.overlays.ImageOverlay;
 
 import java.io.File;
@@ -141,7 +142,7 @@ public class User {
         }
 
 
-        ImageLoader loader = new ImageLoader(file);
+        ImageLoader loader = new BaseImageLoader(file);
         loader.setWidth(width);
         loader.setHeight(height);
 

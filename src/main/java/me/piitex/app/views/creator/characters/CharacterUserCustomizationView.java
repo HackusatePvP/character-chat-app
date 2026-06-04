@@ -16,7 +16,8 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.containers.TileContainer;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.image.BaseImageLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import me.piitex.os.configurations.InfoFile;
 import org.json.JSONObject;
@@ -48,7 +49,7 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
         root.setAlignment(Pos.CENTER);
         addProperties("progress", "User");
 
-        ScrollContainer scrollContainer = new ScrollContainer(root, width, height);
+        ScrollContainer scrollContainer = new ScrollContainer(root, width - 15, height - 40);
         scrollContainer.setHorizontalScroll(false);
         scrollContainer.setScrollWhenNeeded(false);
         scrollContainer.setMaxSize(width, height);
@@ -112,7 +113,7 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
             tempLore.clear();
             userDisplayInput.setCurrentText(user.getDisplayName());
             userPersonaInput.setCurrentText(user.getPersona());
-            userImage.setImage(new ImageLoader(new File(user.getIconPath())));
+            userImage.setImage(new BaseImageLoader(new File(user.getIconPath())));
             loreLayout.removeAllElements();
             loreItems.forEach((s, s2) -> loreLayout.addElement(buildLoreEntry(s, s2)));
         });
@@ -183,7 +184,7 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
                         tempLore.clear();
                         userDisplayInput.setCurrentText(displayName);
                         userPersonaInput.setCurrentText(persona);
-                        userImage.setImage(new ImageLoader(file));
+                        userImage.setImage(new BaseImageLoader(file));
                         loreLayout.removeAllElements();
                         loreItems.forEach((s, s2) -> loreLayout.addElement(buildLoreEntry(s, s2)));
                     } catch (ImageProcessingException | IOException e) {
@@ -266,7 +267,7 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
             image = new File(App.getExecutedDirectory(), "icons/character.png");
         }
 
-        ImageLoader imageLoader = new ImageLoader(image);
+        ImageLoader imageLoader = new BaseImageLoader(image);
 
         imageLoader.setWidth(imageSize);
         imageLoader.setHeight(imageSize);
@@ -284,7 +285,7 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
             if (file != null && !file.isDirectory() && file.exists()) {
 
                 App.logger.info("Updating image to '{}'", file.getAbsoluteFile());
-                ImageLoader newImage = new ImageLoader(file);
+                ImageLoader newImage = new BaseImageLoader(file);
                 newImage.setWidth(imageSize);
                 newImage.setHeight(imageSize);
                 userImage.setImage(newImage);
@@ -297,7 +298,7 @@ public class CharacterUserCustomizationView extends EmptyContainer  {
         ButtonOverlay reset = new ButtonBuilder("rst").setText("Reset Image").addStyle(Styles.FLAT).build();
         layout.addElement(reset);
         reset.onClick(_ -> {
-            ImageLoader loader = new ImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
+            ImageLoader loader = new BaseImageLoader(new File(App.getExecutedDirectory(), "icons/character.png"));
             userImage.setImage(loader);
             infoFile.set("user-icon-path", loader.getFile().getAbsolutePath());
         });

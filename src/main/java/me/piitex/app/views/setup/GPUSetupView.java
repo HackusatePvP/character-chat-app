@@ -5,7 +5,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import me.piitex.app.App;
 import me.piitex.app.backend.server.DeviceProcess;
-import me.piitex.app.backend.server.ServerSettings;
+import me.piitex.app.configuration.ServerSettings;
 import me.piitex.app.configuration.AppSettings;
 import me.piitex.app.views.Positions;
 import me.piitex.engine.layouts.VerticalLayout;
@@ -63,6 +63,12 @@ public class GPUSetupView extends VerticalLayout {
         backendBox.addElement(backendSelection);
         backendSelection.onItemSelect(event -> {
             settings.setBackend(event.getNewValue());
+
+            try {
+                new DeviceProcess(event.getNewValue());
+            } catch (IOException e) {
+                App.logger.error("Could not load devices for '" + event.getNewValue() + "'!", e);
+            }
         });
 
         VerticalLayout gpuBox = new VerticalLayout(-1, -1);

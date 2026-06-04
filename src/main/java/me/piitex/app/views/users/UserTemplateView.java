@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import me.piitex.app.App;
 import me.piitex.app.backend.User;
@@ -23,7 +24,8 @@ import me.piitex.engine.containers.ScrollContainer;
 import me.piitex.engine.layouts.FlowLayout;
 import me.piitex.engine.layouts.HorizontalLayout;
 import me.piitex.engine.layouts.VerticalLayout;
-import me.piitex.engine.loaders.ImageLoader;
+import me.piitex.engine.loaders.FontLoader;
+import me.piitex.engine.loaders.image.ImageLoader;
 import me.piitex.engine.overlays.*;
 import org.apache.commons.io.FileUtils;
 import org.kordamp.ikonli.material2.Material2AL;
@@ -58,21 +60,34 @@ public class UserTemplateView extends EmptyContainer {
         root.addElement(sidebarView);
         root.setSpacing(35);
 
-        if (App.getInstance().isLoading()) {
-            root.addElement(new LoadingView("Loading data...", root.getWidth(), 650));
-            App.getThreadPoolManager().submitSchedule(() -> {
-                boolean loading = App.getInstance().isLoading();
-                while (loading) {
-                    loading = App.getInstance().isLoading();
-                    if (!loading) break;
-                }
-                Platform.runLater(() -> {
-                    root.removeElement(1);
-                    buildUsers();
-                });
-            }, 1, TimeUnit.SECONDS);
+        if (!App.getInstance().getUserTemplates().isEmpty()) {
+            if (App.getInstance().isLoading()) {
+                root.addElement(new LoadingView("Loading data...", root.getWidth(), 650));
+                App.getThreadPoolManager().submitSchedule(() -> {
+                    boolean loading = App.getInstance().isLoading();
+                    while (loading) {
+                        loading = App.getInstance().isLoading();
+                        if (!loading) break;
+                    }
+                    Platform.runLater(() -> {
+                        root.removeElement(1);
+                        buildUsers();
+                    });
+                }, 1, TimeUnit.SECONDS);
+            } else {
+                buildUsers();
+            }
         } else {
-            buildUsers();
+            VerticalLayout layout = new VerticalLayout(appSettings.getWidth() - Positions.SIDEBAR_WIDTH - 25, -1);
+            layout.setMaxSize(layout.getWidth(), layout.getHeight());
+            layout.setSpacing(20);
+            layout.setAlignment(Pos.CENTER);
+            layout.addStyle(Styles.BORDER_DEFAULT);
+            root.addElement(layout);
+
+            TextOverlay body = new TextOverlay("Create your first user in the creator page.");
+            body.setFont(new FontLoader(Font.getDefault(), 24));
+            layout.addElement(body);
         }
     }
 
@@ -102,7 +117,7 @@ public class UserTemplateView extends EmptyContainer {
             imageWidth = 256;
             imageHeight = 256;
             cardWidth = 280;
-            cardHeight = 380;
+            cardHeight = 350;
         }
         body.setScrollWhenNeeded(false);
         body.setHorizontalScroll(false);
@@ -119,16 +134,11 @@ public class UserTemplateView extends EmptyContainer {
             CardContainer card = new CardContainer(0,0, cardWidth, cardHeight);
             card.setMaxSize(cardWidth, cardHeight);
 
-            VerticalLayout displayBox = new VerticalLayout(0, 330);
+            VerticalLayout displayBox = new VerticalLayout(0, cardHeight - 50);
             displayBox.setSpacing(15);
             displayBox.setAlignment(Pos.TOP_CENTER);
 
-            TextOverlay helper = new TextOverlay("Click to chat");
-            helper.setUnderline(true);
-            displayBox.addElement(helper);
-
             ContextMenu contextMenu = new ContextMenu();
-
             MenuItem edit = new MenuItem("Edit");
             edit.setOnAction(_ -> editUser(user));
             MenuItem copy = new MenuItem("Copy");
@@ -270,7 +280,7 @@ public class UserTemplateView extends EmptyContainer {
 
             // Cleanup image usage
             VerticalLayout verticalLayout = (VerticalLayout) card.getBody();
-            ImageOverlay imageOverlay = (ImageOverlay) verticalLayout.getElementAt(1);
+            ImageOverlay imageOverlay = (ImageOverlay) verticalLayout.getElementAt(0);
 
             // When setting to null the engine will dispose of the image and the JVM will call gc.
             imageOverlay.setImage(null);
@@ -281,9 +291,10 @@ public class UserTemplateView extends EmptyContainer {
             App.getThreadPoolManager().submitSchedule(() -> {
                 try {
                     App.logger.info("Removing image from cache '{}'", user.getIconPath());
-                    ImageLoader.imageCache.remove(user.getIconPath()); // Clear image from cache.
+                    ImageLoader.clearCache();
                     App.logger.info("Deleting User: {}", user.getId());
                     FileUtils.deleteDirectory(user.getUserDirectory());
+                    App.getInstance().getUserTemplates().remove(user.getId());
                 } catch (IOException e) {
                     App.logger.error("Could not delete directory!", e);
                 }
