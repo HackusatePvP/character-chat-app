@@ -229,8 +229,8 @@ public class ServerProcess {
         if (VRAM_PER_LAYER_MIB > 0.0) {
             layers = (int) Math.floor(LAYER_ALLOC_BUDGET / VRAM_PER_LAYER_MIB);
         } else {
-            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to 0.");
-            layers = 0;
+            App.logger.warn("VRAM per layer (dataPerLayer) is 0.0, defaulting layers to {}.", model.getSettings().getTotalLayers());
+            layers = model.getSettings().getTotalLayers();
         }
 
         // Cap the offloaded layers
@@ -321,14 +321,14 @@ public class ServerProcess {
                 Thread.sleep(100); // Wait for 100 milliseconds before checking the file again
                 try (Scanner scanner = new Scanner(new FileInputStream(output))) {
                     while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine().substring(15);
+                        String line = scanner.nextLine();
                         if (line.contains("cleaning up before exit...") || line.contains("failed to load model") || line.contains("error while handling") || line.startsWith("error:") || line.startsWith("ROCm error:")) {
                             App.logger.error("ERROR: Could not start backend server.");
                             error = true;
                             process.destroy();
                             break;
                         }
-                        if (line.contains("starting the main loop") || line.contains("model loaded")) {
+                        if (line.contains("starting the main loop") || line.contains("model loaded") || line.contains("server is listening on")) {
                             App.logger.info("Backend server stated!");
                             started = true;
                             break;

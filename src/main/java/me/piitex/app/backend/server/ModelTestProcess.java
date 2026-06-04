@@ -191,16 +191,19 @@ public class ModelTestProcess {
         try (Scanner scanner = new Scanner(new FileInputStream(output))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                line = line.substring(15);
+                if (line.contains(" ")) {
+                    line = line.split(" ", 2)[1];
+                }
+                line = line.replace("I ", "").trim();
                 if (line.contains("cleaning up before exit...") || line.contains("failed to load model") || line.contains("error while handling") || line.startsWith("error:") || line.startsWith("ROCm error:")) {
                     App.logger.error("ERROR: Could not start backend server.");
                     error = true;
                     break;
                 }
                 if (line.startsWith("print_info: n_layer") && model.getSettings().getTotalLayers() == 0) {
-                    line = line.split("=")[1].trim();
-                    App.logger.info("Total Model Layers: {}", line);
-                    model.getSettings().setTotalLayers(Integer.parseInt(line));
+                    String layers = line.substring(15).split("=")[1].trim();
+                    App.logger.info("Total Model Layers: {}", layers);
+                    model.getSettings().setTotalLayers(Integer.parseInt(layers));
                 }
                 if (line.contains("common_memory_breakdown_print:") && line.contains("|") && line.contains("=")) {
                     String[] parts = line.split("\\|");
@@ -268,10 +271,12 @@ public class ModelTestProcess {
             if (computeBufferMiB > 0.0) {
                 model.getSettings().setComputeBufferSize(computeBufferMiB);
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             error = true;
-            stop();
+            App.logger.error("Err while testing model.", e);
         }
+
+        App.logger.info("Model data processed!");
         stop();
     }
 
